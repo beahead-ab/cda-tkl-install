@@ -128,10 +128,14 @@ Koppla in Stream Deck i en av de blå USB 3-portarna. Ställverket kopplar upp d
 både när Pi:n startar och när Stream Deck kopplas in senare. Ingen dialog behövs, eftersom
 installationen har sagt åt Chromium att ställverket får använda Elgatos enheter.
 
+- Flera deck kan sitta i samtidigt, till exempel ett XL och två MK.2. Varje deck känns igen på sitt
+  serienummer och visar sin egen layout.
 - Knapparna visar plupparna och driftknapparna med samma färger som på skärmen.
-- **Koppla bort** under menyn **Stream Deck** gör att den förblir bortkopplad på den här Pi:n tills
-  man väljer **Anslut** igen.
-- Layouten redigeras under **Stream Deck → Layout**.
+- **Koppla bort** under menyn **Stream Deck** gör att decken förblir bortkopplade på den här Pi:n
+  tills man väljer **Anslut** igen.
+- Layouten för varje deck redigeras under **Stream Deck → Layout**. Under **Alla deck** visar **Visa
+  vilket deck** namnet på deckets knappar, och **Exportera** och **Importera …** flyttar en layout
+  som fil från en annan dator.
 
 ## 8. Använda ställverket
 

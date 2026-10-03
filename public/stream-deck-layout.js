@@ -7,7 +7,9 @@ export const SYSTEM_KEYS=[
   {id:'all-stop',title:'Alla signaler i stopp'},
   {id:'reset-ais',title:'Återställ stopp'},
   {id:'panel-reset',title:'Återställ panel',caption:'håll 1 s'},
-  {id:'cancel',title:'Avbryt val'}
+  {id:'cancel',title:'Avbryt val'},
+  // Not on the automatic layout: placed by hand where the rangerbangård is run from.
+  {id:'yard-authority',title:'Styra RBG',optional:true}
 ];
 export const COLORS={background:'#141413',free:'#d8d6cc',route:'#67df8d',held:'#ecc074',occupied:'#ff6067',choice:'#fff5bd',destination:'#9ad0ff',preparing:'#cbb876',text:'#efefed',muted:'#7d8791'};
 const collator=new Intl.Collator('sv',{numeric:true});
@@ -16,7 +18,7 @@ export function orderPluppar(pluppar){
 }
 export function buildPages(pluppar,keyCount,lines=[]){
   const ordered=orderPluppar(pluppar),pages=[];let i=0;
-  const first=SYSTEM_KEYS.map(k=>({type:'system',...k}));
+  const first=SYSTEM_KEYS.filter(k=>!k.optional).map(({optional,...k})=>({type:'system',...k}));
   // One departure and one arrival key per line toward a neighbouring station.
   for(const line of lines)for(const role of ['departure','arrival'])if(first.length<keyCount)first.push({type:'train',role,lineId:line.id,neighborId:line.neighborId,neighborName:line.neighborName,neighborCode:line.neighborCode||''});
   while(first.length<keyCount&&i<ordered.length)first.push({type:'plupp',...ordered[i++]});
@@ -33,13 +35,15 @@ export function pluppSpec(key,classes,phase){
     dim:has('choice-disabled')||has('unavailable'),blink:has('route-preparing'),blocked:has('line-is-blocked')
   };
 }
-export function systemSpec(key,{stopAll=false,chosen=false,page=0,pages=1,remote=false}={}){
+export function systemSpec(key,{stopAll=false,chosen=false,page=0,pages=1,remote=false,yard=null}={}){
   const base={kind:'system',id:key.id,title:key.title,lines:splitLabel(key.title),caption:key.caption||'',fill:'',ring:'',dim:false,blink:false,blocked:false};
   if(key.id==='page')return {...base,title:`Sida ${page+1}/${pages}`,lines:['Sida',`${page+1} / ${pages}`],dim:pages<2};
   if(key.id==='all-stop')return {...base,fill:stopAll?COLORS.occupied:'',caption:stopAll?'aktiv':''};
   if(key.id==='reset-ais')return {...base,dim:!stopAll};
   if(key.id==='cancel')return {...base,dim:!chosen};
   if(key.id==='panel-reset')return {...base,dim:remote};
+  // Styra RBG: plain while TKL controls the yard, struck through while the ranger does.
+  if(key.id==='yard-authority')return {...base,lines:['Styra','RBG'],strike:!!yard?.delegated,caption:yard?.delegated?'RBG styr':'',dim:!yard||!yard.allowed};
   return base;
 }
 export function splitLabel(text){

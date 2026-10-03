@@ -146,7 +146,17 @@ const server = http.createServer(async (req, res) => {
     const data = await body(req,url.pathname==='/api/timetable-import/save'?2*1024*1024:65536);
     if(url.pathname.startsWith('/api/timetable-import/')){const command=url.pathname.slice('/api/timetable-import/'.length);if(!['manual','edit','append','save','sheet','activate','discard','select'].includes(command))return json(res,{error:'Okänd tidtabellsåtgärd'},404);return json(res,timetableImport[command](data));}
     if(url.pathname.startsWith('/api/bindings/')){const command=url.pathname.slice('/api/bindings/'.length);if(!['save','discard','restore','activate'].includes(command))return json(res,{error:'Okänd driftinställning'},404);const result=bindings[command](data);engine.log('bindings',command==='activate'?'Driftprofil version '+result.activeVersion+' aktiverad. AIS kvarstår, alla rapporter läses in på nytt.':'Driftinställningarnas utkast uppdaterat.');dirty=true;return json(res,result);}
-    if(url.pathname.startsWith('/api/streamdeck/')){const command={save:'save',activate:'activate',discard:'discard',reset:'reset'}[url.pathname.slice('/api/streamdeck/'.length)];if(!command)return json(res,{error:'Okänd Stream Deck-åtgärd'},404);const result=streamDeckLayouts[command](data);dirty=true;if(command==='activate')engine.log('streamdeck','Stream Deck-layout version '+result.activeVersion+' aktiverad.');if(command==='reset')engine.log('streamdeck','Stream Deck använder standardlayouten.');return json(res,result);}
+    if(url.pathname.startsWith('/api/streamdeck/')){
+      const command=url.pathname.slice('/api/streamdeck/'.length);
+      if(!['seen','save','activate','discard','reset','rename','copy','remove'].includes(command))return json(res,{error:'Okänd Stream Deck-åtgärd'},404);
+      const decks=streamDeckLayouts.data.decks,before=typeof data?.serial==='string'&&Object.hasOwn(decks,data.serial)?decks[data.serial]:null,result=streamDeckLayouts[command](data);dirty=true;
+      const name=(Object.hasOwn(result.decks,data.serial)?result.decks[data.serial].name:before?.name)||'Stream Deck';
+      if(command==='seen'&&!before)engine.log('streamdeck',name+' känns igen för första gången.');
+      if(command==='activate')engine.log('streamdeck','Stream Deck-layout för '+name+' version '+result.decks[data.serial].activeVersion+' aktiverad.');
+      if(command==='reset')engine.log('streamdeck',name+' använder standardlayouten.');
+      if(command==='remove')engine.log('streamdeck',name+' är glömt.');
+      return json(res,result);
+    }
     if(url.pathname==='/api/destinations'){const result=destinations.save(data,trainMeet.context?.stations||[]);dirty=true;return json(res,result);}
     if(url.pathname.startsWith('/api/trainmeet/')){const command={configure:'configure',pair:'pair',refresh:'refresh',disconnect:'disconnect',stations:'stations','operator-name':'setOperatorName',clearance:'clearance',movement:'movement'}[url.pathname.slice('/api/trainmeet/'.length)];if(!command)return json(res,{error:'Okänd TrainMeet-åtgärd'},404);return json(res,await trainMeet[command](data));}
     // On a Raspberry Pi the panel can start cda-tkl-update.service (allowed for the cda-tkl

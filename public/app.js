@@ -19,7 +19,7 @@ import { createTelegramRecorder } from './telegram-recorder.js';
 import { createTrainMeet } from './trainmeet.js';
 import {createClearance} from './clearance.js';
 import {createStreamDeck} from './stream-deck.js';
-import {createStreamDeckEditor} from './stream-deck-editor.js';
+import {createStreamDeckAdmin} from './stream-deck-admin.js';
 import { createModelClock } from './model-clock.js';
 import { createFeedback } from './feedback.js';
 import { createOperatingControls } from './operating-controls.js';
@@ -57,7 +57,7 @@ const routeTargets=createRouteTargets({load:async(from,kind)=>{
   if(!response.ok)throw Error('Mål kunde inte kontrolleras.');
   return response.json();
 },onChange:()=>paint()});
-let currentPage='panel',appMenu,contextDialog,panelConsole,panelEvents,panelHead,timetableImport,signalControls,chosenKind=null,clearanceView,streamDeck,streamDeckEditor;
+let currentPage='panel',appMenu,contextDialog,panelConsole,panelEvents,panelHead,timetableImport,signalControls,chosenKind=null,clearanceView,streamDeck,streamDeckAdmin;
 const pageFromHash=()=>{
   if(location.hash==='#tools/zoom')history.replaceState(null,'','#tools/appearance');
   if(location.hash==='#tools')history.replaceState(null,'','#tools/appearance');
@@ -539,7 +539,7 @@ function renderPanel() {
   trainMeet?.update(state.trainMeet,online,state.timetableImport,{routes:state.routes||[]});
   clearanceView?.update(state.trainMeet,online);
   streamDeck?.update();
-  if(state.streamDeck)streamDeckEditor?.update(state.streamDeck,online);
+  if(state.streamDeck)streamDeckAdmin?.update(state.streamDeck);
   timetableImport?.update(state.timetableImport,online);
   if(chosen && (!usable() || state.controls?.mode==='remote')) clearChoice(false);
   const c = $('connection'); setText(c,!online ? 'Kontakt med kärnan saknas' : state.storageFault ? 'Lagringsfel · spärrad' : state.connection === 'connected' ? (state.connectionInfo?.mode==='simulator'?'Simulator ansluten':'LocoNet ansluten') : (state.connectionInfo?.mode==='simulator'?'Simulator frånkopplad':'LocoNet frånkopplad'));
@@ -639,8 +639,8 @@ async function start() {
   signalControls=signalRouteControls(config,registry,signalEndpoints);
   buildPlan();
   const deckPluppar=()=>buttons.filter(b=>b.isRoute).map(b=>({id:b.id,kind:b.kind,node:b.g,label:label(b.id)}));
-  streamDeck=createStreamDeck({pluppar:deckPluppar,choose,clearChoice,api,message,state:()=>state,online:()=>online&&state?.connection==='connected',chosen:()=>chosen,trainMeet:()=>state?.trainMeet,layout:()=>state?.streamDeck});
-  streamDeckEditor=createStreamDeckEditor({api,message,pluppar:deckPluppar,lines:()=>state?.trainMeet?.context?.lines||[],deck:streamDeck});
+  streamDeck=createStreamDeck({pluppar:deckPluppar,choose,clearChoice,api,message,state:()=>state,online:()=>online&&state?.connection==='connected',chosen:()=>chosen,trainMeet:()=>state?.trainMeet,layout:()=>state?.streamDeck,onChange:()=>streamDeckAdmin?.devices()});
+  streamDeckAdmin=createStreamDeckAdmin({pluppar:deckPluppar,lines:()=>state?.trainMeet?.context?.lines||[],context:()=>state?.trainMeet?.context||null,deck:streamDeck});
   trainInformation=createTrainInformation({catalog:config.trainFields,controls:layout.controls,plan:$('track-plan'),displayName,openSource,onOpen:()=>openTools('train-information')});
   $('close-inspector').onclick=()=>closeInspector();
   $('dismiss-message').onclick=()=>message('');

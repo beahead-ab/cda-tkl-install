@@ -39,12 +39,6 @@ export function lineActions(state,direction){
   if(state==='occupied')return direction==='in'?['arrive']:[];
   return [];
 }
-const optional=(v,max)=>v==null?'':text(String(v),max)?String(v):fail('Ogiltigt trafikpass från TrainMeet.',503);
-function readShift(value){
-  if(value==null)return null;
-  if(!record(value)||!identity(value.shift_id)||!text(value.operator_name,80)||!value.operator_name.trim())fail('Ogiltigt trafikpass från TrainMeet.',503);
-  return {id:value.shift_id,operatorName:value.operator_name,terminalName:optional(value.terminal_name,80),status:optional(value.status,40),startedAt:optional(value.started_at,64),endedAt:optional(value.ended_at,64),note:optional(value.handover_note,1000)};
-}
 // Direction of each movement at the station, read from the service stop lists:
 // the stop before and after this station on the same service. Auxiliary data,
 // so a malformed row is skipped rather than failing the whole read.
@@ -85,27 +79,27 @@ function readLines(display,context,station,names,codes){
 }
 
 // HTTP-v1 adapter for the reviewed TrainMeet contract: it reads the station
-// context and acts as a TKL terminal for shifts and clearances, the same station
-// commands a TMBox uses. It deliberately has no reference to Engine, Field or
+// context and acts as a TKL terminal for clearances and movements, the same station
+// commands a TMBox uses. Like an assigned box it is in service while paired: no
+// traffic shift is started. It deliberately has no reference to Engine, Field or
 // detector state: a clearance is never a route, a lock or a signal aspect.
 export class TrainMeet extends EventEmitter {
   constructor({storage,origin='',fetcher=fetch,now=Date.now,changeFeed=true}) {
     super();this.storage=storage;this.fetcher=fetcher;this.now=now;this.changeFeed=changeFeed;this.feed=null;this.feedRetryAt=0;this.urgent=false;this.sessionId=randomUUID();this.revision=0;this.busy=false;this.current=null;this.lastAttempt=0;this.context=null;this.status='unconfigured';this.error='';this.updatedAt=0;
     this.origin=serverOrigin(origin);this.originLocked=!!origin;
-    this.data=storage.load('trainmeet.json',{version:1,clientId:'cda-tkl',stationId:'',token:'',origin:this.origin,operatorName:'',pairings:{}});
+    this.data=storage.load('trainmeet.json',{version:1,clientId:'cda-tkl',stationId:'',token:'',origin:this.origin,pairings:{}});
     // One saved pairing per server, each key bound to its own origin. Older files hold only the active one.
     const pairings=this.data.pairings??(this.data.token&&text(this.data.origin,512)?{[this.data.origin]:{stationId:this.data.stationId,token:this.data.token}}:{});
     if(!record(pairings)||Object.entries(pairings).some(([o,p])=>!text(o,512)||!record(p)||!text(p.stationId,128)||!text(p.token,4096)||!p.token))throw Error('Ogiltig sparad TrainMeet-anslutning.');
     this.data={...this.data,pairings:Object.fromEntries(Object.entries(pairings).map(([o,p])=>[o,{stationId:p.stationId,token:p.token}]))};
-    // A paired station is in service, like an assigned box. Only the name shown to the neighbours is a setting.
-    this.autoShiftAt=0;this.autoShiftError='';const operatorName=typeof this.data.operatorName==='string'?this.data.operatorName:(this.data.autoShift?.operatorName||'');
-    if(!text(operatorName,80))throw Error('Ogiltig sparad TrainMeet-anslutning.');const {autoShift:_legacy,...rest}=this.data;this.data={...rest,operatorName};
+    // Older files carry a shift operator name; there are no shifts any more.
+    {const {autoShift:_auto,operatorName:_name,...rest}=this.data;this.data=rest;}
     if(this.data.version!==1||!validClientId(this.data.clientId)||!text(this.data.stationId,128)||!text(this.data.token,4096)||!text(this.data.origin,512))throw Error('Ogiltig sparad TrainMeet-anslutning.');
     if(this.origin&&this.data.token&&this.data.origin!==this.origin)throw Error('TrainMeet-adressen har ändrats. Flytta inte en gammal parkopplingsnyckel till en annan server.');
     if(!this.origin)this.origin=serverOrigin(this.data.origin);
     if(this.origin)this.status=this.data.token?'disconnected':'unpaired';
   }
-  view(){return {sessionId:this.sessionId,revision:this.revision,origin:this.origin,originLocked:this.originLocked,clientId:this.data.clientId,status:this.status,busy:this.busy,paired:!!this.data.token,stationId:this.data.stationId,error:this.error,updatedAt:this.updatedAt,stale:this.status!=='connected'||this.now()-this.updatedAt>15000,contract:'TrainMeet HTTP v1 · TKL-terminal',savedServers:Object.entries(this.data.pairings).map(([origin,p])=>({origin,stationId:p.stationId})),operatorName:this.data.operatorName,serviceError:this.autoShiftError,context:this.context,
+  view(){return {sessionId:this.sessionId,revision:this.revision,origin:this.origin,originLocked:this.originLocked,clientId:this.data.clientId,status:this.status,busy:this.busy,paired:!!this.data.token,stationId:this.data.stationId,error:this.error,updatedAt:this.updatedAt,stale:this.status!=='connected'||this.now()-this.updatedAt>15000,contract:'TrainMeet HTTP v1 · TKL-terminal',savedServers:Object.entries(this.data.pairings).map(([origin,p])=>({origin,stationId:p.stationId})),context:this.context,
     // How old the clock reading is now; the panel runs the meet clock on from there.
     clockAgeMs:Number.isFinite(this.context?.clock?.readAt)?Math.max(0,this.now()-this.context.clock.readAt):null};}
   check(data){if(data.sessionId!==this.sessionId||data.revision!==this.revision)fail('TrainMeet-anslutningen har ändrats. Läs in senaste läget.',409);if(this.busy)fail('En TrainMeet-begäran pågår.',409);}
@@ -121,7 +115,7 @@ export class TrainMeet extends EventEmitter {
     const saved=origin?this.data.pairings[origin]:null;
     const next={...this.data,origin,clientId,stationId:saved?saved.stationId:'',token:saved?saved.token:''};
     try{this.storage.save('trainmeet.json',next);}catch{fail('Anslutningen kunde inte sparas. Den tidigare inställningen är kvar.',507);}
-    this.data=next;this.origin=origin;this.context=null;this.updatedAt=0;this.lastAttempt=0;this.autoShiftAt=0;this.status=!origin?'unconfigured':saved?'disconnected':'unpaired';this.error='';this.revision++;this.emit('change');return this.view();
+    this.data=next;this.origin=origin;this.context=null;this.updatedAt=0;this.lastAttempt=0;this.status=!origin?'unconfigured':saved?'disconnected':'unpaired';this.error='';this.revision++;this.emit('change');return this.view();
   }
   async request(path,{token='',payload,denied=null}={}) {
     if(!this.origin)fail('TrainMeet-server är inte angiven för den här installationen.');
@@ -132,7 +126,9 @@ export class TrainMeet extends EventEmitter {
     if(!response.ok){
       // The server explains refused actions in plain language; pass that on
       // unchanged, but never a body that is not a short JSON message.
-      let detail='';try{const body=JSON.parse(raw);if(record(body)&&text(body.message,300)&&body.message.trim())detail=body.message;}catch{}
+      let detail='';try{const body=JSON.parse(raw);if(record(body)&&text(body.message,300)&&body.message.trim())detail=body.message;
+        // Servers before the shift-free TKL contract refuse steps without a traffic shift.
+        if(record(body)&&body.error==='tkl_shift_not_started')detail='TrainMeet-servern är för gammal: den kräver trafikpass. Uppdatera TrainMeet Server.';}catch{}
       // Refusals answer 409 and upstream failures 503, never 502 or 504: the public
       // address sits behind Cloudflare, which swaps those two for its own HTML page
       // and the operator would never see the explanation.
@@ -159,14 +155,13 @@ export class TrainMeet extends EventEmitter {
     const connections=context.connection_states.map(c=>{if(!identity(c.id)||!text(c.state))fail('Ogiltigt förbindelseläge.',503);return {id:c.id,state:c.state,trainNumber:text(c.train_number)?c.train_number:''};});
     const lines=readLines(display,context,station,new Map(stations.map(s=>[s.id,s.name])),new Map(stations.map(s=>[s.id,s.code==null?'':String(s.code)])));
     const directions=routeDirections(display.routes,display.trains,station);
-    const shift=readShift(context.shift),previousShift=readShift(context.previous_shift);
     // Publications are immutable. Refresh dynamic data every poll and reload the
     // timetable on publication/day/station changes or an explicit refresh.
     const previous=this.context;
     const cached=!allowReset&&!reloadTimetable&&previous?.timetable&&previous.publicationId===display.publication_id&&previous.day===display.active_day&&previous.station.id===station;
     const timetable=cached?{trains:previous.trains,tracks:previous.tracks,operatingPoints:previous.operatingPoints,timetable:previous.timetable}
       :readTimetable(await this.request('/v1/timetable?station_id='+encodeURIComponent(station),{token}),{stationId:station,publicationId:display.publication_id,day:display.active_day,loadedAt:this.now()});
-    return {stations:stations.map(s=>({id:s.id,name:s.name,code:s.code==null?'':String(s.code)})),publicationId:display.publication_id,revision:display.revision,day:display.active_day,meet:text(display.meet?.name)?display.meet.name:'',station:{id:station,name:text(context.station.name)?context.station.name:station},clock:{time:clock.time,rate:clock.speed,running:clock.running,configured:clock.configured,readAt},...timetable,movements,connections,lines,directions,shift,previousShift};
+    return {stations:stations.map(s=>({id:s.id,name:s.name,code:s.code==null?'':String(s.code)})),publicationId:display.publication_id,revision:display.revision,day:display.active_day,meet:text(display.meet?.name)?display.meet.name:'',station:{id:station,name:text(context.station.name)?context.station.name:station},clock:{time:clock.time,rate:clock.speed,running:clock.running,configured:clock.configured,readAt},...timetable,movements,connections,lines,directions};
   }
   // One TrainMeet exchange at a time, so a poll and an action never interleave
   // their writes to the last good context.
@@ -192,8 +187,8 @@ export class TrainMeet extends EventEmitter {
         const response=await this.request('/v1/pair',{payload:{pairing_code:pairingCode(data.code),client_id:this.data.clientId,display_name:this.data.clientId,device_kind:'tkl_terminal'},denied:{summary:'TrainMeet godkände inte anslutningskoden.',hint:'Hämta en aktuell kod under Skärmar → Visa anslutningsuppgifter i TrainMeet.'}});
         if(response?.protocol_version!==1||response.client_id!==this.data.clientId||!text(response.access_token,4096)||!response.access_token)fail('TrainMeet lämnade ingen giltig parkopplingsnyckel.',503);
         const context=await this.read(response.access_token,data.stationId,true);
-        const next={version:1,clientId:this.data.clientId,stationId:data.stationId,token:response.access_token,origin:this.origin,operatorName:this.data.operatorName,pairings:{...this.data.pairings,[this.origin]:{stationId:data.stationId,token:response.access_token}}};
-        this.storage.save('trainmeet.json',next);this.data=next;this.context=context;this.status='connected';this.updatedAt=this.now();this.error='';this.autoShiftAt=0;this.revision++;
+        const next={version:1,clientId:this.data.clientId,stationId:data.stationId,token:response.access_token,origin:this.origin,pairings:{...this.data.pairings,[this.origin]:{stationId:data.stationId,token:response.access_token}}};
+        this.storage.save('trainmeet.json',next);this.data=next;this.context=context;this.status='connected';this.updatedAt=this.now();this.error='';this.revision++;
       }catch(e){this.status=this.data.token?'disconnected':'unpaired';this.error=e.status?e.message:'TrainMeet kunde inte anslutas. Kontrollera adress, kod och server.';throw Object.assign(Error(this.error),{status:e.status===409?409:503});}
     });
     return this.view();
@@ -224,30 +219,6 @@ export class TrainMeet extends EventEmitter {
       try{const next=await this.read(this.data.token,this.data.stationId,false,!!data);this.journalTransitions(this.context,next);this.context=next;this.updatedAt=this.now();this.status='connected';this.error='';}
       catch(e){this.status='disconnected';this.error=e.status?e.message:'TrainMeet svarar inte. Senaste uppgifter visas som gamla.';}
     });
-    // A box is simply in service while it is assigned. Keep the station manned the
-    // same way: one attempt per minute at most, never taking over another terminal.
-    if(this.status==='connected'&&this.data.token&&this.context&&!this.context.shift&&this.now()>=this.autoShiftAt)await this.autoStart();
-    return this.view();
-  }
-  async autoStart(){
-    this.autoShiftAt=this.now()+60000;
-    try{await this.startShift({sessionId:this.sessionId,revision:this.revision,operatorName:this.data.operatorName||this.data.clientId,auto:true});this.autoShiftError='';}
-    catch(e){this.autoShiftError=e.message;}
-    this.emit('change');
-  }
-  // The name the neighbours see. Our own active shift is renamed by taking it
-  // over; otherwise the next automatic start uses the new name.
-  async setOperatorName(data){
-    if(!record(data)||data.sessionId!==this.sessionId||data.revision!==this.revision)fail('TrainMeet-anslutningen har ändrats. Läs in senaste läget.',409);
-    const operatorName=typeof data.operatorName==='string'?data.operatorName.trim():'';
-    if(!text(operatorName,80))fail('Namnet får ha högst 80 tecken.');
-    const next={...this.data,operatorName};
-    try{this.storage.save('trainmeet.json',next);}catch{fail('Namnet kunde inte sparas. Det tidigare namnet är kvar.',507);}
-    this.data=next;this.autoShiftError='';this.revision++;this.emit('change');
-    if(this.data.token&&this.context?.shift&&this.context.shift.terminalName===this.data.clientId){
-      try{await this.startShift({sessionId:this.sessionId,revision:this.revision,operatorName:operatorName||this.data.clientId,takeOver:true,auto:true});}
-      catch(e){this.autoShiftError=e.message;this.emit('change');}
-    }else this.autoShiftAt=0;
     return this.view();
   }
   // A station command: post it, then read the authoritative context back before
@@ -271,11 +242,6 @@ export class TrainMeet extends EventEmitter {
       return this.view();
     });
   }
-  async startShift(data){
-    const operatorName=typeof data?.operatorName==='string'?data.operatorName.trim():'';
-    if(!operatorName||!text(operatorName,80))fail('Ange operatörens namn, högst 80 tecken.');
-    return this.command(data,()=>({path:'/v1/tkl/shift/start',payload:{station_id:this.data.stationId,operator_name:operatorName,terminal_name:this.data.clientId,take_over:data.takeOver===true},journal:`Stationen i tjänst hos TrainMeet som ${operatorName}${data.takeOver===true?' (övertaget)':''}.`}));
-  }
   async clearance(data){
     const action=data?.action,trainNumber=typeof data?.trainNumber==='string'?data.trainNumber.trim():'';
     if(!CLEARANCE_ACTIONS.includes(action))fail('Okänd klareringsåtgärd.');
@@ -283,7 +249,6 @@ export class TrainMeet extends EventEmitter {
     return this.command(data,context=>{
       const line=(context.lines||[]).find(l=>l.id===data.connectionId);
       if(!line)fail('Sträckan hör inte till stationen.',409);
-      if(!context.shift)fail('Stationen tas i tjänst hos TrainMeet inom en minut. Försök igen om en stund.',409);
       const number=action==='request'?trainNumber:line.trainNumber;
       return {path:'/v1/tkl/clearance',payload:{station_id:this.data.stationId,connection_id:line.id,action,train_number:action==='request'?trainNumber:''},journal:`Klarering ${CLEARANCE_JOURNAL[action]}${number?' · tåg '+number:''} · ${line.neighborName}.`};
     });
@@ -302,7 +267,6 @@ export class TrainMeet extends EventEmitter {
     return this.command(data,context=>{
       const train=(context.trains||[]).find(t=>t.id===movementId);
       if(!train)fail('Tågrörelsen finns inte på stationen i dag.',409);
-      if(!context.shift)fail('Stationen tas i tjänst hos TrainMeet inom en minut. Försök igen om en stund.',409);
       const current=(context.movements||[]).find(m=>m.id===movementId)||{};
       const payload={station_id:this.data.stationId,movement_id:movementId,departure:departure||current.departure||'none',arrival:arrival||current.arrival||'none',event_type:'tkl_'+(departure||arrival||'track_changed')};
       const actualTrack=track.trim()||current.track||train.track_id||'';if(actualTrack)payload.actual_track=actualTrack;
@@ -311,9 +275,6 @@ export class TrainMeet extends EventEmitter {
     });
   }
   async disconnect(data){this.check(data);
-    // Leaving the server takes our own shift out of service, best effort; open clearances may keep it.
-    const shift=this.context?.shift;
-    if(this.data.token&&shift&&shift.terminalName===this.data.clientId)await this.exclusive(async()=>{try{await this.request('/v1/tkl/shift/finish',{token:this.data.token,payload:{station_id:this.data.stationId,shift_id:shift.id,status:'closed',note:''}});this.emit('journal','Stationen ur tjänst hos TrainMeet (frånkopplad).');}catch{}});
     const pairings={...this.data.pairings};delete pairings[this.origin];const next={...this.data,token:'',stationId:'',origin:this.origin,pairings};this.storage.save('trainmeet.json',next);this.data=next;this.context=null;this.updatedAt=0;this.status=this.origin?'unpaired':'unconfigured';this.error='';this.revision++;this.emit('change');return this.view();}
   tick(){
     const paired=!!(this.origin&&this.data.token);

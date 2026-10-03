@@ -8,7 +8,7 @@ import {createAdminDialog,escapeHTML as esc} from './admin-ui.js';
 import {ACTION_TEXT,TRACK_TEXT,lineStatus,needsAttention,movementStatus,movementActions,movementDone} from './clearance-text.js';
 export function createClearance({api,message}) {
   const root=document.getElementById('clearance-tools');if(!root)return null;
-  root.innerHTML=`<p class="muted">Klarering begärs och besvaras mot grannstationerna genom TrainMeet, som en TMBox. Stationen är i tjänst hos TrainMeet så länge den är parkopplad. Ett godkännande är varken tågväg eller körsignal; de läggs som vanligt i ställverket.</p>
+  root.innerHTML=`<p class="muted">Klarering begärs och besvaras mot grannstationerna genom TrainMeet, som en TMBox. Ett godkännande är varken tågväg eller körsignal; de läggs som vanligt i ställverket.</p>
 <p id="cl-status" class="muted" role="status"></p>
 <div id="cl-lines" class="cl-lines" hidden></div>
 <section class="card cl-trains" hidden><div class="card-heading"><h3>Tågrörelser i dag</h3><span id="cl-trains-count" class="muted"></span></div><p class="muted">Anmäl uppställt och förare på plats före avgång, närmar sig och ankommit vid ankomst. Avgått och mottaget bekräftas på sträckan ovan.</p><table id="cl-trains"><thead><tr><th>Tåg</th><th>Ank</th><th>Avg</th><th>Spår</th><th>Från / till</th><th>Läge</th><th></th></tr></thead><tbody></tbody></table></section>
@@ -22,8 +22,8 @@ export function createClearance({api,message}) {
   $('trains').addEventListener('click',e=>{const button=e.target.closest('button[data-move]');if(!button)return;const [field,value]=button.dataset.move.split(':');const track=$('trains').querySelector(`input[data-track-for="${CSS.escape(button.dataset.movement)}"]`);run(async()=>{if(await call('movement',{movementId:button.dataset.movement,[field]:value,actualTrack:track?track.value.trim():''})&&track)track.value='';});});
   function controls(){
     // A poll in flight does not lock the buttons: the adapter queues a command behind it.
-    const locked=!tm||!online||busy||!tm.paired||tm.stale,noShift=!tm?.context?.shift;
-    for(const el of root.querySelectorAll('#cl-lines button,#cl-lines input,#cl-trains button,#cl-trains input'))el.disabled=locked||noShift;
+    const locked=!tm||!online||busy||!tm.paired||tm.stale;
+    for(const el of root.querySelectorAll('#cl-lines button,#cl-lines input,#cl-trains button,#cl-trains input'))el.disabled=locked;
   }
   function notify(c){
     const incoming=new Map(c.lines.filter(needsAttention).map(l=>[l.id+':'+l.trainNumber,l]));
@@ -41,9 +41,7 @@ export function createClearance({api,message}) {
   }
   function render(){
     const c=tm.context,stale=!online||tm.stale;
-    const shift=c?.shift,ours=!!shift&&shift.terminalName===tm.clientId;
-    const service=!c?'':shift?(ours?`i tjänst som ${esc(shift.operatorName)}`:`bemannad av ${esc(shift.operatorName)} via ${esc(shift.terminalName||'annan terminal')}`):'tas i tjänst inom en minut'+(tm.serviceError?' · senaste försök: '+esc(tm.serviceError):'');
-    $('status').innerHTML=!tm.paired?'Parkoppla med TrainMeet under <a href="#trainmeet">Tidtabeller → TrainMeet</a> innan stationen kan klarera tåg.':!c?'Väntar på TrainMeets stationskontext…':`${esc(c.station.name)} · ${esc(c.meet)} · ${esc(c.day)} · TrainMeet-klocka ${esc(c.clock.time.slice(0,5))} · ${service}${stale?' · <strong>kontakt saknas, gamla uppgifter</strong>':''}`;
+    $('status').innerHTML=!tm.paired?'Parkoppla med TrainMeet under <a href="#trainmeet">Tidtabeller → TrainMeet</a> innan stationen kan klarera tåg.':!c?'Väntar på TrainMeets stationskontext…':`${esc(c.station.name)} · ${esc(c.meet)} · ${esc(c.day)} · TrainMeet-klocka ${esc(c.clock.time.slice(0,5))}${stale?' · <strong>kontakt saknas, gamla uppgifter</strong>':''}`;
     $('lines').hidden=!c;root.querySelector('.cl-trains').hidden=!c;
     if(!c){lastLines=lastRows='';$('lines').innerHTML='';$('trains').querySelector('tbody').innerHTML='';controls();return;}
     const lines=c.lines.map(line=>{

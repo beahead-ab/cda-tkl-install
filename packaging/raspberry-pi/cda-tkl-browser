@@ -1,0 +1,21 @@
+#!/bin/sh
+# Opens the signal box full screen when the desktop starts, and again if Chromium is
+# closed or crashes. Started from labwc's autostart for the logged-in desktop user.
+set -eu
+exec 9>/tmp/cda-tkl-browser.lock
+flock -n 9 || exit 0
+URL=http://127.0.0.1:8910/#panel
+BROWSER=$(command -v chromium || command -v chromium-browser || true)
+[ -n "$BROWSER" ] || { echo "Chromium saknas."; exit 1; }
+wait_for_tkl() { until curl -fsS --max-time 2 -o /dev/null http://127.0.0.1:8910/api/config 2>/dev/null; do sleep 1; done; }
+wait_for_tkl
+while true; do
+  "$BROWSER" \
+    --kiosk --app="$URL" \
+    --noerrdialogs --no-first-run --disable-infobars \
+    --disable-session-crashed-bubble --disable-features=Translate \
+    --overscroll-history-navigation=0 --password-store=basic \
+    --check-for-update-interval=31536000 || true
+  sleep 2
+  wait_for_tkl
+done

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Charlottendal · TKL</title>
+  <link rel="stylesheet" href="/fonts/fonts.css"><link rel="stylesheet" href="/tokens.css"><link rel="stylesheet" href="/app.css"><link rel="stylesheet" href="/workspace.css"><link rel="stylesheet" href="/panel-fixed.css"><link rel="stylesheet" href="/admin.css"><link rel="stylesheet" href="/admin-line.css"><link rel="stylesheet" href="/station-workspace.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body class="panel-app" data-skin="original" data-page="panel" data-crossing-display="calm">
+<header class="app-header">
+  <button id="admin-nav-toggle" type="button" aria-label="Öppna sidomenyn" aria-controls="admin-sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="4" cy="10" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="16" cy="10" r="1.5"/></svg></button>
+  <a class="brand" href="#panel"><span>CHARLOTTENDAL</span></a>
+</header>
+<nav id="admin-sidebar" aria-label="Administration"></nav>
+<div id="connection" class="connection" hidden>Startar…</div>
+
+<div id="global-status" role="region" aria-label="Driftmeddelanden">
+  <div id="message" class="message" role="status" hidden><span id="message-text"></span><button id="dismiss-message" aria-label="Stäng meddelandet">Stäng</button></div>
+  <div id="ais-status" class="ais-status" hidden><span id="ais-text">AIS aktiv · alla körmedgivanden återkallade, tågvägslås behålls</span><button id="reset-ais">Återställ AIS</button></div>
+  <div id="remote-notice" class="notice" hidden>Fjärrläge · lokal tågvägsläggning och växelmanöver är spärrade. Fjärrsystem är ännu inte anslutet. Stopp och återtagning fungerar fortfarande. <a href="#panel">Till ställverket</a></div>
+  <div id="emergency-status" class="notice" role="status" hidden></div>
+</div>
+<main id="panel-view">
+  <section class="panel-shell" aria-label="Charlottendals spårplan">
+    <div id="panel-menu-slot">
+      <button id="menu-toggle" type="button" aria-label="Öppna meny" aria-controls="app-menu" aria-expanded="false" title="Meny"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="4" cy="10" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="16" cy="10" r="1.5"/></svg></button>
+    </div>
+    <div id="panel-controls-source" hidden>
+        <select id="route-mode" aria-label="Typ av tågväg"><option value="main">Huvudtågväg</option><option value="shunt">Växeltågväg</option></select>
+        <button id="all-stop" class="stop-button">Alla signaler i stopp</button>
+      <span id="selection-hint" hidden>Välj startplupp och därefter slutplupp</span><button id="clear-selection" hidden>Avbryt val · Esc</button>
+    </div>
+    <div id="panel-phone-bar" aria-hidden="true"><span class="phone-brand">CHARLOTTENDAL</span><span id="panel-phone-clock"></span><span id="panel-phone-rate"></span></div>
+    <div class="panel-scroll"><div id="plan-stage"><div id="plan-face"><svg id="track-plan" viewBox="24 128 2102 640" role="group" aria-label="Spårplan med signaler, växlar och tågvägsknappar"></svg><aside id="panel-console" aria-label="Återställning och aktuellt manöverläge"></aside></div></div></div>
+    <div id="panel-bottom">
+    <section id="trainmeet-timetable" aria-label="Tidtabell" tabindex="-1"></section>
+    <section id="panel-events" aria-label="Händelser"></section>
+    </div>
+  </section>
+</main>
+<main id="tools-view" hidden>
+  <div class="tools-heading"><h1 tabindex="-1">Verktyg</h1><a class="back-to-panel" href="#panel">Tillbaka till ställverket →</a></div>
+  <nav class="tools-sections" aria-label="Verktygsavsnitt"><a href="#tools/appearance" data-tools-section="appearance-tools">Utseende</a><a href="#tools/journal" data-tools-section="journal-tools">Händelser</a></nav>
+  <section id="traffic-tools" class="tools-section" aria-labelledby="traffic-heading">
+    <h2 id="traffic-heading">Trafik</h2>
+    <details id="route-activity" class="route-activity" hidden open><summary id="route-summary">Aktiva tågvägar</summary><div id="active-routes"></div></details>
+    <div class="work-grid"><section class="card"><div class="card-heading"><h3>Tågvägar</h3><select id="catalog-mode" aria-label="Typ av tågväg i listan"><option value="main">Huvudtågväg</option><option value="shunt">Växeltågväg</option></select></div><div id="route-catalog" class="catalog"></div></section><div id="inspector-home">
+      <section id="inspector-card" class="card inspector" aria-label="Detaljer för valt objekt" tabindex="-1"><div class="card-heading"><h3 id="inspector-heading">Detaljer</h3><button id="close-inspector" aria-label="Stäng detaljer" autofocus>Stäng</button></div><label class="inspector-picker">Visa växel<select id="inspect-turnout" aria-label="Visa växel"></select></label><div id="inspector"><p class="muted">Välj en växel här eller högerklicka på ett objekt i spårplanen.</p></div><div id="manual-feedback-host"></div></section>
+    </div></div>
+    <section id="train-information" aria-label="Tågnummer och inkommande tåg"></section>
+  </section>
+  <section id="operating-tools" class="tools-section" aria-labelledby="operating-heading">
+    <h2 id="operating-heading">Manövrer och spärrar</h2>
+    <div class="card"><div class="authority-bar"><div><strong id="control-mode">Lokal manövrering</strong><span id="mode-reason" class="muted"></span></div><button id="toggle-authority">Växla till fjärrläge</button></div><button id="emergency-cancel" class="stop-button" title="Begär stopp och återtagning. Lås släpps först när frigivningsvillkoren är uppfyllda.">Nödåterta alla</button></div>
+    <details class="card operating-tools"><summary>Spårspärrar <span id="blocked-count"></span></summary><p class="muted">En spärr hindrar nya tågvägar över spåret. En redan lagd väg stoppas med låsen kvar. Detektorns verkliga besked ändras inte.</p><div class="catalog"><label>Spårledning<select id="block-choice"></select></label><button id="toggle-block">Spärra spår</button></div><div id="blocked-list" class="field-list"></div></details>
+    <details class="card operating-tools" id="operating-controls"></details>
+    <details id="model-clock" class="card model-clock"></details>
+    <section id="clearance-tools" aria-label="Tågklarering"></section>
+  </section>
+  <section id="appearance-tools" class="tools-section" aria-labelledby="appearance-heading">
+    <h2 id="appearance-heading">Utseende och ljud</h2>
+    <div class="card appearance-controls"><label>Övergångslampor <select id="crossing-display"><option value="calm">Lugn blinkning</option><option value="steady">Fast rött sken</option></select></label><button id="sound-toggle" aria-pressed="false">Ljud av</button><span id="error-lamp" class="error-lamp" hidden>Fel</span></div>
+    <details class="card"><summary>Teckenförklaring</summary><div class="legend"><span><i class="line free"></i> Fritt</span><span><i class="line route"></i> Tågväg</span><span><i class="line occupied"></i> Belagt</span><span><i class="line held"></i> Lås kvar</span><span><i class="line unknown"></i> Okänt / ej inkopplat</span><span id="derived-indications" aria-label="Beräknade panelindikeringar"></span></div></details>
+  </section>
+  <section id="journal-tools" class="card journal tools-section" aria-labelledby="journal-heading"><div class="card-heading"><h2 id="journal-heading">Händelser</h2><span class="muted" id="event-status">Väntar på rapporter</span></div><div id="events"></div></section>
+  <section id="streamdeck-tools" class="tools-section" aria-labelledby="streamdeck-heading">
+    <div class="admin-workspace-heading"><h1 id="streamdeck-heading" tabindex="-1">Elgato Stream Deck</h1></div>
+    <section class="card" id="streamdeck-card"><div class="card-heading"><span class="admin-scope">Den här enheten</span></div><p id="streamdeck-status"></p><p id="streamdeck-origin" class="muted"></p><div class="admin-actions"><button id="streamdeck-connect" type="button">Anslut Stream Deck</button><button id="streamdeck-disconnect" type="button" hidden>Koppla bort</button></div></section>
+    <section class="card"><h3>Så här kör du</h3><ol class="streamdeck-steps">
+      <li><strong>Rätt webbläsare.</strong> Öppna panelen i Chrome, Edge eller Chromium. Safari och Firefox saknar WebHID och kan inte nå Stream Deck.</li>
+      <li><strong>Rätt adress.</strong> Lokalt på Macen: <code>http://127.0.0.1:8910</code> eller <code>http://localhost:8910</code>. Webbdriften: <code>https://cda-tkl.trainmeet.app</code>. Andra adresser över vanlig HTTP, till exempel en Pi över nätet, räknas inte som säkra och får inte öppna enheten.</li>
+      <li><strong>Elgatos program avslutat.</strong> Stäng Elgato Stream Deck på Macen innan du ansluter, annars ritar två program på samma knappar.</li>
+      <li><strong>Anslut.</strong> Sätt i Stream Deck och tryck Anslut Stream Deck; välj enheten i webbläsarens lista. Därefter öppnas den automatiskt varje gång panelen laddas i den här webbläsaren. Koppla bort stänger av det.</li>
+      <li><strong>På träffens Raspberry Pi</strong> körs Chromium i helskärm mot <code>http://127.0.0.1:8910</code> med en udev-regel för enheten; det ingår i Pi-installationen.</li>
+    </ol></section>
+    <section class="card"><h3>Knapparna</h3><p class="muted">Ett tryck gör samma sak som ett klick på spårplanen, med samma spärrar. Sida 1 börjar med driftknapparna; när TrainMeet är parkopplad följer en avgångs- och en ankomstknapp per sträcka, där kort tryck tar nästa steg i klareringen och långt tryck återtar eller nekar. Därefter kommer plupparna, linjer före spår. Återställ panel kräver att knappen hålls in en sekund.</p><div id="streamdeck-pages" class="muted"></div></section>
+    <section class="card" id="streamdeck-layout-card"><div class="card-heading"><span class="admin-scope">Hela anläggningen</span><h3>Knapplayout</h3></div><p id="streamdeck-layout-summary" class="muted"></p><div class="admin-actions"><button id="streamdeck-layout-edit" type="button">Redigera layout</button><button id="streamdeck-layout-reset" type="button">Återgå till standard</button></div></section>
+  </section>
+  <section id="streamdeck-layout-editor" hidden></section>
+</main>
+<main id="trainmeet-view" hidden><div class="tools-heading"><h1 tabindex="-1">TrainMeet</h1><span class="admin-scope">Hela anläggningen</span><a class="back-to-panel" href="#panel">Tillbaka till ställverket →</a></div><p class="muted">Anslut till träffen och läs Charlottendals tågrörelser.</p><section id="trainmeet" class="card"></section></main>
+<main id="import-view" hidden><div class="tools-heading"><h1 tabindex="-1">Tidtabeller</h1><span class="admin-scope">Hela anläggningen</span><a class="back-to-panel" href="#panel">Tillbaka till ställverket →</a></div><section id="timetable-settings" class="card"></section><div id="timetable-import"></div></main>
+<main id="admin-view" hidden><p class="muted">Läser det kompletta källregistret…</p></main>
+<main id="advanced-view" hidden>
+  <div class="tools-heading"><h1 tabindex="-1">Avancerat</h1><a class="back-to-panel" href="#panel">Tillbaka till ställverket →</a></div>
+  <p class="muted">Verktyg för källgranskning, införande och felsökning.</p>
+  <div class="admin-overview-grid">
+    <section class="card"><h2>XML-granskning</h2><p>Granska importen och källavsnitten eller hämta originalfilen.</p><a href="#advanced/xml">Öppna XML-granskning →</a></section>
+    <section class="card"><h2>Införandestatus</h2><p>Se vilka källregler som är provade, ersatta eller återstår att införa.</p><a href="#advanced/migration">Öppna införandestatus →</a></section>
+    <section class="card"><h2>Protokollinspelning</h2><p>Granska LocoNet-trafik, spela in och hämta sparade loggar.</p><a href="#advanced/protocol">Öppna protokollinspelning →</a></section>
+  </div>
+  <section id="advanced-xml" hidden><div class="admin-workspace-heading"><h1 tabindex="-1">XML-granskning</h1></div><div id="advanced-xml-content"><p class="muted">Läser källunderlaget…</p></div></section>
+  <section id="advanced-migration" hidden><div class="admin-workspace-heading"><h1 tabindex="-1">Införandestatus</h1></div><div id="advanced-migration-content"><p class="muted">Läser införandestatus…</p></div></section>
+  <section id="advanced-protocol" hidden><div class="admin-workspace-heading"><h1 tabindex="-1">Protokollinspelning</h1></div><section class="card"><div id="recording-tools"></div></section><details class="card"><summary>Visa protokolltrafik</summary><pre id="wire"></pre></details></section>
+</main>
+<dialog id="inspector-host" class="inspector-host" aria-labelledby="inspector-heading"></dialog>
+<footer>Charlottendal TKL · version 0.48.0</footer>
+</body></html>

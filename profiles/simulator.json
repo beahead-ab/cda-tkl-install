@@ -1,0 +1,480 @@
+{
+  "id": "charlottendal-field-model",
+  "turnouts": {
+    "Vx121": {
+      "address": 121,
+      "inverted": false,
+      "source": "LT121",
+      "block": "S121",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx120": {
+      "address": 120,
+      "inverted": false,
+      "source": "LT120",
+      "block": "S120",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx122": {
+      "address": 122,
+      "inverted": false,
+      "source": "LT122",
+      "block": "S122",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx123": {
+      "address": 123,
+      "inverted": false,
+      "source": "LT123",
+      "block": "S123",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx126": {
+      "address": 126,
+      "inverted": false,
+      "source": "LT126",
+      "block": "S126",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx131": {
+      "address": 131,
+      "inverted": true,
+      "source": "LT131",
+      "block": "S131",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx95": {
+      "address": 95,
+      "inverted": false,
+      "source": "LT95",
+      "block": "S95",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx100": {
+      "address": 100,
+      "inverted": false,
+      "source": "LT100",
+      "block": "S100",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx101": {
+      "address": 101,
+      "inverted": false,
+      "source": "LT101",
+      "block": "S101",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx102": {
+      "address": 102,
+      "inverted": false,
+      "source": "LT102",
+      "block": "S102",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx117": {
+      "address": 117,
+      "inverted": false,
+      "source": "LT117",
+      "block": "S117",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx110": {
+      "address": 110,
+      "inverted": false,
+      "source": "LT110",
+      "block": "S110",
+      "provenance": "JMRI source; electrical behavior not measured"
+    }
+  },
+  "blocks": {
+    "SIIB": {
+      "address": 3001,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS2b",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S121b": {
+      "address": 3002,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS121",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S121": {
+      "address": 3003,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS121",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S122": {
+      "address": 3004,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS122",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "SIIA": {
+      "address": 3005,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS2a",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "SIVA": {
+      "address": 3006,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS4a",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S123c": {
+      "address": 3007,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS123",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S123": {
+      "address": 3008,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS123",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S123a": {
+      "address": 3009,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS126",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S126": {
+      "address": 3010,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS126",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S126a": {
+      "address": 3011,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS131",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S131": {
+      "address": 3012,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS131",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S131c": {
+      "address": 3013,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS131",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "SVB": {
+      "address": 3014,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS5b",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "SU4A": {
+      "address": 3015,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slSU4a",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "SU4B": {
+      "address": 3016,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slSU4b",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S95": {
+      "address": 3017,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS95",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S100": {
+      "address": 3018,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS100",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S100b": {
+      "address": 3019,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS100t",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S101": {
+      "address": 3020,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS101",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S102": {
+      "address": 3021,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS102",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S117a": {
+      "address": 3022,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS117c",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S117": {
+      "address": 3023,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS117",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S120": {
+      "address": 3024,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS120",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S110": {
+      "address": 3025,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS110",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    }
+  },
+  "signals": {
+    "2/8": {
+      "address": 1501,
+      "reportAddress": 1501,
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "sourceType": "hsi_5",
+      "provenance": "Bench address and provisional Signal10-CZ E4 mapping; Swedish aspect codes NOT verified"
+    },
+    "2/7": {
+      "address": 1502,
+      "reportAddress": 1502,
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "sourceType": "hsi_5",
+      "provenance": "Bench address and provisional Signal10-CZ E4 mapping; Swedish aspect codes NOT verified"
+    },
+    "4/5": {
+      "address": 1503,
+      "reportAddress": 1503,
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "sourceType": "hdvsi_8",
+      "provenance": "Bench address and provisional Signal10-CZ E4 mapping; Swedish aspect codes NOT verified"
+    },
+    "1/5": {
+      "address": 1504,
+      "reportAddress": 1504,
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "sourceType": "hsi_5",
+      "provenance": "Bench address and provisional Signal10-CZ E4 mapping; Swedish aspect codes NOT verified"
+    }
+  },
+  "protection": {
+    "2/8": {
+      "blocks": [
+        "SIIB",
+        "S121b",
+        "S121",
+        "S122",
+        "SIIA"
+      ],
+      "turnouts": {
+        "Vx121": "C",
+        "Vx120": "C",
+        "Vx122": "C"
+      }
+    },
+    "2/7": {
+      "blocks": [
+        "SIIA",
+        "S122",
+        "S121",
+        "S121b",
+        "SIIB"
+      ],
+      "turnouts": {
+        "Vx122": "C",
+        "Vx121": "C",
+        "Vx120": "C"
+      }
+    },
+    "4/5": {
+      "blocks": [
+        "SIVA",
+        "S123c",
+        "S123",
+        "S123a",
+        "S126",
+        "S126a",
+        "S131",
+        "S131c",
+        "SVB"
+      ],
+      "turnouts": {
+        "Vx123": "T",
+        "Vx126": "C",
+        "Vx131": "C"
+      }
+    },
+    "1/5": {
+      "blocks": [
+        "SU4A",
+        "SU4B",
+        "S95",
+        "S100",
+        "S100b",
+        "S101",
+        "S102",
+        "S117a",
+        "S117",
+        "SIIA",
+        "S122",
+        "S121",
+        "S121b",
+        "SIIB"
+      ],
+      "turnouts": {
+        "Vx95": "C",
+        "Vx100": "T",
+        "Vx101": "T",
+        "Vx102": "C",
+        "Vx117": "C",
+        "Vx110": "C",
+        "Vx122": "C",
+        "Vx121": "C",
+        "Vx120": "C"
+      }
+    }
+  },
+  "coupled": {
+    "Vx121": [
+      "Vx121",
+      "Vx120"
+    ],
+    "Vx120": [
+      "Vx120",
+      "Vx121"
+    ],
+    "Vx122": [
+      "Vx122"
+    ],
+    "Vx123": [
+      "Vx123"
+    ],
+    "Vx126": [
+      "Vx126"
+    ],
+    "Vx131": [
+      "Vx131"
+    ],
+    "Vx95": [
+      "Vx95"
+    ],
+    "Vx100": [
+      "Vx100",
+      "Vx101"
+    ],
+    "Vx101": [
+      "Vx101",
+      "Vx100"
+    ],
+    "Vx102": [
+      "Vx102"
+    ],
+    "Vx117": [
+      "Vx117",
+      "Vx110"
+    ],
+    "Vx110": [
+      "Vx110",
+      "Vx117"
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "2b-2c",
+      "label": "Spår 2b → Spår 2c",
+      "blocks": [
+        "SIIB",
+        "S121b",
+        "S121",
+        "S122",
+        "SIIA"
+      ],
+      "signal": "2/8"
+    },
+    {
+      "id": "2c-2b",
+      "label": "Spår 2c → Spår 2b",
+      "blocks": [
+        "SIIA",
+        "S122",
+        "S121",
+        "S121b",
+        "SIIB"
+      ],
+      "signal": "2/7"
+    },
+    {
+      "id": "12-5b",
+      "label": "Spår 12 → Spår 5b",
+      "blocks": [
+        "SIVA",
+        "S123c",
+        "S123",
+        "S123a",
+        "S126",
+        "S126a",
+        "S131",
+        "S131c",
+        "SVB"
+      ],
+      "signal": "4/5"
+    },
+    {
+      "id": "cu-2b",
+      "label": "Cu → Spår 2b",
+      "blocks": [
+        "SU4A",
+        "SU4B",
+        "S95",
+        "S100",
+        "S100b",
+        "S101",
+        "S102",
+        "S117a",
+        "S117",
+        "SIIA",
+        "S122",
+        "S121",
+        "S121b",
+        "SIIB"
+      ],
+      "signal": "1/5"
+    }
+  ],
+  "note": "Independent process and state. Receives only LocoNet commands. Scenarios are static track movements, never TKL runtime state."
+}

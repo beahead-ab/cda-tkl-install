@@ -1,0 +1,26 @@
+[Unit]
+Description=Charlottendal LocoNet simulator
+After=network.target
+
+[Service]
+Type=simple
+User=cda-tkl
+Group=cda-tkl
+WorkingDirectory=/opt/cda-tkl/current
+EnvironmentFile=/etc/cda-tkl/app.env
+ExecStart=/opt/cda-tkl/node/bin/node src/simulator.mjs
+Restart=always
+RestartSec=2
+TimeoutStopSec=10
+UMask=0027
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

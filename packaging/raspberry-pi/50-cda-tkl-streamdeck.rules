@@ -1,0 +1,4 @@
+# Elgato Stream Deck (vendor 0fd9): the logged-in desktop user may open it, so the panel
+# in Chromium can drive it over WebHID. Installed by Charlottendal TKL.
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="0fd9", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", TAG+="uaccess"

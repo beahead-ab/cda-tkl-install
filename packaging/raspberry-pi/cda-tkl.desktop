@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Charlottendal TKL
+Comment=Öppna ställverket i helskärm
+Exec=/usr/local/bin/cda-tkl-browser
+Icon=web-browser
+Terminal=false
+Categories=Utility;
+StartupNotify=true

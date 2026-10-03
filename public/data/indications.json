@@ -1,0 +1,601 @@
+{
+  "sourceHash": "c69a865ae9a85cdb842d70c34d2573dde4b11c50f601a561d5b941136ac6fa87",
+  "group": "IX:AUTO:0012",
+  "indicators": [
+    {
+      "name": "V1",
+      "rule": "IX:AUTO:0012C1",
+      "sourceKey": "f215025be768c7c399e0",
+      "logic": "any",
+      "conditions": [
+        {
+          "kind": "nx",
+          "id": "IN:429040bc-67f8-49a6-8934-ae57c3462b1e",
+          "label": "1/5 → 2/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:8ebd3482-4061-423c-8b43-ad01fd3b1add",
+          "label": "1/5 → 3/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:ae2e9664-5541-4c5e-8412-451de18c57ea",
+          "label": "1/5 → 1/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:c94fa9cb-863d-473f-a699-13c9e44cf9fe",
+          "label": "1/5 → 4/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:6bd97aec-4fd3-41f9-9b8a-12d73cc8dfbd",
+          "label": "1/5 → 5/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:42714135-f6d9-42b6-baa6-ef93873dfb83",
+          "label": "1/10 → 1/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:a802cc6d-3f3a-490b-900e-14619fcdf4cf",
+          "label": "2/5 → 2/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:533504cb-b0e9-45ec-a8b8-3bbc68953533",
+          "label": "2/5 → 3/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:0ed73b3e-35e5-43f7-8c19-f9eb86e71e3c",
+          "label": "2/5 → 4/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:871a7269-712d-4f47-9cb9-c5b316eb2967",
+          "label": "2/5 → 5/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:d12211a5-28ae-4add-bb48-7fb55e571843",
+          "label": "2/10 → 1/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:17dd1cdb-033d-4257-9e5f-8d96cc80c348",
+          "label": "2/10 → 2/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:175be8fb-84e8-47dd-b696-3fc1a5ccd8d0",
+          "label": "3/1 → 3/3"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:b03a6776-1851-46bc-839c-878145f6b949",
+          "label": "3/1 → 6/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:cf714c10-830f-49ba-8b6d-886d2c755876",
+          "label": "3/1 → 7/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:6b9dd993-29d8-4964-a975-9c180c3868b7",
+          "label": "3/1 → 8/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:4d96cbd2-21ef-484a-8949-a156abde3825",
+          "label": "3/1 → 9/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:77561b23-7836-48d7-b3e8-54d33c423de2",
+          "label": "3/10 → 1/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:72191ed1-b72d-4ae0-b9d8-f75c36539b10",
+          "label": "3/10 → 2/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:8be10a2c-1459-4b9d-9437-49d4a1e30a63",
+          "label": "3/10 → IIIev"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:6f3c8c04-94ac-47da-8d6c-846982cafd5f",
+          "label": "4/10 → 1/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:fa61129e-5542-488b-88d4-600c63c448e3",
+          "label": "4/10 → 2/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:4ff1b10a-8b50-4ca3-bd1e-d5e1c3379ec2",
+          "label": "4/10 → IIIev"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:f634a24b-7043-4c2d-9ee0-8378dea7cfe2",
+          "label": "5/10 → 1/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:a1600f94-e4a0-4013-8607-455702f83e44",
+          "label": "5/10 → 2/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:c5877801-d9df-4504-a527-52f4ad57ed62",
+          "label": "5/10 → IIIev"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:191dce9e-3a56-411e-bac3-92df25fb9c02",
+          "label": "6/10 → IIIev"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:9982aa3c-ff40-41e0-bff3-78cc97fa910d",
+          "label": "7/10 → IIIev"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:dd499956-c2e9-474b-bf11-f0dffae62507",
+          "label": "8/10 → IIIev"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:84c62fd8-2843-452d-825e-5487a68a6d8d",
+          "label": "9/10 → IIIev"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS100",
+          "label": "slS100",
+          "sourceSystem": "IS24"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS101",
+          "label": "slS101",
+          "sourceSystem": "IS25"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS103",
+          "label": "slS103",
+          "sourceSystem": "IS27"
+        }
+      ],
+      "lamps": {
+        "g": {
+          "name": "V1g",
+          "sourceSystem": "IS251"
+        },
+        "r": {
+          "name": "V1r",
+          "sourceSystem": "IS252"
+        }
+      },
+      "crossing": {
+        "line": {
+          "id": "T152",
+          "x1": 450,
+          "y1": 215,
+          "x2": 450,
+          "y2": 435
+        },
+        "blocks": [
+          "S100",
+          "S101",
+          "S103"
+        ]
+      }
+    },
+    {
+      "name": "V2",
+      "rule": "IX:AUTO:0012C2",
+      "sourceKey": "36eac1fe4e0da1e1aad9",
+      "logic": "any",
+      "conditions": [
+        {
+          "kind": "nx",
+          "id": "IN:b137bbde-b5bc-4b51-90d2-56c1ec28a478",
+          "label": "1/7 → 1/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:ccb213d2-edb8-48d1-bfef-01fc35ccc32f",
+          "label": "1/8 → 1/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:c664f521-df47-4557-89d7-f65fb3644fd3",
+          "label": "1/8 → 2/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:a7396c65-4eea-46f6-b197-ff6119abe71a",
+          "label": "2/7 → 1/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:0938c621-8dcb-4add-9783-28d6824b0f8d",
+          "label": "2/7 → 2/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:a4607e61-cc12-4f46-9c30-fb534204d98a",
+          "label": "2/7 → 3/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:52be6d9f-956b-4e6c-a476-1f8803639586",
+          "label": "2/7 → 4/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:941b374c-f243-4308-8829-b77dad2253dd",
+          "label": "2/8 → 2/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:8b500613-a031-465d-a3b7-de0b654f22a0",
+          "label": "3/5 → 5/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:ef097bcf-7770-4019-a1d7-60731f8b254a",
+          "label": "3/5 → 6/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:1c8b77e7-e6a7-465f-a580-c95cbb8a88e8",
+          "label": "3/8 → 2/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:6af610f4-2e48-4b05-b33b-c327971b047d",
+          "label": "4/5 → 5/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:c789a119-83a8-49f6-99e0-ddf1b8a0c450",
+          "label": "4/5 → 6/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:02071f89-8e14-4603-8b23-4f86301200ed",
+          "label": "4/8 → 2/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:1a77e99e-db90-453b-aa4e-85b71071b2db",
+          "label": "5/5 → 5/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:d3a73449-9685-4aac-ae15-3d7b7e6cbee5",
+          "label": "5/5 → 6/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:0793ab5d-0ae4-44e1-9d20-d8cd3b66af97",
+          "label": "5/8 → 3/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:30bca77d-457b-4e67-a418-1c1190064ebf",
+          "label": "5/8 → 4/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:a7c38e71-3385-46d7-825d-ad64f78e9fbf",
+          "label": "5/8 → 5/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:28fd5177-1f83-4b70-ab20-8dfa7d9d5bca",
+          "label": "6/5 → 6/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:b40d2819-0552-4586-ab45-2a7aa2087544",
+          "label": "6/6 → 6/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:d29a79dc-dc0b-48ff-8553-ba218dac09fe",
+          "label": "6/6 → 7/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:9637bfe4-0334-4ee1-8b2a-6f54d18b80d7",
+          "label": "6/6 → 8/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:60c05de6-7b87-4156-8000-a73c8a4c9c45",
+          "label": "6/6 → 9/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:8abf0b18-94ad-47b3-9c58-f48f68da4654",
+          "label": "6/8 → 3/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:9af8d60e-52c9-4694-b1d6-1cb7d1a25b2b",
+          "label": "6/8 → 4/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:68af5f58-3f09-460e-95fc-d88791f18a73",
+          "label": "6/8 → 5/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:3d360610-3f48-455c-9476-5d3d877014b2",
+          "label": "7/5 → 6/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:82fca6a8-90ed-41b7-8780-4c6afe4b8ac5",
+          "label": "8/5 → 6/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:6ab85d5e-781c-4fc5-82c1-35ee572f6b28",
+          "label": "9/5 → 6/7"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS120",
+          "label": "slS120",
+          "sourceSystem": "IS38"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS125",
+          "label": "slS125",
+          "sourceSystem": "IS42"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS126",
+          "label": "slS126",
+          "sourceSystem": "IS43"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS130",
+          "label": "slS130",
+          "sourceSystem": "IS46"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS131",
+          "label": "slS131",
+          "sourceSystem": "IS47"
+        }
+      ],
+      "lamps": {
+        "g": {
+          "name": "V2g",
+          "sourceSystem": "IS253"
+        },
+        "r": {
+          "name": "V2r",
+          "sourceSystem": "IS254"
+        }
+      },
+      "crossing": {
+        "line": {
+          "id": "T166",
+          "x1": 1030,
+          "y1": 785,
+          "x2": 1030,
+          "y2": 215
+        },
+        "blocks": [
+          "S120",
+          "S121",
+          "S125",
+          "S126",
+          "S130"
+        ]
+      }
+    },
+    {
+      "name": "V3",
+      "rule": "IX:AUTO:0012C3",
+      "sourceKey": "e895639fba61081e9bdd",
+      "logic": "any",
+      "conditions": [
+        {
+          "kind": "nx",
+          "id": "IN:02bf8516-c5ce-4638-b51b-5ba11b02bd92",
+          "label": "1/4 → 1/6"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:a11b8ed1-24f9-4827-b96a-25daace45b25",
+          "label": "1/4 → 2/6"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:6e4f8eaf-ae36-47fd-93c2-f26b6df1dcf7",
+          "label": "1/4 → 3/6"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:75288d04-f50b-4816-9879-11c6a45eff47",
+          "label": "1/11 → N1"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:7270481f-f9e5-43f2-9ee7-b78863087ebf",
+          "label": "1/11 → U1"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:38153432-a6c0-4029-92b1-875f06fde7c6",
+          "label": "2/4 → 1/6"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:ffa579d7-ecec-4eba-9c94-9018e30153b8",
+          "label": "2/4 → 2/6"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:ea56af37-dad8-4c2d-9891-23783b74f325",
+          "label": "2/4 → 3/6"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:df91a6da-781b-434b-ac6a-88aa95244141",
+          "label": "2/11 → N1"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:347531c7-bd3d-4311-8688-d9613e64b03a",
+          "label": "2/11 → U1"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:04e4337d-e4ec-4c7a-957e-d5fec082d167",
+          "label": "3/11 → N1"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:b4d7b7fd-bda4-4650-82ec-c55ea564a455",
+          "label": "3/11 → U1"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:b7da8647-7366-4a3a-b2e1-5e60acc04527",
+          "label": "3/11 → IIIdo"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:8c8af86b-6435-43c2-aa35-9a8b58768e5e",
+          "label": "6/11 → IIIdo"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:9925d20b-5e18-4f47-a8d5-6fdcf0664a0c",
+          "label": "10/11 → N1"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:915d1120-9a5f-4302-8ca8-acdb62708add",
+          "label": "10/11 → U1"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS3d",
+          "label": "slS3d",
+          "sourceSystem": "IS9"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS165",
+          "label": "slS165",
+          "sourceSystem": "IS64"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS166",
+          "label": "slS166",
+          "sourceSystem": "IS65"
+        }
+      ],
+      "lamps": {
+        "g": {
+          "name": "V3g",
+          "sourceSystem": "IS255"
+        },
+        "r": {
+          "name": "V3r",
+          "sourceSystem": "IS256"
+        }
+      },
+      "crossing": {
+        "line": {
+          "id": "T172",
+          "x1": 1765,
+          "y1": 215,
+          "x2": 1765,
+          "y2": 450
+        },
+        "blocks": [
+          "S165a",
+          "S166a",
+          "SIIID"
+        ]
+      }
+    },
+    {
+      "name": "V4",
+      "rule": "IX:AUTO:0012C4",
+      "sourceKey": "fab0975e0cdeea69fc6d",
+      "logic": "any",
+      "conditions": [
+        {
+          "kind": "nx",
+          "id": "IN:38a2817f-928f-46b9-8467-90cee94ffa5f",
+          "label": "9/10 → LastSp1in"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:98f1e18d-6c98-402a-a654-9d3c807a1f0a",
+          "label": "9/10 → LastSp2in"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:879b4f03-de61-4f8b-bcfb-132c85e4785d",
+          "label": "LastSp1ut → 9/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:afc2b3dd-02e4-4a07-8fea-3d3b9ab65cc0",
+          "label": "LastSp2ut → 9/5"
+        },
+        {
+          "kind": "sensor",
+          "id": "slSL1",
+          "label": "slSL1",
+          "sourceSystem": "IS21"
+        },
+        {
+          "kind": "sensor",
+          "id": "slSL2",
+          "label": "slSL2",
+          "sourceSystem": "IS22"
+        }
+      ],
+      "lamps": {
+        "g": {
+          "name": "V4g",
+          "sourceSystem": "IS257"
+        },
+        "r": {
+          "name": "V4r",
+          "sourceSystem": "IS258"
+        }
+      }
+    }
+  ],
+  "note": "Beräknade panelindikeringar. Ingen fysisk bomstyrning eller bomkvittens."
+}

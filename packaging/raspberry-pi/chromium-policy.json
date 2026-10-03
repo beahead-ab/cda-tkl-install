@@ -1,0 +1,5 @@
+{
+  "WebHidAllowDevicesForUrls": [
+    { "devices": [ { "vendor_id": 4057 } ], "urls": [ "http://127.0.0.1:8910", "http://localhost:8910" ] }
+  ]
+}

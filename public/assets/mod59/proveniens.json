@@ -1,0 +1,279 @@
+{
+  "repository": "https://github.com/JMRI/JMRI",
+  "commit": "da190a99ac7ac41bb21b7718cd6e54ea3e54a47d",
+  "files": [
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Dark.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Dark.gif",
+      "localPath": "icons/Dark.gif",
+      "bytes": 111,
+      "sha256": "cd82b103bfb3969d54891c7c8730abd572d92a13aa6597ed4d40969debe4eb2f"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Dvsi-dark.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Dvsi-dark.gif",
+      "localPath": "icons/Dvsi-dark.gif",
+      "bytes": 105,
+      "sha256": "7731b74ed3d6d847e1478cd9080b0e20b301b6ee916c7e441e2d540eeca3e25a"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Dvsi0.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Dvsi0.gif",
+      "localPath": "icons/Dvsi0.gif",
+      "bytes": 905,
+      "sha256": "23cb5231bd0cc7b44dd271c578bde3d61d17a9cb8d0a904c6ecce332b1155571"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Dvsi1.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Dvsi1.gif",
+      "localPath": "icons/Dvsi1.gif",
+      "bytes": 905,
+      "sha256": "bf5ea22a3e5b5e4bd2b36386c3f7174625fc971c189092630ce94f0c3dbf1b3b"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Fsi0.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Fsi0.gif",
+      "localPath": "icons/Fsi0.gif",
+      "bytes": 909,
+      "sha256": "39c6a2d84b48dbdaf3c121eecaaf66d8f3f5b33e7e6f06af8b613c89a747e88c"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Fsi1.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Fsi1.gif",
+      "localPath": "icons/Fsi1.gif",
+      "bytes": 117,
+      "sha256": "223a0ea9bbddd45c381fe6eea3fc2fce75d4a5714ad085425370ef554914321b"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hdvsi-dark.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hdvsi-dark.gif",
+      "localPath": "icons/Hdvsi-dark.gif",
+      "bytes": 128,
+      "sha256": "377c6a61f177681b36f613cc1e3f8c0083c3ed525dfb5ae705397124c7afb467"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hdvsi0+Sh0.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hdvsi0%2BSh0.gif",
+      "localPath": "icons/Hdvsi0+Sh0.gif",
+      "bytes": 958,
+      "sha256": "e081724ca4f326a3bd7e1c55e375a52b47832ca90c7fbc24c4e18bc21a41e0e1"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hdvsi0+Sh1.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hdvsi0%2BSh1.gif",
+      "localPath": "icons/Hdvsi0+Sh1.gif",
+      "bytes": 962,
+      "sha256": "70025c363c5e7c07165ae2937902a26fa29c2e43c51e7eff2d57752bf21a6bba"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hdvsi1+Sh1.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hdvsi1%2BSh1.gif",
+      "localPath": "icons/Hdvsi1+Sh1.gif",
+      "bytes": 958,
+      "sha256": "3529c202db33f2338d27747f867db7e7f510439f11942615b2a7f92685178778"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hsi-dark+Sh-dark.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hsi-dark%2BSh-dark.gif",
+      "localPath": "icons/Hsi-dark+Sh-dark.gif",
+      "bytes": 113,
+      "sha256": "6920b5ff005641722eb226e197d84ab8c64b89f3db7869fce3a2a24e0d153bb9"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hsi-dark.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hsi-dark.gif",
+      "localPath": "icons/Hsi-dark.gif",
+      "bytes": 110,
+      "sha256": "7c5463e04104c625b824a0f57a49fa4958ec5a20f8671387c83e6705897c8249"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hsi0+Sh0.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hsi0%2BSh0.gif",
+      "localPath": "icons/Hsi0+Sh0.gif",
+      "bytes": 934,
+      "sha256": "cec0c4d0359f5df2d0b09456ed8ce38a8957642c18e35f4578689fcde88dc87c"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hsi0+Sh1.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hsi0%2BSh1.gif",
+      "localPath": "icons/Hsi0+Sh1.gif",
+      "bytes": 937,
+      "sha256": "5a531e02ea108d8d14da551dede36128052d54d7406afb256fdc253695d6a0a7"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hsi0.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hsi0.gif",
+      "localPath": "icons/Hsi0.gif",
+      "bytes": 143,
+      "sha256": "b9cc33020faf30003de0f05d25d395427680509eefa21a0d26bd945ed3cd33f2"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hsi1+Sh1.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hsi1%2BSh1.gif",
+      "localPath": "icons/Hsi1+Sh1.gif",
+      "bytes": 934,
+      "sha256": "554b457b2dc7c7b121c5e57c3a2b4d248880c9cffc955cc989212055671f5286"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hsi1.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Hsi1.gif",
+      "localPath": "icons/Hsi1.gif",
+      "bytes": 143,
+      "sha256": "e7f4c32adaa56b02de93b016e1d7092b29518abba0d62191a453f8af537e01e3"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Ssi0+Sh0.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Ssi0%2BSh0.gif",
+      "localPath": "icons/Ssi0+Sh0.gif",
+      "bytes": 132,
+      "sha256": "dbfe839f89b28f511c9167111dbd85a5cb951ef8ebbebba7f1001b45511079f1"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Ssi0.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Ssi0.gif",
+      "localPath": "icons/Ssi0.gif",
+      "bytes": 909,
+      "sha256": "39c6a2d84b48dbdaf3c121eecaaf66d8f3f5b33e7e6f06af8b613c89a747e88c"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Ssi1+Sh-dark.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Ssi1%2BSh-dark.gif",
+      "localPath": "icons/Ssi1+Sh-dark.gif",
+      "bytes": 116,
+      "sha256": "1a0fb2618c747da1a12799185cb333502c50aaddbe61299ee6f52c0bf56d4bfb"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Ssi1+Sh0.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Ssi1%2BSh0.gif",
+      "localPath": "icons/Ssi1+Sh0.gif",
+      "bytes": 933,
+      "sha256": "23d0233f0dc0b5838bd80b11a9b96672770ae540d83950095360ca677db91c2f"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Ssi1+Sh1.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Ssi1%2BSh1.gif",
+      "localPath": "icons/Ssi1+Sh1.gif",
+      "bytes": 933,
+      "sha256": "65a6cb72f118b5c78603afc79098a31e0eae5aa286444bf471a6a239e7ba7f73"
+    },
+    {
+      "sourcePath": "resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Ssi1.gif",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/resources/icons/smallschematics/aspects/SE-TSFS-2010/mod59/Ssi1.gif",
+      "localPath": "icons/Ssi1.gif",
+      "bytes": 909,
+      "sha256": "74df1466d23285d4d29b2674a62261db3dc3bdcc5f7c96ad59f2202677245aa1"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/appearance-dvsi_4.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/appearance-dvsi_4.xml",
+      "localPath": "definitions/appearance-dvsi_4.xml",
+      "bytes": 11828,
+      "sha256": "419fa4362021c2a426934538b2fda153e139e94028a32cbe418d450b782cf43e"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/appearance-fsi_2.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/appearance-fsi_2.xml",
+      "localPath": "definitions/appearance-fsi_2.xml",
+      "bytes": 7549,
+      "sha256": "8b4317d15dced9ab22aec697a0d321896633f67bc94f642572f37d2dbdc24cd3"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/appearance-fsi_3.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/appearance-fsi_3.xml",
+      "localPath": "definitions/appearance-fsi_3.xml",
+      "bytes": 8479,
+      "sha256": "bf407a70949fa048662cb65b43b5568e3acab65ec980c628ee1ee15772da164c"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/appearance-hdvsi_5.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/appearance-hdvsi_5.xml",
+      "localPath": "definitions/appearance-hdvsi_5.xml",
+      "bytes": 15248,
+      "sha256": "49f7bfb761fc92bd2549a1a5111948b87de2f4090e6e23f075710b5568901f6b"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/appearance-hsi_2+dvsi.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/appearance-hsi_2%2Bdvsi.xml",
+      "localPath": "definitions/appearance-hsi_2+dvsi.xml",
+      "bytes": 11349,
+      "sha256": "6ade0bf35be292c1add350ef4b5ec4e2860bc9119b59e1682695f96d8f8004bd"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/appearance-hsi_2.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/appearance-hsi_2.xml",
+      "localPath": "definitions/appearance-hsi_2.xml",
+      "bytes": 7294,
+      "sha256": "7f8056bdf05ce5f1366f661592a1222c6b7571f7ab16cbab76eb068df1903d6a"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/appearance-hsi_3+dvsi.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/appearance-hsi_3%2Bdvsi.xml",
+      "localPath": "definitions/appearance-hsi_3+dvsi.xml",
+      "bytes": 12802,
+      "sha256": "83e57e340dd28a95bcceb2909f9b795cac879750b60c87af47f5025e804b6e7e"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/appearance-hsi_3.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/appearance-hsi_3.xml",
+      "localPath": "definitions/appearance-hsi_3.xml",
+      "bytes": 8724,
+      "sha256": "bdd8b04a881f6426196bea7109399f783fc3175e678b7157df6de3ec99ebe4a8"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/appearance-hsi_5+dvsi.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/appearance-hsi_5%2Bdvsi.xml",
+      "localPath": "definitions/appearance-hsi_5+dvsi.xml",
+      "bytes": 15207,
+      "sha256": "b5d078029e592c3bc761af8ad32b6d1d4f6a9a98deffa04cd7e3255e9b002253"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/appearance-hsi_5.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/appearance-hsi_5.xml",
+      "localPath": "definitions/appearance-hsi_5.xml",
+      "bytes": 10981,
+      "sha256": "bcec622b5ee1a6ffcd394fe7886c38f33f6c233f83d1e510b9f8d1c9c3d0797a"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/appearance-hsi_7+dvsi.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/appearance-hsi_7%2Bdvsi.xml",
+      "localPath": "definitions/appearance-hsi_7+dvsi.xml",
+      "bytes": 17274,
+      "sha256": "c76697586872880424f000848d4e030cc40762bc5f84759f0821a0a47676096f"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/appearance-hsi_7.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/appearance-hsi_7.xml",
+      "localPath": "definitions/appearance-hsi_7.xml",
+      "bytes": 12974,
+      "sha256": "55b200ea314532c29c1006c1e635fc774df6eeebc01b15b8335ef2c02b6a7965"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/appearance-ssi_2+dvsi.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/appearance-ssi_2%2Bdvsi.xml",
+      "localPath": "definitions/appearance-ssi_2+dvsi.xml",
+      "bytes": 13468,
+      "sha256": "c2fd333efde16e33555b829fc723f7627b79272236395f03188d62ddc065fdb9"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/appearance-ssi_2.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/appearance-ssi_2.xml",
+      "localPath": "definitions/appearance-ssi_2.xml",
+      "bytes": 6885,
+      "sha256": "9dba2a64f775bae5ddbb024f5d75f21b152eb1582d642567bbca98368676fc9a"
+    },
+    {
+      "sourcePath": "xml/signals/SE-TSFS-2010/aspects.xml",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/xml/signals/SE-TSFS-2010/aspects.xml",
+      "localPath": "definitions/aspects.xml",
+      "bytes": 12009,
+      "sha256": "ca42a115cb09970d416fd69ef80c0aae550dfeef6136fd1df1c34e7bef0c5e82"
+    },
+    {
+      "sourcePath": "LICENSE.txt",
+      "sourceUrl": "https://raw.githubusercontent.com/JMRI/JMRI/da190a99ac7ac41bb21b7718cd6e54ea3e54a47d/LICENSE.txt",
+      "localPath": "LICENSE.txt",
+      "bytes": 19605,
+      "sha256": "35ea3c5054c85308a4d56b2a3296ba1de549f87ba6c628cf0a9955f4e9b7542e"
+    }
+  ]
+}

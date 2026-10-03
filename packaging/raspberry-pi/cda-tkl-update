@@ -1,0 +1,14 @@
+#!/bin/sh
+# Updates Charlottendal TKL: fetches the latest package and installs it the same way as
+# the first time. Settings (/etc/cda-tkl/app.env) and operating data (/var/lib/cda-tkl)
+# stay; if the new version does not start, the previous one is put back.
+set -eu
+[ "$(id -u)" -eq 0 ] || { echo "Kör med sudo: sudo cda-tkl-update"; exit 1; }
+TOKEN=""
+[ -r /etc/cda-tkl/github-token ] && TOKEN=$(cat /etc/cda-tkl/github-token)
+URL="https://raw.githubusercontent.com/beahead-ab/cda-tkl-install/${CDA_TKL_BRANCH:-main}/install.sh"
+if [ -n "$TOKEN" ]; then
+  curl -fsSL -H "Authorization: Bearer $TOKEN" "$URL" | CDA_TKL_TOKEN="$TOKEN" sh
+else
+  curl -fsSL "$URL" | sh
+fi

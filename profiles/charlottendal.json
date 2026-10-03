@@ -1,0 +1,1184 @@
+{
+  "id": "charlottendal-etapp1",
+  "title": "Charlottendal · etapp 1",
+  "commissioned": false,
+  "description": "Avgränsad utvecklingsprofil. Källgeometri och växeladresser från JMRI; sensor- och signaladresser är separata provadresser. Ingen fysisk anslutning verifierad.",
+  "transport": {
+    "host": "127.0.0.1",
+    "port": 8912
+  },
+  "staleMs": 7000,
+  "commandTimeoutMs": 6000,
+  "signalStepMs": 300,
+  "turnouts": {
+    "Vx121": {
+      "address": 121,
+      "inverted": false,
+      "source": "LT121",
+      "block": "S121",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx120": {
+      "address": 120,
+      "inverted": false,
+      "source": "LT120",
+      "block": "S120",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx122": {
+      "address": 122,
+      "inverted": false,
+      "source": "LT122",
+      "block": "S122",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx123": {
+      "address": 123,
+      "inverted": false,
+      "source": "LT123",
+      "block": "S123",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx126": {
+      "address": 126,
+      "inverted": false,
+      "source": "LT126",
+      "block": "S126",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx131": {
+      "address": 131,
+      "inverted": true,
+      "source": "LT131",
+      "block": "S131",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx95": {
+      "address": 95,
+      "inverted": false,
+      "source": "LT95",
+      "block": "S95",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx100": {
+      "address": 100,
+      "inverted": false,
+      "source": "LT100",
+      "block": "S100",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx101": {
+      "address": 101,
+      "inverted": false,
+      "source": "LT101",
+      "block": "S101",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx102": {
+      "address": 102,
+      "inverted": false,
+      "source": "LT102",
+      "block": "S102",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx117": {
+      "address": 117,
+      "inverted": false,
+      "source": "LT117",
+      "block": "S117",
+      "provenance": "JMRI source; electrical behavior not measured"
+    },
+    "Vx110": {
+      "address": 110,
+      "inverted": false,
+      "source": "LT110",
+      "block": "S110",
+      "provenance": "JMRI source; electrical behavior not measured"
+    }
+  },
+  "blocks": {
+    "SIIB": {
+      "address": 3001,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS2b",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S121b": {
+      "address": 3002,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS121",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S121": {
+      "address": 3003,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS121",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S122": {
+      "address": 3004,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS122",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "SIIA": {
+      "address": 3005,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS2a",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "SIVA": {
+      "address": 3006,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS4a",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S123c": {
+      "address": 3007,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS123",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S123": {
+      "address": 3008,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS123",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S123a": {
+      "address": 3009,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS126",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S126": {
+      "address": 3010,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS126",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S126a": {
+      "address": 3011,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS131",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S131": {
+      "address": 3012,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS131",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S131c": {
+      "address": 3013,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS131",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "SVB": {
+      "address": 3014,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS5b",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "SU4A": {
+      "address": 3015,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slSU4a",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "SU4B": {
+      "address": 3016,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slSU4b",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S95": {
+      "address": 3017,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS95",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S100": {
+      "address": 3018,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS100",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S100b": {
+      "address": 3019,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS100t",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S101": {
+      "address": 3020,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS101",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S102": {
+      "address": 3021,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS102",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S117a": {
+      "address": 3022,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS117c",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S117": {
+      "address": 3023,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS117",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S120": {
+      "address": 3024,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS120",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    },
+    "S110": {
+      "address": 3025,
+      "activeMeansOccupied": true,
+      "sourceSensor": "slS110",
+      "provenance": "Explicit bench address. Internal/derived source sensor is NOT claimed to be a physical LS address."
+    }
+  },
+  "signals": {
+    "2/8": {
+      "address": 1501,
+      "reportAddress": 1501,
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "sourceType": "hsi_5",
+      "provenance": "Bench address and provisional Signal10-CZ E4 mapping; Swedish aspect codes NOT verified"
+    },
+    "2/7": {
+      "address": 1502,
+      "reportAddress": 1502,
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "sourceType": "hsi_5",
+      "provenance": "Bench address and provisional Signal10-CZ E4 mapping; Swedish aspect codes NOT verified"
+    },
+    "4/5": {
+      "address": 1503,
+      "reportAddress": 1503,
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "sourceType": "hdvsi_8",
+      "provenance": "Bench address and provisional Signal10-CZ E4 mapping; Swedish aspect codes NOT verified"
+    },
+    "1/5": {
+      "address": 1504,
+      "reportAddress": 1504,
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "sourceType": "hsi_5",
+      "provenance": "Bench address and provisional Signal10-CZ E4 mapping; Swedish aspect codes NOT verified"
+    }
+  },
+  "routes": [
+    {
+      "id": "2b-2c",
+      "from": "htvSpIIB",
+      "to": "htvSpIIA",
+      "signals": [
+        "2/8"
+      ],
+      "label": "Spår 2b → Spår 2c",
+      "blocks": [
+        "SIIB",
+        "S121b",
+        "S121",
+        "S122",
+        "SIIA"
+      ],
+      "turnouts": {
+        "Vx121": "C",
+        "Vx120": "C",
+        "Vx122": "C"
+      },
+      "crossings": [],
+      "segments": [
+        "T253",
+        "T252",
+        "T103",
+        "T94",
+        "T4",
+        "T249"
+      ],
+      "flow": [
+        {
+          "id": "T253",
+          "x1": 1270,
+          "y1": 320,
+          "x2": 1230,
+          "y2": 320,
+          "block": "SIIB",
+          "length": 40,
+          "distance": 0
+        },
+        {
+          "id": "T252",
+          "x1": 1230,
+          "y1": 320,
+          "x2": 1170,
+          "y2": 320,
+          "block": "SIIB",
+          "length": 60,
+          "distance": 40
+        },
+        {
+          "id": "T103",
+          "x1": 1170,
+          "y1": 320,
+          "x2": 1080,
+          "y2": 320,
+          "block": "SIIB",
+          "length": 90,
+          "distance": 100
+        },
+        {
+          "id": "T94",
+          "x1": 1080,
+          "y1": 320,
+          "x2": 1045,
+          "y2": 320,
+          "block": "S121b",
+          "length": 35,
+          "distance": 190
+        },
+        {
+          "id": "VX:Vx121:B",
+          "x1": 1045,
+          "y1": 320,
+          "x2": 1015,
+          "y2": 320,
+          "block": "S121",
+          "length": 30,
+          "distance": 225
+        },
+        {
+          "id": "VX:Vx121:A",
+          "x1": 1015,
+          "y1": 320,
+          "x2": 985,
+          "y2": 320,
+          "block": "S121",
+          "length": 30,
+          "distance": 255
+        },
+        {
+          "id": "T4",
+          "x1": 985,
+          "y1": 320,
+          "x2": 990,
+          "y2": 320,
+          "block": "S121",
+          "length": 5,
+          "distance": 285
+        },
+        {
+          "id": "VX:Vx122:B",
+          "x1": 990,
+          "y1": 320,
+          "x2": 960,
+          "y2": 320,
+          "block": "S122",
+          "length": 30,
+          "distance": 290
+        },
+        {
+          "id": "VX:Vx122:A",
+          "x1": 960,
+          "y1": 320,
+          "x2": 930,
+          "y2": 320,
+          "block": "S122",
+          "length": 30,
+          "distance": 320
+        },
+        {
+          "id": "T249",
+          "x1": 930,
+          "y1": 320,
+          "x2": 880,
+          "y2": 320,
+          "block": "SIIA",
+          "length": 50,
+          "distance": 350
+        }
+      ]
+    },
+    {
+      "id": "2c-2b",
+      "from": "htvSpIIA",
+      "to": "htvSpIIB",
+      "signals": [
+        "2/7"
+      ],
+      "label": "Spår 2c → Spår 2b",
+      "blocks": [
+        "SIIA",
+        "S122",
+        "S121",
+        "S121b",
+        "SIIB"
+      ],
+      "turnouts": {
+        "Vx122": "C",
+        "Vx121": "C",
+        "Vx120": "C"
+      },
+      "crossings": [],
+      "segments": [
+        "T249",
+        "T4",
+        "T94",
+        "T103",
+        "T252",
+        "T253"
+      ],
+      "flow": [
+        {
+          "id": "T249",
+          "x1": 880,
+          "y1": 320,
+          "x2": 930,
+          "y2": 320,
+          "block": "SIIA",
+          "length": 50,
+          "distance": 0
+        },
+        {
+          "id": "VX:Vx122:A",
+          "x1": 930,
+          "y1": 320,
+          "x2": 960,
+          "y2": 320,
+          "block": "S122",
+          "length": 30,
+          "distance": 50
+        },
+        {
+          "id": "VX:Vx122:B",
+          "x1": 960,
+          "y1": 320,
+          "x2": 990,
+          "y2": 320,
+          "block": "S122",
+          "length": 30,
+          "distance": 80
+        },
+        {
+          "id": "T4",
+          "x1": 990,
+          "y1": 320,
+          "x2": 985,
+          "y2": 320,
+          "block": "S121",
+          "length": 5,
+          "distance": 110
+        },
+        {
+          "id": "VX:Vx121:A",
+          "x1": 985,
+          "y1": 320,
+          "x2": 1015,
+          "y2": 320,
+          "block": "S121",
+          "length": 30,
+          "distance": 115
+        },
+        {
+          "id": "VX:Vx121:B",
+          "x1": 1015,
+          "y1": 320,
+          "x2": 1045,
+          "y2": 320,
+          "block": "S121",
+          "length": 30,
+          "distance": 145
+        },
+        {
+          "id": "T94",
+          "x1": 1045,
+          "y1": 320,
+          "x2": 1080,
+          "y2": 320,
+          "block": "S121b",
+          "length": 35,
+          "distance": 175
+        },
+        {
+          "id": "T103",
+          "x1": 1080,
+          "y1": 320,
+          "x2": 1170,
+          "y2": 320,
+          "block": "SIIB",
+          "length": 90,
+          "distance": 210
+        },
+        {
+          "id": "T252",
+          "x1": 1170,
+          "y1": 320,
+          "x2": 1230,
+          "y2": 320,
+          "block": "SIIB",
+          "length": 60,
+          "distance": 300
+        },
+        {
+          "id": "T253",
+          "x1": 1230,
+          "y1": 320,
+          "x2": 1270,
+          "y2": 320,
+          "block": "SIIB",
+          "length": 40,
+          "distance": 360
+        }
+      ]
+    },
+    {
+      "id": "12-5b",
+      "from": "htvSpIVA",
+      "to": "htvSpVB",
+      "signals": [
+        "4/5"
+      ],
+      "label": "Spår 12 → Spår 5b",
+      "blocks": [
+        "SIVA",
+        "S123c",
+        "S123",
+        "S123a",
+        "S126",
+        "S126a",
+        "S131",
+        "S131c",
+        "SVB"
+      ],
+      "turnouts": {
+        "Vx123": "T",
+        "Vx126": "C",
+        "Vx131": "C"
+      },
+      "crossings": [],
+      "segments": [
+        "T263",
+        "T130",
+        "T50",
+        "T49",
+        "T116",
+        "T186",
+        "T259",
+        "T187"
+      ],
+      "flow": [
+        {
+          "id": "T263",
+          "x1": 850,
+          "y1": 470,
+          "x2": 930,
+          "y2": 470,
+          "block": "SIVA",
+          "length": 80,
+          "distance": 0
+        },
+        {
+          "id": "T130",
+          "x1": 930,
+          "y1": 470,
+          "x2": 960,
+          "y2": 470,
+          "block": "S123c",
+          "length": 30,
+          "distance": 80
+        },
+        {
+          "id": "VX:Vx123:C",
+          "x1": 960,
+          "y1": 470,
+          "x2": 990,
+          "y2": 470,
+          "block": "S123",
+          "length": 30,
+          "distance": 110
+        },
+        {
+          "id": "VX:Vx123:A",
+          "x1": 990,
+          "y1": 470,
+          "x2": 1005,
+          "y2": 495,
+          "block": "S123",
+          "length": 29.1547594742265,
+          "distance": 140
+        },
+        {
+          "id": "T50",
+          "x1": 1005,
+          "y1": 495,
+          "x2": 1005,
+          "y2": 495,
+          "block": "S123a",
+          "length": 0,
+          "distance": 169.1547594742265
+        },
+        {
+          "id": "VX:Vx126:B",
+          "x1": 1005,
+          "y1": 495,
+          "x2": 1020,
+          "y2": 520,
+          "block": "S126",
+          "length": 29.1547594742265,
+          "distance": 169.1547594742265
+        },
+        {
+          "id": "VX:Vx126:A",
+          "x1": 1020,
+          "y1": 520,
+          "x2": 1035,
+          "y2": 545,
+          "block": "S126",
+          "length": 29.1547594742265,
+          "distance": 198.309518948453
+        },
+        {
+          "id": "T49",
+          "x1": 1035,
+          "y1": 545,
+          "x2": 1035,
+          "y2": 545,
+          "block": "S126a",
+          "length": 0,
+          "distance": 227.46427842267948
+        },
+        {
+          "id": "VX:Vx131:A",
+          "x1": 1035,
+          "y1": 545,
+          "x2": 1050,
+          "y2": 570,
+          "block": "S131",
+          "length": 29.1547594742265,
+          "distance": 227.46427842267948
+        },
+        {
+          "id": "VX:Vx131:C",
+          "x1": 1050,
+          "y1": 570,
+          "x2": 1070,
+          "y2": 570,
+          "block": "S131",
+          "length": 20,
+          "distance": 256.619037896906
+        },
+        {
+          "id": "T116",
+          "x1": 1070,
+          "y1": 570,
+          "x2": 1100,
+          "y2": 570,
+          "block": "S131c",
+          "length": 30,
+          "distance": 276.619037896906
+        },
+        {
+          "id": "T186",
+          "x1": 1100,
+          "y1": 570,
+          "x2": 1250,
+          "y2": 570,
+          "block": "SVB",
+          "length": 150,
+          "distance": 306.619037896906
+        },
+        {
+          "id": "T259",
+          "x1": 1250,
+          "y1": 570,
+          "x2": 1310,
+          "y2": 570,
+          "block": "SVB",
+          "length": 60,
+          "distance": 456.619037896906
+        },
+        {
+          "id": "T187",
+          "x1": 1310,
+          "y1": 570,
+          "x2": 1430,
+          "y2": 570,
+          "block": "SVB",
+          "length": 120,
+          "distance": 516.619037896906
+        }
+      ]
+    },
+    {
+      "id": "cu-2b",
+      "from": "htvCu",
+      "to": "htvSpIIB",
+      "signals": [
+        "1/5",
+        "2/7"
+      ],
+      "label": "Cu → Spår 2b",
+      "blocks": [
+        "SU4A",
+        "SU4B",
+        "S95",
+        "S100",
+        "S100b",
+        "S101",
+        "S102",
+        "S117a",
+        "S117",
+        "SIIA",
+        "S122",
+        "S121",
+        "S121b",
+        "SIIB"
+      ],
+      "turnouts": {
+        "Vx95": "C",
+        "Vx100": "T",
+        "Vx101": "T",
+        "Vx102": "C",
+        "Vx117": "C",
+        "Vx110": "C",
+        "Vx122": "C",
+        "Vx121": "C",
+        "Vx120": "C"
+      },
+      "crossings": [],
+      "segments": [
+        "T163",
+        "T245",
+        "T244",
+        "T234",
+        "T237",
+        "T12",
+        "T3",
+        "T73",
+        "T78",
+        "T115",
+        "T146",
+        "T149",
+        "T248",
+        "T249",
+        "T4",
+        "T94",
+        "T103",
+        "T252",
+        "T253"
+      ],
+      "flow": [
+        {
+          "id": "T163",
+          "x1": 40,
+          "y1": 270,
+          "x2": 70,
+          "y2": 270,
+          "block": "SU4A",
+          "length": 30,
+          "distance": 0
+        },
+        {
+          "id": "T245",
+          "x1": 70,
+          "y1": 270,
+          "x2": 110,
+          "y2": 270,
+          "block": "SU4A",
+          "length": 40,
+          "distance": 30
+        },
+        {
+          "id": "T244",
+          "x1": 110,
+          "y1": 270,
+          "x2": 150,
+          "y2": 270,
+          "block": "SU4A",
+          "length": 40,
+          "distance": 70
+        },
+        {
+          "id": "T234",
+          "x1": 150,
+          "y1": 270,
+          "x2": 260,
+          "y2": 270,
+          "block": "SU4B",
+          "length": 110,
+          "distance": 110
+        },
+        {
+          "id": "VX:Vx95:B",
+          "x1": 260,
+          "y1": 270,
+          "x2": 290,
+          "y2": 270,
+          "block": "S95",
+          "length": 30,
+          "distance": 220
+        },
+        {
+          "id": "VX:Vx95:A",
+          "x1": 290,
+          "y1": 270,
+          "x2": 320,
+          "y2": 270,
+          "block": "S95",
+          "length": 30,
+          "distance": 250
+        },
+        {
+          "id": "T237",
+          "x1": 320,
+          "y1": 270,
+          "x2": 380,
+          "y2": 270,
+          "block": "S95",
+          "length": 60,
+          "distance": 280
+        },
+        {
+          "id": "T12",
+          "x1": 380,
+          "y1": 270,
+          "x2": 405,
+          "y2": 270,
+          "block": "S100",
+          "length": 25,
+          "distance": 340
+        },
+        {
+          "id": "VX:Vx100:A",
+          "x1": 405,
+          "y1": 270,
+          "x2": 435,
+          "y2": 270,
+          "block": "S100",
+          "length": 30,
+          "distance": 365
+        },
+        {
+          "id": "VX:Vx100:C",
+          "x1": 435,
+          "y1": 270,
+          "x2": 450,
+          "y2": 295,
+          "block": "S100",
+          "length": 29.1547594742265,
+          "distance": 395
+        },
+        {
+          "id": "T3",
+          "x1": 450,
+          "y1": 295,
+          "x2": 450,
+          "y2": 295,
+          "block": "S100b",
+          "length": 0,
+          "distance": 424.1547594742265
+        },
+        {
+          "id": "VX:Vx101:C",
+          "x1": 450,
+          "y1": 295,
+          "x2": 465,
+          "y2": 320,
+          "block": "S101",
+          "length": 29.1547594742265,
+          "distance": 424.1547594742265
+        },
+        {
+          "id": "VX:Vx101:A",
+          "x1": 465,
+          "y1": 320,
+          "x2": 495,
+          "y2": 320,
+          "block": "S101",
+          "length": 30,
+          "distance": 453.30951894845305
+        },
+        {
+          "id": "T73",
+          "x1": 495,
+          "y1": 320,
+          "x2": 510,
+          "y2": 320,
+          "block": "S101",
+          "length": 15,
+          "distance": 483.30951894845305
+        },
+        {
+          "id": "VX:Vx102:A",
+          "x1": 510,
+          "y1": 320,
+          "x2": 540,
+          "y2": 320,
+          "block": "S102",
+          "length": 30,
+          "distance": 498.30951894845305
+        },
+        {
+          "id": "VX:Vx102:B",
+          "x1": 540,
+          "y1": 320,
+          "x2": 570,
+          "y2": 320,
+          "block": "S102",
+          "length": 30,
+          "distance": 528.309518948453
+        },
+        {
+          "id": "T78",
+          "x1": 570,
+          "y1": 320,
+          "x2": 610,
+          "y2": 320,
+          "block": "S117a",
+          "length": 40,
+          "distance": 558.309518948453
+        },
+        {
+          "id": "T115",
+          "x1": 610,
+          "y1": 320,
+          "x2": 670,
+          "y2": 320,
+          "block": "S117a",
+          "length": 60,
+          "distance": 598.309518948453
+        },
+        {
+          "id": "VX:Vx117:B",
+          "x1": 670,
+          "y1": 320,
+          "x2": 700,
+          "y2": 320,
+          "block": "S117",
+          "length": 30,
+          "distance": 658.309518948453
+        },
+        {
+          "id": "VX:Vx117:A",
+          "x1": 700,
+          "y1": 320,
+          "x2": 730,
+          "y2": 320,
+          "block": "S117",
+          "length": 30,
+          "distance": 688.309518948453
+        },
+        {
+          "id": "T146",
+          "x1": 730,
+          "y1": 320,
+          "x2": 760,
+          "y2": 320,
+          "block": "S117",
+          "length": 30,
+          "distance": 718.309518948453
+        },
+        {
+          "id": "T149",
+          "x1": 760,
+          "y1": 320,
+          "x2": 820,
+          "y2": 320,
+          "block": "SIIA",
+          "length": 60,
+          "distance": 748.309518948453
+        },
+        {
+          "id": "T248",
+          "x1": 820,
+          "y1": 320,
+          "x2": 880,
+          "y2": 320,
+          "block": "SIIA",
+          "length": 60,
+          "distance": 808.309518948453
+        },
+        {
+          "id": "T249",
+          "x1": 880,
+          "y1": 320,
+          "x2": 930,
+          "y2": 320,
+          "block": "SIIA",
+          "length": 50,
+          "distance": 868.309518948453
+        },
+        {
+          "id": "VX:Vx122:A",
+          "x1": 930,
+          "y1": 320,
+          "x2": 960,
+          "y2": 320,
+          "block": "S122",
+          "length": 30,
+          "distance": 918.309518948453
+        },
+        {
+          "id": "VX:Vx122:B",
+          "x1": 960,
+          "y1": 320,
+          "x2": 990,
+          "y2": 320,
+          "block": "S122",
+          "length": 30,
+          "distance": 948.309518948453
+        },
+        {
+          "id": "T4",
+          "x1": 990,
+          "y1": 320,
+          "x2": 985,
+          "y2": 320,
+          "block": "S121",
+          "length": 5,
+          "distance": 978.309518948453
+        },
+        {
+          "id": "VX:Vx121:A",
+          "x1": 985,
+          "y1": 320,
+          "x2": 1015,
+          "y2": 320,
+          "block": "S121",
+          "length": 30,
+          "distance": 983.309518948453
+        },
+        {
+          "id": "VX:Vx121:B",
+          "x1": 1015,
+          "y1": 320,
+          "x2": 1045,
+          "y2": 320,
+          "block": "S121",
+          "length": 30,
+          "distance": 1013.309518948453
+        },
+        {
+          "id": "T94",
+          "x1": 1045,
+          "y1": 320,
+          "x2": 1080,
+          "y2": 320,
+          "block": "S121b",
+          "length": 35,
+          "distance": 1043.309518948453
+        },
+        {
+          "id": "T103",
+          "x1": 1080,
+          "y1": 320,
+          "x2": 1170,
+          "y2": 320,
+          "block": "SIIB",
+          "length": 90,
+          "distance": 1078.309518948453
+        },
+        {
+          "id": "T252",
+          "x1": 1170,
+          "y1": 320,
+          "x2": 1230,
+          "y2": 320,
+          "block": "SIIB",
+          "length": 60,
+          "distance": 1168.309518948453
+        },
+        {
+          "id": "T253",
+          "x1": 1230,
+          "y1": 320,
+          "x2": 1270,
+          "y2": 320,
+          "block": "SIIB",
+          "length": 40,
+          "distance": 1228.309518948453
+        }
+      ]
+    }
+  ],
+  "coupled": {
+    "Vx121": [
+      "Vx121",
+      "Vx120"
+    ],
+    "Vx120": [
+      "Vx120",
+      "Vx121"
+    ],
+    "Vx122": [
+      "Vx122"
+    ],
+    "Vx123": [
+      "Vx123"
+    ],
+    "Vx126": [
+      "Vx126"
+    ],
+    "Vx131": [
+      "Vx131"
+    ],
+    "Vx95": [
+      "Vx95"
+    ],
+    "Vx100": [
+      "Vx100",
+      "Vx101"
+    ],
+    "Vx101": [
+      "Vx101",
+      "Vx100"
+    ],
+    "Vx102": [
+      "Vx102"
+    ],
+    "Vx117": [
+      "Vx117",
+      "Vx110"
+    ],
+    "Vx110": [
+      "Vx110",
+      "Vx117"
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Logga in · Charlottendal TKL</title><link rel="stylesheet" href="/auth.css"><script type="module" src="/auth.js"></script></head>
+<body><main id="account-view"><div class="brand">CHARLOTTENDAL TKL</div><h1 id="heading">Logga in</h1><p id="intro">Ange ditt lösenord för att öppna ställverket.</p>
+<p id="error" role="alert" hidden></p>
+<form id="login"><label for="password">Lösenord</label><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="128" autofocus><button type="submit">Logga in</button></form>
+<form id="change" hidden><div id="current-row"><label for="current">Nuvarande lösenord</label><input id="current" name="currentPassword" type="password" autocomplete="current-password" required maxlength="128"></div><label for="new">Nytt lösenord</label><input id="new" name="newPassword" type="password" autocomplete="new-password" required minlength="6" maxlength="128"><small>Minst 6 tecken. En kort mening fungerar bra.</small><label for="repeat">Upprepa det nya lösenordet</label><input id="repeat" type="password" autocomplete="new-password" required minlength="6" maxlength="128"><button type="submit" class="primary">Spara och öppna TKL</button></form>
+<nav id="account-actions" hidden><a id="back" href="/">Tillbaka till ställverket</a><button id="logout" type="button">Logga ut</button></nav><footer>Charlottendal · Tågklarering</footer></main></body></html>

@@ -1,0 +1,445 @@
+/* A fixed instrument face. Only an explicit viewport/zoom change resizes it. */
+body.panel-app{height:100dvh;overflow:hidden;overscroll-behavior:none}
+body.panel-app #panel-view .panel-shell{height:100%;display:grid;grid-template-rows:var(--plan-row) minmax(0,1fr);position:relative}
+body.panel-app #panel-view{position:fixed;inset:0;margin:0;overflow:hidden}
+/* Messages float above the instrument face and never reserve layout space. */
+#global-status{position:fixed;z-index:80;top:max(10px,env(safe-area-inset-top));right:14px;width:min(560px,calc(100vw - 64px));max-height:calc(100dvh - 34px);display:flex;flex-direction:column;gap:8px;overflow:auto;overscroll-behavior:contain;pointer-events:none}
+body:not([data-page=panel]) #global-status{top:88px;max-height:calc(100dvh - 112px)}
+#global-status:not(:has(>div:not([hidden]))){display:none}
+#global-status>div:not([hidden]){flex:none;margin:0;padding:12px 14px;border:1px solid #494947;border-radius:8px;background:#242423;color:#efefea;font-size:12px;line-height:1.55;box-shadow:0 5px 22px #0006;pointer-events:auto;animation:toast-appear 180ms ease-out;transition:opacity 180ms ease-out,transform 180ms ease-in}
+#global-status #ais-status{background:#362323;border-color:#845455;color:#ffc1b4}
+#global-status #message{background:#242423;border-color:#51514b;color:#efefea;border-left:3px solid #a5b6a1}
+#global-status #message[data-tone=error]{background:#2b2424;border-color:#63504d;border-left-color:#c38d80;color:#f0ddd7}
+#global-status>div.toast-leaving{opacity:0;transform:translateX(calc(100% + 28px))}
+#global-status button{padding:4px 9px;white-space:nowrap}
+@keyframes toast-appear{from{opacity:0;transform:translateX(calc(100% + 28px))}to{opacity:1;transform:translateX(0)}}
+@media(prefers-reduced-motion:reduce){#global-status>div:not([hidden]){animation:none;transition:none}}
+/* Unavailable endpoints keep their appearance and do not respond to hover. */
+#track-plan .choice-disabled{cursor:default;pointer-events:none}
+#track-plan .choice-disabled .hit{fill:transparent;stroke:transparent}
+#panel-menu-slot{position:absolute;z-index:60;top:8px;left:8px}
+#panel-menu-slot #menu-toggle{width:34px;height:32px;min-height:32px;border-color:transparent;background:transparent;color:var(--ink)}
+#panel-menu-slot #menu-toggle:hover{background:#252524;border-color:#454543}
+#panel-view .panel-scroll{position:relative;min-height:0;overflow:auto;overscroll-behavior:contain;overflow-anchor:none;scroll-behavior:auto;contain:layout paint}
+#panel-view #track-plan{width:100%;height:100%;min-height:0;min-width:0;overflow:hidden;user-select:none;-webkit-user-select:none}
+body:not([data-panel-ready=true]) #track-plan{visibility:hidden}
+body:not([data-panel-ready=true]) .panel-scroll::before{content:'Läser in ställverket…';position:absolute;inset:45% 0 auto;text-align:center;color:var(--ink);font-size:12px;letter-spacing:1px}
+/* The console row under the plan is empty since 0.45: its buttons sit in the status bar. */
+body.panel-app #panel-console{display:none}
+.panel-runtime-info{display:flex;flex-direction:column;gap:10px;margin-top:12px;font-size:12px;line-height:1.5}.panel-runtime-info>span:empty{display:none}
+.operation-overview{display:grid;grid-template-columns:1fr 1fr;gap:12px}.operation-overview button{text-align:left;padding:16px;background:transparent}.operation-overview strong{display:block;font-size:14px;font-weight:500}.operation-overview span{display:block;margin-top:8px;color:var(--muted);font-size:12px;line-height:1.5}
+#panel-drawer .authority-bar{display:flex;justify-content:space-between;gap:16px;align-items:center}
+#panel-drawer{position:fixed;inset:auto auto 10px 50%;transform:translateX(-50%);margin:0;width:min(900px,calc(100vw - 24px));max-height:calc(100dvh - 80px);overflow:auto;overscroll-behavior:contain;border:1px solid #819080;border-radius:5px;box-shadow:0 8px 35px #0009;scrollbar-gutter:stable}
+#panel-drawer::backdrop{background:#0002}
+#panel-drawer .panel-drawer-heading{position:sticky;top:-14px;background:var(--page);z-index:1;padding:10px 0}
+.touch-target .dot,.touch-target:hover .dot,.touch-target:focus-visible .dot{transform:none}
+.touch-target .hit{transition:fill 100ms,stroke 100ms}
+.touch-target .dot{transition:fill 100ms}
+.signal-target image{transition:none}
+@media(max-width:900px){#panel-view .panel-name{grid-template-columns:auto minmax(0,1fr) 34px;gap:8px;padding-inline:10px}#panel-view .panel-name>span:first-child{font-size:10px;letter-spacing:1px}}
+@media(max-width:700px){.operation-overview{grid-template-columns:1fr}#panel-view .panel-actions{flex:none}#panel-drawer{width:calc(100vw - 16px);padding:12px 8px}}
+@media(prefers-reduced-motion:reduce){.touch-target .hit,.touch-target .dot,.panel-key{transition:none}}
+/* One fitted image plane; manual zoom expands only this scrollable area. */
+#plan-stage{display:grid;place-items:center;width:100%;height:100%;min-width:0;min-height:0}
+#panel-view #track-plan{max-width:none;flex:none}
+#menu-zoom-value{margin-left:auto;font-size:11px;color:var(--muted)}
+.panel-zoom-control{display:block;min-width:0}
+.zoom-value-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.zoom-value-row output{font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.admin-dialog .panel-zoom-control input[type=range]{width:100%;height:30px;padding:0;margin:0;accent-color:#adc7b2;display:block}
+.zoom-scale{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin:2px 0 12px}
+.zoom-fit{font-size:12px;padding:7px 12px}
+.panel-zoom-control .muted{margin:10px 0 0}
+.admin-dialog.panel-zoom-dialog{inset:auto 16px 18px auto;margin:0;width:min(380px,calc(100vw - 32px));max-height:calc(100dvh - 36px)}
+.admin-dialog.panel-zoom-dialog::backdrop{background:#0001}
+#panel-zoom-form>p{margin:0}
+@media(max-width:700px){.admin-dialog.panel-zoom-dialog{right:8px;bottom:8px;width:calc(100vw - 16px);max-width:calc(100vw - 16px)}}
+
+/* Two fixed lenses alternate gently while the server prepares the route. */
+@keyframes route-endpoint-wait{0%,35%,100%{fill:#cbb876;stroke:#cbb876}50%,85%{fill:#394039;stroke:#8b917f}}
+.touch-target.route-preparing .dot,.touch-target.route-preparing .traffic-dot{animation:route-endpoint-wait 2400ms ease-in-out infinite}
+.touch-target.route-preparing[data-preparing-endpoint=end] .dot,.touch-target.route-preparing[data-preparing-endpoint=end] .traffic-dot{animation-delay:-1200ms}
+@media(prefers-reduced-motion:reduce){.touch-target.route-preparing .dot,.touch-target.route-preparing .traffic-dot{animation:none;fill:#cbb876;stroke:#cbb876}}
+
+
+/* Reservation and detection are independent: red still means occupied. */
+#track-plan .rail.blocked{stroke-dasharray:9 6;stroke-linecap:butt}
+#track-plan .rail.blocked:not(.occupied){stroke:#b59ce8!important}
+#track-plan .rail.blocked.occupied{stroke:var(--red)!important;stroke-dasharray:9 6}
+#track-plan .rail.blocked.branch-off{opacity:.45}
+.track-restriction{outline:none;cursor:context-menu}
+.restriction-hit{fill:transparent;stroke:none}
+.restriction-bars{fill:none;stroke:#cab5ef;stroke-width:2;stroke-linecap:square;paint-order:stroke}
+.track-restriction:focus-visible .restriction-hit{stroke:#deded1;stroke-width:1;rx:3}
+/* The line reservation is drawn on the track, not as a box around its NX button. */
+#track-plan .route-button.line-is-blocked{outline:none}
+#track-plan .route-button.line-is-blocked .dot{fill:#484642;stroke:#77736a}
+
+/* Selection is ivory; green remains reserved for an established route. */
+@keyframes route-start-choice{0%,35%,100%{fill:#fff5bd;stroke:#fff8d8}50%,85%{fill:#484534;stroke:#e8d997}}
+#track-plan .route-choice-start .dot,#track-plan .route-choice-start .traffic-dot{animation:route-start-choice 1100ms ease-in-out infinite;opacity:1}
+#track-plan .route-choice-start .hit,#track-plan .route-choice-end .hit{stroke:#fff2bd;stroke-width:2;fill:#fff2bd12;stroke-dasharray:none}
+#track-plan .route-choice-end .dot,#track-plan .route-choice-end .traffic-dot{fill:#fff5bd;stroke:#fff8d8;stroke-width:2;opacity:1;animation:none}
+@media(prefers-reduced-motion:reduce){#track-plan .route-choice-start .dot,#track-plan .route-choice-start .traffic-dot{animation:none;stroke:#fff8d8}#track-plan .route-choice-start .dot{fill:#fff5bd}}
+
+#track-plan .destination-phone{fill:#111;stroke:none;font-weight:500;font-family:"Helvetica Neue",Arial,sans-serif}
+.destination-list{overflow-x:auto}
+
+/* Fixed dashed underlay plus a fading confirmed branch: no path swaps or jumps. */
+#track-plan .turnout-lit{opacity:0;transition:opacity 480ms cubic-bezier(.22,.61,.36,1);pointer-events:none}
+#track-plan .turnout-base{transition:opacity 480ms cubic-bezier(.22,.61,.36,1)}
+#track-plan .turnout-base.turnout-stem{opacity:.3}
+#track-plan .turnout-geometry[data-phase=waiting] .rail:not(.occupied):not(.blocked){stroke:#ab9b72;stroke-dasharray:3 6}
+#track-plan .turnout-geometry[data-phase=waiting] .turnout-base{opacity:.5}
+#track-plan .turnout-geometry[data-instant=true] .rail{transition:none}
+#track-plan .turnout-geometry[data-phase=unknown] .turnout-lit{visibility:hidden}
+@media(prefers-reduced-motion:reduce){#track-plan .turnout-lit,#track-plan .turnout-base{transition:none}}
+
+/* Keep the small reset control attached to the fitted drawing, above the timetable. */
+#plan-face{display:flex;flex-direction:column;align-items:center;width:max-content;max-width:none}
+
+/* Turntable pit and bridge, independent of the source's decorative diamond. */
+.turntable{cursor:context-menu;outline:none}
+.turntable-pit{fill:var(--panel);stroke:var(--rail);stroke-width:2}
+.turntable-rim{fill:none;stroke:var(--rail);stroke-width:.8;opacity:.45}
+.turntable-deck{fill:#282625;stroke:var(--rail);stroke-width:.7}
+.turntable-sleeper{fill:none;stroke:var(--rail);stroke-width:1;opacity:.45}
+.turntable-rails{fill:none;stroke:var(--rail);stroke-width:1.5}
+.turntable[data-position=unknown] .turntable-bridge{opacity:.55}
+.turntable-unknown{fill:var(--ink);font-size:10px;opacity:.65}
+.turntable:focus-visible .turntable-pit{stroke:#fff;stroke-width:3}
+
+/* Every NX dot along a reserved path follows the line's indication.
+   Choice/preparation animations retain their existing precedence. */
+#track-plan .route-button.in-route{--route-dot:var(--route)}
+#track-plan .route-button[data-route-phase=held]{--route-dot:var(--amber)}
+#track-plan .route-button[data-route-phase=occupied]{--route-dot:var(--red)}
+#track-plan .route-button.in-route:not(.line-is-blocked):not(.route-choice-end) .dot{fill:var(--route-dot)}
+
+/* Signal selection is an outline, never a lit panel lamp or signal aspect.
+   Possible targets remain unmarked until hover or keyboard focus. */
+#track-plan .signal-target .hit{fill:transparent;stroke:transparent;stroke-width:1.2;stroke-dasharray:none;animation:none}
+#track-plan .signal-target.signal-startable:not(.choice-disabled):hover .hit,
+#track-plan .signal-target.signal-startable:not(.choice-disabled):focus-visible .hit,
+#track-plan .signal-target.signal-destination:not(.choice-disabled):hover .hit,
+#track-plan .signal-target.signal-destination:not(.choice-disabled):focus-visible .hit{stroke:#dedbd0;fill:transparent}
+#track-plan .signal-target.signal-chosen .hit,
+#track-plan .signal-target.route-choice-start .hit,
+#track-plan .signal-target.route-choice-end .hit,
+#track-plan .signal-target.signal-preparing .hit{stroke:#dedbd0;stroke-width:1.5;fill:transparent;animation:none}
+
+/* Incoming identities are planning information, separate from signal aspects. */
+#track-plan .incoming-train-number{cursor:pointer}
+#track-plan .incoming-train-number rect{fill:#13202b;stroke:#8dcaf1;stroke-width:1.2}
+#track-plan .incoming-train-number text{fill:#bde5ff;font:600 12px Menlo,monospace;pointer-events:none}
+#track-plan .incoming-train-number:hover rect,#track-plan .incoming-train-number:focus-visible rect{stroke:#e1f3ff;stroke-width:2}
+#track-plan .incoming-train-number.deviating rect{stroke-dasharray:4 2}
+#track-plan .incoming-train-number.needs-review text{fill:#e6c486}
+.incoming-train-menu{position:fixed;margin:0;padding:18px;width:300px;max-width:calc(100vw - 32px);border:1px solid #48545c;border-radius:6px;background:#191b1c;color:#eee;box-shadow:0 8px 35px #0008}
+.incoming-train-menu::backdrop{background:#0003}
+.incoming-train-menu h2{font-size:16px;margin:0 0 10px}
+.incoming-train-menu p{font-size:12px;line-height:1.5;color:#bcc4c9}
+.incoming-train-menu button{display:block;width:100%;text-align:left;margin:6px 0}
+.incoming-train-menu [data-arrival-message]{color:#d9c7a2}
+
+#yard-authority[aria-pressed=true] .reset-indicator{fill:#7fa7bb;stroke:#a2c7d8}
+.rail.yard-delegated:not(.occupied):not(.unknown):not(.blocked){stroke:#7894a2}
+
+/* ===== Nederrad med tidtabell och händelser · helsideslayout (design 1 oktober 2026) =====
+   The bottom row gets what is left; the plan scales to the width in its 2102:688
+   proportion, never the other way round. Below 300 px of bottom row the plan shrinks
+   instead and is centred. All scrolling is local: the page itself never scrolls. */
+html:has(body.panel-app){overflow:hidden}
+body.panel-app{--console-h:0px;--plan-inset-x:16px;--plan-inset-top:10px;--plan-fit:contain;--plan-tag:pan;--plan-h:min(calc((100vw - 16px) / 3.0552),var(--plan-user,calc(100dvh - 10px - 300px)));--plan-row:calc(var(--plan-h) + var(--plan-inset-top) + var(--console-h));background:#000}
+body.panel-app[data-skin=original] .panel-shell{--panel:#000;background:#000}
+body.panel-app .panel-shell{background:#000}
+#plan-face{padding:var(--plan-inset-top) calc(var(--plan-inset-x) / 2) 0}
+#panel-view .panel-scroll{background:#000}
+/* The row: timetable left, events right. */
+#panel-bottom{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 560px;grid-template-rows:minmax(0,1fr);gap:0;min-height:0;padding:0;border-top:1px solid #1f2429;background:#000;color:#e6e9ec;font:400 13px/1.3 "IBM Plex Sans",system-ui,sans-serif;font-variant-numeric:tabular-nums;--tt-row:25px;--tt-now:27px;--tt-line:14px;--tt-pad:16px;--tt-gap:10px;--tt-cols:72px 48px 104px 104px 62px 62px 84px 250px minmax(0,1fr)}
+#panel-bottom-tabs{display:none}
+body.panel-app #trainmeet-timetable{display:grid;grid-template-rows:auto auto minmax(0,1fr);min-height:0;min-width:0;height:auto;margin:0;padding:0;border:0;border-right:1px solid #1f2429;border-radius:0;background:transparent;color:inherit;font:inherit;position:relative;overflow:hidden}
+.tt-heading{display:flex;align-items:baseline;gap:18px;height:auto;min-height:0;margin:0;padding:9px var(--tt-pad) 7px;border-bottom:1px solid #1f2429;white-space:nowrap;overflow:hidden;flex-wrap:nowrap}
+.tt-heading h2{margin:0;flex:none;font:600 12.5px/1.3 "IBM Plex Sans",system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#e6e9ec}
+#tt-station{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:#7d8791;opacity:1}
+.tt-mode{display:flex;flex:none;border:1px solid #2a3036;border-radius:3px;overflow:hidden;font-size:11px}
+.tt-mode button{min-height:0;padding:2px 9px;border:0;border-radius:0;background:transparent;color:#7d8791;font:inherit;line-height:1.4}
+.tt-mode button:hover{background:#262c32;border-color:transparent}
+.tt-mode button[aria-pressed=true]{background:#262c32;color:#e6e9ec}
+#tt-next{margin-left:auto;flex:none;font-size:12px;color:#aeb6be;white-space:nowrap}
+#tt-next b,#bottom-tabs-next b,.tt-mini-next b{font-weight:600;color:#e6e9ec}
+#tt-next em,#bottom-tabs-next em,.tt-mini-next em{font-style:normal;color:#f5c518}
+#tt-clock{display:flex;flex:none;align-items:baseline;gap:9px;min-width:0;overflow:visible;font-variant-numeric:tabular-nums}
+#tt-clock:empty{display:none}
+#tt-clock-time{font:500 20px/1.2 "IBM Plex Mono",monospace;color:#e6e9ec}
+#tt-clock-label{font-size:11px;color:#7d8791}
+#tt-collapse{display:none}
+#tt-status{position:absolute;z-index:2;top:42px;left:0;right:0;margin:0;padding:5px var(--tt-pad);font-size:11px;line-height:16px;background:#000;color:#f5d76e;border-block:1px solid #2a3036}
+#tt-status[hidden]{display:none!important}
+.tt-labels{display:grid;grid-template-columns:var(--tt-cols);gap:0 var(--tt-gap);padding:5px var(--tt-pad) 3px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#7d8791;opacity:1;white-space:nowrap}
+.tt-labels>span{min-width:0;overflow:hidden;text-overflow:ellipsis;text-align:left}
+#tt-content{min-height:0;overflow:hidden auto;overscroll-behavior:contain;padding:0 var(--tt-pad) 6px;scrollbar-width:thin;outline:none}
+.tt-entry{display:grid;grid-template-columns:var(--tt-cols);gap:0 var(--tt-gap);align-items:center;width:100%;height:var(--tt-row);margin:0;padding:0;border:0;border-radius:0;background:transparent;color:#dfe4e8;font:inherit;text-align:left;white-space:nowrap;cursor:pointer;transition:none}
+.tt-entry>span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.tt-entry .tt-n{font-weight:500}
+.tt-entry:hover{background:#ffffff0a;border-color:transparent}
+.tt-entry:focus-visible{outline:1px solid #7d8791;outline-offset:-1px;background:transparent}
+.tt-done{color:#667079}
+.tt-now{height:var(--tt-now);color:#f3f5f7;background:rgba(245,197,24,.07);margin:0 -8px;width:calc(100% + 16px);padding:0 8px}
+.tt-now .tt-n{font-weight:600}
+.tt-now .tt-lage,.tt-now .tt-la{color:#f5c518}
+.tt-next .tt-lage{color:#7d8791}.tt-next .tt-anm{color:#b6bec6}.tt-next .tt-la{color:#8a939c}
+.tt-track-changed{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.tt-now-line{display:flex;align-items:center;gap:10px;height:var(--tt-line);margin:1px 0}
+.tt-now-line span{font:500 10px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;color:#f5c518}
+.tt-now-line i{flex:1;height:1px;background:#f5c518;opacity:.55}
+.tt-frtill,.tt-la{display:none}
+.tt-empty{margin:9px 0;font-size:12px;color:#7d8791;opacity:1}
+.timetable-stale #tt-content,.timetable-stale #tt-clock{opacity:.55}
+#tt-mini{display:none}
+/* Händelser: the core journal, newest on top. */
+#panel-events{display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0;min-width:0;--ev-cols:60px 10px minmax(0,1fr) auto;--ev-gap:10px;--ev-row:30px}
+.ev-heading{display:flex;align-items:baseline;gap:14px;padding:9px var(--tt-pad) 7px;border-bottom:1px solid #1f2429;white-space:nowrap}
+.ev-heading h2{margin:0;font:600 12.5px/1.3 "IBM Plex Sans",system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#e6e9ec}
+.ev-filters{display:flex;gap:14px;margin-left:auto;font-size:11px}
+.ev-filters button{min-height:0;padding:0;border:0;border-bottom:1px solid transparent;border-radius:0;background:transparent;color:#7d8791;font:inherit;line-height:1.4}
+.ev-filters button:hover{background:transparent;color:#e6e9ec}
+.ev-filters button[aria-pressed=true]{color:#e6e9ec;border-bottom-color:#e6e9ec}
+.ev-alarm-count,#bottom-tabs-alarms{color:#ff6a5c}
+#ev-content{min-height:0;overflow:hidden auto;overscroll-behavior:contain;padding:4px var(--tt-pad) 6px;scrollbar-width:thin;outline:none}
+.ev-row{display:grid;grid-template-columns:var(--ev-cols);gap:0 var(--ev-gap);align-items:center;height:var(--ev-row);font-size:12.5px;border-bottom:1px solid #121619;white-space:nowrap}
+.ev-row time{font:500 11.5px/1 "IBM Plex Mono",monospace;color:#7d8791}
+.ev-dot{width:7px;height:7px;border-radius:50%;background:#5a646d}
+.ev-ok .ev-dot{background:#46d36b}.ev-warn .ev-dot{background:#f5c518}.ev-alarm .ev-dot{background:#ff5a4d}
+.ev-text{min-width:0;overflow:hidden;text-overflow:ellipsis;color:#cfd5db}
+.ev-warn .ev-text{color:#f5d76e}.ev-alarm .ev-text{color:#ff8a7f}
+.ev-ack{min-height:0;padding:2px 9px;border:1px solid #ff6a5c;border-radius:3px;background:transparent;color:#ff8a7f;font:inherit;font-size:11px;line-height:1.4}
+.ev-ack:hover{background:#ff6a5c22;border-color:#ff6a5c}
+.ev-empty{margin:9px 0;font-size:12px;color:#7d8791}
+/* Over the plan on tablets and phones: zoom tag, Visa hela and the pan indicator. */
+#plan-overlay{display:none;position:absolute;top:0;left:0;right:0;height:var(--plan-row);z-index:5;pointer-events:none}
+.plan-zoom-tags{position:absolute;right:12px;top:10px;display:flex;gap:6px;font-size:10.5px;white-space:nowrap}
+.plan-zoom-tag{min-height:0;padding:3px 8px;border:1px solid #2a3036;border-radius:3px;background:#16191d;color:#98a2ab;font:inherit;line-height:1.4;pointer-events:auto}
+button.plan-zoom-tag{color:#e6e9ec;cursor:pointer}
+button.plan-zoom-tag:hover{background:#262c32;border-color:#2a3036}
+.plan-pan{position:absolute;left:50%;bottom:calc(var(--console-h) + 6px);transform:translateX(-50%);width:160px;height:4px;border-radius:2px;background:#22282e;opacity:0}
+.plan-overlay-pannable .plan-pan{opacity:1}
+.plan-pan i{position:absolute;top:0;height:4px;border-radius:2px;background:#7d8791}
+#panel-phone-bar{display:none}
+/* Laptop and iPad: one step smaller type, narrower columns. */
+@media(max-width:1799px){
+#panel-bottom{grid-template-columns:minmax(0,1fr) 440px;font-size:12.5px;--tt-row:24px;--tt-now:26px;--tt-line:12px;--tt-pad:14px;--tt-gap:8px;--tt-cols:62px 44px 84px 84px 56px 56px 72px 244px minmax(0,1fr)}
+.tt-heading{gap:14px;padding:8px var(--tt-pad) 6px}.tt-heading h2,.ev-heading h2{font-size:12px}#tt-station{font-size:11.5px}.tt-mode{font-size:10.5px}.tt-mode button{padding:2px 8px}#tt-next{font-size:11.5px}#tt-clock{gap:8px}#tt-clock-time{font-size:18px}#tt-clock-label{font-size:10.5px}.tt-labels{font-size:9.5px;padding:4px var(--tt-pad) 2px}.tt-now-line span{font-size:9.5px}.tt-next-from,.tt-next-kind,.tt-clock-prefix{display:none}
+.ev-heading{gap:12px;padding:8px var(--tt-pad) 6px}.ev-filters{gap:12px;font-size:10.5px}#panel-events{--ev-cols:50px 8px minmax(0,1fr) auto;--ev-gap:8px;--ev-row:28px}.ev-row{font-size:12px}.ev-row time{font-size:11px}.ev-ack{font-size:10.5px;padding:2px 6px}#ev-content{padding:3px var(--tt-pad) 6px}
+}
+@media(max-width:1439px){#panel-bottom{grid-template-columns:minmax(0,1fr) 400px}}
+@media(max-width:1400px){body.panel-app{--plan-inset-top:6px}}
+/* iPad Pro 12,9″ landscape: a touch screen keeps the desktop type. */
+@media(min-width:1300px) and (max-width:1400px) and (pointer:coarse){
+#panel-bottom{font-size:13px;--tt-row:25px;--tt-now:27px;--tt-line:14px;--tt-pad:16px;--tt-gap:10px;--tt-cols:64px 44px 96px 96px 56px 56px 76px 246px minmax(0,1fr)}
+.tt-heading{gap:16px;padding:9px var(--tt-pad) 7px}.tt-heading h2,.ev-heading h2{font-size:12.5px}#tt-station{font-size:12px}.tt-mode{font-size:11px}.tt-mode button{padding:2px 9px}#tt-next{font-size:12px}#tt-clock{gap:9px}#tt-clock-time{font-size:20px}#tt-clock-label{font-size:11px}.tt-labels{font-size:10px;padding:5px var(--tt-pad) 3px}.tt-now-line span{font-size:10px}
+.ev-heading{gap:14px;padding:9px var(--tt-pad) 7px}.ev-filters{gap:14px;font-size:11px}#panel-events{--ev-cols:56px 8px minmax(0,1fr) auto;--ev-gap:8px;--ev-row:30px}.ev-row{font-size:12.5px}.ev-row time{font-size:11.5px}.ev-ack{font-size:11px;padding:2px 7px}#ev-content{padding:4px var(--tt-pad) 6px}
+}
+@media(max-width:1299px){#panel-bottom{grid-template-columns:minmax(0,1fr) 380px}}
+/* Below 1200 px Läge and Anmärkning share one column so rows stay single-line. */
+@media(max-width:1200px){
+#panel-bottom{--tt-cols:60px 40px 84px 84px 52px 52px 64px minmax(0,1fr)}
+.tt-lage,.tt-anm{display:none}.tt-la{display:block}
+}
+/* iPad portrait: the whole plan would be 273 px high. It is locked to 400 px with
+   panning instead; Visa hela goes back to 100 %. Timetable stacks over events. */
+@media(orientation:portrait) and (max-width:900px){
+body.panel-app{--plan-inset-x:0px;--plan-inset-top:6px;--plan-fit:height;--plan-tag:pan;--plan-h:var(--plan-user,400px)}
+#panel-view .panel-scroll{touch-action:pan-x pan-y}
+#panel-bottom{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1.3fr) minmax(0,1fr);--tt-cols:56px 40px 150px 50px 50px 62px minmax(0,1fr)}
+body.panel-app #trainmeet-timetable{border-right:0}
+#panel-events{border-top:1px solid #1f2429;--ev-cols:54px 8px minmax(0,1fr) auto}
+.tt-fr,.tt-till,.tt-lage,.tt-anm{display:none}.tt-frtill,.tt-la{display:block}
+#plan-overlay{display:block}
+}
+/* iPhone portrait: monitoring, not operation. A scrollable plan strip, no touch
+   targets, tabs for timetable and events, two-line rows. */
+@media(max-width:500px){
+body.panel-app{--console-h:0px;--plan-inset-x:0px;--plan-inset-top:4px;--plan-fit:height;--plan-tag:pinch;--plan-h:232px;--plan-row:236px}
+body.panel-app #panel-view .panel-shell{grid-template-rows:40px var(--plan-row) minmax(0,1fr)}
+#panel-phone-bar{display:flex;order:-1;align-items:center;gap:12px;padding:0 48px 0 16px;border-bottom:1px solid #1f2429;white-space:nowrap}
+#panel-phone-bar .phone-brand{font:400 11px/1 "IBM Plex Mono",monospace;letter-spacing:.16em;color:#cfcfcf}
+#panel-phone-clock{margin-left:auto;font:500 16px/1 "IBM Plex Mono",monospace;color:#e6e9ec;font-variant-numeric:tabular-nums}
+#panel-phone-rate{font-size:10.5px;color:#7d8791}
+#panel-menu-slot{top:4px;left:auto;right:8px}
+#plan-overlay{display:block;top:40px}
+.plan-zoom-tags{right:10px;top:8px}.plan-zoom-tag{padding:2px 7px;font-size:10px}#plan-zoom-fit{display:none}.plan-pan{width:120px;bottom:6px}
+#panel-view .panel-scroll{border-bottom:1px solid #1f2429;touch-action:pan-x pan-y}
+#track-plan .touch-target,#track-plan .signal-target{pointer-events:none}
+#panel-bottom{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);border-top:0;--tt-pad:16px;--tt-row:44px;--tt-now:46px;--tt-line:14px}
+#panel-bottom-tabs{display:flex;align-items:center;gap:10px;padding:0 16px;white-space:nowrap}
+.bottom-tabs{display:flex;border:1px solid #2a3036;border-radius:3px;overflow:hidden;font-size:12px}
+.bottom-tabs button{min-height:44px;padding:0 12px;border:0;border-radius:0;background:transparent;color:#aeb6be;font:inherit;line-height:1.4}
+.bottom-tabs button[aria-selected=true]{background:#262c32;color:#e6e9ec}
+#bottom-tabs-next{margin-left:auto;font-size:11px;color:#aeb6be}
+#panel-bottom[data-bottom-tab=events] #trainmeet-timetable{display:none}
+#panel-bottom:not([data-bottom-tab=events]) #panel-events{display:none}
+body.panel-app #trainmeet-timetable{border-right:0;grid-template-rows:minmax(0,1fr)}
+.tt-heading,.tt-labels{display:none}
+#tt-status{top:0}
+.tt-entry{grid-template-columns:46px minmax(0,1fr) 42px 42px 50px;grid-template-rows:auto auto;gap:0 8px;align-items:baseline;align-content:center;border-bottom:1px solid #121619}
+.tt-entry>span:not(.tt-la){grid-row:1}
+.tt-slag,.tt-fr,.tt-till,.tt-lage,.tt-anm{display:none}.tt-frtill{display:block}.tt-spar{text-align:right}
+.tt-entry>.tt-la{display:block;grid-row:2;grid-column:1/-1;padding-left:54px;font-size:11px;color:#8a939c}
+.tt-done .tt-la{color:inherit}.tt-now .tt-la{color:#f5c518}
+.tt-now-line{height:14px;margin:2px 0;gap:8px}.tt-now-line span{font-size:9.5px}
+#panel-events{--ev-cols:54px 8px minmax(0,1fr) auto;--ev-gap:8px;--ev-row:36px}
+.ev-heading{padding:8px 16px 6px}
+}
+/* iPhone landscape: the whole plan in 734 px, then the clock, next train, alarm and
+   the three nearest rows. Swipe up for the full timetable and events. */
+@media(max-height:430px){
+body.panel-app{--console-h:0px;--plan-inset-x:0px;--plan-inset-top:10px;--plan-fit:contain;--plan-h:240px;--plan-row:250px}
+body.panel-app #panel-view .panel-shell{grid-template-rows:var(--plan-row) minmax(0,1fr);padding:0 max(0px,env(safe-area-inset-right)) 0 max(0px,env(safe-area-inset-left))}
+#panel-phone-bar{display:none}
+#track-plan .touch-target,#track-plan .signal-target{pointer-events:none}
+#panel-bottom{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);--tt-pad:0px;--tt-row:24px;--tt-now:24px}
+#panel-bottom-tabs,#panel-events{display:none}
+body.panel-app #trainmeet-timetable{border-right:0;grid-template-rows:minmax(0,1fr)}
+.tt-heading,.tt-labels,#tt-content{display:none}
+#tt-mini{display:grid;grid-template-rows:26px minmax(0,1fr) 16px;min-height:0}
+.tt-mini-status{display:flex;align-items:center;gap:14px;font-size:11.5px;white-space:nowrap;overflow:hidden}
+.tt-mini-nu{font:500 10px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;color:#f5c518}
+.tt-mini-clock{margin-left:-8px;font:500 14px/1 "IBM Plex Mono",monospace;color:#e6e9ec;font-variant-numeric:tabular-nums}
+.tt-mini-rate{margin-left:-8px;font-size:10px;color:#7d8791}
+.tt-mini-next{color:#aeb6be}
+#panel-alarm-summary{display:flex;align-items:center;gap:6px;margin-left:auto;min-width:0;overflow:hidden;text-overflow:ellipsis;color:#ff8a7f}
+#panel-alarm-summary[hidden]{display:none}
+#panel-alarm-summary::before{content:'';flex:none;width:7px;height:7px;border-radius:50%;background:#ff5a4d}
+.tt-mini-rows{min-height:0;overflow:hidden}
+.tt-mini-rows .tt-entry{grid-template-columns:48px 150px 46px 46px 56px minmax(0,1fr);gap:0 8px;height:24px;font-size:12.5px}
+.tt-mini-rows .tt-now{margin:0 -6px;width:calc(100% + 12px);padding:0 6px}
+.tt-mini-rows .tt-slag,.tt-mini-rows .tt-fr,.tt-mini-rows .tt-till,.tt-mini-rows .tt-lage,.tt-mini-rows .tt-anm{display:none}
+.tt-mini-rows .tt-frtill,.tt-mini-rows .tt-la{display:block}
+.tt-mini-hint{display:flex;align-items:center;justify-content:center;gap:8px;min-height:0;padding:0;border:0;background:transparent;font:inherit;font-size:10px;color:#7d8791}
+.tt-mini-hint::before{content:'';width:26px;height:3px;border-radius:2px;background:#2a3036}
+#panel-bottom[data-expanded]{position:fixed;inset:0;z-index:70;grid-template-rows:minmax(0,1fr) minmax(0,1fr);background:#000;--tt-pad:12px}
+#panel-bottom[data-expanded] #tt-mini{display:none}
+#panel-bottom[data-expanded] .tt-heading,#panel-bottom[data-expanded] .tt-labels,#panel-bottom[data-expanded] #tt-content,#panel-bottom[data-expanded] #panel-events{display:grid}
+#panel-bottom[data-expanded] .tt-heading{display:flex}#panel-bottom[data-expanded] #tt-content{display:block}
+#panel-bottom[data-expanded] #trainmeet-timetable{grid-template-rows:auto auto minmax(0,1fr)}
+#panel-bottom[data-expanded] #tt-collapse{display:inline-block;margin-left:12px;min-height:0;padding:2px 8px;border:1px solid #2a3036;border-radius:3px;background:#16191d;color:#e6e9ec;font:inherit;font-size:10.5px}
+#panel-bottom[data-expanded] #panel-events{border-top:1px solid #1f2429}
+}
+@media(prefers-reduced-motion:reduce){.tt-entry,.ev-row{transition:none}}
+
+/* ===== Harmoniserat ställverk (design 1 oktober 2026, STÄLLVERK.md) =====
+   Only colour, line weight and typography. Geometry, hit areas, zoom and the
+   route, lock and signal logic are untouched. Tokens come from tokens.css. */
+body.panel-app .panel-shell{--rail:var(--track-side);--rail-unknown:var(--track-off);--route:var(--green);--ink:var(--fg);--red:#ff5a4d;--green:#46d36b;--amber:#f5c518}
+#track-plan{font-family:var(--font-mono)}
+#track-plan .rail{stroke:var(--track-side);stroke-width:var(--track-w);stroke-linecap:round}
+#track-plan .rail.main{stroke:var(--track-main)}
+#track-plan .rail.unconfigured{stroke:var(--track-off)}
+#track-plan .rail.occupied{stroke:var(--red)!important;stroke-width:var(--track-w-state);stroke-dasharray:none}
+#track-plan .rail.unknown:not(.turnout-base){stroke:var(--yellow);stroke-width:var(--track-w);stroke-dasharray:var(--track-dash-unknown)}
+#track-plan .rail.branch-off{stroke:var(--track-off);stroke-width:var(--track-w-off);opacity:1;stroke-dasharray:none}
+#track-plan .turnout-base.turnout-stem{opacity:1}
+#track-plan .turnout-base.unknown{stroke:var(--track-off);stroke-width:var(--track-w-off);stroke-dasharray:4 4}
+#track-plan .turnout-lit{stroke:var(--track-main);stroke-width:var(--track-w)}
+#track-plan .turnout-lit.occupied{stroke:var(--red)!important;stroke-width:var(--track-w-state)}
+#track-plan .route-flow{stroke:var(--green);stroke-width:var(--track-w-state);opacity:1}
+#track-plan .route-flow.held,#track-plan .route-flow.setting,#track-plan .route-flow.cancelling{stroke:var(--yellow);stroke-dasharray:4 6;opacity:.9}
+#track-plan .route-flow.occupied,#track-plan .route-flow.traversing{stroke:var(--red);stroke-dasharray:none;opacity:1}
+#track-plan .turnout-number{display:block;fill:var(--fg-label);font:400 11px var(--font-mono);opacity:1}
+#track-plan .turnout-number.locked{fill:var(--yellow);font-weight:500}
+#track-plan .track-label{fill:var(--fg);font:500 12px var(--font-mono);letter-spacing:0}
+#track-plan .track-label.lbl-place{fill:var(--fg-muted);font:500 11.5px var(--font-sans)}
+#track-plan .track-label.lbl-road{fill:var(--fg-faint);font:400 10.5px var(--font-mono)}
+#track-plan .destination-label{fill:var(--fg);font:600 10.5px var(--font-sans);letter-spacing:.12em}
+#track-plan .destination-arrow{stroke:var(--fg)}
+#track-plan .destination-plate{fill:var(--chip-bg);stroke:var(--chip-border);stroke-width:1}
+#track-plan .destination rect:not(.destination-plate){display:none}
+#track-plan .destination-phone{fill:var(--fg);font:600 10.5px var(--font-sans);letter-spacing:.12em}
+#track-plan .touch-target .dot{fill:var(--plupp-idle);stroke:var(--fg-faint);stroke-width:1}
+#track-plan .touch-target:hover .dot,#track-plan .touch-target:focus-visible .dot{fill:#aeb6be;filter:none}
+#track-plan .touch-target:hover .hit,#track-plan .touch-target:focus-visible .hit{fill:rgba(255,255,255,.10);stroke:rgba(245,197,24,.6)}
+#track-plan .touch-target.locked .dot{stroke:var(--yellow)}
+#track-plan .route-button.in-route{--route-dot:var(--green)}
+#track-plan .route-choice-start .dot{animation:none;fill:var(--green);stroke:var(--green)}
+#track-plan .route-choice-end .dot,#track-plan .route-preparing .dot{fill:#fff;stroke:#fff;animation:hblink .7s infinite}
+#track-plan .touch-target.chosen .dot{fill:#fff;stroke:#fff}
+#track-plan .shunt-arrow{fill:var(--plupp-idle);stroke:var(--fg-faint)}
+#track-plan .indicator-off{fill:var(--lamp-off);stroke:#2a3036}
+#track-plan .signal-unknown,#track-plan .derived-unknown,#track-plan .turntable-unknown{fill:var(--yellow);font:700 11px var(--font-mono);opacity:1}
+#track-plan .incoming-train-number rect{fill:var(--red-bg);stroke:var(--red-border);stroke-width:1}
+#track-plan .incoming-train-number text{fill:var(--red-text);font:500 11.5px var(--font-mono)}
+#track-plan .turntable-pit{fill:#000;stroke:var(--track-struct);stroke-width:1.5}
+#track-plan .turntable-rim{stroke:#3a424a;opacity:1}
+#track-plan .turntable-deck{fill:#000;stroke:var(--fg-faint)}
+#track-plan .turntable-sleeper,#track-plan .turntable-rails{stroke:var(--fg-faint);opacity:1}
+#track-plan .hilite{fill:none;stroke:var(--yellow);stroke-width:2;pointer-events:none}
+@media(prefers-reduced-motion:reduce){#track-plan .route-choice-end .dot,#track-plan .route-preparing .dot{animation:none}}
+/* Status bar over the plan's top band: title, station line, the core's message. */
+#plan-head{position:absolute;left:50px;top:8px;z-index:6;display:flex;align-items:center;gap:14px;height:32px;white-space:nowrap;pointer-events:none;max-width:calc(100% - 420px);overflow:hidden}
+.plan-head-title{font:600 12.5px var(--font-sans);letter-spacing:.12em;text-transform:uppercase;color:var(--fg)}
+.plan-head-sub{font:400 12px var(--font-sans);color:var(--fg-label)}
+#plan-head-right{position:absolute;right:12px;top:10px;z-index:6;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:0;padding:3px 8px;border:1px solid var(--chip-border);border-radius:3px;background:var(--chip-bg);font:400 10.5px/1.3 var(--font-sans);color:#98a2ab;pointer-events:auto}
+button.chip{cursor:pointer;color:var(--fg)}button.chip:hover{background:#262c32;border-color:var(--chip-border)}
+.chip-dot{width:7px;height:7px;border-radius:50%;background:var(--fg-label);flex:none}
+.chip[data-tone=on] .chip-dot{background:var(--green)}.chip[data-tone=warn] .chip-dot{background:var(--yellow)}.chip[data-tone=alarm] .chip-dot,.chip[data-tone=err] .chip-dot{background:var(--red)}
+.chip-status{padding:3px 9px;font-size:11.5px;color:var(--fg-dim);min-width:0}
+.chip-status>span{overflow:hidden;text-overflow:ellipsis;max-width:60ch}
+.chip-status[data-tone=warn]{color:var(--yellow-text)}.chip-status[data-tone=alarm]{color:var(--red-text)}
+.chip-sim{background:transparent;border-color:var(--amber-border);color:var(--amber);letter-spacing:.07em;text-transform:uppercase}
+.chip-release{border-color:var(--yellow);color:var(--yellow-text)}button.chip-release:hover{border-color:var(--yellow)}
+.chip.chip-off>span{text-decoration:line-through;text-decoration-thickness:1px;color:var(--fg-label)}
+.chip[hidden]{display:none}
+/* Återställ panel · Lämna över rangerbangården: chips in the status bar, beside the zoom chip. */
+#plan-head-right #panel-quick-actions{display:contents}
+button.chip:disabled{opacity:.45;cursor:default}button.chip:disabled:hover{background:var(--chip-bg)}button.chip[aria-busy=true]{cursor:wait}
+@media(orientation:portrait) and (max-width:900px){#plan-head-zoom{display:none}#plan-head-right{right:236px}.plan-head-sub{display:none}#plan-head{max-width:calc(100% - 560px)}}
+@media(max-width:500px){#plan-head,#plan-head-right{display:none}}
+@media(max-height:430px){#plan-head-right{display:none}#plan-head{left:44px;top:4px;height:28px}}
+/* Right column, second tab: track occupancy over time (design 1c). Händelser and
+   Spårbeläggning share the heading; the legend replaces the filters. */
+.ev-tabs{display:flex;gap:14px;margin:0}
+.ev-tabs button{min-height:0;padding:0;border:0;border-radius:0;background:transparent;font:600 12.5px/1.3 "IBM Plex Sans",system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#7d8791}
+.ev-tabs button:hover{background:transparent;color:#e6e9ec}.ev-tabs button[aria-selected=true]{color:#e6e9ec}
+#occ-range{font-size:12px;color:#7d8791}
+.occ-legend{display:flex;gap:14px;margin-left:auto;align-items:center;font-size:11px;color:#7d8791}
+.occ-legend i{display:inline-block;width:14px;height:8px;margin-right:6px;vertical-align:-1px;border:1px solid}
+.occ-done{background:#2a3036;border-color:#3a424a}.occ-now{background:rgba(245,197,24,.18);border-color:#f5c518}.occ-next{background:#1b2a3a;border-color:#4a7fb5}
+#panel-bottom:not([data-right=occupancy]) :is(#panel-occupancy,#occ-range,.occ-legend){display:none}
+#panel-bottom[data-right=occupancy] :is(#ev-content,.ev-filters){display:none}
+#panel-occupancy{display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0;padding:6px var(--tt-pad) 8px;--occ-name:64px;--occ-row:36px}
+.occ-axis{position:relative;height:16px;margin-left:var(--occ-name)}
+.occ-axis span{position:absolute;top:0;transform:translateX(-50%);font:400 10.5px/1 "IBM Plex Mono",monospace;color:#7d8791}
+.occ-scroll{min-height:0;overflow:hidden auto;overscroll-behavior:contain;scrollbar-width:thin}
+.occ-rows{display:grid;grid-template-columns:var(--occ-name) minmax(0,1fr)}
+.occ-name{height:var(--occ-row);display:flex;align-items:center;padding-right:8px;font-size:12.5px;color:#aeb6be;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.occ-lanes{position:relative;min-width:0}
+.occ-ticks{position:absolute;inset:0;pointer-events:none}
+.occ-tick{position:absolute;top:0;bottom:0;width:1px;background:#1c2126}
+.occ-nowline{position:absolute;top:-4px;bottom:0;width:1px;background:#f5c518;opacity:.8}
+.occ-lane{position:relative;height:var(--occ-row);border-bottom:1px solid #15191d;overflow:hidden}
+.occ-bar{position:absolute;top:7px;height:22px;min-width:48px;margin:0;padding:0 5px;border:1px solid;border-radius:0;box-sizing:border-box;display:flex;align-items:center;font:500 11.5px/1 "IBM Plex Sans",system-ui,sans-serif;white-space:nowrap;overflow:hidden;cursor:pointer}
+.occ-bar.occ-done{color:#7d8791}.occ-bar.occ-now{color:#f5d76e}.occ-bar.occ-next{color:#e6e9ec}
+.occ-bar.occ-open{border-right-style:dashed}
+.occ-bar:hover{filter:brightness(1.25)}.occ-bar:focus-visible{outline:2px solid #e6e9ec;outline-offset:1px}
+.occ-empty{margin:9px 0;font-size:12px;color:#7d8791}
+/* The chart needs width: the column grows while it is shown, the timetable keeps its compact columns. */
+@media(min-width:1800px) and (min-height:431px){#panel-bottom[data-right=occupancy]{grid-template-columns:minmax(0,1fr) 820px}}
+@media(min-width:1440px) and (max-width:1799px) and (min-height:431px){#panel-bottom[data-right=occupancy]{grid-template-columns:minmax(0,1fr) 640px}}
+@media(min-width:1201px) and (max-width:1439px) and (min-height:431px){#panel-bottom[data-right=occupancy]{grid-template-columns:minmax(0,1fr) 480px;--tt-cols:60px 40px 84px 84px 52px 52px 64px minmax(0,1fr)}#panel-bottom[data-right=occupancy] :is(.tt-lage,.tt-anm){display:none}#panel-bottom[data-right=occupancy] .tt-la{display:block}}
+@media(min-width:901px) and (max-width:1200px) and (min-height:431px){#panel-bottom[data-right=occupancy]{grid-template-columns:minmax(0,1fr) 400px}}
+@media(max-width:1439px){.occ-legend{display:none}}
+@media(max-width:1799px){#panel-occupancy{--occ-row:32px}.occ-bar{font-size:11px}.occ-name{font-size:12px}.ev-tabs button{font-size:12px}}
+@media(max-width:1200px){#panel-occupancy{--occ-name:56px}}
+/* Draggable boundary between the plan and the bottom row (panel-split.js). The line is
+   the bottom row's top border; a 14 px grip straddles it and shows a pill on hover. */
+#panel-divider{position:absolute;left:0;right:0;top:-7px;height:14px;z-index:7;cursor:row-resize;touch-action:none;display:flex;align-items:center;justify-content:center}
+#panel-divider[hidden]{display:none}
+#panel-divider i{display:block;width:36px;height:4px;border-radius:2px;background:#3a424a;opacity:0;transition:opacity 120ms}
+#panel-divider:hover i,#panel-divider:focus-visible i,body[data-split-dragging] #panel-divider i{opacity:1;background:#7d8791}
+body[data-split-dragging]{cursor:row-resize;user-select:none;-webkit-user-select:none}
+body[data-split-dragging] #panel-bottom{border-top-color:#5c656d}
+@media(pointer:coarse){#panel-divider{top:-11px;height:22px}#panel-divider i{opacity:1}}
+@media(max-width:500px),(max-height:430px){#panel-divider{display:none}}
+

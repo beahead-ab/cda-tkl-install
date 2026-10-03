@@ -1,0 +1,1095 @@
+{
+  "sourceHash": "c69a865ae9a85cdb842d70c34d2573dde4b11c50f601a561d5b941136ac6fa87",
+  "note": "Explicitly reviewed catalog extension. Source NX boundaries and protective destination must still be validated. No ranger handover or new map coordinates.",
+  "controls": {
+    "tvv1/1": "IS302",
+    "tvv1/10": "IS309",
+    "tvv1/12": "IS395",
+    "tvv1/2": "IS306",
+    "tvv1/3": "IS385",
+    "tvv1/5": "IS343",
+    "tvv1/7": "IS303",
+    "tvv1/8": "IS308",
+    "tvv2/1": "IS313",
+    "tvv2/10": "IS320",
+    "tvv2/12": "IS396",
+    "tvv2/3": "IS382",
+    "tvv2/5": "IS344",
+    "tvv2/7": "IS314",
+    "tvv2/8": "IS319",
+    "tvv3/3": "IS316",
+    "tvv6/10": "IS354",
+    "tvv6/5": "IS371",
+    "tvv6/8": "IS341",
+    "tvv6/9": "IS342",
+    "tvv7/10": "IS355",
+    "tvv7/5": "IS372",
+    "tvv8/10": "IS356",
+    "tvv8/5": "IS373",
+    "tvv9/10": "IS357",
+    "tvv9/5": "IS374",
+    "tvvN2": "IS321",
+    "tvvN4": "IS375",
+    "tvvU2": "IS310",
+    "tvvU4": "IS377"
+  },
+  "routes": [
+    {
+      "from": "tvv1/2",
+      "to": "tvv1/4",
+      "rules": [
+        "IX:AUTO:0019C9"
+      ],
+      "nxButtons": [
+        "tvs1/2",
+        "tvs1/4"
+      ],
+      "signals": [
+        "1/2"
+      ],
+      "target": "1/4"
+    },
+    {
+      "from": "tvv9/10",
+      "to": "tvvIIIev",
+      "rules": [
+        "IX:AUTO:0019C10"
+      ],
+      "nxButtons": [
+        "tvs9/10",
+        "tvsIIIev"
+      ],
+      "signals": [
+        "9/10"
+      ],
+      "target": "IIIev"
+    },
+    {
+      "from": "tvv2/5",
+      "to": "tvv2/7",
+      "rules": [
+        "IX:AUTO:0019C13"
+      ],
+      "nxButtons": [
+        "tvs2/5",
+        "tvs2/7"
+      ],
+      "signals": [
+        "2/5"
+      ],
+      "target": "2/7"
+    },
+    {
+      "from": "tvv2/5",
+      "to": "tvv5/5",
+      "rules": [
+        "IX:AUTO:0019C14"
+      ],
+      "nxButtons": [
+        "tvs2/5",
+        "tvs5/5"
+      ],
+      "signals": [
+        "2/5"
+      ],
+      "target": "5/5"
+    },
+    {
+      "from": "tvv2/5",
+      "to": "tvv3/5",
+      "rules": [
+        "IX:AUTO:0019C15"
+      ],
+      "nxButtons": [
+        "tvs2/5",
+        "tvs3/5"
+      ],
+      "signals": [
+        "2/5"
+      ],
+      "target": "3/5"
+    },
+    {
+      "from": "tvv2/5",
+      "to": "tvv4/5",
+      "rules": [
+        "IX:AUTO:0019C16"
+      ],
+      "nxButtons": [
+        "tvs2/5",
+        "tvs4/5"
+      ],
+      "signals": [
+        "2/5"
+      ],
+      "target": "4/5"
+    },
+    {
+      "from": "tvv7/10",
+      "to": "tvvIIIev",
+      "rules": [
+        "IX:AUTO:0019C17"
+      ],
+      "nxButtons": [
+        "tvs7/10",
+        "tvsIIIev"
+      ],
+      "signals": [
+        "7/10"
+      ],
+      "target": "IIIev"
+    },
+    {
+      "from": "tvv9/5",
+      "to": "tvv6/7",
+      "rules": [
+        "IX:AUTO:0019C18"
+      ],
+      "nxButtons": [
+        "tvs9/5",
+        "tvs6/7"
+      ],
+      "signals": [
+        "9/5"
+      ],
+      "target": "6/7"
+    },
+    {
+      "from": "tvv2/8",
+      "to": "tvv2/10",
+      "rules": [
+        "IX:AUTO:0019C22"
+      ],
+      "nxButtons": [
+        "tvs2/8",
+        "tvs2/10"
+      ],
+      "signals": [
+        "2/8"
+      ],
+      "target": "2/10"
+    },
+    {
+      "from": "tvv2/3",
+      "to": "tvv2/5",
+      "rules": [
+        "IX:AUTO:0019C29"
+      ],
+      "nxButtons": [
+        "tvs2/3",
+        "tvs2/5"
+      ],
+      "signals": [
+        "2/3"
+      ],
+      "target": "2/5"
+    },
+    {
+      "from": "tvv3/8",
+      "to": "tvv2/10",
+      "rules": [
+        "IX:AUTO:0019C30"
+      ],
+      "nxButtons": [
+        "tvs3/8",
+        "tvs2/10"
+      ],
+      "signals": [
+        "3/8"
+      ],
+      "target": "2/10"
+    },
+    {
+      "from": "tvv3/5",
+      "to": "tvv6/9",
+      "rules": [
+        "IX:AUTO:0019C33"
+      ],
+      "nxButtons": [
+        "tvs3/5",
+        "tvs6/9"
+      ],
+      "signals": [
+        "3/5",
+        "6/7"
+      ],
+      "target": "6/9"
+    },
+    {
+      "from": "tvv6/10",
+      "to": "tvvIIIev",
+      "rules": [
+        "IX:AUTO:0019C34"
+      ],
+      "nxButtons": [
+        "tvs6/10",
+        "tvsIIIev"
+      ],
+      "signals": [
+        "6/10"
+      ],
+      "target": "IIIev"
+    },
+    {
+      "from": "tvv6/6",
+      "to": "tvv6/10",
+      "rules": [
+        "IX:AUTO:0019C35"
+      ],
+      "nxButtons": [
+        "tvs6/6",
+        "tvs6/10"
+      ],
+      "signals": [
+        "6/6"
+      ],
+      "target": "6/10"
+    },
+    {
+      "from": "tvv6/6",
+      "to": "tvv8/10",
+      "rules": [
+        "IX:AUTO:0019C36"
+      ],
+      "nxButtons": [
+        "tvs6/6",
+        "tvs8/10"
+      ],
+      "signals": [
+        "6/6"
+      ],
+      "target": "8/10"
+    },
+    {
+      "from": "tvv6/6",
+      "to": "tvv9/10",
+      "rules": [
+        "IX:AUTO:0019C37"
+      ],
+      "nxButtons": [
+        "tvs6/6",
+        "tvs9/10"
+      ],
+      "signals": [
+        "6/6"
+      ],
+      "target": "9/10"
+    },
+    {
+      "from": "tvv6/6",
+      "to": "tvv7/10",
+      "rules": [
+        "IX:AUTO:0019C38"
+      ],
+      "nxButtons": [
+        "tvs6/6",
+        "tvs7/10"
+      ],
+      "signals": [
+        "6/6"
+      ],
+      "target": "7/10"
+    },
+    {
+      "from": "tvv1/4",
+      "to": "tvv6/8",
+      "rules": [
+        "IX:AUTO:0019C43"
+      ],
+      "nxButtons": [
+        "tvs1/4",
+        "tvs6/8"
+      ],
+      "signals": [
+        "1/4",
+        "3/6",
+        "6/6"
+      ],
+      "target": "6/8"
+    },
+    {
+      "from": "tvv8/5",
+      "to": "tvv6/7",
+      "rules": [
+        "IX:AUTO:0019C44"
+      ],
+      "nxButtons": [
+        "tvs8/5",
+        "tvs6/7"
+      ],
+      "signals": [
+        "8/5"
+      ],
+      "target": "6/7"
+    },
+    {
+      "from": "tvv1/10",
+      "to": "tvv1/12",
+      "rules": [
+        "IX:AUTO:0019C45"
+      ],
+      "nxButtons": [
+        "tvs1/10",
+        "tvs1/12"
+      ],
+      "signals": [
+        "1/10"
+      ],
+      "target": "1/12"
+    },
+    {
+      "from": "tvv1/12",
+      "to": "tvvU4",
+      "rules": [
+        "IX:AUTO:0019C46"
+      ],
+      "nxButtons": [
+        "tvs1/12",
+        "tvsU4"
+      ],
+      "signals": [
+        "1/12"
+      ],
+      "target": "U4"
+    },
+    {
+      "from": "tvv1/12",
+      "to": "tvvU2",
+      "rules": [
+        "IX:AUTO:0019C48"
+      ],
+      "nxButtons": [
+        "tvs1/12",
+        "tvsU2"
+      ],
+      "signals": [
+        "1/12"
+      ],
+      "target": "U2"
+    },
+    {
+      "from": "tvv2/12",
+      "to": "tvvN2",
+      "rules": [
+        "IX:AUTO:0019C50"
+      ],
+      "nxButtons": [
+        "tvs2/12",
+        "tvsN2"
+      ],
+      "signals": [
+        "2/12"
+      ],
+      "target": "N2"
+    },
+    {
+      "from": "tvv4/10",
+      "to": "tvv1/12",
+      "rules": [
+        "IX:AUTO:0019C51"
+      ],
+      "nxButtons": [
+        "tvs4/10",
+        "tvs1/12"
+      ],
+      "signals": [
+        "4/10"
+      ],
+      "target": "1/12"
+    },
+    {
+      "from": "tvv4/10",
+      "to": "tvv2/12",
+      "rules": [
+        "IX:AUTO:0019C52"
+      ],
+      "nxButtons": [
+        "tvs4/10",
+        "tvs2/12"
+      ],
+      "signals": [
+        "4/10"
+      ],
+      "target": "2/12"
+    },
+    {
+      "from": "tvv2/7",
+      "to": "tvv4/9",
+      "rules": [
+        "IX:AUTO:0019C53"
+      ],
+      "nxButtons": [
+        "tvs2/7",
+        "tvs4/9"
+      ],
+      "signals": [
+        "2/7"
+      ],
+      "target": "4/9"
+    },
+    {
+      "from": "tvv2/7",
+      "to": "tvv2/9",
+      "rules": [
+        "IX:AUTO:0019C54"
+      ],
+      "nxButtons": [
+        "tvs2/7",
+        "tvs2/9"
+      ],
+      "signals": [
+        "2/7"
+      ],
+      "target": "2/9"
+    },
+    {
+      "from": "tvv2/7",
+      "to": "tvv3/9",
+      "rules": [
+        "IX:AUTO:0019C55"
+      ],
+      "nxButtons": [
+        "tvs2/7",
+        "tvs3/9"
+      ],
+      "signals": [
+        "2/7"
+      ],
+      "target": "3/9"
+    },
+    {
+      "from": "tvv2/7",
+      "to": "tvv1/9",
+      "rules": [
+        "IX:AUTO:0019C56"
+      ],
+      "nxButtons": [
+        "tvs2/7",
+        "tvs1/9"
+      ],
+      "signals": [
+        "2/7"
+      ],
+      "target": "1/9"
+    },
+    {
+      "from": "tvv1/7",
+      "to": "tvv1/9",
+      "rules": [
+        "IX:AUTO:0019C57"
+      ],
+      "nxButtons": [
+        "tvs1/7",
+        "tvs1/9"
+      ],
+      "signals": [
+        "1/7"
+      ],
+      "target": "1/9"
+    },
+    {
+      "from": "tvv2/10",
+      "to": "tvv1/12",
+      "rules": [
+        "IX:AUTO:0019C58"
+      ],
+      "nxButtons": [
+        "tvs2/10",
+        "tvs1/12"
+      ],
+      "signals": [
+        "2/10"
+      ],
+      "target": "1/12"
+    },
+    {
+      "from": "tvv2/10",
+      "to": "tvv2/12",
+      "rules": [
+        "IX:AUTO:0019C59"
+      ],
+      "nxButtons": [
+        "tvs2/10",
+        "tvs2/12"
+      ],
+      "signals": [
+        "2/10"
+      ],
+      "target": "2/12"
+    },
+    {
+      "from": "tvv2/12",
+      "to": "tvvN4",
+      "rules": [
+        "IX:AUTO:0019C60"
+      ],
+      "nxButtons": [
+        "tvs2/12",
+        "tvsN4"
+      ],
+      "signals": [
+        "2/12"
+      ],
+      "target": "N4"
+    },
+    {
+      "from": "tvv2/4",
+      "to": "tvv6/8",
+      "rules": [
+        "IX:AUTO:0019C69"
+      ],
+      "nxButtons": [
+        "tvs2/4",
+        "tvs6/8"
+      ],
+      "signals": [
+        "2/4",
+        "3/6",
+        "6/6"
+      ],
+      "target": "6/8"
+    },
+    {
+      "from": "tvv8/10",
+      "to": "tvvIIIev",
+      "rules": [
+        "IX:AUTO:0019C72"
+      ],
+      "nxButtons": [
+        "tvs8/10",
+        "tvsIIIev"
+      ],
+      "signals": [
+        "8/10"
+      ],
+      "target": "IIIev"
+    },
+    {
+      "from": "tvv1/3",
+      "to": "tvv1/5",
+      "rules": [
+        "IX:AUTO:0019C73"
+      ],
+      "nxButtons": [
+        "tvs1/3",
+        "tvs1/5"
+      ],
+      "signals": [
+        "1/3"
+      ],
+      "target": "1/5"
+    },
+    {
+      "from": "tvv5/10",
+      "to": "tvv1/12",
+      "rules": [
+        "IX:AUTO:0019C77"
+      ],
+      "nxButtons": [
+        "tvs5/10",
+        "tvs1/12"
+      ],
+      "signals": [
+        "5/10"
+      ],
+      "target": "1/12"
+    },
+    {
+      "from": "tvv5/10",
+      "to": "tvv2/12",
+      "rules": [
+        "IX:AUTO:0019C78"
+      ],
+      "nxButtons": [
+        "tvs5/10",
+        "tvs2/12"
+      ],
+      "signals": [
+        "5/10"
+      ],
+      "target": "2/12"
+    },
+    {
+      "from": "tvv6/7",
+      "to": "tvv6/9",
+      "rules": [
+        "IX:AUTO:0019C81"
+      ],
+      "nxButtons": [
+        "tvs6/7",
+        "tvs6/9"
+      ],
+      "signals": [
+        "6/7"
+      ],
+      "target": "6/9"
+    },
+    {
+      "from": "tvv7/5",
+      "to": "tvv6/7",
+      "rules": [
+        "IX:AUTO:0019C87"
+      ],
+      "nxButtons": [
+        "tvs7/5",
+        "tvs6/7"
+      ],
+      "signals": [
+        "7/5"
+      ],
+      "target": "6/7"
+    },
+    {
+      "from": "tvv1/6",
+      "to": "tvv1/8",
+      "rules": [
+        "IX:AUTO:0019C88"
+      ],
+      "nxButtons": [
+        "tvs1/6",
+        "tvs1/8"
+      ],
+      "signals": [
+        "1/6"
+      ],
+      "target": "1/8"
+    },
+    {
+      "from": "tvv1/6",
+      "to": "tvv2/8",
+      "rules": [
+        "IX:AUTO:0019C89"
+      ],
+      "nxButtons": [
+        "tvs1/6",
+        "tvs2/8"
+      ],
+      "signals": [
+        "1/6"
+      ],
+      "target": "2/8"
+    },
+    {
+      "from": "tvv4/8",
+      "to": "tvv2/10",
+      "rules": [
+        "IX:AUTO:0019C96"
+      ],
+      "nxButtons": [
+        "tvs4/8",
+        "tvs2/10"
+      ],
+      "signals": [
+        "4/8"
+      ],
+      "target": "2/10"
+    },
+    {
+      "from": "tvv6/8",
+      "to": "tvv5/10",
+      "rules": [
+        "IX:AUTO:0019C97"
+      ],
+      "nxButtons": [
+        "tvs6/8",
+        "tvs5/10"
+      ],
+      "signals": [
+        "6/8"
+      ],
+      "target": "5/10"
+    },
+    {
+      "from": "tvv6/8",
+      "to": "tvv3/10",
+      "rules": [
+        "IX:AUTO:0019C98"
+      ],
+      "nxButtons": [
+        "tvs6/8",
+        "tvs3/10"
+      ],
+      "signals": [
+        "6/8"
+      ],
+      "target": "3/10"
+    },
+    {
+      "from": "tvv6/8",
+      "to": "tvv4/10",
+      "rules": [
+        "IX:AUTO:0019C99"
+      ],
+      "nxButtons": [
+        "tvs6/8",
+        "tvs4/10"
+      ],
+      "signals": [
+        "6/8"
+      ],
+      "target": "4/10"
+    },
+    {
+      "from": "tvv4/5",
+      "to": "tvv6/9",
+      "rules": [
+        "IX:AUTO:0019C102"
+      ],
+      "nxButtons": [
+        "tvs4/5",
+        "tvs6/9"
+      ],
+      "signals": [
+        "4/5",
+        "6/7"
+      ],
+      "target": "6/9"
+    },
+    {
+      "from": "tvv6/5",
+      "to": "tvv6/7",
+      "rules": [
+        "IX:AUTO:0019C103"
+      ],
+      "nxButtons": [
+        "tvs6/5",
+        "tvs6/7"
+      ],
+      "signals": [
+        "6/5"
+      ],
+      "target": "6/7"
+    },
+    {
+      "from": "tvv3/3",
+      "to": "tvv5/5",
+      "rules": [
+        "IX:AUTO:0019C104"
+      ],
+      "nxButtons": [
+        "tvs3/3",
+        "tvs5/5"
+      ],
+      "signals": [
+        "3/3"
+      ],
+      "target": "5/5"
+    },
+    {
+      "from": "tvv3/3",
+      "to": "tvv3/5",
+      "rules": [
+        "IX:AUTO:0019C105"
+      ],
+      "nxButtons": [
+        "tvs3/3",
+        "tvs3/5"
+      ],
+      "signals": [
+        "3/3"
+      ],
+      "target": "3/5"
+    },
+    {
+      "from": "tvv3/3",
+      "to": "tvv4/5",
+      "rules": [
+        "IX:AUTO:0019C106"
+      ],
+      "nxButtons": [
+        "tvs3/3",
+        "tvs4/5"
+      ],
+      "signals": [
+        "3/3"
+      ],
+      "target": "4/5"
+    },
+    {
+      "from": "tvv6/9",
+      "to": "tvv3/11",
+      "rules": [
+        "IX:AUTO:0019C107"
+      ],
+      "nxButtons": [
+        "tvs6/9",
+        "tvs3/11"
+      ],
+      "signals": [
+        "6/9"
+      ],
+      "target": "3/11"
+    },
+    {
+      "from": "tvv1/5",
+      "to": "tvv1/7",
+      "rules": [
+        "IX:AUTO:0019C111"
+      ],
+      "nxButtons": [
+        "tvs1/5",
+        "tvs1/7"
+      ],
+      "signals": [
+        "1/5"
+      ],
+      "target": "1/7"
+    },
+    {
+      "from": "tvv1/5",
+      "to": "tvv2/7",
+      "rules": [
+        "IX:AUTO:0019C112"
+      ],
+      "nxButtons": [
+        "tvs1/5",
+        "tvs2/7"
+      ],
+      "signals": [
+        "1/5"
+      ],
+      "target": "2/7"
+    },
+    {
+      "from": "tvv1/5",
+      "to": "tvv5/5",
+      "rules": [
+        "IX:AUTO:0019C113"
+      ],
+      "nxButtons": [
+        "tvs1/5",
+        "tvs5/5"
+      ],
+      "signals": [
+        "1/5"
+      ],
+      "target": "5/5"
+    },
+    {
+      "from": "tvv1/5",
+      "to": "tvv3/5",
+      "rules": [
+        "IX:AUTO:0019C114"
+      ],
+      "nxButtons": [
+        "tvs1/5",
+        "tvs3/5"
+      ],
+      "signals": [
+        "1/5"
+      ],
+      "target": "3/5"
+    },
+    {
+      "from": "tvv1/5",
+      "to": "tvv4/5",
+      "rules": [
+        "IX:AUTO:0019C115"
+      ],
+      "nxButtons": [
+        "tvs1/5",
+        "tvs4/5"
+      ],
+      "signals": [
+        "1/5"
+      ],
+      "target": "4/5"
+    },
+    {
+      "from": "tvv3/1",
+      "to": "tvv8/5",
+      "rules": [
+        "IX:AUTO:0019C116"
+      ],
+      "nxButtons": [
+        "tvs3/1",
+        "tvs8/5"
+      ],
+      "signals": [
+        "3/1"
+      ],
+      "target": "8/5"
+    },
+    {
+      "from": "tvv3/1",
+      "to": "tvv6/5",
+      "rules": [
+        "IX:AUTO:0019C117"
+      ],
+      "nxButtons": [
+        "tvs3/1",
+        "tvs6/5"
+      ],
+      "signals": [
+        "3/1"
+      ],
+      "target": "6/5"
+    },
+    {
+      "from": "tvv3/1",
+      "to": "tvv3/3",
+      "rules": [
+        "IX:AUTO:0019C118"
+      ],
+      "nxButtons": [
+        "tvs3/1",
+        "tvs3/3"
+      ],
+      "signals": [
+        "3/1"
+      ],
+      "target": "3/3"
+    },
+    {
+      "from": "tvv3/1",
+      "to": "tvv7/5",
+      "rules": [
+        "IX:AUTO:0019C119"
+      ],
+      "nxButtons": [
+        "tvs3/1",
+        "tvs7/5"
+      ],
+      "signals": [
+        "3/1"
+      ],
+      "target": "7/5"
+    },
+    {
+      "from": "tvv3/1",
+      "to": "tvv9/5",
+      "rules": [
+        "IX:AUTO:0019C120"
+      ],
+      "nxButtons": [
+        "tvs3/1",
+        "tvs9/5"
+      ],
+      "signals": [
+        "3/1"
+      ],
+      "target": "9/5"
+    },
+    {
+      "from": "tvv1/8",
+      "to": "tvv1/10",
+      "rules": [
+        "IX:AUTO:0019C121"
+      ],
+      "nxButtons": [
+        "tvs1/8",
+        "tvs1/10"
+      ],
+      "signals": [
+        "1/8"
+      ],
+      "target": "1/10"
+    },
+    {
+      "from": "tvv1/8",
+      "to": "tvv2/10",
+      "rules": [
+        "IX:AUTO:0019C122"
+      ],
+      "nxButtons": [
+        "tvs1/8",
+        "tvs2/10"
+      ],
+      "signals": [
+        "1/8"
+      ],
+      "target": "2/10"
+    },
+    {
+      "from": "tvv2/6",
+      "to": "tvv1/8",
+      "rules": [
+        "IX:AUTO:0019C125"
+      ],
+      "nxButtons": [
+        "tvs2/6",
+        "tvs1/8"
+      ],
+      "signals": [
+        "2/6"
+      ],
+      "target": "1/8"
+    },
+    {
+      "from": "tvv2/6",
+      "to": "tvv2/8",
+      "rules": [
+        "IX:AUTO:0019C126"
+      ],
+      "nxButtons": [
+        "tvs2/6",
+        "tvs2/8"
+      ],
+      "signals": [
+        "2/6"
+      ],
+      "target": "2/8"
+    },
+    {
+      "from": "tvv1/1",
+      "to": "tvv1/5",
+      "rules": [
+        "IX:AUTO:0019C130"
+      ],
+      "nxButtons": [
+        "tvs1/1",
+        "tvs1/5"
+      ],
+      "signals": [
+        "1/1"
+      ],
+      "target": "1/5"
+    },
+    {
+      "from": "tvv5/5",
+      "to": "tvv6/9",
+      "rules": [
+        "IX:AUTO:0019C133"
+      ],
+      "nxButtons": [
+        "tvs5/5",
+        "tvs6/9"
+      ],
+      "signals": [
+        "5/5",
+        "6/7"
+      ],
+      "target": "6/9"
+    },
+    {
+      "from": "tvv2/1",
+      "to": "tvv2/5",
+      "rules": [
+        "IX:AUTO:0019C134"
+      ],
+      "nxButtons": [
+        "tvs2/1",
+        "tvs2/5"
+      ],
+      "signals": [
+        "2/1"
+      ],
+      "target": "2/5"
+    },
+    {
+      "from": "tvv6/6",
+      "to": "tvv6/8",
+      "rules": [
+        "IX:AUTO:0019C139"
+      ],
+      "nxButtons": [
+        "tvs6/6",
+        "tvs6/8"
+      ],
+      "signals": [
+        "6/6"
+      ],
+      "target": "6/8"
+    }
+  ]
+}

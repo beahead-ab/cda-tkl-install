@@ -1,0 +1,3580 @@
+{
+  "sourceHash": "c69a865ae9a85cdb842d70c34d2573dde4b11c50f601a561d5b941136ac6fa87",
+  "fields": [
+    {
+      "key": "block:SIA",
+      "kind": "block",
+      "name": "SIA",
+      "label": "Spår 01a",
+      "sourceSystem": "IB1",
+      "memorySystem": "IM:AUTO:0001",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[1]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[1]",
+        "/layout-config[1]/blocks[1]/block[203]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[1]",
+      "anchors": [
+        "block-icon-7"
+      ]
+    },
+    {
+      "key": "block:S110",
+      "kind": "block",
+      "name": "S110",
+      "label": "Vx110",
+      "sourceSystem": "IB2",
+      "memorySystem": "IM:AUTO:0072",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[2]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[2]",
+        "/layout-config[1]/blocks[1]/block[204]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[72]",
+      "anchors": []
+    },
+    {
+      "key": "block:S111",
+      "kind": "block",
+      "name": "S111",
+      "label": "Vx111",
+      "sourceSystem": "IB57",
+      "memorySystem": "IM:AUTO:0112",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[3]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[57]",
+        "/layout-config[1]/blocks[1]/block[259]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[112]",
+      "anchors": []
+    },
+    {
+      "key": "block:S102",
+      "kind": "block",
+      "name": "S102",
+      "label": "Vx102",
+      "sourceSystem": "IB4",
+      "memorySystem": "IM:AUTO:0093",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[4]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[4]",
+        "/layout-config[1]/blocks[1]/block[206]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[93]",
+      "anchors": [
+        "block-icon-43"
+      ]
+    },
+    {
+      "key": "block:S112",
+      "kind": "block",
+      "name": "S112",
+      "label": "Vx112",
+      "sourceSystem": "IB5",
+      "memorySystem": "IM:AUTO:0104",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[5]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[5]",
+        "/layout-config[1]/blocks[1]/block[207]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[104]",
+      "anchors": []
+    },
+    {
+      "key": "block:S113",
+      "kind": "block",
+      "name": "S113",
+      "label": "Vx113",
+      "sourceSystem": "IB6",
+      "memorySystem": "IM:AUTO:0115",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[6]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[6]",
+        "/layout-config[1]/blocks[1]/block[208]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[115]",
+      "anchors": []
+    },
+    {
+      "key": "block:S103",
+      "kind": "block",
+      "name": "S103",
+      "label": "Vx103",
+      "sourceSystem": "IB7",
+      "memorySystem": "IM:AUTO:0125",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[7]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[7]",
+        "/layout-config[1]/blocks[1]/block[209]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[125]",
+      "anchors": []
+    },
+    {
+      "key": "block:S114",
+      "kind": "block",
+      "name": "S114",
+      "label": "M03 Vx114",
+      "sourceSystem": "IB8",
+      "memorySystem": "IM:AUTO:0136",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[8]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[8]",
+        "/layout-config[1]/blocks[1]/block[210]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[136]",
+      "anchors": []
+    },
+    {
+      "key": "block:S162",
+      "kind": "block",
+      "name": "S162",
+      "label": "M10 Vx162",
+      "sourceSystem": "IB40",
+      "memorySystem": "IM:AUTO:0094",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[9]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[40]",
+        "/layout-config[1]/blocks[1]/block[242]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[94]",
+      "anchors": []
+    },
+    {
+      "key": "block:SLI",
+      "kind": "block",
+      "name": "SLI",
+      "label": "Lastspår 1",
+      "sourceSystem": "IB60",
+      "memorySystem": "IM:AUTO:0116",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[10]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[60]",
+        "/layout-config[1]/blocks[1]/block[262]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[116]",
+      "anchors": []
+    },
+    {
+      "key": "block:S116",
+      "kind": "block",
+      "name": "S116",
+      "label": "M03 Vx116",
+      "sourceSystem": "IB11",
+      "memorySystem": "IM:AUTO:0013",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[11]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[11]",
+        "/layout-config[1]/blocks[1]/block[213]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[13]",
+      "anchors": []
+    },
+    {
+      "key": "block:S163",
+      "kind": "block",
+      "name": "S163",
+      "label": "M10 Vx163",
+      "sourceSystem": "IB39",
+      "memorySystem": "IM:AUTO:0092",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[12]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[39]",
+        "/layout-config[1]/blocks[1]/block[241]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[92]",
+      "anchors": []
+    },
+    {
+      "key": "block:S162c",
+      "kind": "block",
+      "name": "S162c",
+      "label": "M10 till korset",
+      "sourceSystem": "IB155",
+      "memorySystem": "IM:AUTO:0060",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[13]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[155]",
+        "/layout-config[1]/blocks[1]/block[357]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[60]",
+      "anchors": []
+    },
+    {
+      "key": "block:S163c",
+      "kind": "block",
+      "name": "S163c",
+      "label": "M10 till korset",
+      "sourceSystem": "IB154",
+      "memorySystem": "IM:AUTO:0059",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[14]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[154]",
+        "/layout-config[1]/blocks[1]/block[356]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[59]",
+      "anchors": []
+    },
+    {
+      "key": "block:S123",
+      "kind": "block",
+      "name": "S123",
+      "label": "M06 Vx123",
+      "sourceSystem": "IB15",
+      "memorySystem": "IM:AUTO:0054",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[15]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[15]",
+        "/layout-config[1]/blocks[1]/block[217]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[54]",
+      "anchors": []
+    },
+    {
+      "key": "block:S122",
+      "kind": "block",
+      "name": "S122",
+      "label": "Vx122",
+      "sourceSystem": "IB16",
+      "memorySystem": "IM:AUTO:0061",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[16]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[16]",
+        "/layout-config[1]/blocks[1]/block[218]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[61]",
+      "anchors": []
+    },
+    {
+      "key": "block:S125",
+      "kind": "block",
+      "name": "S125",
+      "label": "Vx125",
+      "sourceSystem": "IB17",
+      "memorySystem": "IM:AUTO:0062",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[17]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[17]",
+        "/layout-config[1]/blocks[1]/block[219]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[62]",
+      "anchors": [
+        "block-icon-36"
+      ]
+    },
+    {
+      "key": "block:S121",
+      "kind": "block",
+      "name": "S121",
+      "label": "M06 Vx121",
+      "sourceSystem": "IB18",
+      "memorySystem": "IM:AUTO:0067",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[18]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[18]",
+        "/layout-config[1]/blocks[1]/block[220]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[67]",
+      "anchors": [
+        "block-icon-33"
+      ]
+    },
+    {
+      "key": "block:S120",
+      "kind": "block",
+      "name": "S120",
+      "label": "Vx120",
+      "sourceSystem": "IB19",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[19]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[19]",
+        "/layout-config[1]/blocks[1]/block[221]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:SLII",
+      "kind": "block",
+      "name": "SLII",
+      "label": "Lastspår 2",
+      "sourceSystem": "IB112",
+      "memorySystem": "IM:AUTO:0016",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[20]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[112]",
+        "/layout-config[1]/blocks[1]/block[314]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[16]",
+      "anchors": []
+    },
+    {
+      "key": "block:SG54",
+      "kind": "block",
+      "name": "SG54",
+      "label": "Godsspår 54",
+      "sourceSystem": "IB56",
+      "memorySystem": "IM:AUTO:0111",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[21]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[56]",
+        "/layout-config[1]/blocks[1]/block[258]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[111]",
+      "anchors": []
+    },
+    {
+      "key": "block:S165a",
+      "kind": "block",
+      "name": "S165a",
+      "label": "M10 signal 1/4",
+      "sourceSystem": "IB178",
+      "memorySystem": "IM:AUTO:0065",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[22]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[178]",
+        "/layout-config[1]/blocks[1]/block[380]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[65]",
+      "anchors": []
+    },
+    {
+      "key": "block:S166a",
+      "kind": "block",
+      "name": "S166a",
+      "label": "M10 signal 2/4",
+      "sourceSystem": "IB179",
+      "memorySystem": "IM:AUTO:0066",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[23]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[179]",
+        "/layout-config[1]/blocks[1]/block[381]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[66]",
+      "anchors": []
+    },
+    {
+      "key": "block:S126",
+      "kind": "block",
+      "name": "S126",
+      "label": "M06 Vx126",
+      "sourceSystem": "IB24",
+      "memorySystem": "IM:AUTO:0076",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[24]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[24]",
+        "/layout-config[1]/blocks[1]/block[226]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[76]",
+      "anchors": []
+    },
+    {
+      "key": "block:SG53",
+      "kind": "block",
+      "name": "SG53",
+      "label": "Godsspår 53",
+      "sourceSystem": "IB54",
+      "memorySystem": "IM:AUTO:0109",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[25]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[54]",
+        "/layout-config[1]/blocks[1]/block[256]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[109]",
+      "anchors": []
+    },
+    {
+      "key": "block:S140b",
+      "kind": "block",
+      "name": "S140b",
+      "label": "M08 mellan 140-142",
+      "sourceSystem": "IB144",
+      "memorySystem": "IM:AUTO:0048",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[26]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[144]",
+        "/layout-config[1]/blocks[1]/block[346]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[48]",
+      "anchors": []
+    },
+    {
+      "key": "block:S151",
+      "kind": "block",
+      "name": "S151",
+      "label": "M09 Vx151",
+      "sourceSystem": "IB27",
+      "memorySystem": "IM:AUTO:0079",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[27]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[27]",
+        "/layout-config[1]/blocks[1]/block[229]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[79]",
+      "anchors": []
+    },
+    {
+      "key": "block:S152",
+      "kind": "block",
+      "name": "S152",
+      "label": "M09 Vx152",
+      "sourceSystem": "IB28",
+      "memorySystem": "IM:AUTO:0080",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[28]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[28]",
+        "/layout-config[1]/blocks[1]/block[230]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[80]",
+      "anchors": []
+    },
+    {
+      "key": "block:S153",
+      "kind": "block",
+      "name": "S153",
+      "label": "M09 Vx153",
+      "sourceSystem": "IB29",
+      "memorySystem": "IM:AUTO:0081",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[29]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[29]",
+        "/layout-config[1]/blocks[1]/block[231]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[81]",
+      "anchors": []
+    },
+    {
+      "key": "block:S115a",
+      "kind": "block",
+      "name": "S115a",
+      "label": "M03 Spår U1",
+      "sourceSystem": "IB180",
+      "memorySystem": "IM:AUTO:0068",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[30]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[180]",
+        "/layout-config[1]/blocks[1]/block[382]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[68]",
+      "anchors": []
+    },
+    {
+      "key": "block:S161",
+      "kind": "block",
+      "name": "S161",
+      "label": "M10 Vx161",
+      "sourceSystem": "IB31",
+      "memorySystem": "IM:AUTO:0084",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[31]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[31]",
+        "/layout-config[1]/blocks[1]/block[233]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[84]",
+      "anchors": []
+    },
+    {
+      "key": "block:S160",
+      "kind": "block",
+      "name": "S160",
+      "label": "M10 Vx160",
+      "sourceSystem": "IB32",
+      "memorySystem": "IM:AUTO:0085",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[32]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[32]",
+        "/layout-config[1]/blocks[1]/block[234]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[85]",
+      "anchors": []
+    },
+    {
+      "key": "block:SX",
+      "kind": "block",
+      "name": "SX",
+      "label": "Spår 10",
+      "sourceSystem": "IB33",
+      "memorySystem": "IM:AUTO:0086",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[33]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[33]",
+        "/layout-config[1]/blocks[1]/block[235]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[86]",
+      "anchors": [
+        "block-icon-0"
+      ]
+    },
+    {
+      "key": "block:S140",
+      "kind": "block",
+      "name": "S140",
+      "label": "M08 Vx140",
+      "sourceSystem": "IB34",
+      "memorySystem": "IM:AUTO:0087",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[34]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[34]",
+        "/layout-config[1]/blocks[1]/block[236]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[87]",
+      "anchors": []
+    },
+    {
+      "key": "block:S142",
+      "kind": "block",
+      "name": "S142",
+      "label": "M08 Vx142",
+      "sourceSystem": "IB35",
+      "memorySystem": "IM:AUTO:0088",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[35]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[35]",
+        "/layout-config[1]/blocks[1]/block[237]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[88]",
+      "anchors": []
+    },
+    {
+      "key": "block:S143",
+      "kind": "block",
+      "name": "S143",
+      "label": "M08 Vx143",
+      "sourceSystem": "IB36",
+      "memorySystem": "IM:AUTO:0089",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[36]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[36]",
+        "/layout-config[1]/blocks[1]/block[238]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[89]",
+      "anchors": []
+    },
+    {
+      "key": "block:S141",
+      "kind": "block",
+      "name": "S141",
+      "label": "M08 Vx141",
+      "sourceSystem": "IB37",
+      "memorySystem": "IM:AUTO:0090",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[37]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[37]",
+        "/layout-config[1]/blocks[1]/block[239]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[90]",
+      "anchors": []
+    },
+    {
+      "key": "block:S165",
+      "kind": "block",
+      "name": "S165",
+      "label": "M10 Vx165",
+      "sourceSystem": "IB38",
+      "memorySystem": "IM:AUTO:0091",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[38]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[38]",
+        "/layout-config[1]/blocks[1]/block[240]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[91]",
+      "anchors": []
+    },
+    {
+      "key": "block:S115b",
+      "kind": "block",
+      "name": "S115b",
+      "label": "M03 Spår U2",
+      "sourceSystem": "IB181",
+      "memorySystem": "IM:AUTO:0069",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[39]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[181]",
+        "/layout-config[1]/blocks[1]/block[383]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[69]",
+      "anchors": []
+    },
+    {
+      "key": "block:SU2A",
+      "kind": "block",
+      "name": "SU2A",
+      "label": "M01 Signal U2",
+      "sourceSystem": "IB81",
+      "memorySystem": "IM:AUTO:0138",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[40]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[81]",
+        "/layout-config[1]/blocks[1]/block[283]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[138]",
+      "anchors": []
+    },
+    {
+      "key": "block:S166",
+      "kind": "block",
+      "name": "S166",
+      "label": "M10 Vx166",
+      "sourceSystem": "IB41",
+      "memorySystem": "IM:AUTO:0095",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[41]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[41]",
+        "/layout-config[1]/blocks[1]/block[243]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[95]",
+      "anchors": []
+    },
+    {
+      "key": "block:S150",
+      "kind": "block",
+      "name": "S150",
+      "label": "M09 Vx150",
+      "sourceSystem": "IB42",
+      "memorySystem": "IM:AUTO:0096",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[42]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[42]",
+        "/layout-config[1]/blocks[1]/block[244]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[96]",
+      "anchors": []
+    },
+    {
+      "key": "block:S154",
+      "kind": "block",
+      "name": "S154",
+      "label": "M09 Vx154",
+      "sourceSystem": "IB43",
+      "memorySystem": "IM:AUTO:0097",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[43]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[43]",
+        "/layout-config[1]/blocks[1]/block[245]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[97]",
+      "anchors": []
+    },
+    {
+      "key": "block:S141b",
+      "kind": "block",
+      "name": "S141b",
+      "label": "M08 mellan 141-143",
+      "sourceSystem": "IB145",
+      "memorySystem": "IM:AUTO:0049",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[44]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[145]",
+        "/layout-config[1]/blocks[1]/block[347]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[49]",
+      "anchors": []
+    },
+    {
+      "key": "block:S133",
+      "kind": "block",
+      "name": "S133",
+      "label": "M07 Vx133",
+      "sourceSystem": "IB45",
+      "memorySystem": "IM:AUTO:0099",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[45]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[45]",
+        "/layout-config[1]/blocks[1]/block[247]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[99]",
+      "anchors": []
+    },
+    {
+      "key": "block:S110b",
+      "kind": "block",
+      "name": "S110b",
+      "label": "Vx110 thrown",
+      "sourceSystem": "IB111",
+      "memorySystem": "IM:AUTO:0015",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[46]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[111]",
+        "/layout-config[1]/blocks[1]/block[313]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[15]",
+      "anchors": []
+    },
+    {
+      "key": "block:SVI",
+      "kind": "block",
+      "name": "SVI",
+      "label": "Spår 06",
+      "sourceSystem": "IB47",
+      "memorySystem": "IM:AUTO:0101",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[47]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[47]",
+        "/layout-config[1]/blocks[1]/block[249]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[101]",
+      "anchors": [
+        "block-icon-15"
+      ]
+    },
+    {
+      "key": "block:S120b",
+      "kind": "block",
+      "name": "S120b",
+      "label": "Vx120 thrown",
+      "sourceSystem": "IB175",
+      "memorySystem": "IM:AUTO:0063",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[48]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[175]",
+        "/layout-config[1]/blocks[1]/block[377]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[63]",
+      "anchors": []
+    },
+    {
+      "key": "block:S132",
+      "kind": "block",
+      "name": "S132",
+      "label": "M07 Vx132",
+      "sourceSystem": "IB49",
+      "memorySystem": "IM:AUTO:0103",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[49]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[49]",
+        "/layout-config[1]/blocks[1]/block[251]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[103]",
+      "anchors": []
+    },
+    {
+      "key": "block:S127",
+      "kind": "block",
+      "name": "S127",
+      "label": "Vx127",
+      "sourceSystem": "IB50",
+      "memorySystem": "IM:AUTO:0105",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[50]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[50]",
+        "/layout-config[1]/blocks[1]/block[252]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[105]",
+      "anchors": []
+    },
+    {
+      "key": "block:S131",
+      "kind": "block",
+      "name": "S131",
+      "label": "M07 Vx131",
+      "sourceSystem": "IB51",
+      "memorySystem": "IM:AUTO:0106",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[51]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[51]",
+        "/layout-config[1]/blocks[1]/block[253]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[106]",
+      "anchors": []
+    },
+    {
+      "key": "block:SLIII",
+      "kind": "block",
+      "name": "SLIII",
+      "label": "Lastspår 3",
+      "sourceSystem": "IB48",
+      "memorySystem": "IM:AUTO:0102",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[52]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[48]",
+        "/layout-config[1]/blocks[1]/block[250]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[102]",
+      "anchors": []
+    },
+    {
+      "key": "block:SU2B",
+      "kind": "block",
+      "name": "SU2B",
+      "label": "M01 Signal 1/1",
+      "sourceSystem": "IB85",
+      "memorySystem": "IM:AUTO:0142",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[53]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[85]",
+        "/layout-config[1]/blocks[1]/block[287]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[142]",
+      "anchors": [
+        "block-icon-16"
+      ]
+    },
+    {
+      "key": "block:SN2A",
+      "kind": "block",
+      "name": "SN2A",
+      "label": "M01 Signal N2",
+      "sourceSystem": "IB82",
+      "memorySystem": "IM:AUTO:0139",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[54]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[82]",
+        "/layout-config[1]/blocks[1]/block[284]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[139]",
+      "anchors": [
+        "block-icon-22",
+        "block-icon-23"
+      ]
+    },
+    {
+      "key": "block:S128",
+      "kind": "block",
+      "name": "S128",
+      "label": "Vx128",
+      "sourceSystem": "IB55",
+      "memorySystem": "IM:AUTO:0110",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[55]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[55]",
+        "/layout-config[1]/blocks[1]/block[257]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[110]",
+      "anchors": []
+    },
+    {
+      "key": "block:Slokstall1",
+      "kind": "block",
+      "name": "Slokstall1",
+      "label": "M10",
+      "sourceSystem": "IB167",
+      "memorySystem": "IM:AUTO:0070",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[56]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[167]",
+        "/layout-config[1]/blocks[1]/block[369]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[70]",
+      "anchors": []
+    },
+    {
+      "key": "block:S117",
+      "kind": "block",
+      "name": "S117",
+      "label": "Vx117",
+      "sourceSystem": "IB3",
+      "memorySystem": "IM:AUTO:0082",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[57]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[3]",
+        "/layout-config[1]/blocks[1]/block[205]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[82]",
+      "anchors": []
+    },
+    {
+      "key": "block:S118",
+      "kind": "block",
+      "name": "S118",
+      "label": "M03 Vx118",
+      "sourceSystem": "IB58",
+      "memorySystem": "IM:AUTO:0113",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[58]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[58]",
+        "/layout-config[1]/blocks[1]/block[260]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[113]",
+      "anchors": []
+    },
+    {
+      "key": "block:S115",
+      "kind": "block",
+      "name": "S115",
+      "label": "M03 Vx115",
+      "sourceSystem": "IB59",
+      "memorySystem": "IM:AUTO:0114",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[59]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[59]",
+        "/layout-config[1]/blocks[1]/block[261]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[114]",
+      "anchors": []
+    },
+    {
+      "key": "block:Slokstall2",
+      "kind": "block",
+      "name": "Slokstall2",
+      "label": "M10",
+      "sourceSystem": "IB168",
+      "memorySystem": "IM:AUTO:0071",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[60]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[168]",
+        "/layout-config[1]/blocks[1]/block[370]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[71]",
+      "anchors": []
+    },
+    {
+      "key": "block:S125a",
+      "kind": "block",
+      "name": "S125a",
+      "label": "Vx125 closed",
+      "sourceSystem": "IB75",
+      "memorySystem": "IM:AUTO:0131",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[61]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[75]",
+        "/layout-config[1]/blocks[1]/block[277]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[131]",
+      "anchors": []
+    },
+    {
+      "key": "block:S119",
+      "kind": "block",
+      "name": "S119",
+      "label": "M03 Vx119",
+      "sourceSystem": "IB62",
+      "memorySystem": "IM:AUTO:0117",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[62]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[62]",
+        "/layout-config[1]/blocks[1]/block[264]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[117]",
+      "anchors": []
+    },
+    {
+      "key": "block:S101",
+      "kind": "block",
+      "name": "S101",
+      "label": "Vx101",
+      "sourceSystem": "IB63",
+      "memorySystem": "IM:AUTO:0118",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[63]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[63]",
+        "/layout-config[1]/blocks[1]/block[265]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[118]",
+      "anchors": []
+    },
+    {
+      "key": "block:S101a",
+      "kind": "block",
+      "name": "S101a",
+      "label": "Mellan 101-102",
+      "sourceSystem": "IB64",
+      "memorySystem": "IM:AUTO:0119",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[64]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[64]",
+        "/layout-config[1]/blocks[1]/block[266]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[119]",
+      "anchors": []
+    },
+    {
+      "key": "block:S119b",
+      "kind": "block",
+      "name": "S119b",
+      "label": "S119b",
+      "sourceSystem": "IB53",
+      "memorySystem": "IM:AUTO:0108",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[65]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[53]",
+        "/layout-config[1]/blocks[1]/block[255]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[108]",
+      "anchors": []
+    },
+    {
+      "key": "block:S100a",
+      "kind": "block",
+      "name": "S100a",
+      "label": "Vx100 closed",
+      "sourceSystem": "IB66",
+      "memorySystem": "IM:AUTO:0121",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[66]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[66]",
+        "/layout-config[1]/blocks[1]/block[268]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[121]",
+      "anchors": [
+        "block-icon-30"
+      ]
+    },
+    {
+      "key": "block:S100",
+      "kind": "block",
+      "name": "S100",
+      "label": "Vx100",
+      "sourceSystem": "IB67",
+      "memorySystem": "IM:AUTO:0122",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[67]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[67]",
+        "/layout-config[1]/blocks[1]/block[269]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[122]",
+      "anchors": []
+    },
+    {
+      "key": "block:S164",
+      "kind": "block",
+      "name": "S164",
+      "label": "Vx164",
+      "sourceSystem": "IB87",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[68]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[87]",
+        "/layout-config[1]/blocks[1]/block[289]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:S161a",
+      "kind": "block",
+      "name": "S161a",
+      "label": "M10 mellan 161-163",
+      "sourceSystem": "IB69",
+      "memorySystem": "IM:AUTO:0124",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[69]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[69]",
+        "/layout-config[1]/blocks[1]/block[271]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[124]",
+      "anchors": []
+    },
+    {
+      "key": "block:S160a",
+      "kind": "block",
+      "name": "S160a",
+      "label": "M10 mellan 160-162",
+      "sourceSystem": "IB70",
+      "memorySystem": "IM:AUTO:0126",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[70]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[70]",
+        "/layout-config[1]/blocks[1]/block[272]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[126]",
+      "anchors": []
+    },
+    {
+      "key": "block:S140c",
+      "kind": "block",
+      "name": "S140c",
+      "label": "M08 till korset",
+      "sourceSystem": "IB146",
+      "memorySystem": "IM:AUTO:0050",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[71]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[146]",
+        "/layout-config[1]/blocks[1]/block[348]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[50]",
+      "anchors": []
+    },
+    {
+      "key": "block:S133a",
+      "kind": "block",
+      "name": "S133a",
+      "label": "M08 mellan 133-144",
+      "sourceSystem": "IB72",
+      "memorySystem": "IM:AUTO:0128",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[72]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[72]",
+        "/layout-config[1]/blocks[1]/block[274]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[128]",
+      "anchors": []
+    },
+    {
+      "key": "block:S127a",
+      "kind": "block",
+      "name": "S127a",
+      "label": "M06 mellan 127-130",
+      "sourceSystem": "IB73",
+      "memorySystem": "IM:AUTO:0129",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[73]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[73]",
+        "/layout-config[1]/blocks[1]/block[275]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[129]",
+      "anchors": []
+    },
+    {
+      "key": "block:S130a",
+      "kind": "block",
+      "name": "S130a",
+      "label": "M07 mellan 130-132",
+      "sourceSystem": "IB74",
+      "memorySystem": "IM:AUTO:0130",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[74]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[74]",
+        "/layout-config[1]/blocks[1]/block[276]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[130]",
+      "anchors": []
+    },
+    {
+      "key": "block:S155",
+      "kind": "block",
+      "name": "S155",
+      "label": "Vx155",
+      "sourceSystem": "IB61",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[75]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[61]",
+        "/layout-config[1]/blocks[1]/block[263]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:S119a",
+      "kind": "block",
+      "name": "S119a",
+      "label": "M03 mellan 118-119",
+      "sourceSystem": "IB76",
+      "memorySystem": "IM:AUTO:0132",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[76]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[76]",
+        "/layout-config[1]/blocks[1]/block[278]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[132]",
+      "anchors": []
+    },
+    {
+      "key": "block:S114b",
+      "kind": "block",
+      "name": "S114b",
+      "label": "M03 mellan 111-114",
+      "sourceSystem": "IB77",
+      "memorySystem": "IM:AUTO:0133",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[77]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[77]",
+        "/layout-config[1]/blocks[1]/block[279]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[133]",
+      "anchors": []
+    },
+    {
+      "key": "block:S114a",
+      "kind": "block",
+      "name": "S114a",
+      "label": "M03 mellan 114-115",
+      "sourceSystem": "IB78",
+      "memorySystem": "IM:AUTO:0134",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[78]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[78]",
+        "/layout-config[1]/blocks[1]/block[280]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[134]",
+      "anchors": []
+    },
+    {
+      "key": "block:S103a",
+      "kind": "block",
+      "name": "S103a",
+      "label": "Mellan 103-112",
+      "sourceSystem": "IB79",
+      "memorySystem": "IM:AUTO:0135",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[79]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[79]",
+        "/layout-config[1]/blocks[1]/block[281]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[135]",
+      "anchors": []
+    },
+    {
+      "key": "block:S130",
+      "kind": "block",
+      "name": "S130",
+      "label": "M07 Vx130",
+      "sourceSystem": "IB80",
+      "memorySystem": "IM:AUTO:0137",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[80]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[80]",
+        "/layout-config[1]/blocks[1]/block[282]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[137]",
+      "anchors": []
+    },
+    {
+      "key": "block:S112b",
+      "kind": "block",
+      "name": "S112b",
+      "label": "Vx112 thrown",
+      "sourceSystem": "IB97",
+      "memorySystem": "IM:AUTO:0151",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[81]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[97]",
+        "/layout-config[1]/blocks[1]/block[299]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[151]",
+      "anchors": [
+        "block-icon-41"
+      ]
+    },
+    {
+      "key": "block:S117a",
+      "kind": "block",
+      "name": "S117a",
+      "label": "Vx117 closed",
+      "sourceSystem": "IB65",
+      "memorySystem": "IM:AUTO:0120",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[82]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[65]",
+        "/layout-config[1]/blocks[1]/block[267]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[120]",
+      "anchors": [
+        "block-icon-31"
+      ]
+    },
+    {
+      "key": "block:S164b",
+      "kind": "block",
+      "name": "S164b",
+      "label": "Vx164 thrown",
+      "sourceSystem": "IB89",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[83]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[89]",
+        "/layout-config[1]/blocks[1]/block[291]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:S155b",
+      "kind": "block",
+      "name": "S155b",
+      "label": "Vx155 thrown",
+      "sourceSystem": "IB91",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[84]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[91]",
+        "/layout-config[1]/blocks[1]/block[293]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:S155c",
+      "kind": "block",
+      "name": "S155c",
+      "label": "Vx155 closed",
+      "sourceSystem": "IB96",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[85]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[96]",
+        "/layout-config[1]/blocks[1]/block[298]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:S100b",
+      "kind": "block",
+      "name": "S100b",
+      "label": "Vx100 thrown",
+      "sourceSystem": "IB86",
+      "memorySystem": "IM:AUTO:0143",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[86]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[86]",
+        "/layout-config[1]/blocks[1]/block[288]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[143]",
+      "anchors": []
+    },
+    {
+      "key": "block:S95",
+      "kind": "block",
+      "name": "S95",
+      "label": "M01 Vx95",
+      "sourceSystem": "IB99",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[87]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[99]",
+        "/layout-config[1]/blocks[1]/block[301]"
+      ],
+      "memoryPath": null,
+      "anchors": [
+        "block-icon-28"
+      ]
+    },
+    {
+      "key": "block:S96",
+      "kind": "block",
+      "name": "S96",
+      "label": "M01 Vx96",
+      "sourceSystem": "IB126",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[88]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[126]",
+        "/layout-config[1]/blocks[1]/block[328]"
+      ],
+      "memoryPath": null,
+      "anchors": [
+        "block-icon-29"
+      ]
+    },
+    {
+      "key": "block:SIIA",
+      "kind": "block",
+      "name": "SIIA",
+      "label": "Spår 02a",
+      "sourceSystem": "IB9",
+      "memorySystem": "IM:AUTO:0145",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[89]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[9]",
+        "/layout-config[1]/blocks[1]/block[211]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[145]",
+      "anchors": [
+        "block-icon-10"
+      ]
+    },
+    {
+      "key": "block:S95b",
+      "kind": "block",
+      "name": "S95b",
+      "label": "M01 Vx95 thrown",
+      "sourceSystem": "IB142",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[90]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[142]",
+        "/layout-config[1]/blocks[1]/block[344]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:SIIIA",
+      "kind": "block",
+      "name": "SIIIA",
+      "label": "Spår 03a",
+      "sourceSystem": "IB12",
+      "memorySystem": "IM:AUTO:0024",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[91]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[12]",
+        "/layout-config[1]/blocks[1]/block[214]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[24]",
+      "anchors": [
+        "block-icon-11"
+      ]
+    },
+    {
+      "key": "block:S132b",
+      "kind": "block",
+      "name": "S132b",
+      "label": "M07 mellan 131-132",
+      "sourceSystem": "IB92",
+      "memorySystem": "IM:AUTO:0147",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[92]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[92]",
+        "/layout-config[1]/blocks[1]/block[294]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[147]",
+      "anchors": []
+    },
+    {
+      "key": "block:S96b",
+      "kind": "block",
+      "name": "S96b",
+      "label": "M01 Vx96 closed",
+      "sourceSystem": "IB143",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[93]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[143]",
+        "/layout-config[1]/blocks[1]/block[345]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:S141c",
+      "kind": "block",
+      "name": "S141c",
+      "label": "M08 till korset",
+      "sourceSystem": "IB147",
+      "memorySystem": "IM:AUTO:0051",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[94]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[147]",
+        "/layout-config[1]/blocks[1]/block[349]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[51]",
+      "anchors": []
+    },
+    {
+      "key": "block:S110a",
+      "kind": "block",
+      "name": "S110a",
+      "label": "Vx110 closed",
+      "sourceSystem": "IB98",
+      "memorySystem": "IM:AUTO:0152",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[95]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[98]",
+        "/layout-config[1]/blocks[1]/block[300]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[152]",
+      "anchors": []
+    },
+    {
+      "key": "block:SU4A",
+      "kind": "block",
+      "name": "SU4A",
+      "label": "M01 Signal U4",
+      "sourceSystem": "IB156",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[96]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[156]",
+        "/layout-config[1]/blocks[1]/block[358]"
+      ],
+      "memoryPath": null,
+      "anchors": [
+        "block-icon-26"
+      ]
+    },
+    {
+      "key": "block:S121b",
+      "kind": "block",
+      "name": "S121b",
+      "label": "M06 signal 2/8",
+      "sourceSystem": "IB100",
+      "memorySystem": "IM:AUTO:0003",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[97]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[100]",
+        "/layout-config[1]/blocks[1]/block[302]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[3]",
+      "anchors": []
+    },
+    {
+      "key": "block:SN4A",
+      "kind": "block",
+      "name": "SN4A",
+      "label": "M01 Signal N4",
+      "sourceSystem": "IB157",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[98]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[157]",
+        "/layout-config[1]/blocks[1]/block[359]"
+      ],
+      "memoryPath": null,
+      "anchors": [
+        "block-icon-27"
+      ]
+    },
+    {
+      "key": "block:S120a",
+      "kind": "block",
+      "name": "S120a",
+      "label": "Vx120 closed",
+      "sourceSystem": "IB102",
+      "memorySystem": "IM:AUTO:0005",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[99]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[102]",
+        "/layout-config[1]/blocks[1]/block[304]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[5]",
+      "anchors": [
+        "block-icon-32"
+      ]
+    },
+    {
+      "key": "block:S140a",
+      "kind": "block",
+      "name": "S140a",
+      "label": "M08 signal 1/9",
+      "sourceSystem": "IB103",
+      "memorySystem": "IM:AUTO:0006",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[100]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[103]",
+        "/layout-config[1]/blocks[1]/block[305]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[6]",
+      "anchors": []
+    },
+    {
+      "key": "block:S141a",
+      "kind": "block",
+      "name": "S141a",
+      "label": "M08 signal 2/9",
+      "sourceSystem": "IB104",
+      "memorySystem": "IM:AUTO:0007",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[101]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[104]",
+        "/layout-config[1]/blocks[1]/block[306]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[7]",
+      "anchors": []
+    },
+    {
+      "key": "block:S142a",
+      "kind": "block",
+      "name": "S142a",
+      "label": "M08 signal 1/6",
+      "sourceSystem": "IB105",
+      "memorySystem": "IM:AUTO:0008",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[102]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[105]",
+        "/layout-config[1]/blocks[1]/block[307]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[8]",
+      "anchors": []
+    },
+    {
+      "key": "block:S143a",
+      "kind": "block",
+      "name": "S143a",
+      "label": "M08 signal 2/6",
+      "sourceSystem": "IB106",
+      "memorySystem": "IM:AUTO:0009",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[103]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[106]",
+        "/layout-config[1]/blocks[1]/block[308]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[9]",
+      "anchors": []
+    },
+    {
+      "key": "block:S160b",
+      "kind": "block",
+      "name": "S160b",
+      "label": "M10 signal 1/11",
+      "sourceSystem": "IB107",
+      "memorySystem": "IM:AUTO:0010",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[104]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[107]",
+        "/layout-config[1]/blocks[1]/block[309]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[10]",
+      "anchors": [
+        "block-icon-34"
+      ]
+    },
+    {
+      "key": "block:S161c",
+      "kind": "block",
+      "name": "S161c",
+      "label": "M09 mellan 161-153",
+      "sourceSystem": "IB108",
+      "memorySystem": "IM:AUTO:0011",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[105]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[108]",
+        "/layout-config[1]/blocks[1]/block[310]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[11]",
+      "anchors": [
+        "block-icon-39"
+      ]
+    },
+    {
+      "key": "block:S160c",
+      "kind": "block",
+      "name": "S160c",
+      "label": "M09 signal 10/11",
+      "sourceSystem": "IB109",
+      "memorySystem": "IM:AUTO:0012",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[106]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[109]",
+        "/layout-config[1]/blocks[1]/block[311]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[12]",
+      "anchors": []
+    },
+    {
+      "key": "block:S161b",
+      "kind": "block",
+      "name": "S161b",
+      "label": "M10 signal 2/11",
+      "sourceSystem": "IB110",
+      "memorySystem": "IM:AUTO:0014",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[107]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[110]",
+        "/layout-config[1]/blocks[1]/block[312]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[14]",
+      "anchors": [
+        "block-icon-35"
+      ]
+    },
+    {
+      "key": "block:SIVA",
+      "kind": "block",
+      "name": "SIVA",
+      "label": "Spår 04a",
+      "sourceSystem": "IB13",
+      "memorySystem": "IM:AUTO:0034",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[108]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[13]",
+        "/layout-config[1]/blocks[1]/block[215]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[34]",
+      "anchors": [
+        "block-icon-12"
+      ]
+    },
+    {
+      "key": "block:SVA",
+      "kind": "block",
+      "name": "SVA",
+      "label": "Spår 05a",
+      "sourceSystem": "IB14",
+      "memorySystem": "IM:AUTO:0045",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[109]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[14]",
+        "/layout-config[1]/blocks[1]/block[216]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[45]",
+      "anchors": [
+        "block-icon-13"
+      ]
+    },
+    {
+      "key": "block:S153c",
+      "kind": "block",
+      "name": "S153c",
+      "label": "M09 signal 3/2",
+      "sourceSystem": "IB113",
+      "memorySystem": "IM:AUTO:0017",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[110]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[113]",
+        "/layout-config[1]/blocks[1]/block[315]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[17]",
+      "anchors": []
+    },
+    {
+      "key": "block:S103b",
+      "kind": "block",
+      "name": "S103b",
+      "label": "M02 Spår 03e",
+      "sourceSystem": "IB114",
+      "memorySystem": "IM:AUTO:0018",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[111]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[114]",
+        "/layout-config[1]/blocks[1]/block[316]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[18]",
+      "anchors": [
+        "block-icon-42"
+      ]
+    },
+    {
+      "key": "block:S103c",
+      "kind": "block",
+      "name": "S103c",
+      "label": "Mellan 103-114",
+      "sourceSystem": "IB115",
+      "memorySystem": "IM:AUTO:0019",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[112]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[115]",
+        "/layout-config[1]/blocks[1]/block[317]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[19]",
+      "anchors": []
+    },
+    {
+      "key": "block:S113c",
+      "kind": "block",
+      "name": "S113c",
+      "label": "M03 mellan 113-116",
+      "sourceSystem": "IB116",
+      "memorySystem": "IM:AUTO:0020",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[113]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[116]",
+        "/layout-config[1]/blocks[1]/block[318]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[20]",
+      "anchors": []
+    },
+    {
+      "key": "block:S113b",
+      "kind": "block",
+      "name": "S113b",
+      "label": "M03 3/10",
+      "sourceSystem": "IB117",
+      "memorySystem": "IM:AUTO:0021",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[114]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[117]",
+        "/layout-config[1]/blocks[1]/block[319]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[21]",
+      "anchors": []
+    },
+    {
+      "key": "block:S113a",
+      "kind": "block",
+      "name": "S113a",
+      "label": "Mellan 112-113",
+      "sourceSystem": "IB118",
+      "memorySystem": "IM:AUTO:0022",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[115]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[118]",
+        "/layout-config[1]/blocks[1]/block[320]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[22]",
+      "anchors": [
+        "block-icon-40"
+      ]
+    },
+    {
+      "key": "block:S116c",
+      "kind": "block",
+      "name": "S116c",
+      "label": "M03 signal 4/10",
+      "sourceSystem": "IB119",
+      "memorySystem": "IM:AUTO:0023",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[116]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[119]",
+        "/layout-config[1]/blocks[1]/block[321]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[23]",
+      "anchors": []
+    },
+    {
+      "key": "block:S116a",
+      "kind": "block",
+      "name": "S116a",
+      "label": "M03 signal 5/10",
+      "sourceSystem": "IB120",
+      "memorySystem": "IM:AUTO:0025",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[117]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[120]",
+        "/layout-config[1]/blocks[1]/block[322]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[25]",
+      "anchors": []
+    },
+    {
+      "key": "block:S123a",
+      "kind": "block",
+      "name": "S123a",
+      "label": "M06 mellan 123-126",
+      "sourceSystem": "IB121",
+      "memorySystem": "IM:AUTO:0026",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[118]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[121]",
+        "/layout-config[1]/blocks[1]/block[323]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[26]",
+      "anchors": []
+    },
+    {
+      "key": "block:S123b",
+      "kind": "block",
+      "name": "S123b",
+      "label": "M06 signal 3/5",
+      "sourceSystem": "IB122",
+      "memorySystem": "IM:AUTO:0027",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[119]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[122]",
+        "/layout-config[1]/blocks[1]/block[324]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[27]",
+      "anchors": []
+    },
+    {
+      "key": "block:S123c",
+      "kind": "block",
+      "name": "S123c",
+      "label": "M06 signal 4/5",
+      "sourceSystem": "IB123",
+      "memorySystem": "IM:AUTO:0028",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[120]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[123]",
+        "/layout-config[1]/blocks[1]/block[325]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[28]",
+      "anchors": []
+    },
+    {
+      "key": "block:S126c",
+      "kind": "block",
+      "name": "S126c",
+      "label": "M06 signal 5/5",
+      "sourceSystem": "IB124",
+      "memorySystem": "IM:AUTO:0029",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[121]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[124]",
+        "/layout-config[1]/blocks[1]/block[326]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[29]",
+      "anchors": []
+    },
+    {
+      "key": "block:S126a",
+      "kind": "block",
+      "name": "S126a",
+      "label": "M06 mellan 126-131",
+      "sourceSystem": "IB125",
+      "memorySystem": "IM:AUTO:0030",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[122]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[125]",
+        "/layout-config[1]/blocks[1]/block[327]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[30]",
+      "anchors": []
+    },
+    {
+      "key": "block:SU4B",
+      "kind": "block",
+      "name": "SU4B",
+      "label": "M01 Signal 1/3",
+      "sourceSystem": "IB158",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[123]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[158]",
+        "/layout-config[1]/blocks[1]/block[360]"
+      ],
+      "memoryPath": null,
+      "anchors": [
+        "block-icon-24"
+      ]
+    },
+    {
+      "key": "block:S125b",
+      "kind": "block",
+      "name": "S125b",
+      "label": "Vx125 thrown",
+      "sourceSystem": "IB127",
+      "memorySystem": "IM:AUTO:0031",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[124]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[127]",
+        "/layout-config[1]/blocks[1]/block[329]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[31]",
+      "anchors": []
+    },
+    {
+      "key": "block:S131c",
+      "kind": "block",
+      "name": "S131c",
+      "label": "M07 signal 5/8",
+      "sourceSystem": "IB128",
+      "memorySystem": "IM:AUTO:0032",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[125]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[128]",
+        "/layout-config[1]/blocks[1]/block[330]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[32]",
+      "anchors": []
+    },
+    {
+      "key": "block:S131a",
+      "kind": "block",
+      "name": "S131a",
+      "label": "M07 signal 6/8",
+      "sourceSystem": "IB129",
+      "memorySystem": "IM:AUTO:0033",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[126]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[129]",
+        "/layout-config[1]/blocks[1]/block[331]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[33]",
+      "anchors": []
+    },
+    {
+      "key": "block:S153b",
+      "kind": "block",
+      "name": "S153b",
+      "label": "M09 mellan 152-153",
+      "sourceSystem": "IB130",
+      "memorySystem": "IM:AUTO:0035",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[127]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[130]",
+        "/layout-config[1]/blocks[1]/block[332]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[35]",
+      "anchors": []
+    },
+    {
+      "key": "block:S152b",
+      "kind": "block",
+      "name": "S152b",
+      "label": "M09 mellan 151-152",
+      "sourceSystem": "IB131",
+      "memorySystem": "IM:AUTO:0036",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[128]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[131]",
+        "/layout-config[1]/blocks[1]/block[333]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[36]",
+      "anchors": [
+        "block-icon-38"
+      ]
+    },
+    {
+      "key": "block:S152c",
+      "kind": "block",
+      "name": "S152c",
+      "label": "M09 signal 3/9",
+      "sourceSystem": "IB132",
+      "memorySystem": "IM:AUTO:0037",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[129]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[132]",
+        "/layout-config[1]/blocks[1]/block[334]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[37]",
+      "anchors": []
+    },
+    {
+      "key": "block:S151b",
+      "kind": "block",
+      "name": "S151b",
+      "label": "M09 mellan 151-154",
+      "sourceSystem": "IB133",
+      "memorySystem": "IM:AUTO:0038",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[130]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[133]",
+        "/layout-config[1]/blocks[1]/block[335]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[38]",
+      "anchors": [
+        "block-icon-37"
+      ]
+    },
+    {
+      "key": "block:S151c",
+      "kind": "block",
+      "name": "S151c",
+      "label": "M09 signal 4/9",
+      "sourceSystem": "IB134",
+      "memorySystem": "IM:AUTO:0039",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[131]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[134]",
+        "/layout-config[1]/blocks[1]/block[336]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[39]",
+      "anchors": []
+    },
+    {
+      "key": "block:S154c",
+      "kind": "block",
+      "name": "S154c",
+      "label": "M09 signal 5/9",
+      "sourceSystem": "IB135",
+      "memorySystem": "IM:AUTO:0040",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[132]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[135]",
+        "/layout-config[1]/blocks[1]/block[337]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[40]",
+      "anchors": []
+    },
+    {
+      "key": "block:S154b",
+      "kind": "block",
+      "name": "S154b",
+      "label": "M09 signal 6/9",
+      "sourceSystem": "IB136",
+      "memorySystem": "IM:AUTO:0041",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[133]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[136]",
+        "/layout-config[1]/blocks[1]/block[338]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[41]",
+      "anchors": []
+    },
+    {
+      "key": "block:S133c",
+      "kind": "block",
+      "name": "S133c",
+      "label": "M07 Spår L3",
+      "sourceSystem": "IB137",
+      "memorySystem": "IM:AUTO:0042",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[134]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[137]",
+        "/layout-config[1]/blocks[1]/block[339]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[42]",
+      "anchors": []
+    },
+    {
+      "key": "block:S132a",
+      "kind": "block",
+      "name": "S132a",
+      "label": "M07 spår 06b",
+      "sourceSystem": "IB138",
+      "memorySystem": "IM:AUTO:0043",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[135]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[138]",
+        "/layout-config[1]/blocks[1]/block[340]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[43]",
+      "anchors": []
+    },
+    {
+      "key": "block:S112a",
+      "kind": "block",
+      "name": "S112a",
+      "label": "Vx112 closed",
+      "sourceSystem": "IB139",
+      "memorySystem": "IM:AUTO:0044",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[136]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[139]",
+        "/layout-config[1]/blocks[1]/block[341]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[44]",
+      "anchors": []
+    },
+    {
+      "key": "block:S150a",
+      "kind": "block",
+      "name": "S150a",
+      "label": "M09 mellan 144-150",
+      "sourceSystem": "IB140",
+      "memorySystem": "IM:AUTO:0046",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[137]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[140]",
+        "/layout-config[1]/blocks[1]/block[342]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[46]",
+      "anchors": []
+    },
+    {
+      "key": "block:S144b",
+      "kind": "block",
+      "name": "S144b",
+      "label": "M08 mellan 144-153",
+      "sourceSystem": "IB94",
+      "memorySystem": "IM:AUTO:0149",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[138]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[94]",
+        "/layout-config[1]/blocks[1]/block[296]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[149]",
+      "anchors": []
+    },
+    {
+      "key": "block:S150b",
+      "kind": "block",
+      "name": "S150b",
+      "label": "M09 kolgård",
+      "sourceSystem": "IB93",
+      "memorySystem": "IM:AUTO:0148",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[139]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[93]",
+        "/layout-config[1]/blocks[1]/block[295]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[148]",
+      "anchors": []
+    },
+    {
+      "key": "block:S150c",
+      "kind": "block",
+      "name": "S150c",
+      "label": "M09 lokstall",
+      "sourceSystem": "IB141",
+      "memorySystem": "IM:AUTO:0047",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[140]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[141]",
+        "/layout-config[1]/blocks[1]/block[343]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[47]",
+      "anchors": []
+    },
+    {
+      "key": "block:S144a",
+      "kind": "block",
+      "name": "S144a",
+      "label": "M09 mellan 144-154",
+      "sourceSystem": "IB71",
+      "memorySystem": "IM:AUTO:0127",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[141]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[71]",
+        "/layout-config[1]/blocks[1]/block[273]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[127]",
+      "anchors": []
+    },
+    {
+      "key": "block:S144",
+      "kind": "block",
+      "name": "S144",
+      "label": "M08 Vx144",
+      "sourceSystem": "IB44",
+      "memorySystem": "IM:AUTO:0098",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[142]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[44]",
+        "/layout-config[1]/blocks[1]/block[246]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[98]",
+      "anchors": []
+    },
+    {
+      "key": "block:SG52",
+      "kind": "block",
+      "name": "SG52",
+      "label": "Godsspår 52",
+      "sourceSystem": "IB95",
+      "memorySystem": "IM:AUTO:0150",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[143]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[95]",
+        "/layout-config[1]/blocks[1]/block[297]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[150]",
+      "anchors": []
+    },
+    {
+      "key": "block:SG51",
+      "kind": "block",
+      "name": "SG51",
+      "label": "Godsspår 51",
+      "sourceSystem": "IB52",
+      "memorySystem": "IM:AUTO:0107",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[144]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[52]",
+        "/layout-config[1]/blocks[1]/block[254]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[107]",
+      "anchors": []
+    },
+    {
+      "key": "block:SN2B",
+      "kind": "block",
+      "name": "SN2B",
+      "label": "M01 Signal 2/1",
+      "sourceSystem": "IB88",
+      "memorySystem": "IM:AUTO:0144",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[145]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[88]",
+        "/layout-config[1]/blocks[1]/block[290]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[144]",
+      "anchors": [
+        "block-icon-17"
+      ]
+    },
+    {
+      "key": "block:S143c",
+      "kind": "block",
+      "name": "S143c",
+      "label": "M08 till korset",
+      "sourceSystem": "IB148",
+      "memorySystem": "IM:AUTO:0052",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[146]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[148]",
+        "/layout-config[1]/blocks[1]/block[350]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[52]",
+      "anchors": []
+    },
+    {
+      "key": "block:S142c",
+      "kind": "block",
+      "name": "S142c",
+      "label": "M08 till korset",
+      "sourceSystem": "IB149",
+      "memorySystem": "IM:AUTO:0053",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[147]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[149]",
+        "/layout-config[1]/blocks[1]/block[351]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[53]",
+      "anchors": []
+    },
+    {
+      "key": "block:S165b",
+      "kind": "block",
+      "name": "S165b",
+      "label": "M10 mellan 162-165",
+      "sourceSystem": "IB150",
+      "memorySystem": "IM:AUTO:0055",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[148]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[150]",
+        "/layout-config[1]/blocks[1]/block[352]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[55]",
+      "anchors": []
+    },
+    {
+      "key": "block:S166b",
+      "kind": "block",
+      "name": "S166b",
+      "label": "M10 mellan 163-166",
+      "sourceSystem": "IB151",
+      "memorySystem": "IM:AUTO:0056",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[149]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[151]",
+        "/layout-config[1]/blocks[1]/block[353]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[56]",
+      "anchors": []
+    },
+    {
+      "key": "block:SIB",
+      "kind": "block",
+      "name": "SIB",
+      "label": "Spår 01b",
+      "sourceSystem": "IB20",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[150]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[20]",
+        "/layout-config[1]/blocks[1]/block[222]"
+      ],
+      "memoryPath": null,
+      "anchors": [
+        "block-icon-8"
+      ]
+    },
+    {
+      "key": "block:SIIB",
+      "kind": "block",
+      "name": "SIIB",
+      "label": "Spår 02b",
+      "sourceSystem": "IB21",
+      "memorySystem": "IM:AUTO:0073",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[151]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[21]",
+        "/layout-config[1]/blocks[1]/block[223]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[73]",
+      "anchors": [
+        "block-icon-9"
+      ]
+    },
+    {
+      "key": "block:S166c",
+      "kind": "block",
+      "name": "S166c",
+      "label": "M10 till korset",
+      "sourceSystem": "IB153",
+      "memorySystem": "IM:AUTO:0058",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[152]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[153]",
+        "/layout-config[1]/blocks[1]/block[355]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[58]",
+      "anchors": []
+    },
+    {
+      "key": "block:S165c",
+      "kind": "block",
+      "name": "S165c",
+      "label": "M10 till korset",
+      "sourceSystem": "IB152",
+      "memorySystem": "IM:AUTO:0057",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[153]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[152]",
+        "/layout-config[1]/blocks[1]/block[354]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[57]",
+      "anchors": []
+    },
+    {
+      "key": "block:SU1A",
+      "kind": "block",
+      "name": "SU1A",
+      "label": "Signal U1",
+      "sourceSystem": "IB83",
+      "memorySystem": "IM:AUTO:0140",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[154]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[83]",
+        "/layout-config[1]/blocks[1]/block[285]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[140]",
+      "anchors": [
+        "block-icon-20"
+      ]
+    },
+    {
+      "key": "block:SU1B",
+      "kind": "block",
+      "name": "SU1B",
+      "label": "Signal 1/2",
+      "sourceSystem": "IB90",
+      "memorySystem": "IM:AUTO:0146",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[155]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[90]",
+        "/layout-config[1]/blocks[1]/block[292]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[146]",
+      "anchors": [
+        "block-icon-19"
+      ]
+    },
+    {
+      "key": "block:SN4B",
+      "kind": "block",
+      "name": "SN4B",
+      "label": "M01 Signal 2/3",
+      "sourceSystem": "IB159",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[156]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[159]",
+        "/layout-config[1]/blocks[1]/block[361]"
+      ],
+      "memoryPath": null,
+      "anchors": [
+        "block-icon-25"
+      ]
+    },
+    {
+      "key": "block:SN1A",
+      "kind": "block",
+      "name": "SN1A",
+      "label": "Signal N1",
+      "sourceSystem": "IB84",
+      "memorySystem": "IM:AUTO:0141",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[157]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[84]",
+        "/layout-config[1]/blocks[1]/block[286]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[141]",
+      "anchors": [
+        "block-icon-21"
+      ]
+    },
+    {
+      "key": "block:SN1B",
+      "kind": "block",
+      "name": "SN1B",
+      "label": "Signal 2/2",
+      "sourceSystem": "IB176",
+      "memorySystem": "IM:AUTO:0064",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[158]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[176]",
+        "/layout-config[1]/blocks[1]/block[378]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[64]",
+      "anchors": [
+        "block-icon-18"
+      ]
+    },
+    {
+      "key": "block:Slokstall3",
+      "kind": "block",
+      "name": "Slokstall3",
+      "label": "M10",
+      "sourceSystem": "IB160",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[159]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[160]",
+        "/layout-config[1]/blocks[1]/block[362]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:Slokstall4",
+      "kind": "block",
+      "name": "Slokstall4",
+      "label": "M10",
+      "sourceSystem": "IB161",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[160]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[161]",
+        "/layout-config[1]/blocks[1]/block[363]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:Slokstall5",
+      "kind": "block",
+      "name": "Slokstall5",
+      "label": "M10",
+      "sourceSystem": "IB162",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[161]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[162]",
+        "/layout-config[1]/blocks[1]/block[364]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:Slokstall6",
+      "kind": "block",
+      "name": "Slokstall6",
+      "label": "M10",
+      "sourceSystem": "IB163",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[162]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[163]",
+        "/layout-config[1]/blocks[1]/block[365]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:Slokstall7",
+      "kind": "block",
+      "name": "Slokstall7",
+      "label": "M10",
+      "sourceSystem": "IB164",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[163]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[164]",
+        "/layout-config[1]/blocks[1]/block[366]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:Slokstall8",
+      "kind": "block",
+      "name": "Slokstall8",
+      "label": "M10",
+      "sourceSystem": "IB165",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[164]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[165]",
+        "/layout-config[1]/blocks[1]/block[367]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:Slokstall9",
+      "kind": "block",
+      "name": "Slokstall9",
+      "label": "M10",
+      "sourceSystem": "IB166",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[165]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[166]",
+        "/layout-config[1]/blocks[1]/block[368]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:SIIIB",
+      "kind": "block",
+      "name": "SIIIB",
+      "label": "Spår 03b",
+      "sourceSystem": "IB22",
+      "memorySystem": "IM:AUTO:0074",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[167]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[22]",
+        "/layout-config[1]/blocks[1]/block[224]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[74]",
+      "anchors": [
+        "block-icon-3"
+      ]
+    },
+    {
+      "key": "block:SL1a",
+      "kind": "block",
+      "name": "SL1a",
+      "label": "Signal L1",
+      "sourceSystem": "IB173",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[168]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[173]",
+        "/layout-config[1]/blocks[1]/block[375]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:S127b",
+      "kind": "block",
+      "name": "S127b",
+      "label": "Vx127 closed",
+      "sourceSystem": "IB169",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[169]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[169]",
+        "/layout-config[1]/blocks[1]/block[371]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:S127c",
+      "kind": "block",
+      "name": "S127c",
+      "label": "Vx127 thrown",
+      "sourceSystem": "IB170",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[170]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[170]",
+        "/layout-config[1]/blocks[1]/block[372]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:S128b",
+      "kind": "block",
+      "name": "S128b",
+      "label": "Vx128 closed",
+      "sourceSystem": "IB171",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[171]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[171]",
+        "/layout-config[1]/blocks[1]/block[373]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:S128c",
+      "kind": "block",
+      "name": "S128c",
+      "label": "Vx128 thrown",
+      "sourceSystem": "IB172",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[172]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[172]",
+        "/layout-config[1]/blocks[1]/block[374]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:SL1b",
+      "kind": "block",
+      "name": "SL1b",
+      "label": "Signal 4/2",
+      "sourceSystem": "IB174",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[173]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[174]",
+        "/layout-config[1]/blocks[1]/block[376]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:S170",
+      "kind": "block",
+      "name": "S170",
+      "label": "Vx170",
+      "sourceSystem": "IB177",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[174]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[177]",
+        "/layout-config[1]/blocks[1]/block[379]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:v1u",
+      "kind": "block",
+      "name": "v1u",
+      "label": "v1u",
+      "sourceSystem": "IB185",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[175]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[185]",
+        "/layout-config[1]/blocks[1]/block[387]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:v1n",
+      "kind": "block",
+      "name": "v1n",
+      "label": "v1n",
+      "sourceSystem": "IB186",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[176]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[186]",
+        "/layout-config[1]/blocks[1]/block[388]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:v4u",
+      "kind": "block",
+      "name": "v4u",
+      "label": "v4u",
+      "sourceSystem": "IB187",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[177]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[187]",
+        "/layout-config[1]/blocks[1]/block[389]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:v4n",
+      "kind": "block",
+      "name": "v4n",
+      "label": "v4n",
+      "sourceSystem": "IB188",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[178]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[188]",
+        "/layout-config[1]/blocks[1]/block[390]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:v4",
+      "kind": "block",
+      "name": "v4",
+      "label": "v4",
+      "sourceSystem": "IB189",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[179]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[189]",
+        "/layout-config[1]/blocks[1]/block[391]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:v1",
+      "kind": "block",
+      "name": "v1",
+      "label": "v1",
+      "sourceSystem": "IB190",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[180]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[190]",
+        "/layout-config[1]/blocks[1]/block[392]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:v2",
+      "kind": "block",
+      "name": "v2",
+      "label": "v2",
+      "sourceSystem": "IB191",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[181]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[191]",
+        "/layout-config[1]/blocks[1]/block[393]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:v2u",
+      "kind": "block",
+      "name": "v2u",
+      "label": "v2u",
+      "sourceSystem": "IB192",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[182]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[192]",
+        "/layout-config[1]/blocks[1]/block[394]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:v2n",
+      "kind": "block",
+      "name": "v2n",
+      "label": "v2n",
+      "sourceSystem": "IB193",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[183]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[193]",
+        "/layout-config[1]/blocks[1]/block[395]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:v3n",
+      "kind": "block",
+      "name": "v3n",
+      "label": "v3n",
+      "sourceSystem": "IB194",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[184]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[194]",
+        "/layout-config[1]/blocks[1]/block[396]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:v3u",
+      "kind": "block",
+      "name": "v3u",
+      "label": "v3u",
+      "sourceSystem": "IB195",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[185]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[195]",
+        "/layout-config[1]/blocks[1]/block[397]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:SIVB",
+      "kind": "block",
+      "name": "SIVB",
+      "label": "Spår 04b",
+      "sourceSystem": "IB23",
+      "memorySystem": "IM:AUTO:0075",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[186]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[23]",
+        "/layout-config[1]/blocks[1]/block[225]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[75]",
+      "anchors": [
+        "block-icon-4"
+      ]
+    },
+    {
+      "key": "block:v3",
+      "kind": "block",
+      "name": "v3",
+      "label": "v3",
+      "sourceSystem": "IB196",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[187]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[196]",
+        "/layout-config[1]/blocks[1]/block[398]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:perrongu",
+      "kind": "block",
+      "name": "perrongu",
+      "label": "perrongu",
+      "sourceSystem": "IB197",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[188]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[197]",
+        "/layout-config[1]/blocks[1]/block[399]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:perrongn",
+      "kind": "block",
+      "name": "perrongn",
+      "label": "perrongn",
+      "sourceSystem": "IB198",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[189]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[198]",
+        "/layout-config[1]/blocks[1]/block[400]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:friline",
+      "kind": "block",
+      "name": "friline",
+      "label": "friline",
+      "sourceSystem": "IB199",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[190]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[199]",
+        "/layout-config[1]/blocks[1]/block[401]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:turntable",
+      "kind": "block",
+      "name": "turntable",
+      "label": "turntable",
+      "sourceSystem": "IB200",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[191]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[200]",
+        "/layout-config[1]/blocks[1]/block[402]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:S171",
+      "kind": "block",
+      "name": "S171",
+      "label": "Vx171",
+      "sourceSystem": "IB:AUTO:0001",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[192]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[201]",
+        "/layout-config[1]/blocks[1]/block[403]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "block:SVB",
+      "kind": "block",
+      "name": "SVB",
+      "label": "Spår 05b",
+      "sourceSystem": "IB46",
+      "memorySystem": "IM:AUTO:0100",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[193]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[46]",
+        "/layout-config[1]/blocks[1]/block[248]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[100]",
+      "anchors": [
+        "block-icon-5"
+      ]
+    },
+    {
+      "key": "block:SIC",
+      "kind": "block",
+      "name": "SIC",
+      "label": "Spår 01c",
+      "sourceSystem": "IB25",
+      "memorySystem": "IM:AUTO:0077",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[194]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[25]",
+        "/layout-config[1]/blocks[1]/block[227]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[77]",
+      "anchors": [
+        "block-icon-1"
+      ]
+    },
+    {
+      "key": "block:SIIC",
+      "kind": "block",
+      "name": "SIIC",
+      "label": "Spår 02c",
+      "sourceSystem": "IB26",
+      "memorySystem": "IM:AUTO:0078",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[195]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[26]",
+        "/layout-config[1]/blocks[1]/block[228]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[78]",
+      "anchors": [
+        "block-icon-2"
+      ]
+    },
+    {
+      "key": "block:SIIID",
+      "kind": "block",
+      "name": "SIIID",
+      "label": "Spår 03d",
+      "sourceSystem": "IB30",
+      "memorySystem": "IM:AUTO:0083",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[196]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[30]",
+        "/layout-config[1]/blocks[1]/block[232]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[83]",
+      "anchors": [
+        "block-icon-6"
+      ]
+    },
+    {
+      "key": "block:SIIIE",
+      "kind": "block",
+      "name": "SIIIE",
+      "label": "Spår 03e",
+      "sourceSystem": "IB10",
+      "memorySystem": "IM:AUTO:0002",
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[197]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[10]",
+        "/layout-config[1]/blocks[1]/block[212]"
+      ],
+      "memoryPath": "/layout-config[1]/memories[1]/memory[2]",
+      "anchors": [
+        "block-icon-14"
+      ]
+    },
+    {
+      "key": "block:S172",
+      "kind": "block",
+      "name": "S172",
+      "label": "Vx172",
+      "sourceSystem": "IB:AUTO:0002",
+      "memorySystem": null,
+      "sourcePath": "/layout-config[1]/layoutblocks[1]/layoutblock[198]",
+      "blockPaths": [
+        "/layout-config[1]/blocks[1]/block[202]",
+        "/layout-config[1]/blocks[1]/block[404]"
+      ],
+      "memoryPath": null,
+      "anchors": []
+    },
+    {
+      "key": "incoming:AnedIn",
+      "kind": "incoming",
+      "name": "AnedIn",
+      "label": "A · ned",
+      "sourceSystem": "IM:AUTO:0167",
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/memoryicon[1]",
+      "memoryPath": "/layout-config[1]/memories[1]/memory[167]",
+      "initialValue": "-",
+      "x": 150,
+      "y": 915,
+      "sourceHidden": false
+    },
+    {
+      "key": "incoming:AuppIn",
+      "kind": "incoming",
+      "name": "AuppIn",
+      "label": "A · upp",
+      "sourceSystem": "IM:AUTO:0166",
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/memoryicon[2]",
+      "memoryPath": "/layout-config[1]/memories[1]/memory[166]",
+      "initialValue": "-",
+      "x": 150,
+      "y": 895,
+      "sourceHidden": false
+    },
+    {
+      "key": "incoming:CnedIn",
+      "kind": "incoming",
+      "name": "CnedIn",
+      "label": "C · ned",
+      "sourceSystem": "IM:AUTO:0171",
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/memoryicon[3]",
+      "memoryPath": "/layout-config[1]/memories[1]/memory[171]",
+      "initialValue": "-",
+      "x": 150,
+      "y": 855,
+      "sourceHidden": false
+    },
+    {
+      "key": "incoming:CuppIn",
+      "kind": "incoming",
+      "name": "CuppIn",
+      "label": "C · upp",
+      "sourceSystem": "IM:AUTO:0170",
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/memoryicon[4]",
+      "memoryPath": "/layout-config[1]/memories[1]/memory[170]",
+      "initialValue": "-",
+      "x": 150,
+      "y": 835,
+      "sourceHidden": false
+    },
+    {
+      "key": "incoming:BuppIn",
+      "kind": "incoming",
+      "name": "BuppIn",
+      "label": "B · upp",
+      "sourceSystem": "IM:AUTO:0168",
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/memoryicon[5]",
+      "memoryPath": "/layout-config[1]/memories[1]/memory[168]",
+      "initialValue": "-",
+      "x": 1940,
+      "y": 835,
+      "sourceHidden": false
+    },
+    {
+      "key": "incoming:BnedIn",
+      "kind": "incoming",
+      "name": "BnedIn",
+      "label": "B · ned",
+      "sourceSystem": "IM:AUTO:0169",
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/memoryicon[6]",
+      "memoryPath": "/layout-config[1]/memories[1]/memory[169]",
+      "initialValue": "-",
+      "x": 1940,
+      "y": 860,
+      "sourceHidden": false
+    },
+    {
+      "key": "incoming:DIn",
+      "kind": "incoming",
+      "name": "DIn",
+      "label": "D",
+      "sourceSystem": "IM:AUTO:0172",
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/memoryicon[7]",
+      "memoryPath": "/layout-config[1]/memories[1]/memory[172]",
+      "initialValue": "-",
+      "x": 1940,
+      "y": 895,
+      "sourceHidden": false
+    }
+  ],
+  "anchors": [
+    {
+      "id": "block-icon-0",
+      "key": "block:SX",
+      "block": "SX",
+      "x": 1510,
+      "y": 172,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[1]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-1",
+      "key": "block:SIC",
+      "block": "SIC",
+      "x": 1460,
+      "y": 271,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[2]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-2",
+      "key": "block:SIIC",
+      "block": "SIIC",
+      "x": 1460,
+      "y": 321,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[3]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-3",
+      "key": "block:SIIIB",
+      "block": "SIIIB",
+      "x": 1330,
+      "y": 421,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[4]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-4",
+      "key": "block:SIVB",
+      "block": "SIVB",
+      "x": 1330,
+      "y": 471,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[5]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-5",
+      "key": "block:SVB",
+      "block": "SVB",
+      "x": 1330,
+      "y": 571,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[6]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-6",
+      "key": "block:SIIID",
+      "block": "SIIID",
+      "x": 1780,
+      "y": 372,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[7]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-7",
+      "key": "block:SIA",
+      "block": "SIA",
+      "x": 790,
+      "y": 272,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[8]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-8",
+      "key": "block:SIB",
+      "block": "SIB",
+      "x": 1130,
+      "y": 272,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[9]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-9",
+      "key": "block:SIIB",
+      "block": "SIIB",
+      "x": 1130,
+      "y": 322,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[10]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-10",
+      "key": "block:SIIA",
+      "block": "SIIA",
+      "x": 790,
+      "y": 322,
+      "sourceHidden": false,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[11]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-11",
+      "key": "block:SIIIA",
+      "block": "SIIIA",
+      "x": 710,
+      "y": 421,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[12]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-12",
+      "key": "block:SIVA",
+      "block": "SIVA",
+      "x": 740,
+      "y": 471,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[13]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-13",
+      "key": "block:SVA",
+      "block": "SVA",
+      "x": 770,
+      "y": 521,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[14]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-14",
+      "key": "block:SIIIE",
+      "block": "SIIIE",
+      "x": 180,
+      "y": 562,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[15]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-15",
+      "key": "block:SVI",
+      "block": "SVI",
+      "x": 1230,
+      "y": 646,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[16]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-16",
+      "key": "block:SU2B",
+      "block": "SU2B",
+      "x": 180,
+      "y": 422,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[17]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-17",
+      "key": "block:SN2B",
+      "block": "SN2B",
+      "x": 180,
+      "y": 472,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[18]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-18",
+      "key": "block:SN1B",
+      "block": "SN1B",
+      "x": 1850,
+      "y": 322,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[19]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-19",
+      "key": "block:SU1B",
+      "block": "SU1B",
+      "x": 1820,
+      "y": 272,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[20]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-20",
+      "key": "block:SU1A",
+      "block": "SU1A",
+      "x": 2055,
+      "y": 272,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[21]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-21",
+      "key": "block:SN1A",
+      "block": "SN1A",
+      "x": 2055,
+      "y": 322,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[22]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-22",
+      "key": "block:SN2A",
+      "block": "SN2A",
+      "x": 40,
+      "y": 422,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[23]",
+      "duplicate": true
+    },
+    {
+      "id": "block-icon-23",
+      "key": "block:SN2A",
+      "block": "SN2A",
+      "x": 40,
+      "y": 472,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[24]",
+      "duplicate": true
+    },
+    {
+      "id": "block-icon-24",
+      "key": "block:SU4B",
+      "block": "SU4B",
+      "x": 180,
+      "y": 272,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[25]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-25",
+      "key": "block:SN4B",
+      "block": "SN4B",
+      "x": 180,
+      "y": 322,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[26]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-26",
+      "key": "block:SU4A",
+      "block": "SU4A",
+      "x": 40,
+      "y": 272,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[27]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-27",
+      "key": "block:SN4A",
+      "block": "SN4A",
+      "x": 40,
+      "y": 322,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[28]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-28",
+      "key": "block:S95",
+      "block": "S95",
+      "x": 300,
+      "y": 272,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[29]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-29",
+      "key": "block:S96",
+      "block": "S96",
+      "x": 320,
+      "y": 322,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[30]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-30",
+      "key": "block:S100a",
+      "block": "S100a",
+      "x": 500,
+      "y": 272,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[31]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-31",
+      "key": "block:S117a",
+      "block": "S117a",
+      "x": 640,
+      "y": 322,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[32]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-32",
+      "key": "block:S120a",
+      "block": "S120a",
+      "x": 980,
+      "y": 272,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[33]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-33",
+      "key": "block:S121",
+      "block": "S121",
+      "x": 1030,
+      "y": 321,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[34]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-34",
+      "key": "block:S160b",
+      "block": "S160b",
+      "x": 1590,
+      "y": 271,
+      "sourceHidden": false,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[35]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-35",
+      "key": "block:S161b",
+      "block": "S161b",
+      "x": 1590,
+      "y": 321,
+      "sourceHidden": false,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[36]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-36",
+      "key": "block:S125",
+      "block": "S125",
+      "x": 969,
+      "y": 370,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[37]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-37",
+      "key": "block:S151b",
+      "block": "S151b",
+      "x": 1500,
+      "y": 490,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[38]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-38",
+      "key": "block:S152b",
+      "block": "S152b",
+      "x": 1545,
+      "y": 430,
+      "sourceHidden": false,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[39]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-39",
+      "key": "block:S161c",
+      "block": "S161c",
+      "x": 1605,
+      "y": 330,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[40]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-40",
+      "key": "block:S113a",
+      "block": "S113a",
+      "x": 566,
+      "y": 384,
+      "sourceHidden": false,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[41]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-41",
+      "key": "block:S112b",
+      "block": "S112b",
+      "x": 520,
+      "y": 371,
+      "sourceHidden": false,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[42]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-42",
+      "key": "block:S103b",
+      "block": "S103b",
+      "x": 380,
+      "y": 371,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[43]",
+      "duplicate": false
+    },
+    {
+      "id": "block-icon-43",
+      "key": "block:S102",
+      "block": "S102",
+      "x": 500,
+      "y": 322,
+      "sourceHidden": true,
+      "sourcePath": "/layout-config[1]/LayoutEditor[1]/BlockContentsIcon[44]",
+      "duplicate": false
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+import {createAdminDialog,registerAdminWorkspace,escapeHTML as esc} from './admin-ui.js';
+import {destinationDisplay,destinationDefaults,destinationLines,isOutgoingDestination} from './destination-data.js';
+export function createDestinations(root){
+  let state,online=false,busy=false,entry,revision,baseline='';
+  root.innerHTML='<section class="card"><h2>Orter och telefonnummer</h2><p class="muted">Namn och telefonnummer vid panelens in- och utfarter.</p><button type="button">Öppna ortsuppgifter</button></section>';
+  const page=document.createElement('section');page.innerHTML='<div class="admin-workspace-heading"><h1 tabindex="-1">Orter och telefonnummer</h1></div><p class="muted">Välj lokalt namn eller koppla orten till en station i TrainMeet. Välj normal utfart per linje. Pil, ort och telefonnummer visas bara vid det spåret. Normal infart för inkommande tåg är det andra spåret; på enkelspår används samma spår. Grundinställningen är vänstertrafik. Telefonnummer anges lokalt.</p><div class="destination-list"></div>';root.append(page);
+  const workspace=registerAdminWorkspace('#register/destinations',page);root.querySelector('button').onclick=workspace.open;
+  const form=document.createElement('form');form.id='destination-editor';form.innerHTML='<label>Normal utfart<select name="outgoing"></select></label><p class="muted">Gäller hela linjen. Pil, ort och telefonnummer visas vid valt spår. Övriga spår behåller sina sparade ortsuppgifter.</p><label>Namnkälla<select name="source"><option value="local">Lokalt i TKL</option><option value="trainmeet">Station i TrainMeet</option></select></label><label data-station>Station i TrainMeet<select name="stationId"></select></label><label><span data-name-label>Ortsnamn</span><input name="name" maxlength="40" required></label><label>Telefonnummer<input name="phone" type="tel" maxlength="24" autocomplete="off" placeholder="Exempel: 72"></label><p class="muted">Tomt telefonnummer döljer den vita rutan. Uppgifterna sparas för hela TKL-anläggningen.</p><button type="submit">Spara</button>';
+  const field=n=>form.elements.namedItem(n),value=()=>JSON.stringify(['outgoing','source','stationId','name','phone'].map(n=>field(n).value));
+  const modal=createAdminDialog({title:'Redigera ort',body:form,saveButton:form.querySelector('button'),dirty:()=>value()!==baseline,busy:()=>busy});
+  function source(){form.querySelector('[data-station]').hidden=field('source').value!=='trainmeet';form.querySelector('[data-name-label]').textContent=field('source').value==='trainmeet'?'Lokalt reservnamn':'Ortsnamn';field('stationId').required=field('source').value==='trainmeet';}
+  field('source').onchange=source;
+  page.onclick=e=>{const id=e.target.closest('[data-destination]')?.dataset.destination;if(!id||busy||!state?.destinations)return;entry=state.destinations.entries.find(d=>d.id===id);revision=state.destinations.revision;
+    const line=destinationLines.find(l=>l.tracks.includes(id));
+    field('outgoing').innerHTML=line.tracks.map(track=>`<option value="${track}">${esc(destinationDefaults.find(d=>d.id===track).position)} (${track})</option>`).join('');
+    field('outgoing').value=state.destinations.outgoing?.[line.id]??line.outgoing;field('outgoing').disabled=line.tracks.length===1;
+    modal.setTitle('Redigera '+destinationDefaults.find(d=>d.id===id).position);
+    const stations=state.trainMeet?.context?.stations||[];
+    field('stationId').innerHTML='<option value="">Välj station</option>'+stations.map(s=>`<option value="${esc(s.id)}">${esc(s.name)} · ${esc(s.id)}</option>`).join('');
+    if(entry.stationId&&!stations.some(s=>s.id===entry.stationId)){const option=document.createElement('option');option.value=entry.stationId;option.textContent=entry.stationId+' · saknas i aktuell träff';field('stationId').append(option);}
+    for(const n of ['source','stationId','name','phone'])field(n).value=entry[n];source();baseline=value();modal.open();
+  };
+  form.onsubmit=async e=>{e.preventDefault();if(busy)return;busy=true;modal.setBusy(true);modal.message('');
+    try{const response=await fetch('/api/destinations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision,outgoing:field('outgoing').value,entry:{id:entry.id,...Object.fromEntries(['source','stationId','name','phone'].map(n=>[n,field(n).value]))}})});if([401,428].includes(response.status)){location.assign('/login');return;}const answer=await response.json();if(!response.ok)throw Error(answer.error||'Kunde inte spara.');state={...state,destinations:answer};baseline=value();modal.close(true);render();}catch(e){modal.message(e.message);}finally{busy=false;modal.setBusy(false);}
+  };
+  function render(){if(!state?.destinations)return;page.querySelector('.destination-list').innerHTML='<table><thead><tr><th>Panelens anslutning</th><th>Normal utfart</th><th>Ortsnamn</th><th>Telefon</th><th>Namnkälla</th><th></th></tr></thead><tbody>'+state.destinations.entries.map(d=>{const shown=destinationDisplay(d,state.trainMeet);return `<tr><td>${esc(destinationDefaults.find(x=>x.id===d.id)?.position||d.id)}</td><td>${isOutgoingDestination(d.id,state.destinations.outgoing)?'Ja':'—'}</td><td>${esc(shown.name)}</td><td>${esc(shown.phone)||'—'}</td><td>${esc(shown.sourceLabel)}</td><td><button data-destination="${d.id}" ${!online?'disabled':''}>Redigera</button></td></tr>`;}).join('')+'</tbody></table>';}
+  let signature='';return {update(next,connected){state=next;online=connected;const key=JSON.stringify([next?.destinations,next?.trainMeet?.context?.stations,next?.trainMeet?.stale,connected]);if(key!==signature){signature=key;render();}}};
+}

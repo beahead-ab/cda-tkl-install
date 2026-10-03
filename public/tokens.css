@@ -1,0 +1,74 @@
+/* ============================================================
+   Charlottendal TKL — tokens för hela sidan (ställverk + nederrad)
+   Design: Ställverk Helsida.dc.html (3a). Alla värden nedan är
+   hämtade därifrån. Läs STÄLLVERK.md för betydelsen av varje token.
+   Ingen av dessa variabler påverkar geometri, träffytor eller logik.
+   ============================================================ */
+
+/* Scoped to the panel (plan, console, bottom row); the admin pages keep app.css variables. */
+body.panel-app .panel-shell {
+  /* --- ytor ------------------------------------------------ */
+  --bg:            #000000;   /* sida och spårplan */
+  --surface:       #0a0c0e;   /* nederradens paneler (när de inte ligger direkt på svart) */
+  --chip-bg:       #16191d;   /* chips: riktningsplåt, status, zoom, gateway */
+  --chip-border:   #2a3036;
+  --divider:       #1f2429;   /* avdelare i nederraden */
+  --divider-soft:  #121619;   /* radavdelare i händelser */
+  --segment-active:#262c32;   /* aktivt segment i Kommande/Alla */
+
+  /* --- text ------------------------------------------------ */
+  --fg:            #e6e9ec;   /* primär text, spårbeteckningar, rubriker */
+  --fg-soft:       #dfe4e8;   /* kommande rader */
+  --fg-dim:        #cfd5db;   /* händelsetext */
+  --fg-muted:      #aeb6be;   /* platsnamn i planen, "Nästa …" */
+  --fg-note:       #b6bec6;   /* anmärkning på kommande rad */
+  --fg-label:      #7d8791;   /* kolumnrubriker, växelnummer i vila, tidsstämplar */
+  --fg-done:       #667079;   /* avklarade rader */
+  --fg-faint:      #5c656d;   /* sidospår, V1–V4, turntable-nav */
+
+  /* --- betydelsefärger (samma uppe och nere) --------------- */
+  --red:           #ff5a4d;   /* belagt block · larm-prick */
+  --red-text:      #ff8a7f;   /* larmtext · tågnummer vid spår · Kvittera */
+  --red-border:    #5a2b22;   /* ram kring tågnummer · Kvittera */
+  --red-bg:        #1a0e0d;   /* bakgrund tågnummer vid spår */
+  --red-lamp-off:  #2a1416;   /* släckt indikeringslampa vid tryckknapp */
+  --green:         #46d36b;   /* lagd tågväg · ok-prick · gateway ansluten · plupp ändpunkt */
+  --yellow:        #f5c518;   /* NU-linje · pågående · låst växel · väntar · osäkert · markeringsring */
+  --yellow-text:   #f5d76e;   /* varningstext */
+  --yellow-delay:  #b08d1a;   /* försening +n */
+  --amber:         #d29922;   /* "Simulering"-chip (befintlig) */
+  --amber-border:  #4a3c1a;
+  --white:         #ffffff;   /* plupp som väntar på målknapp (blinkar) */
+
+  /* --- spårplan: struktur ---------------------------------- */
+  --track-main:    #8a939c;   /* huvudspår (seg.m) */
+  --track-side:    #5c656d;   /* sidospår, dvärgspår */
+  --track-off:     #262c32;   /* växelben som inte ligger */
+  --track-struct:  #262c32;   /* perrongkontur, friline, turntable-ram */
+  --track-road:    #343b42;   /* vägkorsningar v1–v4 */
+  --track-w:       2px;       /* struktur */
+  --track-w-state: 3px;       /* belagt / lagd väg */
+  --track-w-off:   1.5px;     /* ej lagt växelben, struktur-konturer */
+  --track-dash-side: 7 5;     /* streckade sidospår (seg.d) */
+  --track-dash-unknown: 4 4;  /* osäker beläggning */
+
+  /* --- spårplan: objekt ------------------------------------ */
+  --plupp-idle:    #7d8791;   /* 8×8, radius 1 */
+  --plupp-end:     #46d36b;
+  --plupp-wait:    #ffffff;   /* animation hblink .7s */
+  --lamp-off:      #16191d;   /* 7×7 släckt lampa (lamp-g / lamp-r) */
+  --free-on:       #e6e9ec;   /* friindikering 9×9 cirkel */
+  --free-border:   #3a424a;
+  --hw:            #5c656d;   /* hw-location 9×9 */
+  --button-face:   #e6e9ec;   /* tryckknapp 24 px, platt */
+  --button-border: #3a424a;
+
+  /* --- typografi ------------------------------------------- */
+  --font-sans:  'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono:  'IBM Plex Mono', ui-monospace, monospace;
+  --ls-heading: 0.12em;
+  --ls-label:   0.08em;
+}
+
+/* Blink för plupp som väntar på målknapp. Ersätter tklblink i planen. */
+@keyframes hblink { 0%,49% { opacity:1; } 50%,100% { opacity:0.15; } }

@@ -10,7 +10,7 @@ export function createAdminNavigation({account=false}={}) {
   document.addEventListener('keydown',e=>{if(e.key==='Tab')document.body.setAttribute('data-nav-keyboard','');},true);
   const popup=document.getElementById('app-menu')||document.createElement('div');popup.id='app-menu';popup.className='shared-menu';popup.hidden=false;
   const fieldLink='<a id="field-link" hidden target="_blank" rel="noopener">Anläggningssimulator ↗</a>';
-  popup.innerHTML=`<div class="admin-nav-items"></div><div class="admin-nav-footer"><a id="open-panel-zoom" href="${prefix}#tools/zoom">Zoom <span id="menu-zoom-value"></span></a><button id="toggle-fullscreen" type="button" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path class="fullscreen-expand" d="M7 3H3v4m10-4h4v4M3 13v4h4m10-4v4h-4"/><path class="fullscreen-contract" d="M3 7h4V3m6 0v4h4M7 17v-4H3m10 4v-4h4"/></svg><span>Fullskärm</span></button>${account?fieldLink:''}<a id="account-link" href="/account" hidden>Byt lösenord</a><div id="admin-nav-status"></div><span id="panel-connection" hidden></span></div>`;
+  popup.innerHTML=`<div class="admin-nav-items"></div><div class="admin-nav-footer"><button id="toggle-fullscreen" type="button" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path class="fullscreen-expand" d="M7 3H3v4m10-4h4v4M3 13v4h4m10-4v4h-4"/><path class="fullscreen-contract" d="M3 7h4V3m6 0v4h4M7 17v-4H3m10 4v-4h4"/></svg><span>Fullskärm</span></button>${account?fieldLink:''}<a id="account-link" href="/account" hidden>Byt lösenord</a><div id="admin-nav-status"></div><span id="panel-connection" hidden></span></div>`;
   sidebar.replaceChildren(popup);
   const items=popup.querySelector('.admin-nav-items');
   for(const section of NAVIGATION_SECTIONS){

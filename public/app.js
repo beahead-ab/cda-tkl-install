@@ -7,7 +7,7 @@ import {trackRestrictions,restrictionMarkers,lineRestrictionExtents} from './tra
 import {signalRouteControls,signalImage} from './signal-route-controls.js';
 import {createAdminNavigation} from './admin-navigation.js';
 import {createAdminAppearance} from './admin-appearance.js';
-import {createPanelZoom,createZoomDialog,zoomLabel} from './panel-zoom.js';
+import {createPanelFit} from './panel-fit.js';
 import {syncAdminWorkspaces,registerAdminWorkspace} from './admin-ui.js';
 import {attribute,style,text as setText,flowProgress,createPanelFrames,preparingEndpoints} from './panel-rendering.js';
 import {createTimetableImport} from './timetable-import.js';
@@ -224,13 +224,14 @@ function highlightObject(target){
 window.addEventListener('panel-highlight',e=>highlightObject(e.detail));
 document.addEventListener('pointerdown',()=>{if(hiliteNode)style(hiliteNode,'display','none');},true);
 const HEAD_WAIT=new Set(['setting','establishing','clearing','held','cancelling']);
-function headStatus(){
-  const mode=state?.controls?.mode;
-  const subtitle=[config?.profile?.title||'Charlottendal',mode==='remote'?'fjärrläge':'lokal drift',Object.keys(config?.turnouts||{}).length+' växlar',signals.length+' signaler'].join(' · ');
+// The standing notice beside CHARLOTTENDAL: lost contact first, then a route that waits or is
+// held, then remote mode. A message from the core is shown over it for a while.
+function headNotice(){
+  if(!online||state?.connection!=='connected')return {text:'Ingen kontakt med anläggningen',tone:'alarm'};
   const waiting=(state?.routes||[]).find(r=>HEAD_WAIT.has(r.state));
-  const status=waiting?{text:displayName('routes',waiting.definitionId,waiting.label)+' · '+(statuses[waiting.state]||waiting.state)+(waiting.reason?' · '+waiting.reason:''),tone:waiting.state==='held'?'alarm':'warn'}:null;
-  const simulator=state?.connectionInfo?.mode==='simulator';
-  return {subtitle,status,gateway:{text:simulator?'Simulering':'MGP · LocoNet',tone:online&&state?.connection==='connected'?'on':'err'},simulator};
+  if(waiting)return {text:displayName('routes',waiting.definitionId,waiting.label)+' · '+(statuses[waiting.state]||waiting.state)+(waiting.reason?' · '+waiting.reason:''),tone:waiting.state==='held'?'alarm':'warn'};
+  if(state?.controls?.mode==='remote')return {text:'Fjärrläge · lokal manövrering spärrad',tone:'warn'};
+  return null;
 }
 function buildPlan() {
   layout = panelLayout(panel);
@@ -574,7 +575,7 @@ function renderPanel() {
   $('event-status').textContent = state.routes.length + ' tågvägslås · ' + Object.keys(config.turnouts).length + ' anslutna växlar';
   html('events', state.events.filter(e => !['report', 'transport'].includes(e.kind)).slice(0, 7).map(e => `<div class="event-row"><time>${time(e.at)}</time><span>${esc(e.message)}</span></div>`).join(''));
   $('wire').textContent = (state.trace || []).slice(0, 40).map(e => `${time(e.at)}  ${e.direction === 'out' ? 'SKICKAT ' : 'MOTTAGET'}  ${e.hex}`).join('\n');
-  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.update(headStatus());
+  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());
 }
 function paintInspector() {
   if (!inspected || !state) return;
@@ -680,15 +681,12 @@ async function start() {
   document.addEventListener('keydown', e => { if(e.key==='Escape'){if(document.querySelector('.admin-dialog[open]'))return;if($('inspector-host').open){e.preventDefault();closeInspector();return;}if(fullscreen.active()){fullscreen.exit();return;}manualFeedback.clear();clearChoice();} });
   // Original is the only active panel. Retired skin preferences must not restore it differently.
   try{localStorage.removeItem('charlottendal-skin');}catch{}
-  const panelZoom=createPanelZoom({plan:$('track-plan'),viewport:document.querySelector('.panel-scroll'),stage:$('plan-stage'),controls:$('panel-console')});
-  const zoomDialog=createZoomDialog(panelZoom);
-  panelHead=createPanelHead({shell:document.querySelector('#panel-view .panel-shell'),onZoom:()=>zoomDialog.open(),onUpdate:view=>openUpdateNotice(view,{api,message})});
-  createPanelSplit({bottom:$('panel-bottom'),viewport:document.querySelector('.panel-scroll')});panelZoom.subscribe(value=>panelHead?.zoom(value));
-  // Återställ panel and Lämna över rangerbangården sit beside the zoom chip; the console row under the plan is gone.
-  document.getElementById('plan-head-zoom')?.before($('panel-quick-actions'));
-  panelZoom.subscribe(value=>{$('menu-zoom-value').textContent=zoomLabel(value);});
-  $('open-panel-zoom').onclick=e=>{e.preventDefault();e.stopPropagation();appMenu.close();zoomDialog.open();};
-  createAdminAppearance({zoom:panelZoom});
+  createPanelFit({plan:$('track-plan'),viewport:document.querySelector('.panel-scroll'),stage:$('plan-stage'),controls:$('panel-console')});
+  panelHead=createPanelHead({shell:document.querySelector('#panel-view .panel-shell'),onUpdate:view=>openUpdateNotice(view,{api,message})});
+  createPanelSplit({bottom:$('panel-bottom'),viewport:document.querySelector('.panel-scroll')});
+  // Återställ and Styra RBG end the status bar's right side; the console row under the plan is gone.
+  document.getElementById('plan-head-right')?.append($('panel-quick-actions'));
+  createAdminAppearance();
   for(const id of ['appearance','journal','streamdeck'])registerAdminWorkspace('#tools/'+id,$(id+'-tools'));
   for(const id of ['xml','migration','protocol'])registerAdminWorkspace('#advanced/'+id,$('advanced-'+id));
   document.addEventListener('click',e=>{
@@ -706,7 +704,7 @@ async function start() {
   let presentationLoading=false,observedResetId;
   source.onmessage = e => {
     state = JSON.parse(e.data);if(state.bindingVersion!==config.bindingVersion){location.reload();return;} online = true; lastEvent = Date.now();
-    panelHead?.release(state.release&&config.release&&state.release!==config.release?state.release:null);panelHead?.update(state.update);
+    panelHead?.release(state.release&&config.release&&state.release!==config.release?state.release:null);panelHead?.updateNotice(state.update);
     // A quick reset may finish between two snapshots. Use its identity, not a
     // waiting/stop transition, so every open panel clears its local buttons once.
     const resetId=state.panelReset?.id;

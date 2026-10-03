@@ -95,7 +95,8 @@ sudo reboot
 ```
 
 Efter omstarten loggar Pi:n in på skrivbordet av sig själv och Chromium öppnar ställverket i
-helskärm. Statusraden överst visar `● SIMULERING`: TKL kör mot den inbyggda anläggningssimulatorn.
+helskärm, med CHARLOTTENDAL överst till vänster. TKL kör mot den inbyggda anläggningssimulatorn.
+Tappar ställverket kontakten med anläggningen står det "Ingen kontakt med anläggningen" bredvid namnet.
 
 Kontrollera vid behov i terminalen:
 
@@ -137,7 +138,7 @@ installationen har sagt åt Chromium att ställverket får använda Elgatos enhe
 - **Helskärm.** Chromium visar bara ställverket, utan adressrad och flikar. Stängs fönstret öppnas
   det igen efter två sekunder. Genvägen **Charlottendal TKL** på skrivbordet gör samma sak.
 - **Storlek.** Dra i linjen mellan ställverket och tidtabellen för att ändra fördelningen;
-  dubbelklicka för standardläget. Zoom finns i statusraden. Båda sparas på Pi:n.
+  dubbelklicka för standardläget. Valet sparas på Pi:n.
 - **Uppdatering.** `● Uppdatering X` i statusraden betyder att en ny version finns att installera, se
   avsnitt 9. `● Ny version · ladda om` betyder att den redan är installerad och att fönstret ska
   laddas om.
@@ -209,7 +210,7 @@ sudo systemctl start cda-tkl-simulator cda-tkl
 | Installationen avbryts med "Kunde inte hämta" | Kontrollera internet (`ping -c1 github.com`). |
 | Ingen helskärm efter omstart | Kör `cat ~/.config/labwc/autostart`; raden `/usr/local/bin/cda-tkl-browser &` ska finnas. Pi:n måste använda skrivbordet labwc (standard i Raspberry Pi OS från hösten 2024): `sudo raspi-config` → Advanced Options → Wayland → labwc. |
 | Ställverket svarar inte | `systemctl status cda-tkl` och `journalctl -u cda-tkl -n 50`. |
-| `● SIMULERING` saknas eller anläggningen är tom | `systemctl status cda-tkl-simulator` och `journalctl -u cda-tkl-simulator -n 50`. |
+| "Ingen kontakt med anläggningen" eller anläggningen är tom | `systemctl status cda-tkl-simulator` och `journalctl -u cda-tkl-simulator -n 50`. |
 | Stream Deck kopplas inte upp | Dra ur och sätt i den igen. Kontrollera att regeln finns: `cat /etc/udev/rules.d/50-cda-tkl-streamdeck.rules`, och att Chromium har policyn: öppna `chrome://policy` och leta efter `WebHidAllowDevicesForUrls`. Prova en annan USB-port eller en strömförsörjd USB-hubb. |
 | Varning om strömförsörjning (blixt i hörnet) | Använd den officiella 27 W-adaptern. |
 | Tidtabellen kommer inte | Se **Tidtabeller → TrainMeet**. "Parkopplingen gäller inte längre" betyder att ett annat TKL med samma TKL-id har kopplats; ge Pi:n ett eget id och parkoppla igen. |

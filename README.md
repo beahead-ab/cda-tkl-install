@@ -168,8 +168,8 @@ Den sista raden tar även bort driftdata och inställningar.
 
 ## Gemensamt
 
-- **Simulator.** Alla installationer kör mot den inbyggda anläggningssimulatorn; statusraden visar
-  `● SIMULERING`. Riktig anläggning via LocoBuffer kopplas in i driftsättningssteget.
+- **Simulator.** Alla installationer kör mot den inbyggda anläggningssimulatorn. Riktig anläggning via
+  LocoBuffer kopplas in i driftsättningssteget.
 - **Ingen inloggning.** TKL svarar bara på datorn själv och kräver därför ingen inloggning.
 - **En TKL per dator.** Alla använder portarna 8910–8912.
 - **Ny version.** Varje installation tittar efter nya versioner i `beahead-ab/cda-tkl-install` när den

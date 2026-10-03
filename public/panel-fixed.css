@@ -17,7 +17,7 @@ body:not([data-page=panel]) #global-status{top:88px;max-height:calc(100dvh - 112
 /* Unavailable endpoints keep their appearance and do not respond to hover. */
 #track-plan .choice-disabled{cursor:default;pointer-events:none}
 #track-plan .choice-disabled .hit{fill:transparent;stroke:transparent}
-#panel-menu-slot{position:absolute;z-index:60;top:8px;left:8px}
+#panel-menu-slot{position:absolute;z-index:60;top:0;left:8px}
 #panel-menu-slot #menu-toggle{width:34px;height:32px;min-height:32px;border-color:transparent;background:transparent;color:var(--ink)}
 #panel-menu-slot #menu-toggle:hover{background:#252524;border-color:#454543}
 #panel-view .panel-scroll{position:relative;min-height:0;overflow:auto;overscroll-behavior:contain;overflow-anchor:none;scroll-behavior:auto;contain:layout paint}
@@ -42,7 +42,6 @@ body.panel-app #panel-console{display:none}
 /* One fitted image plane; manual zoom expands only this scrollable area. */
 #plan-stage{display:grid;place-items:center;width:100%;height:100%;min-width:0;min-height:0}
 #panel-view #track-plan{max-width:none;flex:none}
-#menu-zoom-value{margin-left:auto;font-size:11px;color:var(--muted)}
 .panel-zoom-control{display:block;min-width:0}
 .zoom-value-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
 .zoom-value-row output{font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -150,7 +149,7 @@ body.panel-app #panel-console{display:none}
    proportion, never the other way round. Below 300 px of bottom row the plan shrinks
    instead and is centred. All scrolling is local: the page itself never scrolls. */
 html:has(body.panel-app){overflow:hidden}
-body.panel-app{--console-h:0px;--plan-inset-x:16px;--plan-inset-top:10px;--plan-fit:contain;--plan-tag:pan;--plan-h:min(calc((100vw - 16px) / 3.0552),var(--plan-user,calc(100dvh - 10px - 300px)));--plan-row:calc(var(--plan-h) + var(--plan-inset-top) + var(--console-h));background:#000}
+body.panel-app{--console-h:0px;--plan-inset-x:16px;--plan-inset-top:32px;--plan-fit:contain;--plan-tag:pan;--plan-h:min(calc((100vw - 16px) / 3.0552),var(--plan-user,calc(100dvh - 32px - 300px)));--plan-row:calc(var(--plan-h) + var(--plan-inset-top) + var(--console-h));background:#000}
 body.panel-app[data-skin=original] .panel-shell{--panel:#000;background:#000}
 body.panel-app .panel-shell{background:#000}
 #plan-face{padding:var(--plan-inset-top) calc(var(--plan-inset-x) / 2) 0}
@@ -218,10 +217,6 @@ body.panel-app #trainmeet-timetable{display:grid;grid-template-rows:auto auto mi
 .ev-empty{margin:9px 0;font-size:12px;color:#7d8791}
 /* Over the plan on tablets and phones: zoom tag, Visa hela and the pan indicator. */
 #plan-overlay{display:none;position:absolute;top:0;left:0;right:0;height:var(--plan-row);z-index:5;pointer-events:none}
-.plan-zoom-tags{position:absolute;right:12px;top:10px;display:flex;gap:6px;font-size:10.5px;white-space:nowrap}
-.plan-zoom-tag{min-height:0;padding:3px 8px;border:1px solid #2a3036;border-radius:3px;background:#16191d;color:#98a2ab;font:inherit;line-height:1.4;pointer-events:auto}
-button.plan-zoom-tag{color:#e6e9ec;cursor:pointer}
-button.plan-zoom-tag:hover{background:#262c32;border-color:#2a3036}
 .plan-pan{position:absolute;left:50%;bottom:calc(var(--console-h) + 6px);transform:translateX(-50%);width:160px;height:4px;border-radius:2px;background:#22282e;opacity:0}
 .plan-overlay-pannable .plan-pan{opacity:1}
 .plan-pan i{position:absolute;top:0;height:4px;border-radius:2px;background:#7d8791}
@@ -233,7 +228,6 @@ button.plan-zoom-tag:hover{background:#262c32;border-color:#2a3036}
 .ev-heading{gap:12px;padding:8px var(--tt-pad) 6px}.ev-filters{gap:12px;font-size:10.5px}#panel-events{--ev-cols:50px 8px minmax(0,1fr) auto;--ev-gap:8px;--ev-row:28px}.ev-row{font-size:12px}.ev-row time{font-size:11px}.ev-ack{font-size:10.5px;padding:2px 6px}#ev-content{padding:3px var(--tt-pad) 6px}
 }
 @media(max-width:1439px){#panel-bottom{grid-template-columns:minmax(0,1fr) 400px}}
-@media(max-width:1400px){body.panel-app{--plan-inset-top:6px}}
 /* iPad Pro 12,9″ landscape: a touch screen keeps the desktop type. */
 @media(min-width:1300px) and (max-width:1400px) and (pointer:coarse){
 #panel-bottom{font-size:13px;--tt-row:25px;--tt-now:27px;--tt-line:14px;--tt-pad:16px;--tt-gap:10px;--tt-cols:64px 44px 96px 96px 56px 56px 76px 246px minmax(0,1fr)}
@@ -249,7 +243,7 @@ button.plan-zoom-tag:hover{background:#262c32;border-color:#2a3036}
 /* iPad portrait: the whole plan would be 273 px high. It is locked to 400 px with
    panning instead; Visa hela goes back to 100 %. Timetable stacks over events. */
 @media(orientation:portrait) and (max-width:900px){
-body.panel-app{--plan-inset-x:0px;--plan-inset-top:6px;--plan-fit:height;--plan-tag:pan;--plan-h:var(--plan-user,400px)}
+body.panel-app{--plan-inset-x:0px;--plan-inset-top:32px;--plan-fit:height;--plan-tag:pan;--plan-h:var(--plan-user,400px)}
 #panel-view .panel-scroll{touch-action:pan-x pan-y}
 #panel-bottom{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1.3fr) minmax(0,1fr);--tt-cols:56px 40px 150px 50px 50px 62px minmax(0,1fr)}
 body.panel-app #trainmeet-timetable{border-right:0}
@@ -268,7 +262,7 @@ body.panel-app #panel-view .panel-shell{grid-template-rows:40px var(--plan-row) 
 #panel-phone-rate{font-size:10.5px;color:#7d8791}
 #panel-menu-slot{top:4px;left:auto;right:8px}
 #plan-overlay{display:block;top:40px}
-.plan-zoom-tags{right:10px;top:8px}.plan-zoom-tag{padding:2px 7px;font-size:10px}#plan-zoom-fit{display:none}.plan-pan{width:120px;bottom:6px}
+.plan-pan{width:120px;bottom:6px}
 #panel-view .panel-scroll{border-bottom:1px solid #1f2429;touch-action:pan-x pan-y}
 #track-plan .touch-target,#track-plan .signal-target{pointer-events:none}
 #panel-bottom{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);border-top:0;--tt-pad:16px;--tt-row:44px;--tt-now:46px;--tt-line:14px}
@@ -294,7 +288,7 @@ body.panel-app #trainmeet-timetable{border-right:0;grid-template-rows:minmax(0,1
 /* iPhone landscape: the whole plan in 734 px, then the clock, next train, alarm and
    the three nearest rows. Swipe up for the full timetable and events. */
 @media(max-height:430px){
-body.panel-app{--console-h:0px;--plan-inset-x:0px;--plan-inset-top:10px;--plan-fit:contain;--plan-h:240px;--plan-row:250px}
+body.panel-app{--console-h:0px;--plan-inset-x:0px;--plan-inset-top:34px;--plan-fit:contain;--plan-h:216px;--plan-row:250px}
 body.panel-app #panel-view .panel-shell{grid-template-rows:var(--plan-row) minmax(0,1fr);padding:0 max(0px,env(safe-area-inset-right)) 0 max(0px,env(safe-area-inset-left))}
 #panel-phone-bar{display:none}
 #track-plan .touch-target,#track-plan .signal-target{pointer-events:none}
@@ -376,10 +370,9 @@ body.panel-app .panel-shell{--rail:var(--track-side);--rail-unknown:var(--track-
 #track-plan .hilite{fill:none;stroke:var(--yellow);stroke-width:2;pointer-events:none}
 @media(prefers-reduced-motion:reduce){#track-plan .route-choice-end .dot,#track-plan .route-preparing .dot{animation:none}}
 /* Status bar over the plan's top band: title, station line, the core's message. */
-#plan-head{position:absolute;left:50px;top:8px;z-index:6;display:flex;align-items:center;gap:14px;height:32px;white-space:nowrap;pointer-events:none;max-width:calc(100% - 420px);overflow:hidden}
+#plan-head{position:absolute;left:50px;top:2px;z-index:6;display:flex;align-items:center;gap:14px;height:28px;white-space:nowrap;pointer-events:none;max-width:calc(100% - 470px);overflow:hidden}
 .plan-head-title{font:600 12.5px var(--font-sans);letter-spacing:.12em;text-transform:uppercase;color:var(--fg)}
-.plan-head-sub{font:400 12px var(--font-sans);color:var(--fg-label)}
-#plan-head-right{position:absolute;right:12px;top:10px;z-index:6;display:flex;align-items:center;gap:6px;white-space:nowrap}
+#plan-head-right{position:absolute;right:12px;top:5px;z-index:6;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .chip{display:inline-flex;align-items:center;gap:6px;min-height:0;padding:3px 8px;border:1px solid var(--chip-border);border-radius:3px;background:var(--chip-bg);font:400 10.5px/1.3 var(--font-sans);color:#98a2ab;pointer-events:auto}
 button.chip{cursor:pointer;color:var(--fg)}button.chip:hover{background:#262c32;border-color:var(--chip-border)}
 .chip-dot{width:7px;height:7px;border-radius:50%;background:var(--fg-label);flex:none}
@@ -387,7 +380,6 @@ button.chip{cursor:pointer;color:var(--fg)}button.chip:hover{background:#262c32;
 .chip-status{padding:3px 9px;font-size:11.5px;color:var(--fg-dim);min-width:0}
 .chip-status>span{overflow:hidden;text-overflow:ellipsis;max-width:60ch}
 .chip-status[data-tone=warn]{color:var(--yellow-text)}.chip-status[data-tone=alarm]{color:var(--red-text)}
-.chip-sim{background:transparent;border-color:var(--amber-border);color:var(--amber);letter-spacing:.07em;text-transform:uppercase}
 .chip-release{border-color:var(--yellow);color:var(--yellow-text)}
 .chip-update{border-color:#4a7fb5;color:#9cc3ea}.chip-update .chip-dot{background:#4a7fb5}button.chip-update:hover{border-color:#6a9fd5}
 .update-line{margin:8px 0;padding:10px 12px;border:1px solid #2a3036;border-radius:3px;background:#0a0c0e;white-space:pre-wrap;word-break:break-all;font:400 12.5px/1.5 var(--font-mono,monospace);color:#e6e9ec}button.chip-release:hover{border-color:var(--yellow)}
@@ -396,7 +388,7 @@ button.chip{cursor:pointer;color:var(--fg)}button.chip:hover{background:#262c32;
 /* Återställ panel · Lämna över rangerbangården: chips in the status bar, beside the zoom chip. */
 #plan-head-right #panel-quick-actions{display:contents}
 button.chip:disabled{opacity:.45;cursor:default}button.chip:disabled:hover{background:var(--chip-bg)}button.chip[aria-busy=true]{cursor:wait}
-@media(orientation:portrait) and (max-width:900px){#plan-head-zoom{display:none}#plan-head-right{right:236px}.plan-head-sub{display:none}#plan-head{max-width:calc(100% - 560px)}}
+@media(orientation:portrait) and (max-width:900px){#plan-head{max-width:calc(100% - 300px)}}
 @media(max-width:500px){#plan-head,#plan-head-right{display:none}}
 @media(max-height:430px){#plan-head-right{display:none}#plan-head{left:44px;top:4px;height:28px}}
 /* Right column, second tab: track occupancy over time (design 1c). Händelser and

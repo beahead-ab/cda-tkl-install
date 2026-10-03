@@ -52,9 +52,12 @@ grep -q '^CHARLOTTENDAL_INSTALL_KIND=' "$APP/app.env" || printf '\nCHARLOTTENDAL
 cp "$SOURCE_DIR/packaging/mac/run.sh" "$APP/run.sh" && chmod +x "$APP/run.sh"
 
 # The app that opens the panel: Chrome (WebHID for the Stream Deck), else the default browser.
-mkdir -p "$HOME/Applications"
-rm -rf "$HOME/Applications/Charlottendal TKL.app"
-osacompile -o "$HOME/Applications/Charlottendal TKL.app" "$SOURCE_DIR/packaging/mac/open-panel.applescript" >/dev/null
+# It goes in Program (/Applications), which an administrator can write without sudo;
+# otherwise in Program in the home folder. A copy in the other place is removed.
+APPS=/Applications
+[ -w "$APPS" ] || { APPS="$HOME/Applications"; mkdir -p "$APPS"; }
+rm -rf "/Applications/Charlottendal TKL.app" "$HOME/Applications/Charlottendal TKL.app" 2>/dev/null || true
+osacompile -o "$APPS/Charlottendal TKL.app" "$SOURCE_DIR/packaging/mac/open-panel.applescript" >/dev/null
 
 if [ -n "${CDA_TKL_NO_LAUNCHD:-}" ]; then
   echo "Startas inte (CDA_TKL_NO_LAUNCHD). Starta för hand med:  \"$APP/run.sh\""
@@ -81,6 +84,6 @@ fi
 echo
 echo "Charlottendal TKL $VERSION är installerad och startar när du loggar in."
 echo "Ställverket:  http://127.0.0.1:8910   Anläggningssimulatorn:  http://127.0.0.1:8911"
-echo "Appen 'Charlottendal TKL' finns i mappen Program i din hemkatalog."
+echo "Appen 'Charlottendal TKL' finns i $([ "$APPS" = /Applications ] && echo 'mappen Program' || echo 'mappen Program i din hemkatalog')."
 echo "Uppdatera senare genom att köra installationsraden igen."
-open "$HOME/Applications/Charlottendal TKL.app" 2>/dev/null || true
+open "$APPS/Charlottendal TKL.app" 2>/dev/null || true

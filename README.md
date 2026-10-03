@@ -41,8 +41,9 @@ Mac och PC beskrivs nedan.
 ### Efter installationen
 
 - TKL startar av sig själv när du loggar in och startas om om det skulle stanna.
-- Appen **Charlottendal TKL** ligger i mappen **Program i din hemkatalog** (`~/Applications`). Dra den
-  till Dock för att ha den nära till hands. Den öppnar ställverket i ett eget fönster i Chrome.
+- Appen **Charlottendal TKL** ligger i mappen **Program**. Dra den till Dock för att ha den nära till
+  hands. Den öppnar ställverket i ett eget fönster i Chrome. (Utan administratörsrätt hamnar den i
+  mappen Program i hemkatalogen, `~/Applications`.)
 - **Stream Deck:** koppla in den, öppna menyn **⋯ → Stream Deck** och tryck **Anslut** en gång.
   Chrome kommer ihåg valet, och därefter kopplas den upp av sig själv varje gång.
 - **TrainMeet:** menyn **⋯ → Tidtabeller → TrainMeet**. Ge datorn ett eget **TKL-id** under
@@ -65,7 +66,7 @@ automatiskt.
 | Driftdata | `~/Library/Application Support/Charlottendal TKL/state/` |
 | Logg | `~/Library/Application Support/Charlottendal TKL/logs/tkl.log` |
 | Autostart | `~/Library/LaunchAgents/se.beahead.cda-tkl.plist` |
-| App | `~/Applications/Charlottendal TKL.app` |
+| App | `/Applications/Charlottendal TKL.app` (utan administratörsrätt `~/Applications`) |
 
 ### Felsökning
 
@@ -84,7 +85,7 @@ den andra kopian; bara en TKL kan lyssna på porten.
 ```sh
 launchctl bootout gui/$(id -u)/se.beahead.cda-tkl
 rm -f ~/Library/LaunchAgents/se.beahead.cda-tkl.plist
-rm -rf ~/Applications/Charlottendal\ TKL.app
+rm -rf /Applications/Charlottendal\ TKL.app ~/Applications/Charlottendal\ TKL.app
 rm -rf ~/Library/Application\ Support/Charlottendal\ TKL
 ```
 

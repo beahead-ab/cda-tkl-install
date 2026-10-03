@@ -3,7 +3,7 @@
 const ALARM=new Set(['error','unexpected-go','bad-frame','emergency']);
 const WARN=new Set(['all-stop','route-held','programming-held','line-block','track-block','permission']);
 const OK=new Set(['established','route-active','released','panel-reset-complete','emergency-complete']);
-const ROUTE=new Set(['route-request','route-held','route-active','established','released','cancel','order','emergency','emergency-complete','all-stop','panel-reset','panel-reset-complete','programming','programming-held','unexpected-go']);
+const ROUTE=new Set(['route-request','route-repeat','route-held','route-active','established','released','cancel','order','emergency','emergency-complete','all-stop','panel-reset','panel-reset-complete','programming','programming-held','unexpected-go']);
 const TRAIN=new Set(['train-entered','train-information','trainmeet','track-block','line-block','yard-authority']);
 // The column shows operating events: routes, trains, alarms. Field-level rows stay in
 // the full journal under Verktyg: reports and transport frames (as there), plus the

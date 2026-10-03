@@ -162,7 +162,9 @@ function choose(id,kind='main') {
     if(kind==='shunt'&&!signalControls.starts.has(id))return message('Signalen kan väljas som mål men saknar en ansluten växeltågväg som start.');
     chosenKind=kind;chosen = id;routeTargets.select(id,kind); $('selection-hint').hidden=false; $('selection-hint').textContent = label(id) + (kind==='shunt'?' → välj slutsignal':' → välj slutplupp'); $('clear-selection').disabled = false; paint();
   } else if (chosen === id) clearChoice();
-  else { routeConfirmation.start({from:chosen,to:id,kind}); }
+  // Say whether this lays or takes back a route, as the targets showed it, so that a
+  // repeated request can never undo the first one.
+  else { routeConfirmation.start({from:chosen,to:id,kind,intent:routeTargets.action(id)==='cancel'?'cancel':'build'}); }
 }
 function syncChoiceControls() {
   for(const node of $('track-plan').querySelectorAll('[role="button"]')){
@@ -527,7 +529,7 @@ function animateFlow(now=performance.now()) {
 }
 const statuses = { setting: 'Lägger växlar', establishing: 'Etablerar', clearing: 'Klarsätter', active: 'Klar', traversing:'Tåg passerar', held: 'Stopp · lås kvar', occupied: 'Lås kvar', cancelling: 'Återtar' };
 const frames=createPanelFrames({render:renderPanel,animate:animateFlow});
-routeConfirmation=createRouteConfirmation({submit:({from,to})=>api('route',{from,to}),valid:()=>!!routeConfirmation.selection&&routeTargets.has(routeConfirmation.selection.to)&&usable()&&!pending&&state.controls?.mode!=='remote'&&!['waiting','interrupted'].includes(state.panelReset?.phase),onChange:finished=>{if(finished)clearChoice(false);paint();}});
+routeConfirmation=createRouteConfirmation({submit:({from,to,intent})=>api('route',{from,to,...(intent?{intent}:{})}),valid:()=>!!routeConfirmation.selection&&routeTargets.has(routeConfirmation.selection.to)&&usable()&&!pending&&state.controls?.mode!=='remote'&&!['waiting','interrupted'].includes(state.panelReset?.phase),onChange:finished=>{if(finished)clearChoice(false);paint();}});
 function paint(){frames.paint();}
 function renderPanel() {
   if (!state) return;

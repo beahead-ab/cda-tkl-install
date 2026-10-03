@@ -187,7 +187,7 @@ const server = http.createServer(async (req, res) => {
       engine.log('train-information',({move:'Tågnummer flyttat manuellt mellan informationsfält.',follow:'Tågnummer kopplat till rapporterad passage.',unfollow:'Tågnummerföljning avslutad av operatören.',save:'Tåginformation registrerad eller kontrollerad manuellt.'})[command]);
       return json(res,result);
     }
-    if (url.pathname === '/api/route') engine.request(data.from, data.to);
+    if (url.pathname === '/api/route') engine.request(data.from, data.to, data.intent);
     else if (url.pathname === '/api/cancel') engine.cancel(data.id);
     else if (url.pathname === '/api/turnout') engine.manual(data.name, data.position);
     else if (url.pathname === '/api/track-block') engine.blockTrack(data.name, data.blocked);

@@ -166,8 +166,18 @@ export class Engine extends EventEmitter {
     }
     return null;
   }
-  request(from, to) {
-    const plan=this.planRequest(from,to);
+  // intent is what the operator saw when choosing: 'build' lays a route and never takes
+  // one back, 'cancel' takes one back and never lays one. A second identical request (a
+  // doubled press, a second window driving the same Stream Deck, a slow connection) is
+  // then harmless. Without an intent the same endpoints toggle as before; the route list
+  // and older clients rely on that.
+  request(from, to, intent) {
+    if(intent!=null&&intent!=='build'&&intent!=='cancel')throw Error('Okänd avsikt för tågvägen.');
+    let plan;
+    try{plan=this.planRequest(from,to);}
+    catch(error){if(intent!=='cancel')throw error;this.log('route-repeat',`${from} → ${to}: återtagning begärd, men det finns ingen sådan tågväg längre.`);return null;}
+    if(intent==='build'&&plan.action!=='build'){const route=plan.chain?.[0]||null;this.log('route-repeat',`${route?.label||from+' → '+to}: begärd igen men ligger redan. Ingen återtagning.`);return route;}
+    if(intent==='cancel'&&plan.action==='build'){this.log('route-repeat',`${plan.definition.label||from+' → '+to}: återtagning begärd, men tågvägen ligger inte. Ingenting lades.`);return null;}
     if(plan.action==='build')return this.establishRoute(plan.definition);
     if(plan.action==='section')return this.applySectionCancellation(plan);
     this.cancelRoutes(plan.chain);return plan.chain[0];

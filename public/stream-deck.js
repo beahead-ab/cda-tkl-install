@@ -19,27 +19,48 @@ async function post(path,data){
 }
 // A serial the server accepts: letters, digits, dot, dash and underscore, starting with a letter or digit.
 export const cleanSerial=v=>String(v??'').replace(/[^A-Za-z0-9._-]/g,'').replace(/^[^A-Za-z0-9]+/,'').slice(0,64);
-// hid and library are the browser's WebHID and the Stream Deck library; tests pass stand-ins.
-export function createStreamDeck({pluppar,choose,clearChoice,api,message,state,online,chosen,trainMeet,layout,onChange,hid=typeof navigator!=='undefined'?navigator.hid:null,library=sd}){
+// hid, library and locks are the browser's WebHID, the Stream Deck library and Web Locks;
+// tests pass stand-ins.
+export function createStreamDeck({pluppar,choose,clearChoice,api,message,state,online,chosen,trainMeet,layout,onChange,hid=typeof navigator!=='undefined'?navigator.hid:null,library=sd,locks=typeof navigator!=='undefined'?navigator.locks:null}){
   const $=id=>document.getElementById(id),statusNode=$('streamdeck-status'),connectButton=$('streamdeck-connect'),disconnectButton=$('streamdeck-disconnect'),originNode=$('streamdeck-origin'),pagesNode=$('streamdeck-pages');
   const supported=!!hid&&typeof window!=='undefined'&&window.isSecureContext;
   const units=new Map(),previews=new Map();
-  let previewSeq=0,blinkOn=false,timer=null,scanning=false;
+  // Without Web Locks every window drives its decks, as before.
+  let previewSeq=0,blinkOn=false,timer=null,scanning=false,owner=!locks;
   const deckEntry=serial=>{const decks=layout?.()?.decks;return decks&&Object.hasOwn(decks,serial)?decks[serial]:null;};
   const nameOf=unit=>deckEntry(unit.serial)?.name||unit.deck.PRODUCT_NAME||'Stream Deck';
   const changed=()=>{try{onChange?.();}catch{}};
   function status(){
     if(statusNode)statusNode.textContent=!supported?'WebHID saknas här. Använd Chrome, Edge eller Chromium på en säker adress (https eller localhost).'
+      :!owner?'Stream Deck styrs från ett annat fönster med ställverket. Tryck Styr härifrån för att ta över.'
       :units.size?[...units.values()].map(u=>`${nameOf(u)} · ${MODELS[u.model]?.short||u.controls.length+' knappar'} · sida ${u.page+1} av ${u.pages.length} · ${u.saved?.label||'standardlayout'}`).join('. ')+'.':'Ej ansluten.';
-    if(connectButton){connectButton.disabled=!supported;connectButton.textContent=units.size?'Anslut fler':'Anslut Stream Deck';}
+    if(connectButton){connectButton.disabled=!supported;connectButton.textContent=!owner?'Styr härifrån':units.size?'Anslut fler':'Anslut Stream Deck';}
     if(disconnectButton)disconnectButton.hidden=!units.size;
   }
   status();
   if(originNode)originNode.textContent=`Den här sidan: ${location.origin} · ${!hid?'WebHID saknas i webbläsaren, öppna adressen i Chrome':!window.isSecureContext?'osäker adress, använd https eller localhost':'WebHID tillgängligt'}.`;
   const off=()=>{try{return localStorage.getItem(STORAGE)==='off';}catch{return false;}};
+  // One window per browser drives the decks. Two would both act on every press, and a
+  // route requested twice used to be a route laid and taken back. The other windows wait
+  // and take over when that window closes, or at once with Styr härifrån.
+  const LOCK='charlottendal-streamdeck';
+  let waiting=null;
+  function claim(steal=false){
+    if(!supported||!locks)return;
+    // At most one request per window: taking over withdraws the one waiting in the queue.
+    if(waiting){waiting.abort();waiting=null;}
+    const wait=steal?null:new AbortController();waiting=wait;
+    locks.request(LOCK,steal?{steal:true}:{signal:wait.signal},()=>{if(waiting===wait)waiting=null;owner=true;status();changed();if(!off())scan();return new Promise(()=>{});})
+      .catch(e=>{if(wait?.signal.aborted||e?.name!=='AbortError')return;owner=false;release();claim();});
+  }
+  // Let go of the decks without clearing them: the window taking over draws on them.
+  function release(){
+    const list=[...units.values()];for(const u of list){forgetUnit(u);u.deck.close().catch(()=>{});}
+    if(pagesNode)pagesNode.replaceChildren();status();changed();
+  }
   // Open every Stream Deck the browser allows that is not open yet.
   async function scan(){
-    if(!supported||scanning)return;scanning=true;
+    if(!supported||!owner||scanning)return;scanning=true;
     try{
       for(const device of await hid.getDevices()){
         if(device.vendorId!==VENDOR||device.opened||[...units.values()].some(u=>u.hid===device))continue;
@@ -52,6 +73,7 @@ export function createStreamDeck({pluppar,choose,clearChoice,api,message,state,o
     try{
       if(prompt){const chosenDevices=await hid.requestDevice({filters:[{vendorId:VENDOR}]});if(!chosenDevices.length){message('Ingen Stream Deck valdes.');return false;}}
       try{localStorage.setItem(STORAGE,'auto');}catch{}
+      if(!owner){claim(true);return true;}
       await scan();return units.size>0;
     }catch(e){message('Stream Deck kunde inte öppnas: '+(e?.message||e));return false;}
   }
@@ -197,10 +219,12 @@ export function createStreamDeck({pluppar,choose,clearChoice,api,message,state,o
   if(disconnectButton)disconnectButton.onclick=()=>detach(true);
   // Open the Stream Decks the browser already allows (a click earlier, or the Raspberry Pi's
   // Chromium policy) at start and whenever one is plugged in, unless Koppla bort was chosen here.
-  if(supported&&!off())scan();
+  if(supported){if(locks)claim();else if(!off())scan();}
   if(supported)hid.addEventListener('connect',()=>{if(!off())scan();});
   return {
     update:()=>update(false),connect,detach,identify,environment,
+    // Whether this window drives the decks (the others wait).
+    driving:()=>owner,
     // The decks open in this browser right now.
     decks:()=>[...units.values()].map(u=>({serial:u.serial,model:u.model,columns:u.columns,rows:u.rows,keys:u.controls.length,product:u.deck.PRODUCT_NAME||'',page:u.page})),
     // Show an editor's draft on one deck, or go back to its saved layout with null.

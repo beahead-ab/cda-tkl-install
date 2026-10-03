@@ -46,9 +46,16 @@ ln -sfn "$RELEASE" "$APP/current"
 ls -1dt "$APP"/releases/*/ 2>/dev/null | tail -n +4 | while read -r old; do [ "${old%/}" = "$RELEASE" ] || rm -rf "$old"; done
 
 if [ ! -f "$APP/app.env" ]; then
-  sed -e "s|^CHARLOTTENDAL_STATE_DIR=.*|CHARLOTTENDAL_STATE_DIR=$APP/state|" -e "s|^CHARLOTTENDAL_INSTALL_KIND=.*|CHARLOTTENDAL_INSTALL_KIND=mac|" "$SOURCE_DIR/packaging/raspberry-pi/app.env" > "$APP/app.env"
+  sed -e "s|^CHARLOTTENDAL_STATE_DIR=.*|CHARLOTTENDAL_STATE_DIR=\"$APP/state\"|" -e "s|^CHARLOTTENDAL_INSTALL_KIND=.*|CHARLOTTENDAL_INSTALL_KIND=mac|" "$SOURCE_DIR/packaging/raspberry-pi/app.env" > "$APP/app.env"
 fi
 grep -q '^CHARLOTTENDAL_INSTALL_KIND=' "$APP/app.env" || printf '\nCHARLOTTENDAL_INSTALL_KIND=mac\n' >> "$APP/app.env"
+# "Application Support" has a space: run.sh sources app.env, so the value must be quoted.
+# Installations from before 0.50.1 wrote it unquoted, and TKL then kept its data in the
+# release's own var folder. Quote it, and bring that data into state once.
+sed -i '' -E 's|^(CHARLOTTENDAL_STATE_DIR)=([^"].* .*)$|\1="\2"|' "$APP/app.env"
+if [ -z "$(ls -A "$APP/state" 2>/dev/null)" ] && [ -n "$PREVIOUS" ] && [ -n "$(ls -A "$PREVIOUS/var" 2>/dev/null | grep -v '^.gitkeep$')" ]; then
+  cp -Rp "$PREVIOUS/var"/. "$APP/state"/ && rm -f "$APP/state/.gitkeep" && echo "Driftdata flyttade till $APP/state"
+fi
 cp "$SOURCE_DIR/packaging/mac/run.sh" "$APP/run.sh" && chmod +x "$APP/run.sh"
 
 # The app that opens the panel: Chrome (WebHID for the Stream Deck), else the default browser.
@@ -65,8 +72,15 @@ if [ -n "${CDA_TKL_NO_LAUNCHD:-}" ]; then
 fi
 mkdir -p "$HOME/Library/LaunchAgents"
 sed -e "s|@RUN@|$APP/run.sh|" -e "s|@LOGS@|$APP/logs|g" -e "s|@LABEL@|$LABEL|" "$SOURCE_DIR/packaging/mac/launchd.plist" > "$PLIST"
+# bootout returns before the old agent is gone; bootstrapping too early fails with error 5.
 launchctl bootout "gui/$(id -u)/$LABEL" 2>/dev/null || true
-launchctl bootstrap "gui/$(id -u)" "$PLIST"
+for _ in $(seq 1 20); do launchctl print "gui/$(id -u)/$LABEL" >/dev/null 2>&1 || break; sleep 0.5; done
+loaded=false
+for _ in 1 2 3 4 5; do
+  if launchctl bootstrap "gui/$(id -u)" "$PLIST" 2>/dev/null; then loaded=true; break; fi
+  sleep 1
+done
+[ "$loaded" = true ] || { echo "Autostarten kunde inte registreras. Logga ut och in, eller kör installationsraden igen."; exit 1; }
 ok=false
 for _ in $(seq 1 40); do
   if curl -fsS --max-time 2 -o /dev/null http://127.0.0.1:8910/api/config 2>/dev/null; then ok=true; break; fi

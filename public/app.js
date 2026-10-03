@@ -29,6 +29,7 @@ import { createPanelConsole } from './panel-console.js';
 import {createPanelEvents} from './panel-events.js';
 import {createPanelHead} from './panel-head.js';
 import {createPanelSplit} from './panel-split.js';
+import {openUpdateNotice} from './update-notice.js';
 import {labelClass,objectFromMessage} from './plan-objects.js';
 const $ = id => document.getElementById(id);
 const adminNavigation=createAdminNavigation();
@@ -681,7 +682,7 @@ async function start() {
   try{localStorage.removeItem('charlottendal-skin');}catch{}
   const panelZoom=createPanelZoom({plan:$('track-plan'),viewport:document.querySelector('.panel-scroll'),stage:$('plan-stage'),controls:$('panel-console')});
   const zoomDialog=createZoomDialog(panelZoom);
-  panelHead=createPanelHead({shell:document.querySelector('#panel-view .panel-shell'),onZoom:()=>zoomDialog.open()});
+  panelHead=createPanelHead({shell:document.querySelector('#panel-view .panel-shell'),onZoom:()=>zoomDialog.open(),onUpdate:view=>openUpdateNotice(view,{api,message})});
   createPanelSplit({bottom:$('panel-bottom'),viewport:document.querySelector('.panel-scroll')});panelZoom.subscribe(value=>panelHead?.zoom(value));
   // Återställ panel and Lämna över rangerbangården sit beside the zoom chip; the console row under the plan is gone.
   document.getElementById('plan-head-zoom')?.before($('panel-quick-actions'));
@@ -705,7 +706,7 @@ async function start() {
   let presentationLoading=false,observedResetId;
   source.onmessage = e => {
     state = JSON.parse(e.data);if(state.bindingVersion!==config.bindingVersion){location.reload();return;} online = true; lastEvent = Date.now();
-    panelHead?.release(state.release&&config.release&&state.release!==config.release?state.release:null);
+    panelHead?.release(state.release&&config.release&&state.release!==config.release?state.release:null);panelHead?.update(state.update);
     // A quick reset may finish between two snapshots. Use its identity, not a
     // waiting/stop transition, so every open panel clears its local buttons once.
     const resetId=state.panelReset?.id;

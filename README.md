@@ -51,8 +51,10 @@ Mac och PC beskrivs nedan.
 
 ### Uppdatera
 
-Kör installationsraden igen. Inställningar och driftdata ligger kvar; svarar den nya versionen inte
-inom 40 sekunder återställs den föregående automatiskt.
+När en ny version finns visar statusraden `● Uppdatering X`. Tryck på den: rutan visar raden att köra
+och har en knapp som kopierar den. Kör installationsraden igen i Terminal. Inställningar och
+driftdata ligger kvar; svarar den nya versionen inte inom 40 sekunder återställs den föregående
+automatiskt.
 
 ### Var allt ligger
 
@@ -124,8 +126,10 @@ Om Windows Defender SmartScreen eller brandväggen frågar: TKL lyssnar bara på
 
 ### Uppdatera
 
-Kör installationsraden igen i PowerShell. Inställningar och driftdata ligger kvar; svarar den nya
-versionen inte inom 40 sekunder återställs den föregående automatiskt.
+När en ny version finns visar statusraden `● Uppdatering X`. Tryck på den: rutan visar raden att köra
+och har en knapp som kopierar den. Kör installationsraden igen i PowerShell. Inställningar och
+driftdata ligger kvar; svarar den nya versionen inte inom 40 sekunder återställs den föregående
+automatiskt.
 
 ### Var allt ligger
 
@@ -167,6 +171,9 @@ Den sista raden tar även bort driftdata och inställningar.
   `● SIMULERING`. Riktig anläggning via LocoBuffer kopplas in i driftsättningssteget.
 - **Ingen inloggning.** TKL svarar bara på datorn själv och kräver därför ingen inloggning.
 - **En TKL per dator.** Alla använder portarna 8910–8912.
+- **Ny version.** Varje installation tittar efter nya versioner i `beahead-ab/cda-tkl-install` när den
+  startar och sedan var sjätte timme; den läser bara versionsnumret och skickar inget om datorn.
+  På Raspberry Pi startar knappen **Uppdatera nu** uppdateringen direkt från ställverket.
 - **Säkerhetskopia.** Kopiera katalogen med driftdata (`state`) och `app.env` medan TKL är stoppat.
 
 ## Provat

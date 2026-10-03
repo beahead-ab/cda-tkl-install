@@ -79,6 +79,8 @@ install -d -m 0755 "$CONFIG_DIR"
 if [ ! -f "$CONFIG_DIR/app.env" ]; then
   install -m 0644 "$PACKAGING/app.env" "$CONFIG_DIR/app.env"
 fi
+# Older installations lack the setting that turns on the update notice.
+grep -q '^CHARLOTTENDAL_INSTALL_KIND=' "$CONFIG_DIR/app.env" || printf '\nCHARLOTTENDAL_INSTALL_KIND=raspberry-pi\n' >> "$CONFIG_DIR/app.env"
 if [ -n "${CDA_TKL_TOKEN:-}" ]; then
   umask 077 && printf '%s\n' "$CDA_TKL_TOKEN" > "$CONFIG_DIR/github-token" && umask 022
 fi
@@ -88,6 +90,11 @@ install -m 0644 "$PACKAGING/cda-tkl-simulator.service" /etc/systemd/system/cda-t
 install -m 0644 "$PACKAGING/cda-tkl-update.service" /etc/systemd/system/cda-tkl-update.service
 install -m 0755 "$PACKAGING/cda-tkl-update" /usr/local/sbin/cda-tkl-update
 install -m 0755 "$PACKAGING/cda-tkl-browser" /usr/local/bin/cda-tkl-browser
+# The panel may start the update service, and only that (polkit).
+if [ -d /etc/polkit-1/rules.d ] || command -v pkcheck >/dev/null 2>&1; then
+  install -d -m 0755 /etc/polkit-1/rules.d
+  install -m 0644 "$PACKAGING/50-cda-tkl-update.rules" /etc/polkit-1/rules.d/50-cda-tkl-update.rules
+fi
 
 # Stream Deck: the logged-in desktop user may open it (udev), and Chromium lets the
 # panel use it without the "choose a device" dialog (policy), so it connects by itself.

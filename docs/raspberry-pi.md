@@ -138,12 +138,22 @@ installationen har sagt åt Chromium att ställverket får använda Elgatos enhe
   det igen efter två sekunder. Genvägen **Charlottendal TKL** på skrivbordet gör samma sak.
 - **Storlek.** Dra i linjen mellan ställverket och tidtabellen för att ändra fördelningen;
   dubbelklicka för standardläget. Zoom finns i statusraden. Båda sparas på Pi:n.
-- **Ny version.** Efter en uppdatering visas `● Ny version · ladda om` i statusraden. Tryck på det.
+- **Uppdatering.** `● Uppdatering X` i statusraden betyder att en ny version finns att installera, se
+  avsnitt 9. `● Ny version · ladda om` betyder att den redan är installerad och att fönstret ska
+  laddas om.
 - **Skärmen släcks aldrig.** Installationen stänger av skärmsläckaren.
 - **Lämna helskärmen tillfälligt** (till exempel för att nå skrivbordet): logga in med ssh och kör
   `pkill -f cda-tkl-browser; pkill chromium`. Vid nästa omstart är helskärmen tillbaka.
 
 ## 9. Uppdatera
+
+När en ny version finns visar statusraden `● Uppdatering 0.49.0` (blå). Tryck på den och välj
+**Uppdatera nu**: Pi:n hämtar versionen, installerar den och startar om TKL, vilket tar ett par
+minuter. När den är klar visar statusraden `● Ny version · ladda om`; tryck på det. Pi:n tittar efter
+nya versioner när den startar och sedan var sjätte timme, och läser då bara versionsnumret i det
+publika förrådet.
+
+Samma sak från terminalen:
 
 ```sh
 sudo cda-tkl-update
@@ -235,7 +245,7 @@ användaren med `sudo userdel cda-tkl`. Gör det bara om du inte vill återinsta
 | Helskärm | `/usr/local/bin/cda-tkl-browser`, startas från `~/.config/labwc/autostart` |
 | Genväg | `Charlottendal-TKL.desktop` på skrivbordet |
 | Stream Deck | udev-regeln `/etc/udev/rules.d/50-cda-tkl-streamdeck.rules` och Chromium-policyn `cda-tkl.json` |
-| Uppdatering | `/usr/local/sbin/cda-tkl-update` och tjänsten `cda-tkl-update` |
+| Uppdatering | `/usr/local/sbin/cda-tkl-update`, tjänsten `cda-tkl-update` och polkit-regeln `/etc/polkit-1/rules.d/50-cda-tkl-update.rules`, som låter TKL starta just den tjänsten från ställverket |
 | Skrivbordet | automatisk inloggning, labwc, ingen skärmsläckare (via `raspi-config`) |
 
 Alla portar lyssnar bara på `127.0.0.1`. Tjänsterna körs utan rätt att ändra något utanför

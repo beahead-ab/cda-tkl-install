@@ -388,7 +388,9 @@ button.chip{cursor:pointer;color:var(--fg)}button.chip:hover{background:#262c32;
 .chip-status>span{overflow:hidden;text-overflow:ellipsis;max-width:60ch}
 .chip-status[data-tone=warn]{color:var(--yellow-text)}.chip-status[data-tone=alarm]{color:var(--red-text)}
 .chip-sim{background:transparent;border-color:var(--amber-border);color:var(--amber);letter-spacing:.07em;text-transform:uppercase}
-.chip-release{border-color:var(--yellow);color:var(--yellow-text)}button.chip-release:hover{border-color:var(--yellow)}
+.chip-release{border-color:var(--yellow);color:var(--yellow-text)}
+.chip-update{border-color:#4a7fb5;color:#9cc3ea}.chip-update .chip-dot{background:#4a7fb5}button.chip-update:hover{border-color:#6a9fd5}
+.update-line{margin:8px 0;padding:10px 12px;border:1px solid #2a3036;border-radius:3px;background:#0a0c0e;white-space:pre-wrap;word-break:break-all;font:400 12.5px/1.5 var(--font-mono,monospace);color:#e6e9ec}button.chip-release:hover{border-color:var(--yellow)}
 .chip.chip-off>span{text-decoration:line-through;text-decoration-thickness:1px;color:var(--fg-label)}
 .chip[hidden]{display:none}
 /* Återställ panel · Lämna över rangerbangården: chips in the status bar, beside the zoom chip. */

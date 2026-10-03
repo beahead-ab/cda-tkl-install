@@ -46,8 +46,9 @@ ln -sfn "$RELEASE" "$APP/current"
 ls -1dt "$APP"/releases/*/ 2>/dev/null | tail -n +4 | while read -r old; do [ "${old%/}" = "$RELEASE" ] || rm -rf "$old"; done
 
 if [ ! -f "$APP/app.env" ]; then
-  sed "s|^CHARLOTTENDAL_STATE_DIR=.*|CHARLOTTENDAL_STATE_DIR=$APP/state|" "$SOURCE_DIR/packaging/raspberry-pi/app.env" > "$APP/app.env"
+  sed -e "s|^CHARLOTTENDAL_STATE_DIR=.*|CHARLOTTENDAL_STATE_DIR=$APP/state|" -e "s|^CHARLOTTENDAL_INSTALL_KIND=.*|CHARLOTTENDAL_INSTALL_KIND=mac|" "$SOURCE_DIR/packaging/raspberry-pi/app.env" > "$APP/app.env"
 fi
+grep -q '^CHARLOTTENDAL_INSTALL_KIND=' "$APP/app.env" || printf '\nCHARLOTTENDAL_INSTALL_KIND=mac\n' >> "$APP/app.env"
 cp "$SOURCE_DIR/packaging/mac/run.sh" "$APP/run.sh" && chmod +x "$APP/run.sh"
 
 # The app that opens the panel: Chrome (WebHID for the Stream Deck), else the default browser.

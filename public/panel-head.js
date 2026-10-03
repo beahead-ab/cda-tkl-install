@@ -3,14 +3,15 @@
 // zoom chips. It is drawn over the plan and takes no height from it. Presentation
 // only; app.js hands it the texts, it sends nothing.
 const esc=v=>String(v??'');
-export function createPanelHead({shell,onZoom}){
+export function createPanelHead({shell,onZoom,onUpdate}){
   if(!shell)return null;
   const left=document.createElement('div');left.id='plan-head';
   left.innerHTML='<span class="plan-head-title">Ställverk</span><span class="plan-head-sub" id="plan-head-sub"></span><span class="chip chip-status" id="plan-head-status" role="status" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></span>';
   const right=document.createElement('div');right.id='plan-head-right';
-  right.innerHTML='<button type="button" class="chip chip-release" id="plan-head-release" data-tone="warn" hidden><i class="chip-dot" aria-hidden="true"></i><span>Ny version · ladda om</span></button><span class="chip" id="plan-head-gateway"><i class="chip-dot" aria-hidden="true"></i><span></span></span><button type="button" class="chip" id="plan-head-zoom">Zoom</button>';
+  right.innerHTML='<button type="button" class="chip chip-update" id="plan-head-update" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></button><button type="button" class="chip chip-release" id="plan-head-release" data-tone="warn" hidden><i class="chip-dot" aria-hidden="true"></i><span>Ny version · ladda om</span></button><span class="chip" id="plan-head-gateway"><i class="chip-dot" aria-hidden="true"></i><span></span></span><button type="button" class="chip" id="plan-head-zoom">Zoom</button>';
   shell.append(left,right);
-  const status=left.querySelector('#plan-head-status'),gateway=right.querySelector('#plan-head-gateway'),zoom=right.querySelector('#plan-head-zoom'),release=right.querySelector('#plan-head-release');
+  const status=left.querySelector('#plan-head-status'),gateway=right.querySelector('#plan-head-gateway'),zoom=right.querySelector('#plan-head-zoom'),release=right.querySelector('#plan-head-release'),updateChip=right.querySelector('#plan-head-update');
+  let updateView=null;updateChip.onclick=()=>onUpdate?.(updateView);
   // Reloading is the operator's choice: never in the middle of a route choice or an acknowledgement.
   release.onclick=()=>location.reload();
   zoom.onclick=()=>onZoom?.();
@@ -25,6 +26,8 @@ export function createPanelHead({shell,onZoom}){
     message(text,error,duration){clearTimeout(timer);message=text?{text,tone:error?'alarm':'ok'}:null;if(text&&duration)timer=setTimeout(()=>{message=null;draw();},duration);draw();},
     // One word in the bar; the current zoom is in the tooltip and the dialog.
     zoom(value){const text=value===100?'Zoom · hela planen':'Zoom · '+value+' %';zoom.title=text;zoom.setAttribute('aria-label',text);},
+    // A newer release in the public install repository than this installed copy runs.
+    update(view){updateView=view||null;const show=!!view?.available;updateChip.hidden=!show;if(show){updateChip.querySelector('span').textContent='Uppdatering '+view.latest;const text='Charlottendal TKL '+view.latest+' finns att installera. Den här datorn kör '+view.current+'.';updateChip.title=text;updateChip.setAttribute('aria-label',text);}},
     // The server runs a newer version than this page was loaded from.
     release(version){release.hidden=!version;if(version){const text='Ny version '+version+' finns. Ladda om sidan för att använda den.';release.title=text;release.setAttribute('aria-label',text);}},
     update(data){

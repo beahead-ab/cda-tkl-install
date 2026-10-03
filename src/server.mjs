@@ -21,6 +21,8 @@ import { TimetableImport, IMPORT_LIMITS } from './timetable-import.mjs';
 import { TimetableAI } from './timetable-ai.mjs';
 import { ModelClock } from './model-clock.mjs';
 import { describeProtocol, TelegramRecorder } from './telegram-recorder.mjs';
+import { UpdateCheck } from './update-check.mjs';
+import { spawn } from 'node:child_process';
 
 const baseProfile=loadProfile();
 const port = Number(process.env.CHARLOTTENDAL_PORT || 8910), root = fileURLToPath(new URL('../public', import.meta.url));
@@ -85,7 +87,10 @@ const streamDeckLayouts=new StreamDeckLayouts(storage,{pluppIds:()=>Object.keys(
 // The version this process was started with. An open panel compares it with the
 // version it was loaded from and offers a reload after a release.
 const release=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8')).version;
-const snapshot = () => {const state=engine.snapshot();return { ...state,release,connectionInfo:connectionInfo(profile),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),timetableImport:timetableImport.summary(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot() };};
+// Installed copies look for a newer release in the public install repository.
+const updateCheck=process.env.CHARLOTTENDAL_INSTALL_KIND?new UpdateCheck({current:release,kind:process.env.CHARLOTTENDAL_INSTALL_KIND}):null;
+updateCheck?.start();
+const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),timetableImport:timetableImport.summary(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot() };};
 const server = http.createServer(async (req, res) => {
   try {
     guard(req, port); const url = new URL(req.url, `http://127.0.0.1:${port}`);
@@ -144,6 +149,17 @@ const server = http.createServer(async (req, res) => {
     if(url.pathname.startsWith('/api/streamdeck/')){const command={save:'save',activate:'activate',discard:'discard',reset:'reset'}[url.pathname.slice('/api/streamdeck/'.length)];if(!command)return json(res,{error:'Okänd Stream Deck-åtgärd'},404);const result=streamDeckLayouts[command](data);dirty=true;if(command==='activate')engine.log('streamdeck','Stream Deck-layout version '+result.activeVersion+' aktiverad.');if(command==='reset')engine.log('streamdeck','Stream Deck använder standardlayouten.');return json(res,result);}
     if(url.pathname==='/api/destinations'){const result=destinations.save(data,trainMeet.context?.stations||[]);dirty=true;return json(res,result);}
     if(url.pathname.startsWith('/api/trainmeet/')){const command={configure:'configure',pair:'pair',refresh:'refresh',disconnect:'disconnect',stations:'stations','operator-name':'setOperatorName',clearance:'clearance',movement:'movement'}[url.pathname.slice('/api/trainmeet/'.length)];if(!command)return json(res,{error:'Okänd TrainMeet-åtgärd'},404);return json(res,await trainMeet[command](data));}
+    // On a Raspberry Pi the panel can start cda-tkl-update.service (allowed for the cda-tkl
+    // user by the installer's polkit rule). It reinstalls and restarts TKL; the panel then
+    // offers a reload. Elsewhere the update is started from Terminal or PowerShell.
+    if(url.pathname==='/api/update/start'){
+      if(!updateCheck?.view().canStart)return json(res,{error:'Uppdateringen startas från Terminal eller PowerShell på den här datorn.'},409);
+      const run=spawn('systemctl',['start','--no-block','cda-tkl-update.service'],{stdio:'ignore'});
+      const code=await new Promise(r=>{run.on('error',()=>r(-1));run.on('exit',r);});
+      if(code!==0)return json(res,{error:'Uppdateringen kunde inte startas (systemctl '+code+'). Kör sudo cda-tkl-update på Pi:n.'},409);
+      engine.log('update','Uppdatering till '+(updateCheck.view().latest||'senaste versionen')+' startad. TKL startar om när den är installerad.');dirty=true;
+      return json(res,{started:true});
+    }
     if(url.pathname==='/api/clock'){const result=modelClock.change(data);dirty=true;engine.log('clock','Modellklockan '+(result.running?'går':'är pausad')+' med hastighet '+result.rate+'×.');return json(res,result);}
     if(url.pathname==='/api/recordings/start'){recorder.start(data,engine.connected?'connected':'disconnected');return json(res,recorder.view());}
     if(url.pathname==='/api/recordings/stop'){await recorder.stop(data);return json(res,recorder.view());}

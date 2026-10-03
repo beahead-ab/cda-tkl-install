@@ -86,9 +86,10 @@ try {
   # Settings, written once and kept by updates.
   $EnvFile = Join-Path $App 'app.env'
   if (-not (Test-Path $EnvFile)) {
-    (Get-Content (Join-Path $Source 'packaging\raspberry-pi\app.env')) -replace '^CHARLOTTENDAL_STATE_DIR=.*', ("CHARLOTTENDAL_STATE_DIR=" + (Join-Path $App 'state')) |
+    (Get-Content (Join-Path $Source 'packaging\raspberry-pi\app.env')) -replace '^CHARLOTTENDAL_STATE_DIR=.*', ("CHARLOTTENDAL_STATE_DIR=" + (Join-Path $App 'state')) -replace '^CHARLOTTENDAL_INSTALL_KIND=.*', 'CHARLOTTENDAL_INSTALL_KIND=windows' |
       Set-Content -Path $EnvFile -Encoding UTF8
   }
+  if (-not (Select-String -Path $EnvFile -Pattern '^CHARLOTTENDAL_INSTALL_KIND=' -Quiet)) { Add-Content -Path $EnvFile -Value 'CHARLOTTENDAL_INSTALL_KIND=windows' -Encoding UTF8 }
   Copy-Item -Force (Join-Path $Source 'packaging\windows\run.ps1') (Join-Path $App 'run.ps1')
 
   # Started hidden at login (Startup folder; no administrator rights needed).

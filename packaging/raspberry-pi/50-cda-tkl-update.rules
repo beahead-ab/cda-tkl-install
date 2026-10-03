@@ -1,0 +1,11 @@
+// Lets the TKL service start its own update (cda-tkl-update.service) from the panel,
+// and nothing else. Installed by Charlottendal TKL.
+polkit.addRule(function(action, subject) {
+    if (action.id === "org.freedesktop.systemd1.manage-units" &&
+        subject.user === "cda-tkl" &&
+        action.lookup("unit") === "cda-tkl-update.service" &&
+        action.lookup("verb") === "start") {
+        return polkit.Result.YES;
+    }
+    return polkit.Result.NOT_HANDLED;
+});

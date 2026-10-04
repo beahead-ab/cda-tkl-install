@@ -1,16 +1,8 @@
 // Navigation model for the administration window. Pure data, so the rail,
 // the tab rows and the page titles stay consistent and can be tested without a DOM.
-// Every existing #-address is kept; only the presentation groups them.
+// Every existing #-address is kept; only the presentation groups them. The old Drift
+// pages (#tools/operations…) open the Drift tab in the signal box's bottom row.
 export const NAVIGATION_SECTIONS=[
-  {hash:'#tools/operations',label:'Drift',id:'operations-tab',title:'Driftverktyg',tabs:[
-    {hash:'#tools/operations',label:'Driftverktyg'},
-    {hash:'#tools/operations/routes',label:'Tågvägar'},
-    {hash:'#tools/operations/clearance',label:'Tågklarering'},
-    {hash:'#tools/operations/blocks',label:'Spårspärrar'},
-    {hash:'#tools/operations/lines',label:'Linjer och programmeringsspår'},
-    {hash:'#tools/operations/trains',label:'Tågnummer'},
-    {hash:'#tools/operations/clock',label:'Modellklocka'},
-    {hash:'#tools/operations/authority',label:'Lokal- och fjärrläge'}]},
   {hash:'#import',label:'Tidtabeller',id:'import-tab',title:'Tidtabeller',members:['#trainmeet'],tabs:[
     {hash:'#import',label:'Tidtabeller'},
     {hash:'#trainmeet',label:'TrainMeet',id:'trainmeet-tab',status:'menu-trainmeet-status'},

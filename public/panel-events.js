@@ -9,12 +9,14 @@ const time=at=>new Date(at).toLocaleTimeString('sv-SE');
 
 export function createPanelEvents(){
   const root=document.getElementById('panel-events');if(!root)return null;
-  root.innerHTML='<header class="ev-heading"><div class="ev-tabs" role="tablist" aria-label="Kolumnens innehåll"><button type="button" role="tab" data-view="events" aria-selected="true">Händelser</button><button type="button" role="tab" data-view="occupancy" aria-selected="false">Spårbeläggning</button></div><span id="occ-range"></span><nav class="ev-filters" aria-label="Filtrera händelser">'+FILTERS.map(([key,label])=>'<button type="button" data-filter="'+key+'" aria-pressed="'+(key==='all')+'">'+label+(key==='alarm'?'<span class="ev-alarm-count"></span>':'')+'</button>').join('')+'</nav><span class="occ-legend" aria-hidden="true"><span><i class="occ-done"></i>avklarat</span><span><i class="occ-now"></i>pågår</span><span><i class="occ-next"></i>kommande</span></span></header><div id="ev-content" tabindex="0"></div><div id="panel-occupancy" aria-label="Spårbeläggning"></div>';
+  root.innerHTML='<header class="ev-heading"><div class="ev-tabs" role="tablist" aria-label="Kolumnens innehåll"><button type="button" role="tab" data-view="events" aria-selected="true">Händelser</button><button type="button" role="tab" data-view="occupancy" aria-selected="false">Spårbeläggning</button><button type="button" role="tab" data-view="drift" aria-selected="false">Drift<span id="drift-tab-count" class="ev-alarm-count"></span></button></div><span id="occ-range"></span><nav class="ev-filters" aria-label="Filtrera händelser">'+FILTERS.map(([key,label])=>'<button type="button" data-filter="'+key+'" aria-pressed="'+(key==='all')+'">'+label+(key==='alarm'?'<span class="ev-alarm-count"></span>':'')+'</button>').join('')+'</nav><span class="occ-legend" aria-hidden="true"><span><i class="occ-done"></i>avklarat</span><span><i class="occ-now"></i>pågår</span><span><i class="occ-next"></i>kommande</span></span></header><div id="ev-content" tabindex="0"></div><div id="panel-occupancy" aria-label="Spårbeläggning"></div>';
   // Händelser or Spårbeläggning fills the column; the choice is this browser's own.
   const views=root.querySelector('.ev-tabs'),bottomHost=document.getElementById('panel-bottom');
   const showView=view=>{if(bottomHost)bottomHost.dataset.right=view;for(const b of views.querySelectorAll('[role=tab]'))b.setAttribute('aria-selected',String(b.dataset.view===view));try{localStorage.setItem('cda-panel-right',view);}catch{}};
-  views.addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(b)showView(b.dataset.view);});
-  let savedView='events';try{if(localStorage.getItem('cda-panel-right')==='occupancy')savedView='occupancy';}catch{}
+  // A tab the operator picked stays for a while; a new clearance request then waits for them.
+  let chosenAt=0;
+  views.addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(b){chosenAt=Date.now();showView(b.dataset.view);}});
+  let savedView='events';try{const saved=localStorage.getItem('cda-panel-right');if(saved==='occupancy'||saved==='drift')savedView=saved;}catch{}
   showView(savedView);
   // Phone tabs: timetable or events fills the bottom row; the next train stays visible.
   const bottom=document.getElementById('panel-bottom');
@@ -44,5 +46,8 @@ export function createPanelEvents(){
   }
   render();
   // The core keeps operating events in their own buffer so field reports and orders cannot push them out.
-  return {update(state){events=Array.isArray(state?.operatingEvents)?state.operatingEvents:Array.isArray(state?.events)?state.events:[];render();}};
+  return {
+    // Drift is shown at once when asked for; a request only when no tab was picked lately.
+    showDrift({auto=false}={}){if(auto&&Date.now()-chosenAt<15000)return;showView('drift');if(bottom&&!auto){bottom.dataset.bottomTab='events';for(const o of tabs.querySelectorAll('[role=tab]'))o.setAttribute('aria-selected',String(o.dataset.tab==='events'));}},
+    update(state){events=Array.isArray(state?.operatingEvents)?state.operatingEvents:Array.isArray(state?.events)?state.events:[];render();}};
 }

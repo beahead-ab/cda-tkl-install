@@ -628,8 +628,8 @@ async function start() {
   const fullscreen = createFullscreen({button: $('toggle-fullscreen'), onError: message});
   telegramRecorder=createTelegramRecorder();
   operatingControls=createOperatingControls({api,openSource});
-  timetableImport=createTimetableImport();modelClock=createModelClock({api});trainMeet=createTrainMeet({api,onTimetable:()=>openTools('trainmeet-timetable'),stationHint:()=>config?.profile?.title||'Charlottendal'});feedback=createFeedback();clearanceView=createClearance({api,message});
-  panelConsole=createPanelConsole({onOpen:()=>{appMenu?.close();},onResetComplete:text=>message(text,{error:false,duration:4000})});panelEvents=createPanelEvents();
+  timetableImport=createTimetableImport();modelClock=createModelClock({api});trainMeet=createTrainMeet({api,onTimetable:()=>openTools('trainmeet-timetable'),stationHint:()=>config?.profile?.title||'Charlottendal'});feedback=createFeedback();clearanceView=createClearance({api,message,onRequest:()=>panelEvents?.showDrift({auto:true})});
+  panelEvents=createPanelEvents();panelConsole=createPanelConsole({onOpen:()=>{appMenu?.close();},onResetComplete:text=>message(text,{error:false,duration:4000}),showDrift:()=>panelEvents?.showDrift()});
   [config, panel, registry, signalEndpoints] = await Promise.all(['/api/config', '/data/panel.json', '/data/source/signals.json', '/data/signal-endpoints.json'].map(async url => { const r = await fetch(url); if (r.status === 401 || r.status === 428) { location.assign('/login'); throw Error('Inloggning krävs'); } if (!r.ok) throw Error('Kunde inte läsa underlaget'); return r.json(); }));
   const files = [...new Set([...Object.values(iconTypes).flatMap(a => a.slice(0, 3)), 'Hsi0+Sh1', 'Hdvsi0+Sh1'])];
   // Loading a missing or slow icon must not prevent the track plan from starting.
@@ -688,8 +688,8 @@ async function start() {
   createPanelFit({plan:$('track-plan'),viewport:document.querySelector('.panel-scroll'),stage:$('plan-stage'),controls:$('panel-console')});
   panelHead=createPanelHead({shell:document.querySelector('#panel-view .panel-shell'),onUpdate:view=>openUpdateNotice(view,{api,message})});
   createPanelSplit({bottom:$('panel-bottom'),viewport:document.querySelector('.panel-scroll')});
-  // Återställ and Styra RBG end the status bar's right side; the console row under the plan is gone.
-  document.getElementById('plan-head-right')?.append($('panel-quick-actions'));
+  // Nothing administrative in the signal box's frame: the update chips join the Drift tab's buttons.
+  const headRight=document.getElementById('plan-head-right');if(headRight){document.querySelector('#panel-drift .drift-actions')?.append(...headRight.children);headRight.remove();}
   createAdminAppearance();
   for(const id of ['appearance','journal','streamdeck'])registerAdminWorkspace('#tools/'+id,$(id+'-tools'));
   for(const id of ['xml','migration','protocol','update'])registerAdminWorkspace('#advanced/'+id,$('advanced-'+id));

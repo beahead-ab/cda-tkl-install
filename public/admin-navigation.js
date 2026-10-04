@@ -46,7 +46,7 @@ export function createAdminNavigation({account=false}={}) {
   const exit=document.createElement('a');exit.id='admin-shell-close';exit.href=prefix+'#panel';exit.setAttribute('aria-label','Stäng administration');exit.innerHTML='<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg>';
   shell.append(bar,rail,drawerShade,content,exit);document.body.append(shell);document.body.classList.add('admin-shell-app');
   const shade=document.createElement('div');shade.id='admin-shell-shade';shade.hidden=true;document.body.append(shade);
-  const panel=document.getElementById('panel-view');let lastAdmin='#tools/operations',wasOpen=false;
+  const panel=document.getElementById('panel-view');let lastAdmin='#trainmeet',wasOpen=false;
   // Phone drawer: below 540 px the rail is hidden until the three-dot button opens it.
   let drawerOpen=false;const phone=window.matchMedia?.('(max-width:539px)');
   function setDrawer(open){

@@ -6,7 +6,7 @@
 // applies an action locally.
 import {createAdminDialog,escapeHTML as esc} from './admin-ui.js';
 import {ACTION_TEXT,TRACK_TEXT,NEIGHBOR_TEXT,lineStatus,needsAttention,movementStatus,movementActions,movementDone} from './clearance-text.js';
-export function createClearance({api,message}) {
+export function createClearance({api,message,onRequest}) {
   const root=document.getElementById('clearance-tools');if(!root)return null;
   root.innerHTML=`<p class="muted">Klarering begärs och besvaras mot grannstationerna genom TrainMeet, som en TMBox. Ett godkännande är varken tågväg eller körsignal; de läggs som vanligt i ställverket.</p>
 <p id="cl-status" class="muted" role="status"></p>
@@ -27,9 +27,12 @@ export function createClearance({api,message}) {
   }
   function notify(c){
     const incoming=new Map(c.lines.filter(needsAttention).map(l=>[l.id+':'+l.trainNumber,l]));
-    for(const [key,l] of incoming)if(!seen.has(key))message(`Klareringsförfrågan från ${l.neighborName}: tåg ${l.trainNumber||'?'}`,{error:false,duration:10000});
+    let fresh=false;
+    for(const [key,l] of incoming)if(!seen.has(key)){fresh=true;message(`Klareringsförfrågan från ${l.neighborName}: tåg ${l.trainNumber||'?'}`,{error:false,duration:10000});}
     seen=new Set(incoming.keys());
-    const badge=document.querySelector('[data-panel-tool="clearance-tools"] strong');if(badge)badge.textContent=incoming.size?`Tågklarering (${incoming.size})`:'Tågklarering';
+    // The count stands on the bottom row's Drift tab; a new request brings the tab forward.
+    const count=document.getElementById('drift-tab-count');if(count)count.textContent=incoming.size?' '+incoming.size:'';
+    if(fresh)onRequest?.();
   }
   // Replace markup only when it changed, and keep whatever the operator has typed.
   function swap(container,html,previous,inputAttr){

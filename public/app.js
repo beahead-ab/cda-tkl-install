@@ -8,7 +8,7 @@ import {signalRouteControls,signalImage} from './signal-route-controls.js';
 import {createAdminNavigation} from './admin-navigation.js';
 import {createAdminAppearance} from './admin-appearance.js';
 import {createPanelFit} from './panel-fit.js';
-import {syncAdminWorkspaces,registerAdminWorkspace} from './admin-ui.js';
+import {syncAdminWorkspaces,registerAdminWorkspace,settingsRows} from './admin-ui.js';
 import {attribute,style,text as setText,flowProgress,createPanelFrames,preparingEndpoints} from './panel-rendering.js';
 import { createManualFeedback } from './manual-feedback.js';
 import { createSourceRegister } from './source-register.js';
@@ -204,6 +204,16 @@ function applyPresentation(value) {
   if(chosen) $('selection-hint').textContent=label(chosen)+' → välj slutpunkt';
   for(const b of buttons) { const id=b.sensor||b.id;if(!id)continue;const node=b.g||b.node;if(node&&config.buttons?.[id]) {node.setAttribute('aria-label',label(id));const title=node.querySelector('title');if(title)title.textContent=label(id);} }
   paint();
+}
+// Händelser in Inställningar: the whole journal the server holds, with a search;
+// the bottom row keeps showing only the latest.
+function paintJournal(){
+  if(!state)return;const q=$('journal-filter').value.trim().toLowerCase(),all=state.events.filter(e=>!['report','transport'].includes(e.kind)),rows=q?all.filter(e=>(time(e.at)+' '+e.message).toLowerCase().includes(q)):all;
+  settingsRows($('journal-summary'),[
+    ['Visas',q?`${rows.length} av ${all.length} händelser`:`De senaste ${all.length} händelserna`,'Hela journalen sparas på disk i TKL-servern. Nederraden visar de allra senaste.'],
+    ['Läget nu',state.routes.length+' tågvägslås · '+Object.keys(config.turnouts).length+' anslutna växlar','Tågvägar som är lagda just nu och växlar med bindning till banan.']]);
+  html('events',rows.map(e=>`<div class="event-row"><time>${time(e.at)}</time><span>${esc(e.message)}</span></div>`).join(''));
+  $('journal-empty').hidden=!!rows.length;$('journal-empty').textContent=q?'Inga händelser matchar sökningen.':'Inga händelser ännu.';
 }
 // A yellow ring marks the plan object a journal row or timetable row refers to.
 // Presentation only: it reads the drawn plan and sends nothing.
@@ -576,8 +586,7 @@ function renderPanel() {
   html('active-routes', state.routes.map(r => `<div class="route-item"><strong>${esc(displayName('routes',r.definitionId,r.label))}<span class="route-state ${esc(r.state)}">${esc(statuses[r.state])}</span></strong><small>${esc(r.reason)}${r.passage&&r.enteredAt?' · '+r.passage.filter(p=>p.state==='clear').length+'/'+r.passage.length+' avsnitt passerade':''}</small><button data-cancel="${esc(r.id)}" ${!online || r.cancelRequested ? 'disabled' : ''}>${r.cancelRequested ? 'Inväntar frigivning' : 'Återta'}</button></div>`).join(''));
   $('route-activity').hidden=!state.routes.length;
   $('route-summary').textContent=`${state.routes.length} ${state.routes.length===1?'tågväg':'tågvägar'} · ${state.routes.map(r=>statuses[r.state]).filter((v,i,a)=>a.indexOf(v)===i).join(' / ')}`;
-  $('event-status').textContent = state.routes.length + ' tågvägslås · ' + Object.keys(config.turnouts).length + ' anslutna växlar';
-  html('events', state.events.filter(e => !['report', 'transport'].includes(e.kind)).slice(0, 7).map(e => `<div class="event-row"><time>${time(e.at)}</time><span>${esc(e.message)}</span></div>`).join(''));
+  paintJournal();
   $('wire').textContent = (state.trace || []).slice(0, 40).map(e => `${time(e.at)}  ${e.direction === 'out' ? 'SKICKAT ' : 'MOTTAGET'}  ${e.hex}`).join('\n');
   panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());
 }
@@ -692,6 +701,7 @@ async function start() {
   const headRight=document.getElementById('plan-head-right');if(headRight){document.querySelector('#panel-drift .drift-actions')?.append(...headRight.children);headRight.remove();}
   createAdminAppearance();
   for(const id of ['appearance','journal','streamdeck'])registerAdminWorkspace('#tools/'+id,$(id+'-tools'));
+  $('journal-filter').oninput=paintJournal;
   for(const id of ['xml','migration','protocol','update'])registerAdminWorkspace('#advanced/'+id,$('advanced-'+id));
   updatePage=createUpdatePage({root:$('advanced-update-content'),api,message});
   document.addEventListener('click',e=>{

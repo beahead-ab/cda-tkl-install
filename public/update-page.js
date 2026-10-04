@@ -13,20 +13,25 @@ export function createUpdatePage({root,api,message}){
     if(e.target.closest('[data-start-update]'))openUpdateNotice(view,{api,message});
   });
   const line=(kind)=>{const how=UPDATE_LINES[kind];return `<p>Öppna ${esc(how.where)} på ${kind==='mac'?'Macen':'datorn'} och kör:</p><pre class="update-line"><code>${esc(how.line)}</code></pre><button type="button" data-copy-line="${esc(how.line)}">Kopiera raden</button>`;};
+  // Label · value · consequence, as in the other sections of Inställningar.
+  const rows=list=>`<dl class="settings-rows">${list.map(([label,value,note])=>`<div><dt>${esc(label)}</dt><dd>${value}</dd><dd class="settings-consequence">${esc(note)}</dd></div>`).join('')}</dl>`;
+  const pill=(mode,text)=>`<span class="settings-state" data-state="${mode}">${esc(text)}</span>`;
   return {update(update,release){
     view=update;
     let html;
     if(!update){
-      html=`<section class="card"><h2>Webbdriften</h2><p>Den här TKL är webbdriften${release?' och kör '+esc(release):''}. Den uppdateras genom publicering från utvecklingsdatorn, inte härifrån.</p></section>`;
+      html=`<section class="card"><h2>Webbdriften</h2>${rows([['Installerad',esc(release||'okänd'),'Den här TKL är webbdriften.'],['Uppdateras','genom publicering','Från utvecklingsdatorn, inte härifrån.']])}</section>`;
     }else{
-      const status=update.available?`<p><strong>Charlottendal TKL ${esc(update.latest)} finns.</strong> Den här datorn (${esc(KIND_TEXT[update.kind]||update.kind)}) kör ${esc(update.current)}.</p>`
-        :update.latest?`<p>Den här datorn (${esc(KIND_TEXT[update.kind]||update.kind)}) kör ${esc(update.current)}, som är senaste versionen.</p>`
-        :`<p>Den här datorn (${esc(KIND_TEXT[update.kind]||update.kind)}) kör ${esc(update.current)}. Senaste version har inte kunnat läsas än.</p>`;
+      const where=KIND_TEXT[update.kind]||update.kind;
+      const state=update.available?[pill('warn','Ny version finns'),`${update.latest} kan installeras. Inget ändras förrän du uppdaterar.`]
+        :update.latest?[pill('ok','Senaste versionen'),'Inget att göra.']
+        :[pill('off','Okänt'),update.error||'Senaste versionen har inte kunnat läsas än. Uppdateringen fungerar ändå.'];
       const how=update.canStart
-        ?(update.available?'<p>Pi:n hämtar, installerar och startar om TKL själv.</p><button type="button" class="primary" data-start-update>Uppdatera nu</button>':'<p>Pi:n uppdaterar sig själv härifrån när en ny version finns.</p>')
+        ?(update.available?'<div class="settings-actions"><button type="button" class="primary" data-start-update>Uppdatera nu</button><p>Pi:n hämtar, installerar och startar om TKL själv. Panelen är borta en kort stund.</p></div>':'<p class="muted">Pi:n uppdaterar sig själv härifrån när en ny version finns.</p>')
         :line(update.kind);
-      html=`<section class="card"><h2>Den här installationen</h2>${status}${update.error?`<p class="muted">${esc(update.error)}</p>`:''}${how}<p class="muted">Inställningar och driftdata ligger kvar vid uppdateringen, och om den nya versionen inte startar återställs den gamla. Raden går att köra även när ingen ny version visas; då installeras samma version igen.</p></section>`
-        +`<details class="card"><summary>Raden för andra datorer</summary>${['mac','windows'].filter(k=>k!==update.kind).map(line).join('')}<p>Raspberry Pi: <code>curl -fsSL https://raw.githubusercontent.com/beahead-ab/cda-tkl-install/main/install.sh | sudo sh</code></p></details>`;
+      html=`<section class="card"><h2>Den här installationen</h2>${rows([['Status',state[0],state[1]],['Installerad',esc(update.current),'Den här datorn: '+where+'.'],['Senaste',esc(update.latest||'–'),'Läses från installationsförrådet på GitHub.']])}${how}</section>`
+        +`<details class="card"><summary>Raden för andra datorer</summary>${['mac','windows'].filter(k=>k!==update.kind).map(line).join('')}<p>Raspberry Pi: <code>curl -fsSL https://raw.githubusercontent.com/beahead-ab/cda-tkl-install/main/install.sh | sudo sh</code></p></details>`
+        +'<p class="settings-footnote">Inställningar och driftdata ligger kvar vid uppdateringen, och om den nya versionen inte startar återställs den gamla. Raden går att köra även när ingen ny version visas; då installeras samma version igen.</p>';
     }
     if(html!==last){last=html;root.innerHTML=html;}
   }};

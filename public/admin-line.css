@@ -251,3 +251,41 @@ body[data-admin-nav-open] #admin-shell .admin-shell-drawer-shade{display:block;p
 #admin-shell .admin-nav-heading:first-child{margin-top:2px}
 #admin-shell .admin-nav-status{margin-left:6px;font-size:11px;color:#7d8791}
 #admin-shell .admin-nav-status:empty{display:none}
+
+/* Inställningar, the pedagogical layer (docs/installningar-plan.md): a scope line under
+   the title, rows of label · value · grey consequence, status as text and shape, and a
+   footnote on what the section does not do. */
+.settings-scope{margin:-14px 0 22px;font-size:12px;color:var(--muted)}
+.settings-rows{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,1.1fr);margin:12px 0 0;font-size:13px}
+.settings-rows>div{display:contents}
+.settings-rows :is(dt,dd){margin:0;padding:12px 18px 12px 0;border-bottom:1px solid #292928;line-height:1.5;overflow-wrap:anywhere}
+.settings-rows>div:last-child>:is(dt,dd){border-bottom:0}
+.settings-rows dt,.settings-consequence{color:var(--muted)}
+.settings-consequence{font-size:12px}
+.settings-actions{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 16px;align-items:center;margin:18px 0 0}
+.settings-actions>button{justify-self:start}
+.settings-actions>p{margin:0;font-size:12px;line-height:1.5;color:var(--muted)}
+.settings-footnote{margin:26px 0 0;padding-top:14px;border-top:1px solid var(--border);font-size:12px;line-height:1.6;color:var(--muted)}
+#trainmeet #tm-status{margin:0;font-size:inherit}
+.settings-state{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--text)}
+.settings-state::before{content:"○";font-size:11px;line-height:1;color:var(--muted)}
+.settings-state[data-state=ok]::before{content:"●";color:#8fd19e}
+.settings-state[data-state=warn]{color:#edc785}.settings-state[data-state=warn]::before{content:"▲";color:#edc785}
+.settings-alert{margin:14px 0 0;padding:10px 12px;border-left:2px solid #edc785;background:#211f1a;font-size:12px;line-height:1.55}
+.admin-unchanged{margin-right:auto;align-self:center;font-size:12px;color:var(--muted)}
+@media(max-width:700px){
+  .settings-rows{grid-template-columns:1fr}
+  .settings-rows dt{padding:10px 0 2px;border:0}
+  .settings-rows dd{padding:0 0 2px}
+  .settings-rows dd.settings-consequence{padding-bottom:10px}
+  .settings-actions{grid-template-columns:1fr;gap:4px}
+  .settings-actions>p{margin-bottom:10px}
+}
+.journal-search{display:flex;flex-direction:column;gap:7px;margin:20px 0 10px;font-size:12px;color:var(--muted)}
+.journal-search input{width:min(420px,100%);padding:9px 10px}
+.recording-history-heading{margin:24px 0 6px;font-size:12px;font-weight:500}
+#loconet-communication .communication-view{margin-top:12px}
+.card-heading+.settings-scope{margin:-10px 0 14px}
+.settings-rows #recording-status{color:var(--text)}
+#journal-tools .settings-scope{margin:6px 0 18px}
+@media(max-width:700px){.settings-rows dd:not(.settings-consequence){border:0}}

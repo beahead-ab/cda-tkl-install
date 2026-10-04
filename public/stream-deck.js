@@ -33,12 +33,17 @@ export function createStreamDeck({pluppar,choose,clearChoice,api,message,state,o
   function status(){
     if(statusNode)statusNode.textContent=!supported?'WebHID saknas här. Använd Chrome, Edge eller Chromium på en säker adress (https eller localhost).'
       :!owner?'Stream Deck styrs från ett annat fönster med ställverket. Tryck Styr härifrån för att ta över.'
-      :units.size?[...units.values()].map(u=>`${nameOf(u)} · ${MODELS[u.model]?.short||u.controls.length+' knappar'} · sida ${u.page+1} av ${u.pages.length} · ${u.saved?.label||'standardlayout'}`).join('. ')+'.':'Ej ansluten.';
+      :units.size?[...units.values()].map(u=>`${nameOf(u)} · ${MODELS[u.model]?.short||u.controls.length+' knappar'} · sida ${u.page+1} av ${u.pages.length} · ${u.saved?.label||'standardlayout'}`).join('. ')+'.':'Tryck Anslut Stream Deck och välj enheten i webbläsarens lista.';
     if(connectButton){connectButton.disabled=!supported;connectButton.textContent=!owner?'Styr härifrån':units.size?'Anslut fler':'Anslut Stream Deck';}
-    if(disconnectButton)disconnectButton.hidden=!units.size;
+    if(disconnectButton){disconnectButton.hidden=!units.size;$('streamdeck-disconnect-note')&&($('streamdeck-disconnect-note').hidden=!units.size);}
+    // Status as text and shape for Inställningar → Stream Deck.
+    const state=$('streamdeck-state');
+    if(state){const [mode,text]=!supported?['warn','WebHID saknas']:!owner?['warn','Styrs från ett annat fönster']:units.size?['ok',units.size===1?'Ansluten':units.size+' anslutna']:['off','Ej ansluten'];
+      state.innerHTML=`<span class="settings-state" data-state="${mode}">${text}</span>`;}
   }
   status();
-  if(originNode)originNode.textContent=`Den här sidan: ${location.origin} · ${!hid?'WebHID saknas i webbläsaren, öppna adressen i Chrome':!window.isSecureContext?'osäker adress, använd https eller localhost':'WebHID tillgängligt'}.`;
+  if($('streamdeck-page'))$('streamdeck-page').textContent=location.origin;
+  if(originNode)originNode.textContent=`${!hid?'WebHID saknas i webbläsaren. Öppna adressen i Chrome, Edge eller Chromium':!window.isSecureContext?'Osäker adress. Använd https eller localhost':'WebHID finns, så decket kan nås härifrån'}.`;
   const off=()=>{try{return localStorage.getItem(STORAGE)==='off';}catch{return false;}};
   // One window per browser drives the decks. Two would both act on every press, and a
   // route requested twice used to be a route laid and taken back. The other windows wait

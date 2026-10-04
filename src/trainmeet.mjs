@@ -61,6 +61,7 @@ export function routeDirections(routes,trains,station){
 }
 // Lines of this station: static catalogue from the display joined with the
 // live state from the station context. Unknown or missing states stay unknown.
+const NEIGHBOR_MODES=new Set(['automatic','manual','disconnected']);
 function readLines(display,context,station,names,codes){
   const catalogue=display.connections??[];
   if(!Array.isArray(catalogue)||catalogue.length>5000)fail('Ogiltig sträckkatalog från TrainMeet.',503);
@@ -70,11 +71,14 @@ function readLines(display,context,station,names,codes){
     if(!text(from,128)||!text(to,128))fail('Ogiltigt förbindelseläge.',503);
     live.set(c.id,{state:LINE_STATES.has(c.state)?c.state:'unknown',from,to,trainNumber:text(c.train_number)?c.train_number:''});
   }
+  // Who answers at the other end (TrainMeet Server 2.6+): automatic, manual or disconnected.
+  const modes=record(context.station_modes)?context.station_modes:{};
   return catalogue.filter(c=>record(c)&&(c.station_a_id===station||c.station_b_id===station)).map(c=>{
     if(!identity(c.id)||!identity(c.station_a_id)||!identity(c.station_b_id))fail('Ogiltig sträcka från TrainMeet.',503);
     const neighborId=c.station_a_id===station?c.station_b_id:c.station_a_id,s=live.get(c.id);
     const state=s?s.state:'unknown',direction=!s||state==='free'?'':s.from===station?'out':s.to===station?'in':'';
-    return {id:c.id,neighborId,neighborName:names.get(neighborId)||neighborId,neighborCode:codes.get(neighborId)||'',trackType:text(c.track_type,32)?c.track_type:'',state,direction,from:s?.from||'',to:s?.to||'',trainNumber:s?.trainNumber||'',actions:lineActions(state,direction)};
+    const neighborMode=NEIGHBOR_MODES.has(modes[neighborId])?modes[neighborId]:'';
+    return {id:c.id,neighborId,neighborMode,neighborName:names.get(neighborId)||neighborId,neighborCode:codes.get(neighborId)||'',trackType:text(c.track_type,32)?c.track_type:'',state,direction,from:s?.from||'',to:s?.to||'',trainNumber:s?.trainNumber||'',actions:lineActions(state,direction)};
   });
 }
 

@@ -10,12 +10,8 @@ export const NAVIGATION_GROUPS=[
   {key:'anlaggningen',label:'Anläggningen'}
 ];
 export const NAVIGATION_SECTIONS=[
-  // The local timetable pages ride along under TrainMeet until they are removed (step 3).
-  {group:'traffen',hash:'#trainmeet',label:'TrainMeet',id:'trainmeet-tab',title:'TrainMeet',status:'menu-trainmeet-status',members:['#import'],tabs:[
-    {hash:'#trainmeet',label:'Anslutning',title:'TrainMeet'},
-    {hash:'#import',label:'Tidtabeller'},
-    {hash:'#import/upload',label:'Importera',title:'Importera tidtabell'},
-    {hash:'#import/edit',label:'Redigera utkast',title:'Redigera tidtabell'}]},
+  // TrainMeet is the only timetable; the old #import pages lead here.
+  {group:'traffen',hash:'#trainmeet',label:'TrainMeet',id:'trainmeet-tab',title:'TrainMeet',status:'menu-trainmeet-status',tabs:[]},
   {group:'traffen',hash:'#tools/journal',label:'Händelser',id:'journal-tab',title:'Händelser',tabs:[]},
   {group:'datorn',hash:'#tools/appearance',label:'Utseende och ljud',id:'tools-tab',title:'Utseende och ljud',tabs:[]},
   {group:'datorn',hash:'#tools/streamdeck',label:'Stream Deck',id:'streamdeck-tab',title:'Elgato Stream Deck',tabs:[

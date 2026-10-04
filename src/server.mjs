@@ -17,8 +17,6 @@ import { Configuration } from './configuration.mjs';
 import { TrainInformation } from './train-information.mjs';
 import { PanelIndications } from './panel-indications.mjs';
 import { TrainMeet } from './trainmeet.mjs';
-import { TimetableImport, IMPORT_LIMITS } from './timetable-import.mjs';
-import { TimetableAI } from './timetable-ai.mjs';
 import { ModelClock } from './model-clock.mjs';
 import { describeProtocol, TelegramRecorder } from './telegram-recorder.mjs';
 import { UpdateCheck } from './update-check.mjs';
@@ -57,7 +55,6 @@ function createRuntime(p){
 }
 const bindings=new BindingConfiguration(baseProfile,{storage,canActivate:activationStatus,prepare:p=>{const next=createRuntime(p);return ()=>installRuntime(next);}});
 const trainMeet=new TrainMeet({storage,origin:process.env.CHARLOTTENDAL_TRAINMEET_ORIGIN||''});
-const timetableImport=new TimetableImport({storage,reader:new TimetableAI()});let importUploading=false;
 const destinations=new Destinations(storage);
 const modelClock=new ModelClock(storage);let clockPublished=0;
 let notes = storage.load('notes.json', {}); const streams = new Set(), trace = [], protocolTrace=[]; let dirty = true;
@@ -80,7 +77,6 @@ function installRuntime(next,start=true){
   if(start)c.start();dirty=true;
 }
 trainMeet.on('change',()=>{dirty=true;});trainMeet.on('journal',text=>{engine.log('trainmeet',text);dirty=true;});
-timetableImport.on('change',()=>{dirty=true;});
 installRuntime(createRuntime(bindings.profile()),false);
 // Layouts are checked against the live profile's pluppar, so the store is created once the runtime exists.
 const streamDeckLayouts=new StreamDeckLayouts(storage,{pluppIds:()=>Object.keys(profile?.buttons||{})});
@@ -90,7 +86,7 @@ const release=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.u
 // Installed copies look for a newer release in the public install repository.
 const updateCheck=process.env.CHARLOTTENDAL_INSTALL_KIND?new UpdateCheck({current:release,kind:process.env.CHARLOTTENDAL_INSTALL_KIND}):null;
 updateCheck?.start();
-const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),timetableImport:timetableImport.summary(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot() };};
+const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot() };};
 const server = http.createServer(async (req, res) => {
   try {
     guard(req, port); const url = new URL(req.url, `http://127.0.0.1:${port}`);
@@ -100,20 +96,6 @@ const server = http.createServer(async (req, res) => {
       if (url.pathname === '/api/state') return json(res, snapshot());
       if(url.pathname==='/api/communication')return json(res,{connection:connectionInfo(profile),connectionState:engine.connected?'connected':'disconnected',expectations:commandExpectations(profile,engine.snapshot()),trace:protocolTrace});
       if(url.pathname==='/api/route-targets')return json(res,{targets:engine.routeTargets(url.searchParams.get('from'),url.searchParams.get('kind')||'main')});
-      if(url.pathname==='/api/timetable-import')return json(res,timetableImport.view());
-      const templateMatch=url.pathname.match(/^\/api\/timetable-import\/template\.(csv|xlsx)$/);
-      if(templateMatch){
-        const ext=templateMatch[1],bytes=fs.readFileSync(path.join(root,'templates','cda-tkl-tidtabell.'+ext));
-        res.writeHead(200,{'Content-Type':ext==='csv'?'text/csv; charset=utf-8':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','Content-Disposition':`attachment; filename="cda-tkl-tidtabell.${ext}"`,'Cache-Control':'no-cache','X-Content-Type-Options':'nosniff'});
-        return res.end(req.method==='HEAD'?undefined:bytes);
-      }
-      const sourceMatch=url.pathname.match(/^\/api\/timetable-import\/source\/([a-f0-9-]{36})\/(\d+)$/);
-      if(sourceMatch){
-        const file=timetableImport.sourceFile(sourceMatch[1],sourceMatch[2]);
-        const bytes=fs.readFileSync(file.path);
-        res.writeHead(200,{'Content-Type':file.mime,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"sandbox; default-src 'none'",'Content-Disposition':(file.mime.startsWith('image/')?'inline':'attachment')+"; filename*=UTF-8''"+encodeURIComponent(file.name)});
-        return res.end(req.method==='HEAD'?undefined:bytes);
-      }
       if (url.pathname === '/api/config') { const {routeAlternatives,...panelProfile}=profile; return json(res, { ...panelProfile,release,bindingVersion:bindings.data.activeVersion, notes, trainFields:trainInformation.catalog(),panelIndications:panelIndications.catalog(), presentation:configuration.presentation(), fieldUrl: process.env.CHARLOTTENDAL_FIELD_URL || `http://127.0.0.1:${Number(process.env.CHARLOTTENDAL_SIM_PORT || 8911)}/`, accountUrl: process.env.CHARLOTTENDAL_AUTH_MODE === 'password' ? '/account' : null }); }
       if (url.pathname === '/api/train-information') return json(res, {...trainInformation.snapshot(),...trainInformation.catalog()});
       if(url.pathname==='/api/bindings')return json(res,bindings.view());
@@ -136,15 +118,7 @@ const server = http.createServer(async (req, res) => {
       if (url.pathname.startsWith('/api/')) return json(res, { error: 'Finns inte' }, 404);
       return staticFile(res, root, decodeURIComponent(url.pathname));
     }
-    if(['/api/timetable-import/begin','/api/timetable-import/table'].includes(url.pathname)){
-      if(importUploading)return json(res,{error:'En uppladdning pågår redan.'},409);
-      const table=url.pathname.endsWith('/table');
-      if(!table&&!timetableImport.reader.configured)return json(res,{error:'AI-tolkning är inte ansluten. Lägg till serverns API-nyckel först.'},503);
-      importUploading=true;
-      try{const data=await body(req,table?3*1024*1024:IMPORT_LIMITS.requestBytes);return json(res,table?await timetableImport.table(data):timetableImport.begin(data),table?200:202);}finally{importUploading=false;}
-    }
-    const data = await body(req,url.pathname==='/api/timetable-import/save'?2*1024*1024:65536);
-    if(url.pathname.startsWith('/api/timetable-import/')){const command=url.pathname.slice('/api/timetable-import/'.length);if(!['manual','edit','append','save','sheet','activate','discard','select'].includes(command))return json(res,{error:'Okänd tidtabellsåtgärd'},404);return json(res,timetableImport[command](data));}
+    const data = await body(req,65536);
     if(url.pathname.startsWith('/api/bindings/')){const command=url.pathname.slice('/api/bindings/'.length);if(!['save','discard','restore','activate'].includes(command))return json(res,{error:'Okänd driftinställning'},404);const result=bindings[command](data);engine.log('bindings',command==='activate'?'Driftprofil version '+result.activeVersion+' aktiverad. AIS kvarstår, alla rapporter läses in på nytt.':'Driftinställningarnas utkast uppdaterat.');dirty=true;return json(res,result);}
     if(url.pathname.startsWith('/api/streamdeck/')){
       const command=url.pathname.slice('/api/streamdeck/'.length);

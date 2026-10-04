@@ -10,7 +10,6 @@ import {createAdminAppearance} from './admin-appearance.js';
 import {createPanelFit} from './panel-fit.js';
 import {syncAdminWorkspaces,registerAdminWorkspace} from './admin-ui.js';
 import {attribute,style,text as setText,flowProgress,createPanelFrames,preparingEndpoints} from './panel-rendering.js';
-import {createTimetableImport} from './timetable-import.js';
 import { createManualFeedback } from './manual-feedback.js';
 import { createSourceRegister } from './source-register.js';
 import { panelLayout } from './panel-layout.js';
@@ -58,15 +57,17 @@ const routeTargets=createRouteTargets({load:async(from,kind)=>{
   if(!response.ok)throw Error('Mål kunde inte kontrolleras.');
   return response.json();
 },onChange:()=>paint()});
-let currentPage='panel',appMenu,contextDialog,panelConsole,panelEvents,panelHead,timetableImport,signalControls,chosenKind=null,clearanceView,streamDeck,streamDeckAdmin,updatePage;
+let currentPage='panel',appMenu,contextDialog,panelConsole,panelEvents,panelHead,signalControls,chosenKind=null,clearanceView,streamDeck,streamDeckAdmin,updatePage;
 const pageFromHash=()=>{
   if(location.hash==='#tools/zoom')history.replaceState(null,'','#tools/appearance');
   if(location.hash==='#tools')history.replaceState(null,'','#tools/appearance');
   if(location.hash==='#tools/connections')history.replaceState(null,'','#register');
-  return ({'#register':'admin','#tools':'tools','#trainmeet':'trainmeet','#import':'import','#advanced':'advanced'})[location.hash.split('/')[0]]||'panel';
+  // The local timetable is gone; TrainMeet is the only timetable (docs/installningar-plan.md).
+  if(location.hash==='#import'||location.hash.startsWith('#import/'))history.replaceState(null,'','#trainmeet');
+  return ({'#register':'admin','#tools':'tools','#trainmeet':'trainmeet','#advanced':'advanced'})[location.hash.split('/')[0]]||'panel';
 };
 function setPage(page,{historyMode='push'}={}) {
-  let hash={panel:'#panel',tools:'#tools',admin:'#register',trainmeet:'#trainmeet',import:'#import',advanced:'#advanced'}[page];
+  let hash={panel:'#panel',tools:'#tools',admin:'#register',trainmeet:'#trainmeet',advanced:'#advanced'}[page];
   if(!hash)return;
   if(historyMode==='replace'&&location.hash.startsWith(hash+'/'))hash=location.hash;
   if(historyMode!=='none'&&location.hash!==hash)history[historyMode==='replace'?'replaceState':'pushState'](null,'',hash);
@@ -74,7 +75,7 @@ function setPage(page,{historyMode='push'}={}) {
   if(currentPage!==page)clearChoice(false);
   currentPage=page;document.body.dataset.page=page;
   appMenu?.close();
-  for(const p of ['panel','tools','admin','trainmeet','import','advanced']) {
+  for(const p of ['panel','tools','admin','trainmeet','advanced']) {
     $(p+'-view').hidden=p!=='panel'&&p!==page;
     const tab=$(p+'-tab');
     if(tab){tab.classList.toggle('selected',p===page);if(p===page)tab.setAttribute('aria-current','page');else tab.removeAttribute('aria-current');}
@@ -539,11 +540,10 @@ function renderPanel() {
   telegramRecorder?.update(state,online);
   operatingControls?.update(state,online);
   if(state.clock)modelClock?.update(state.clock,online);
-  trainMeet?.update(state.trainMeet,online,state.timetableImport,{routes:state.routes||[]});
+  trainMeet?.update(state.trainMeet,online,{routes:state.routes||[]});
   clearanceView?.update(state.trainMeet,online);
   streamDeck?.update();
   if(state.streamDeck)streamDeckAdmin?.update(state.streamDeck);
-  timetableImport?.update(state.timetableImport,online);
   updatePage?.update(state.update,state.release);
   if(chosen && (!usable() || state.controls?.mode==='remote')) clearChoice(false);
   const c = $('connection'); setText(c,!online ? 'Kontakt med kärnan saknas' : state.storageFault ? 'Lagringsfel · spärrad' : state.connection === 'connected' ? (state.connectionInfo?.mode==='simulator'?'Simulator ansluten':'LocoNet ansluten') : (state.connectionInfo?.mode==='simulator'?'Simulator frånkopplad':'LocoNet frånkopplad'));
@@ -628,7 +628,7 @@ async function start() {
   const fullscreen = createFullscreen({button: $('toggle-fullscreen'), onError: message});
   telegramRecorder=createTelegramRecorder();
   operatingControls=createOperatingControls({api,openSource});
-  timetableImport=createTimetableImport();modelClock=createModelClock({api});trainMeet=createTrainMeet({api,onTimetable:()=>openTools('trainmeet-timetable'),stationHint:()=>config?.profile?.title||'Charlottendal'});feedback=createFeedback();clearanceView=createClearance({api,message,onRequest:()=>panelEvents?.showDrift({auto:true})});
+  modelClock=createModelClock({api});trainMeet=createTrainMeet({api,onTimetable:()=>openTools('trainmeet-timetable'),stationHint:()=>config?.profile?.title||'Charlottendal'});feedback=createFeedback();clearanceView=createClearance({api,message,onRequest:()=>panelEvents?.showDrift({auto:true})});
   panelEvents=createPanelEvents();panelConsole=createPanelConsole({onOpen:()=>{appMenu?.close();},onResetComplete:text=>message(text,{error:false,duration:4000}),showDrift:()=>panelEvents?.showDrift()});
   [config, panel, registry, signalEndpoints] = await Promise.all(['/api/config', '/data/panel.json', '/data/source/signals.json', '/data/signal-endpoints.json'].map(async url => { const r = await fetch(url); if (r.status === 401 || r.status === 428) { location.assign('/login'); throw Error('Inloggning krävs'); } if (!r.ok) throw Error('Kunde inte läsa underlaget'); return r.json(); }));
   const files = [...new Set([...Object.values(iconTypes).flatMap(a => a.slice(0, 3)), 'Hsi0+Sh1', 'Hdvsi0+Sh1'])];
@@ -699,7 +699,7 @@ async function start() {
     if(section){e.preventDefault();openTools(section.dataset.toolsSection);return;}
     const link=e.target.closest('a[href^="#"]');
     if(link?.getAttribute('href')?.startsWith('#register/station'))closeInspector(false);
-    const page={'#panel':'panel','#tools':'tools','#register':'admin','#trainmeet':'trainmeet','#import':'import','#advanced':'advanced'}[link?.getAttribute('href')];
+    const page={'#panel':'panel','#tools':'tools','#register':'admin','#trainmeet':'trainmeet','#advanced':'advanced'}[link?.getAttribute('href')];
     if(page){e.preventDefault();setPage(page);}
   });
   window.addEventListener('hashchange',()=>setPage(pageFromHash(),{historyMode:'none'}));

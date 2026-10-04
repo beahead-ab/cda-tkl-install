@@ -1,4 +1,3 @@
-import {createAdminDialog} from './admin-ui.js';
 import {createContextDialog} from './context-dialog.js';
 import {clockAt,groupRows,trainClass} from './timetable-rows.js';
 import {createTrackOccupancy} from './track-occupancy.js';
@@ -6,24 +5,19 @@ import {occupancyModel} from './track-occupancy-model.js';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const CELLS=['n','slag','fr','till','frtill','ank','avg','spar','lage','anm','la'];
 
-export function createTrainMeetTimetable({selectSource}) {
+// TrainMeet is the only timetable; the local one is gone (docs/installningar-plan.md).
+export function createTrainMeetTimetable() {
   const root=document.getElementById('trainmeet-timetable'),$=id=>document.getElementById('tt-'+id);
   root.innerHTML='<header class="tt-heading"><h2>Tidtabell</h2><span id="tt-station"></span><div class="tt-mode" role="group" aria-label="Urval"><button id="tt-mode-upcoming" type="button" aria-pressed="true">Kommande</button><button id="tt-mode-all" type="button" aria-pressed="false">Alla<span id="tt-count"></span></button></div><span id="tt-next"></span><span id="tt-clock"><span id="tt-clock-time"></span><span id="tt-clock-label"></span></span><button id="tt-collapse" type="button" hidden>Svep ned · stäng</button></header><p id="tt-status" role="status" hidden></p><div class="tt-labels" aria-hidden="true"><span class="tt-n">Tåg</span><span class="tt-slag">Slag</span><span class="tt-fr">Från</span><span class="tt-till">Till</span><span class="tt-frtill">Från → till</span><span class="tt-ank">Ank</span><span class="tt-avg">Avg</span><span class="tt-spar">Spår</span><span class="tt-lage">Läge</span><span class="tt-anm">Anmärkning</span><span class="tt-la">Läge · anmärkning</span></div><div id="tt-content" tabindex="0"></div><div id="tt-mini" aria-hidden="true"></div>';
-  document.getElementById('timetable-settings').innerHTML='<div class="admin-current-source"><div><h2>Visas i ställverket</h2><p id="tt-source-summary" class="muted"></p></div><button id="tt-change-source">Byt tidtabellskälla</button></div>';
-  const sourceForm=document.createElement('form');sourceForm.id='tt-source-form';sourceForm.innerHTML='<label>Visa i ställverket<select id="tt-source"><option value="trainmeet">TrainMeet</option><option value="import">Egen tidtabell</option></select></label><p class="muted">Båda källorna behålls när du byter.</p><button id="tt-save-source" type="submit">Spara</button>';
-  let sourceBase='',sourceRevision,sourceBusy=false;
-  const sourceDialog=createAdminDialog({title:'Byt tidtabellskälla',body:sourceForm,saveButton:sourceForm.querySelector('button'),dirty:()=>$('source').value!==sourceBase,busy:()=>sourceBusy});
 
   const dialog=document.createElement('dialog');dialog.className='inspector-host timetable-details';dialog.setAttribute('aria-labelledby','tt-detail-title');
   dialog.innerHTML='<div class="card"><div class="card-heading"><h3 id="tt-detail-title"></h3><button type="button" id="tt-close-detail" aria-label="Stäng tidtabellsuppgifter" autofocus>Stäng</button></div><div id="tt-detail-content"></div></div>';document.body.append(dialog);
-  let importState,rows=[],grouped=null,mode='upcoming',last='',miniLast='',identity='',selected=null,detailHTML='',frame=0;
+  let rows=[],grouped=null,mode='upcoming',last='',miniLast='',identity='',selected=null,detailHTML='',frame=0;
   // The meet clock runs locally between polls; groups are recomputed when the minute changes.
   let clockBase=null,clockStart=0,clockKey='',shownMinute=null,clockMinutes=null,occupancy=null,clockShort='',doneLimit=Infinity,routes=[],userActiveUntil=0,lastTouch=0,userMoved=false,programmaticUntil=0,layoutHeight=0,anchoredKey=null;
   const announced=new Map();
   const details=createContextDialog({dialog,onClose:()=>{selected=null;}});
   $('close-detail').onclick=()=>details.close();
-  $('change-source').onclick=()=>{sourceRevision={sessionId:importState.sessionId,revision:importState.revision};sourceBase=importState.source;$('source').value=sourceBase;sourceDialog.open();};
-  sourceForm.onsubmit=async e=>{e.preventDefault();if(sourceBusy)return;sourceBusy=true;sourceDialog.setBusy(true);$('save-source').disabled=true;try{if(await selectSource({...sourceRevision,source:$('source').value}))sourceDialog.close(true);else sourceDialog.message(document.getElementById('message-text').textContent||'Kunde inte spara.');}finally{sourceBusy=false;sourceDialog.setBusy(false);$('save-source').disabled=false;}};
   function drawDetails(){
     if(!selected)return;const row=rows.find(r=>r.id===selected);if(!row){details.close();return;}
     $('detail-title').textContent='Tåg '+row.number;
@@ -164,15 +158,13 @@ export function createTrainMeetTimetable({selectSource}) {
   // Four times a second, so a fast clock (4×) shows every meet second instead of every fourth.
   setInterval(tick,250);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick();});
-  return {update(state,online,imported,panel){
-    importState=imported;routes=Array.isArray(panel?.routes)?panel.routes:[];
-    const local=imported?.source==='import',active=local?imported.active:null;
-    const source=$('source');if(!sourceDialog.isOpen)source.value=local?'import':'trainmeet';source.disabled=!online||!imported;source.options[1].disabled=!imported?.active;$('change-source').disabled=!online||!imported;$('source-summary').textContent=local?(imported.active?.title||'Egen tidtabell'):'TrainMeet';
-    const c=local?(active?{station:{name:'Egen tidtabell'},meet:active.title,day:'',tracks:[],operatingPoints:[],movements:[],lines:[],trains:active.rows.map(r=>({id:r.id,train_number:r.trainNumber,station_name:r.station,day_label:r.day,arrival_time:r.arrival,departure_time:r.departure,arrival_from:r.from,departure_to:r.to,track:r.track,no_stop:r.noStop,note:r.note}))}:null):state?.context;
-    const stale=!!c&&(!online||!local&&state?.stale);
+  return {update(state,online,panel){
+    routes=Array.isArray(panel?.routes)?panel.routes:[];
+    const c=state?.context;
+    const stale=!!c&&(!online||state?.stale);
     root.classList.toggle('timetable-stale',stale);
-    $('station').textContent=c?[c.meet,c.day,local?'':'TrainMeet'].filter(Boolean).join(' · '):'';
-    // The meet clock belongs to TrainMeet; an imported timetable keeps it when the station is paired.
+    $('station').textContent=c?[c.meet,c.day,'TrainMeet'].filter(Boolean).join(' · '):'';
+    // The meet clock belongs to TrainMeet.
     const clock=state?.context?.clock;
     if(clock&&/^\d\d:\d\d:\d\d$/.test(clock.time)){
       // Re-anchor only on a new reading, back-dated by its age; between readings the
@@ -182,14 +174,14 @@ export function createTrainMeetTimetable({selectSource}) {
       $('clock-label').innerHTML='<span class="tt-clock-prefix">träffklocka · </span>'+(clock.running?'går':'pausad')+' · '+esc(clock.rate)+'×';const rate=document.getElementById('panel-phone-rate');if(rate)rate.textContent=clock.rate+'×';}
     else{clockBase=null;clockKey='';clockShort='';$('clock-time').textContent='';$('clock-label').textContent='';}
     $('status').textContent=stale?'Kontakt saknas – senaste mottagna uppgifter.':'';$('status').hidden=!stale;
-    const nextIdentity=JSON.stringify([local,active?.id,c?.station.id,c?.day,c?.trains.map(t=>t.id)]);if(nextIdentity!==identity){identity=nextIdentity;details.close();anchoredKey=null;}
+    const nextIdentity=JSON.stringify([c?.station.id,c?.day,c?.trains.map(t=>t.id)]);if(nextIdentity!==identity){identity=nextIdentity;details.close();anchoredKey=null;}
     rows=[];
     if(c){
       const tracks=new Map(c.tracks.map(t=>[t.id,t])),points=new Map(c.operatingPoints.map(p=>[p.id,p.code])),movements=new Map(c.movements.map(m=>[m.id,m]));
       const trackName=id=>{const t=tracks.get(id);return t?[points.get(t.operatingPointId),t.label].filter(Boolean).join(' · '):'Okänt spår ('+id+')';},trackLabel=id=>tracks.get(id)?.label||'';
       rows=c.trains.map(t=>{
         const m=movements.get(t.id),changed=!!m?.track&&m.track!==t.track_id,planned=t.track_id?trackName(t.track_id):(t.track||'—');
-        return {id:t.id,number:t.train_number,slag:trainClass(t.train_type),station:local?t.station_name:[c.station.name,points.get(t.operating_point_id)].filter(Boolean).join(' · '),day:local?t.day_label:(t.days||c.day),arrival:t.arrival_time,departure:t.departure_time,sortTime:t.sort_time||'',from:t.arrival_from,to:t.departure_to,track:changed?trackName(m.track):planned,trackLabel:changed?trackLabel(m.track):(trackLabel(t.track_id)||t.track||''),planned,changed,noStop:t.no_stop,note:t.note,movement:m||null,state:local?'Planerad':[m?.arrival,m?.departure].filter(v=>v&&v!=='none').map(v=>({approaching:'Närmar sig',arrived:'Ankommet',positioned:'Uppställt',ready:'Redo',waiting:'Väntar',departed:'Avgått'})[v]??v).join(' · '),context:local?[t.station_name,t.day_label].filter(Boolean).join(' · '):points.get(t.operating_point_id)};
+        return {id:t.id,number:t.train_number,slag:trainClass(t.train_type),station:[c.station.name,points.get(t.operating_point_id)].filter(Boolean).join(' · '),day:t.days||c.day,arrival:t.arrival_time,departure:t.departure_time,sortTime:t.sort_time||'',from:t.arrival_from,to:t.departure_to,track:changed?trackName(m.track):planned,trackLabel:changed?trackLabel(m.track):(trackLabel(t.track_id)||t.track||''),planned,changed,noStop:t.no_stop,note:t.note,movement:m||null,state:[m?.arrival,m?.departure].filter(v=>v&&v!=='none').map(v=>({approaching:'Närmar sig',arrived:'Ankommet',positioned:'Uppställt',ready:'Redo',waiting:'Väntar',departed:'Avgått'})[v]??v).join(' · '),context:points.get(t.operating_point_id)};
       });
       // A train announced from a neighbour (its line requested or reserved towards us)
       // is noted with the meet time it was first seen here; TrainMeet sends no timestamp.

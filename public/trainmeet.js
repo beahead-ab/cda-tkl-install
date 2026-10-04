@@ -3,7 +3,7 @@ import {createAdminDialog,confirmAdmin,escapeHTML as esc} from './admin-ui.js';
 import {formatPairingCode} from './pairing-code.js';
 export function createTrainMeet({api,onTimetable,stationHint=()=>''}) {
   const root=document.getElementById('trainmeet'),$=id=>document.getElementById('tm-'+id);
-  const timetable=createTrainMeetTimetable({selectSource:data=>api('timetable-import/select',data)});
+  const timetable=createTrainMeetTimetable();
   let state,online=false,lastContent='',busy=false,editBaseline='',pairBaseline='',openedRevision;
   root.innerHTML=`<div class="card-heading"><h2>Anslutning</h2><span id="tm-status" role="status">Ej ansluten</span></div><p id="tm-message" class="muted"></p><dl class="admin-summary"><dt>TKL-id</dt><dd id="tm-identity"></dd><dt>Serveradress</dt><dd id="tm-origin"></dd><dt>Station</dt><dd id="tm-station-summary"></dd></dl><div class="admin-actions"><button id="tm-edit">Redigera anslutning</button><button id="tm-pair-open">Parkoppla</button><button id="tm-refresh">Hämta senaste</button><button id="tm-disconnect">Koppla från</button><button id="tm-show-timetable">Visa tidtabell</button></div><div id="tm-context"></div>`;
   const editForm=document.createElement('form');editForm.id='tm-server-form';
@@ -50,8 +50,8 @@ export function createTrainMeet({api,onTimetable,stationHint=()=>''}) {
   $('refresh').onclick=()=>action('refresh');
   $('disconnect').onclick=()=>confirmAdmin({title:'Koppla från TrainMeet?',message:'TKL slutar hämta träffens tidtabell och trafikläge. Du kan parkoppla igen senare.',button:'Koppla från',action:async()=>!!await action('disconnect')});
   $('show-timetable').onclick=onTimetable;
-  return {update(next,connected,imported,panel){
-    state=next;online=connected;if(!state)return;timetable.update(state,online,imported,panel);
+  return {update(next,connected,panel){
+    state=next;online=connected;if(!state)return;timetable.update(state,online,panel);
     const stale=!online||state.stale;
     $('status').textContent=!state.paired?'Ej ansluten':stale?'Kontakt saknas · gamla uppgifter':'Ansluten';
     document.getElementById('menu-trainmeet-status').textContent=!state.paired?'Ej ansluten':stale?'Kontakt saknas':'Ansluten';

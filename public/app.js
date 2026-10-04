@@ -30,6 +30,7 @@ import {createPanelEvents} from './panel-events.js';
 import {createPanelHead} from './panel-head.js';
 import {createPanelSplit} from './panel-split.js';
 import {openUpdateNotice} from './update-notice.js';
+import {createUpdatePage} from './update-page.js';
 import {labelClass,objectFromMessage} from './plan-objects.js';
 const $ = id => document.getElementById(id);
 const adminNavigation=createAdminNavigation();
@@ -57,7 +58,7 @@ const routeTargets=createRouteTargets({load:async(from,kind)=>{
   if(!response.ok)throw Error('Mål kunde inte kontrolleras.');
   return response.json();
 },onChange:()=>paint()});
-let currentPage='panel',appMenu,contextDialog,panelConsole,panelEvents,panelHead,timetableImport,signalControls,chosenKind=null,clearanceView,streamDeck,streamDeckAdmin;
+let currentPage='panel',appMenu,contextDialog,panelConsole,panelEvents,panelHead,timetableImport,signalControls,chosenKind=null,clearanceView,streamDeck,streamDeckAdmin,updatePage;
 const pageFromHash=()=>{
   if(location.hash==='#tools/zoom')history.replaceState(null,'','#tools/appearance');
   if(location.hash==='#tools')history.replaceState(null,'','#tools/appearance');
@@ -543,6 +544,7 @@ function renderPanel() {
   streamDeck?.update();
   if(state.streamDeck)streamDeckAdmin?.update(state.streamDeck);
   timetableImport?.update(state.timetableImport,online);
+  updatePage?.update(state.update,state.release);
   if(chosen && (!usable() || state.controls?.mode==='remote')) clearChoice(false);
   const c = $('connection'); setText(c,!online ? 'Kontakt med kärnan saknas' : state.storageFault ? 'Lagringsfel · spärrad' : state.connection === 'connected' ? (state.connectionInfo?.mode==='simulator'?'Simulator ansluten':'LocoNet ansluten') : (state.connectionInfo?.mode==='simulator'?'Simulator frånkopplad':'LocoNet frånkopplad'));
   c.className = 'connection ' + (usable() ? 'online' : 'offline');
@@ -690,7 +692,8 @@ async function start() {
   document.getElementById('plan-head-right')?.append($('panel-quick-actions'));
   createAdminAppearance();
   for(const id of ['appearance','journal','streamdeck'])registerAdminWorkspace('#tools/'+id,$(id+'-tools'));
-  for(const id of ['xml','migration','protocol'])registerAdminWorkspace('#advanced/'+id,$('advanced-'+id));
+  for(const id of ['xml','migration','protocol','update'])registerAdminWorkspace('#advanced/'+id,$('advanced-'+id));
+  updatePage=createUpdatePage({root:$('advanced-update-content'),api,message});
   document.addEventListener('click',e=>{
     const section=e.target.closest('[data-tools-section]');
     if(section){e.preventDefault();openTools(section.dataset.toolsSection);return;}

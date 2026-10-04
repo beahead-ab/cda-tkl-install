@@ -32,6 +32,7 @@ export const NAVIGATION_SECTIONS=[
     {hash:'#advanced/xml',label:'XML-granskning'},
     {hash:'#advanced/migration',label:'Införandestatus'},
     {hash:'#advanced/protocol',label:'Protokollinspelning'},
+    {hash:'#advanced/update',label:'Uppdatering',title:'Uppdatera TKL'},
     {external:'field-link',label:'Simulator ↗'}]}
 ];
 const within=(hash,base)=>hash===base||hash.startsWith(base+'/');

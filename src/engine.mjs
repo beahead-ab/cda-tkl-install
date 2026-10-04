@@ -58,7 +58,12 @@ export class Engine extends EventEmitter {
     this.operating.connection();
     this.invalidate();
     for (const r of this.routes) { r.state = r.cancelRequested ? 'cancelling' : 'held'; r.reason = connected ? 'Återansluten. Inväntar nya återrapporter.' : 'Anslutningen bruten; låsen ligger kvar.'; }
-    this.log(connected ? 'connected' : 'disconnected', connected ? 'LocoNet ansluten. Synkroniserar rapporter.' : 'LocoNet frånkopplad. Alla fälttillstånd är okända.');
+    // The link reports every failed reconnect attempt, about once a second; the journal
+    // only notes the change, so a long disconnection does not push out every other event.
+    const repeated = !connected && this.loggedConnection === false;
+    this.loggedConnection = connected;
+    if (!repeated) this.log(connected ? 'connected' : 'disconnected', connected ? 'LocoNet ansluten. Synkroniserar rapporter.' : 'LocoNet frånkopplad. Alla fälttillstånd är okända.');
+    else this.emit('change');
     if (connected) for (const name of Object.keys(this.signals)) this.permission(name, 'STOP');
     this.persist();
   }

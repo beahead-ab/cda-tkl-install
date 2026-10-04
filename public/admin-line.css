@@ -139,7 +139,7 @@ body:not([data-page=panel]) #global-status{top:14px}
 #admin-sidebar .shared-menu{display:flex;flex-direction:column;min-height:100%;width:100%;padding:0;background:transparent;border:0;box-shadow:none}
 #admin-sidebar .admin-nav-footer{margin-top:auto;padding-top:22px;border-top:1px solid var(--border)}
 #admin-sidebar .admin-nav-footer button{display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;min-height:36px;background:transparent;border:0;text-align:left;color:var(--muted);font-size:12px}
-#admin-sidebar #menu-trainmeet-status{display:none}
+#admin-sidebar #menu-trainmeet-status:not(:empty)::before{content:"· "}
 #admin-sidebar .fullscreen-contract{display:none}
 #admin-sidebar #toggle-fullscreen[aria-pressed=true] .fullscreen-contract{display:block}
 #admin-sidebar #toggle-fullscreen[aria-pressed=true] .fullscreen-expand{display:none}
@@ -254,3 +254,8 @@ body[data-admin-nav-open] #admin-shell .admin-shell-drawer-shade{display:block;p
 .admin-tab-row{gap:0 16px}
 #admin-shell-close{top:8px;right:8px}
 }
+/* Inställningar: three groups in the rail, as in TrainMeet Server. */
+#admin-shell .admin-nav-heading{display:block;margin:14px 12px 4px;font:600 10.5px/1.4 "IBM Plex Sans",system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#7d8791}
+#admin-shell .admin-nav-heading:first-child{margin-top:2px}
+#admin-shell .admin-nav-status{margin-left:6px;font-size:11px;color:#7d8791}
+#admin-shell .admin-nav-status:empty{display:none}

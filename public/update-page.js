@@ -1,4 +1,4 @@
-// Avancerat → Uppdatering: the installed version, the latest one and, on a Mac or
+// Inställningar → Uppdatering: the installed version, the latest one and, on a Mac or
 // PC, the one line to run, always at hand with a copy button. A Raspberry Pi
 // starts the update itself; the web deployment is updated by publishing.
 import {UPDATE_LINES,openUpdateNotice} from './update-notice.js';

@@ -11,7 +11,7 @@
   <button id="admin-nav-toggle" type="button" aria-label="Öppna sidomenyn" aria-controls="admin-sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="4" cy="10" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="16" cy="10" r="1.5"/></svg></button>
   <a class="brand" href="#panel"><span>CHARLOTTENDAL</span></a>
 </header>
-<nav id="admin-sidebar" aria-label="Administration"></nav>
+<nav id="admin-sidebar" aria-label="Inställningar"></nav>
 <div id="connection" class="connection" hidden>Startar…</div>
 
 <div id="global-status" role="region" aria-label="Driftmeddelanden">
@@ -82,19 +82,11 @@
 <main id="import-view" hidden><div class="tools-heading"><h1 tabindex="-1">Tidtabeller</h1><span class="admin-scope">Hela anläggningen</span><a class="back-to-panel" href="#panel">Tillbaka till ställverket →</a></div><section id="timetable-settings" class="card"></section><div id="timetable-import"></div></main>
 <main id="admin-view" hidden><p class="muted">Läser det kompletta källregistret…</p></main>
 <main id="advanced-view" hidden>
-  <div class="tools-heading"><h1 tabindex="-1">Avancerat</h1><a class="back-to-panel" href="#panel">Tillbaka till ställverket →</a></div>
-  <p class="muted">Verktyg för källgranskning, införande och felsökning.</p>
-  <div class="admin-overview-grid">
-    <section class="card"><h2>XML-granskning</h2><p>Granska importen och källavsnitten eller hämta originalfilen.</p><a href="#advanced/xml">Öppna XML-granskning →</a></section>
-    <section class="card"><h2>Införandestatus</h2><p>Se vilka källregler som är provade, ersatta eller återstår att införa.</p><a href="#advanced/migration">Öppna införandestatus →</a></section>
-    <section class="card"><h2>Protokollinspelning</h2><p>Granska LocoNet-trafik, spela in och hämta sparade loggar.</p><a href="#advanced/protocol">Öppna protokollinspelning →</a></section>
-    <section class="card"><h2>Uppdatering</h2><p>Se vilken version som körs och kopiera raden som uppdaterar TKL.</p><a href="#advanced/update">Öppna uppdatering →</a></section>
-  </div>
   <section id="advanced-update" hidden><div class="admin-workspace-heading"><h1 tabindex="-1">Uppdatera TKL</h1></div><div id="advanced-update-content"></div></section>
   <section id="advanced-xml" hidden><div class="admin-workspace-heading"><h1 tabindex="-1">XML-granskning</h1></div><div id="advanced-xml-content"><p class="muted">Läser källunderlaget…</p></div></section>
   <section id="advanced-migration" hidden><div class="admin-workspace-heading"><h1 tabindex="-1">Införandestatus</h1></div><div id="advanced-migration-content"><p class="muted">Läser införandestatus…</p></div></section>
-  <section id="advanced-protocol" hidden><div class="admin-workspace-heading"><h1 tabindex="-1">Protokollinspelning</h1></div><section class="card"><div id="recording-tools"></div></section><details class="card"><summary>Visa protokolltrafik</summary><pre id="wire"></pre></details></section>
+  <section id="advanced-protocol" hidden><div class="admin-workspace-heading"><h1 tabindex="-1">Banan (LocoNet)</h1></div><section class="card"><div id="recording-tools"></div></section><details class="card"><summary>Visa protokolltrafik</summary><pre id="wire"></pre></details></section>
 </main>
 <dialog id="inspector-host" class="inspector-host" aria-labelledby="inspector-heading"></dialog>
-<footer>Charlottendal TKL · version 0.54.0</footer>
+<footer>Charlottendal TKL · version 0.55.0</footer>
 </body></html>

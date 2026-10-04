@@ -1,7 +1,8 @@
-// One administration window; the panel ellipsis opens the full workspace directly.
-// The rail holds six entries. Sub-pages are a tab row above the page, the footer
-// stays fixed while only the list scrolls, and phones get the rail as a drawer.
-import {NAVIGATION_SECTIONS,resolveNavigation} from './admin-navigation-model.js';
+// One Inställningar window; the panel ellipsis opens it directly. The rail holds
+// seven entries in three groups, as in TrainMeet Server. Sub-pages are a tab row
+// above the page, the footer stays fixed while only the list scrolls, and phones
+// get the rail as a drawer.
+import {NAVIGATION_GROUPS,NAVIGATION_SECTIONS,REDIRECTS,resolveNavigation} from './admin-navigation-model.js';
 export function createAdminNavigation({account=false}={}) {
   const sidebar=document.getElementById('admin-sidebar'),button=document.getElementById('admin-nav-toggle'),panelButton=document.getElementById('menu-toggle');
   const prefix=account?'/':'';
@@ -13,11 +14,17 @@ export function createAdminNavigation({account=false}={}) {
   popup.innerHTML=`<div class="admin-nav-items"></div><div class="admin-nav-footer"><button id="toggle-fullscreen" type="button" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path class="fullscreen-expand" d="M7 3H3v4m10-4h4v4M3 13v4h4m10-4v4h-4"/><path class="fullscreen-contract" d="M3 7h4V3m6 0v4h4M7 17v-4H3m10 4v-4h4"/></svg><span>Fullskärm</span></button>${account?fieldLink:''}<a id="account-link" href="/account" hidden>Byt lösenord</a><div id="admin-nav-status"></div><span id="panel-connection" hidden></span></div>`;
   sidebar.replaceChildren(popup);
   const items=popup.querySelector('.admin-nav-items');
+  let heading='';
   for(const section of NAVIGATION_SECTIONS){
+    if(section.group!==heading){heading=section.group;const label=document.createElement('span');label.className='admin-nav-heading';label.textContent=NAVIGATION_GROUPS.find(g=>g.key===heading)?.label||'';items.append(label);}
     const group=document.createElement('div');group.className='admin-nav-group';group.dataset.section=section.hash;
     const link=document.createElement('a');link.href=prefix+section.hash;link.textContent=section.label;link.id=section.id;link.dataset.navHash=section.hash;
+    if(section.status){const status=document.createElement('span');status.id=section.status;status.className='admin-nav-status';link.append(status);}
     group.append(link);items.append(group);
   }
+  // Pages that only led on to others open their first real page.
+  const redirect=()=>{const to=REDIRECTS[location.hash.split('?')[0]];if(to)history.replaceState(null,'',prefix+to);};
+  if(!account){redirect();window.addEventListener('hashchange',redirect,true);}
   // Tab rows are mounted once for every section, so status spans keep their text between page changes.
   const tabs=document.createElement('nav');tabs.className='admin-tabs';tabs.setAttribute('aria-label','Undersidor');tabs.hidden=true;
   const rows=new Map();
@@ -34,7 +41,7 @@ export function createAdminNavigation({account=false}={}) {
     rows.set(section.hash,row);tabs.append(row);
   }
   const connection=document.getElementById('connection');if(connection){connection.hidden=false;popup.querySelector('#admin-nav-status').append(connection);}
-  const shell=document.createElement('section');shell.id='admin-shell';shell.hidden=true;shell.setAttribute('role','dialog');shell.setAttribute('aria-modal','true');shell.setAttribute('aria-label','Administration');
+  const shell=document.createElement('section');shell.id='admin-shell';shell.hidden=true;shell.setAttribute('role','dialog');shell.setAttribute('aria-modal','true');shell.setAttribute('aria-label','Inställningar');
   const bar=document.createElement('div');bar.className='admin-shell-bar';
   if(button){button.hidden=false;button.setAttribute('aria-expanded','false');bar.append(button);}
   const barTitle=document.createElement('span');barTitle.className='admin-shell-bar-title';barTitle.textContent='CHARLOTTENDAL';bar.append(barTitle);
@@ -43,7 +50,7 @@ export function createAdminNavigation({account=false}={}) {
   const drawerShade=document.createElement('div');drawerShade.className='admin-shell-drawer-shade';
   const content=document.createElement('div');content.id='admin-shell-content';content.append(tabs);
   for(const node of document.querySelectorAll('body>main:not(#panel-view),body>footer'))content.append(node);
-  const exit=document.createElement('a');exit.id='admin-shell-close';exit.href=prefix+'#panel';exit.setAttribute('aria-label','Stäng administration');exit.innerHTML='<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg>';
+  const exit=document.createElement('a');exit.id='admin-shell-close';exit.href=prefix+'#panel';exit.setAttribute('aria-label','Stäng inställningar');exit.innerHTML='<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg>';
   shell.append(bar,rail,drawerShade,content,exit);document.body.append(shell);document.body.classList.add('admin-shell-app');
   const shade=document.createElement('div');shade.id='admin-shell-shade';shade.hidden=true;document.body.append(shade);
   const panel=document.getElementById('panel-view');let lastAdmin='#trainmeet',wasOpen=false;
@@ -60,7 +67,7 @@ export function createAdminNavigation({account=false}={}) {
   phone?.addEventListener?.('change',()=>{if(!phone.matches&&drawerOpen)setDrawer(false);});
   function close(){return false;} // Legacy calls only closed the old small menu.
   function open(){location.hash=lastAdmin;}
-  if(panelButton){panelButton.setAttribute('aria-controls','admin-shell');panelButton.setAttribute('aria-haspopup','dialog');panelButton.setAttribute('aria-label','Öppna administration');panelButton.onclick=open;}
+  if(panelButton){panelButton.setAttribute('aria-controls','admin-shell');panelButton.setAttribute('aria-haspopup','dialog');panelButton.setAttribute('aria-label','Öppna inställningar');panelButton.onclick=open;}
   document.addEventListener('keydown',e=>{
     if(shell.hidden||document.querySelector('dialog[open]'))return;
     if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();if(drawerOpen&&phone?.matches){setDrawer(false);button?.focus({preventScroll:true});return;}exit.click();return;}

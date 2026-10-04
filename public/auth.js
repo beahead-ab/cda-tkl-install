@@ -6,7 +6,7 @@ async function mountAccountNavigation(){
   const {createAdminNavigation}=await import('./admin-navigation.js');
   document.body.dataset.page='account';document.body.dataset.skin='original';
   const header=document.createElement('header');header.className='app-header';header.innerHTML='<button id="admin-nav-toggle" type="button" aria-label="Öppna sidomenyn" aria-controls="admin-sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="4" cy="10" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="16" cy="10" r="1.5"/></svg></button><a class="brand" href="/#panel"><span>CHARLOTTENDAL</span></a>';
-  const sidebar=document.createElement('nav');sidebar.id='admin-sidebar';sidebar.setAttribute('aria-label','Administration');document.body.prepend(header,sidebar);createAdminNavigation({account:true});
+  const sidebar=document.createElement('nav');sidebar.id='admin-sidebar';sidebar.setAttribute('aria-label','Inställningar');document.body.prepend(header,sidebar);createAdminNavigation({account:true});
   const {createFullscreen}=await import('./fullscreen.js');createFullscreen({button:document.getElementById('toggle-fullscreen'),onError:text=>showError(Error(text))});
   fetch('/api/config').then(r=>r.ok?r.json():null).then(config=>{if(config?.fieldUrl){const link=document.getElementById('field-link');link.href=config.fieldUrl;link.hidden=false;}}).catch(()=>{});
 }

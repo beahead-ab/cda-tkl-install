@@ -23,7 +23,8 @@ export function createPanelHead({shell,onUpdate}){
   return {
     // The core's message for a while; errors read as alarms.
     message(text,error,duration){clearTimeout(timer);message=text?{text,tone:error?'alarm':'ok'}:null;if(text&&duration)timer=setTimeout(()=>{message=null;draw();},duration);draw();},
-    // The standing notice when no message is shown: no contact, a route waiting, remote mode.
+    // The standing notice when no message is shown: no contact, AIS or an emergency cancel,
+    // a route waiting, remote mode. The panel shows no toasts; this is where they read.
     notice(next){notice=next||null;draw();},
     // A newer release in the public install repository than this installed copy runs.
     updateNotice(view){updateView=view||null;const show=!!view?.available;updateChip.hidden=!show;if(show){updateChip.querySelector('span').textContent='Uppdatering '+view.latest;const text='Charlottendal TKL '+view.latest+' finns att installera. Den här datorn kör '+view.current+'.';updateChip.title=text;updateChip.setAttribute('aria-label',text);}},

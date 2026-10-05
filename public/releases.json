@@ -1,5 +1,12 @@
 [
   {
+    "version": "0.59.2",
+    "date": "2026-10-05",
+    "notes": [
+      "Inga rutor över ställverket: AIS och nödåtertagning visas i statusfältet"
+    ]
+  },
+  {
     "version": "0.59.1",
     "date": "2026-10-05",
     "notes": [

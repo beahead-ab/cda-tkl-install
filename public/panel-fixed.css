@@ -6,6 +6,8 @@ body.panel-app #panel-view{position:fixed;inset:0;margin:0;overflow:hidden}
 #global-status{position:fixed;z-index:80;top:max(10px,env(safe-area-inset-top));right:14px;width:min(560px,calc(100vw - 64px));max-height:calc(100dvh - 34px);display:flex;flex-direction:column;gap:8px;overflow:auto;overscroll-behavior:contain;pointer-events:none}
 body:not([data-page=panel]) #global-status{top:88px;max-height:calc(100dvh - 112px)}
 #global-status:not(:has(>div:not([hidden]))){display:none}
+/* The panel has no toasts: AIS, emergency cancel, remote mode and messages read in the status bar above the plan. */
+body[data-page=panel] #global-status{display:none}
 #global-status>div:not([hidden]){flex:none;margin:0;padding:12px 14px;border:1px solid #494947;border-radius:8px;background:#242423;color:#efefea;font-size:12px;line-height:1.55;box-shadow:0 5px 22px #0006;pointer-events:auto;animation:toast-appear 180ms ease-out;transition:opacity 180ms ease-out,transform 180ms ease-in}
 #global-status #ais-status{background:#362323;border-color:#845455;color:#ffc1b4}
 #global-status #message{background:#242423;border-color:#51514b;color:#efefea;border-left:3px solid #a5b6a1}

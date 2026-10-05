@@ -240,8 +240,13 @@ document.addEventListener('pointerdown',()=>{if(hiliteNode)style(hiliteNode,'dis
 const HEAD_WAIT=new Set(['setting','establishing','clearing','held','cancelling']);
 // The standing notice beside CHARLOTTENDAL: lost contact first, then a route that waits or is
 // held, then remote mode. A message from the core is shown over it for a while.
+// The status bar is the panel's only standing message (no toasts over the plan): contact,
+// then all signals at stop and an emergency cancel, then a route waiting, then remote mode.
 function headNotice(){
   if(!online||state?.connection!=='connected')return {text:'Ingen kontakt med anläggningen',tone:'alarm'};
+  const emergency=state?.controls?.emergency,remaining=state?.emergencyRemaining?.length||0;
+  if(emergency&&remaining)return {text:`Nödåtertagning pågår · ${remaining} av ${emergency.routeIds.length} tågvägslås kvar`,tone:'alarm'};
+  if(state?.controls?.stopAll)return {text:'AIS aktiv · alla körmedgivanden återkallade'+(emergency?' · nödåtertagning klar, återställ stopp när anläggningen är kontrollerad':''),tone:'alarm'};
   const waiting=(state?.routes||[]).find(r=>HEAD_WAIT.has(r.state));
   if(waiting)return {text:displayName('routes',waiting.definitionId,waiting.label)+' · '+(statuses[waiting.state]||waiting.state)+(waiting.reason?' · '+waiting.reason:''),tone:waiting.state==='held'?'alarm':'warn'};
   if(state?.controls?.mode==='remote')return {text:'Fjärrläge · lokal manövrering spärrad',tone:'warn'};

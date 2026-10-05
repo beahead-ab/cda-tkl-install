@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+# Updates the web deployment (cda-tkl.trainmeet.app) from the public install repository,
+# the same source as a Raspberry Pi, Mac or PC. Started by the panel through
+# charlottendal-update.service, or by hand: sudo charlottendal-update.
+#
+# The same steps as deploy/publish-release.sh, run on the server itself: a new release
+# directory with its dependencies, a backup of the operating data, the switch of
+# `current`, a restart of TKL and a check. If TKL does not come back, `current` is put
+# back and TKL restarted on the previous release. The simulator is never touched.
+# Each step is written to update.json in the state directory, which the panel reads.
+# The CHARLOTTENDAL_* paths below are only overridden by test/web-updater.test.mjs.
+set -euo pipefail
+[ "$(id -u)" -eq 0 ] || { echo "Kör med sudo: sudo charlottendal-update"; exit 1; }
+SOURCE="${CHARLOTTENDAL_UPDATE_SOURCE:-https://github.com/beahead-ab/cda-tkl-install.git}"
+BASE="${CHARLOTTENDAL_BASE:-/opt/charlottendal}"
+STATE="${CHARLOTTENDAL_STATE:-/var/lib/charlottendal-tkl}"
+BACKUPS="${CHARLOTTENDAL_BACKUPS:-/root/charlottendal-backups}"
+STATUS="$STATE/update.json"
+NODE="${CHARLOTTENDAL_NODE:-/usr/local/bin/node}"
+NPM="${CHARLOTTENDAL_NPM:-/usr/local/bin/npm}"
+exec 9>"${CHARLOTTENDAL_LOCK:-/run/charlottendal-update.lock}"
+flock -n 9 || { echo "En uppdatering pågår redan."; exit 1; }
+
+status() { # phase, message
+  local tmp="$STATUS.tmp"
+  printf '{"phase":"%s","message":"%s","at":"%s","from":"%s","to":"%s"}\n' \
+    "$1" "${2//\"/\'}" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${FROM:-}" "${TO:-}" > "$tmp"
+  chown --reference="$STATE" "$tmp" 2>/dev/null || true; chmod 0640 "$tmp"; mv -f "$tmp" "$STATUS"
+  echo "== $2"
+}
+fail() { status failed "$1"; exit 1; }
+
+OLD_DIR=$(readlink -f "$BASE/current")
+FROM=$("$NODE" -p "require('$OLD_DIR/package.json').version")
+WORK=$(mktemp -d); trap 'rm -rf "$WORK"' EXIT
+
+status fetching "Hämtar senaste versionen från cda-tkl-install."
+mkdir -p "$WORK/install"
+if command -v git >/dev/null; then
+  git clone -q --depth 1 "$SOURCE" "$WORK/clone" || fail "cda-tkl-install kunde inte hämtas."
+  COMMIT=$(git -C "$WORK/clone" rev-parse --short HEAD)
+  (cd "$WORK/clone" && git archive HEAD) | tar -x -C "$WORK/install"
+else
+  curl -fsSL "${SOURCE%.git}/archive/refs/heads/main.tar.gz" | tar -xz --strip-components=1 -C "$WORK/install" \
+    || fail "cda-tkl-install kunde inte hämtas."
+  COMMIT=$(date -u +%Y%m%d%H%M)
+fi
+TO=$("$NODE" -p "require('$WORK/install/package.json').version")
+ID="v$TO-$COMMIT"
+if [ "$OLD_DIR" = "$BASE/releases/$ID" ]; then status done "Version $TO kör redan."; exit 0; fi
+
+status installing "Installerar $TO med beroenden."
+NEW="$BASE/releases/$ID"; rm -rf "$NEW"; mkdir -p "$NEW"
+cp -a "$WORK/install/." "$NEW/"
+(cd "$NEW" && "$NPM" ci --omit=dev --ignore-scripts --no-audit --no-fund --loglevel=error) || fail "Beroendena för $TO kunde inte installeras. Inget är ändrat."
+for file in "$NEW"/src/*.mjs; do "$NODE" --check "$file" || fail "$TO har ett fel i $(basename "$file"). Inget är ändrat."; done
+chown -R --reference="$OLD_DIR" "$NEW"
+
+status backup "Säkerhetskopierar driftdata."
+BK="$BACKUPS/update-$ID-$(date -u +%Y%m%dT%H%M%SZ)"; mkdir -p "$BK"
+readlink "$BASE/current" > "$BK/current.txt"
+tar -czf "$BK/state.tgz" -C / ${CHARLOTTENDAL_BACKUP_PATHS:-var/lib/charlottendal-tkl var/lib/charlottendal-auth etc/charlottendal-tkl} 2>/dev/null || fail "Säkerhetskopian kunde inte tas. Inget är ändrat."
+
+rollback() {
+  ln -sfn "$OLD_DIR" "$BASE/current.restore" && mv -Tf "$BASE/current.restore" "$BASE/current"
+  systemctl restart charlottendal-tkl || true
+  fail "$TO startade inte. $FROM är återställd; säkerhetskopia i $BK."
+}
+status restarting "Byter till $TO och startar om TKL."
+ln -sfn "$NEW" "$BASE/current.new" && mv -Tf "$BASE/current.new" "$BASE/current"
+systemctl restart charlottendal-tkl || rollback
+for _ in $(seq 1 20); do
+  sleep 1
+  code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8910/index.html || true)
+  case "$code" in 2??|3??|401|403) break;; esac
+done
+systemctl is-active --quiet charlottendal-tkl || rollback
+case "$code" in 2??|3??|401|403) ;; *) rollback;; esac
+
+# Keep the five newest releases besides the running one and the one before it.
+{ ls -1dt "$BASE"/releases/* 2>/dev/null | grep -v -e "^$NEW\$" -e "^$OLD_DIR\$" | tail -n +6 | xargs -r rm -rf; } || true
+status done "Version $TO är installerad. Föregående version: $FROM."

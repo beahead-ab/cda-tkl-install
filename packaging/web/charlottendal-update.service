@@ -1,0 +1,9 @@
+[Unit]
+Description=Update Charlottendal TKL (web deployment) from cda-tkl-install
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/charlottendal-update
+Nice=10

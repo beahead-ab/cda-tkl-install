@@ -19,7 +19,7 @@ import { PanelIndications } from './panel-indications.mjs';
 import { TrainMeet } from './trainmeet.mjs';
 import { ModelClock } from './model-clock.mjs';
 import { describeProtocol, TelegramRecorder } from './telegram-recorder.mjs';
-import { UpdateCheck } from './update-check.mjs';
+import { UpdateCheck, UPDATE_UNITS } from './update-check.mjs';
 import { spawn } from 'node:child_process';
 
 const baseProfile=loadProfile();
@@ -84,7 +84,10 @@ const streamDeckLayouts=new StreamDeckLayouts(storage,{pluppIds:()=>Object.keys(
 // version it was loaded from and offers a reload after a release.
 const release=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8')).version;
 // Installed copies look for a newer release in the public install repository.
-const updateCheck=process.env.CHARLOTTENDAL_INSTALL_KIND?new UpdateCheck({current:release,kind:process.env.CHARLOTTENDAL_INSTALL_KIND}):null;
+// The web deployment sets no install kind; its own updater (installed by publish-release)
+// makes it one, so Inställningar → Uppdatering can update it from cda-tkl-install.
+const installKind=process.env.CHARLOTTENDAL_INSTALL_KIND||(fs.existsSync('/usr/local/sbin/charlottendal-update')?'web':'');
+const updateCheck=installKind?new UpdateCheck({current:release,kind:installKind,statusFile:path.join(storage.directory,'update.json'),readFile:file=>fs.readFileSync(file,'utf8')}):null;
 updateCheck?.start();
 const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot() };};
 const server = http.createServer(async (req, res) => {
@@ -138,9 +141,10 @@ const server = http.createServer(async (req, res) => {
     // offers a reload. Elsewhere the update is started from Terminal or PowerShell.
     if(url.pathname==='/api/update/start'){
       if(!updateCheck?.view().canStart)return json(res,{error:'Uppdateringen startas från Terminal eller PowerShell på den här datorn.'},409);
-      const run=spawn('systemctl',['start','--no-block','cda-tkl-update.service'],{stdio:'ignore'});
+      const unit=UPDATE_UNITS[updateCheck.kind];
+      const run=spawn('systemctl',['start','--no-block',unit],{stdio:'ignore'});
       const code=await new Promise(r=>{run.on('error',()=>r(-1));run.on('exit',r);});
-      if(code!==0)return json(res,{error:'Uppdateringen kunde inte startas (systemctl '+code+'). Kör sudo cda-tkl-update på Pi:n.'},409);
+      if(code!==0)return json(res,{error:'Uppdateringen kunde inte startas (systemctl '+code+'). Kör sudo '+unit.replace('.service','')+' på '+(updateCheck.kind==='web'?'servern':'Pi:n')+'.'},409);
       engine.log('update','Uppdatering till '+(updateCheck.view().latest||'senaste versionen')+' startad. TKL startar om när den är installerad.');dirty=true;
       return json(res,{started:true});
     }

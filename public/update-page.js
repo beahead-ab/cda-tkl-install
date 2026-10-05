@@ -3,7 +3,7 @@
 // starts the update itself; the web deployment is updated by publishing.
 import {UPDATE_LINES,openUpdateNotice} from './update-notice.js';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const KIND_TEXT={'raspberry-pi':'Raspberry Pi',mac:'Mac',windows:'Windows'};
+const KIND_TEXT={'raspberry-pi':'Raspberry Pi',mac:'Mac',windows:'Windows',web:'webbdriften'};
 export function createUpdatePage({root,api,message}){
   if(!root)return null;
   let last='',view=null;
@@ -37,10 +37,14 @@ export function createUpdatePage({root,api,message}){
       const state=update.available?[pill('warn','Ny version finns'),`${update.latest} kan installeras. Inget ändras förrän du uppdaterar.`]
         :update.latest?[pill('ok','Senaste versionen'),'Inget att göra.']
         :[pill('off','Okänt'),update.error||'Senaste versionen har inte kunnat läsas än. Uppdateringen fungerar ändå.'];
+      const who=update.kind==='web'?'Servern':'Pi:n';
       const how=update.canStart
-        ?(update.available?'<div class="settings-actions"><button type="button" class="primary" data-start-update>Uppdatera nu</button><p>Pi:n hämtar, installerar och startar om TKL själv. Panelen är borta en kort stund.</p></div>':'<p class="muted">Pi:n uppdaterar sig själv härifrån när en ny version finns.</p>')
+        ?(update.available?`<div class="settings-actions"><button type="button" class="primary" data-start-update>Uppdatera nu</button><p>${who} hämtar från cda-tkl-install, tar en säkerhetskopia, installerar och startar om TKL själv. Panelen är borta en kort stund${update.kind==='web'?' för alla som är inne':''}.</p></div>`:`<p class="muted">${who} uppdaterar sig själv härifrån när en ny version finns.</p>`)
         :line(update.kind);
-      html=`<section class="card"><h2>Den här installationen</h2>${rows([['Status',state[0],state[1]],['Installerad',esc(update.current),'Den här datorn: '+where+'.'],['Senaste',esc(update.latest||'–'),'Läses från installationsförrådet på GitHub.']])}${how}</section>`
+      // How the last update on the server went: the updater writes each step.
+      const run=update.run,RUN={fetching:['warn','Hämtar'],installing:['warn','Installerar'],backup:['warn','Säkerhetskopierar'],restarting:['warn','Startar om'],done:['ok','Klar'],failed:['off','Misslyckades']}[run?.phase];
+      const runRow=RUN?[['Senaste uppdatering',pill(RUN[0],RUN[1]),run.message+(run.at?' '+run.at.replace('T',' ').slice(0,16)+' UTC.':'')]]:[];
+      html=`<section class="card"><h2>Den här installationen</h2>${rows([['Status',state[0],state[1]],['Installerad',esc(update.current),update.kind==='web'?'Webbdriften på cda-tkl.trainmeet.app.':'Den här datorn: '+where+'.'],['Senaste',esc(update.latest||'–'),'Läses från installationsförrådet på GitHub.'],...runRow])}${how}</section>`
         +`<details class="card"><summary>Raden för andra datorer</summary>${['mac','windows'].filter(k=>k!==update.kind).map(line).join('')}<p>Raspberry Pi: <code>curl -fsSL https://raw.githubusercontent.com/beahead-ab/cda-tkl-install/main/install.sh | sudo sh</code></p></details>`
         +'<p class="settings-footnote">Inställningar och driftdata ligger kvar vid uppdateringen, och om den nya versionen inte startar återställs den gamla. Raden går att köra även när ingen ny version visas; då installeras samma version igen.</p>';
     }

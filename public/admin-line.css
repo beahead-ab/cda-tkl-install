@@ -289,3 +289,11 @@ body[data-admin-nav-open] #admin-shell .admin-shell-drawer-shade{display:block;p
 .settings-rows #recording-status{color:var(--text)}
 #journal-tools .settings-scope{margin:6px 0 18px}
 @media(max-width:700px){.settings-rows dd:not(.settings-consequence){border:0}}
+/* Uppdatering → Vad är nytt: a release per block, its headings below. */
+.releases .release{padding:12px 0;border-top:1px solid #292928}
+.releases .release:first-of-type{border-top:0}
+.release-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}
+.release-version{font-family:ui-monospace,Menlo,monospace;color:var(--text)}
+.releases ul{margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.55;color:var(--muted)}
+.releases [data-more-releases]{margin-top:10px}
+.releases>.settings-scope{margin:4px 0 8px}

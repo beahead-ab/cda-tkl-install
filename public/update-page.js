@@ -16,8 +16,19 @@ export function createUpdatePage({root,api,message}){
   // Label · value · consequence, as in the other sections of Inställningar.
   const rows=list=>`<dl class="settings-rows">${list.map(([label,value,note])=>`<div><dt>${esc(label)}</dt><dd>${value}</dd><dd class="settings-consequence">${esc(note)}</dd></div>`).join('')}</dl>`;
   const pill=(mode,text)=>`<span class="settings-state" data-state="${mode}">${esc(text)}</span>`;
-  return {update(update,release){
-    view=update;
+  // Vad är nytt: each release's headings, from public/releases.json, which every
+  // release adds to; a newer release's headings come from the update check.
+  let notes=null,args=null,expanded=false;
+  fetch('/releases.json',{cache:'no-cache'}).then(r=>r.ok?r.json():[]).catch(()=>[]).then(list=>{notes=Array.isArray(list)?list:[];if(args)page.update(...args);});
+  root.addEventListener('click',e=>{if(e.target.closest('[data-more-releases]')){expanded=!expanded;page.update(...args);}});
+  const block=(entry,tag)=>`<article class="release"><div class="release-head"><span class="release-version">${esc(entry.version)}</span>${tag?`<span class="settings-state" data-state="${tag==='Kommer med uppdateringen'?'warn':'ok'}">${esc(tag)}</span>`:''}<span class="muted">${esc(entry.date||'')}</span></div><ul>${(entry.notes||[]).map(n=>`<li>${esc(n)}</li>`).join('')}</ul></article>`;
+  const whatsNew=(current,coming)=>{
+    const installed=notes||[];if(!installed.length&&!coming.length)return '';
+    const shown=expanded?installed:installed.slice(0,10);
+    return `<section class="card releases"><h2>Vad är nytt</h2><p class="settings-scope">Vad varje version gjorde · på rubriknivå</p>${coming.map(e=>block(e,'Kommer med uppdateringen')).join('')}${shown.map(e=>block(e,e.version===current?'Installerad':'')).join('')}${installed.length>10?`<button type="button" data-more-releases>${expanded?'Visa färre':`Visa äldre versioner (${installed.length-10})`}</button>`:''}</section>`;
+  };
+  const page={update(update,release){
+    args=[update,release];view=update;
     let html;
     if(!update){
       html=`<section class="card"><h2>Webbdriften</h2>${rows([['Installerad',esc(release||'okänd'),'Den här TKL är webbdriften.'],['Uppdateras','genom publicering','Från utvecklingsdatorn, inte härifrån.']])}</section>`;
@@ -33,6 +44,8 @@ export function createUpdatePage({root,api,message}){
         +`<details class="card"><summary>Raden för andra datorer</summary>${['mac','windows'].filter(k=>k!==update.kind).map(line).join('')}<p>Raspberry Pi: <code>curl -fsSL https://raw.githubusercontent.com/beahead-ab/cda-tkl-install/main/install.sh | sudo sh</code></p></details>`
         +'<p class="settings-footnote">Inställningar och driftdata ligger kvar vid uppdateringen, och om den nya versionen inte startar återställs den gamla. Raden går att köra även när ingen ny version visas; då installeras samma version igen.</p>';
     }
+    html+=whatsNew(update?.current||release,update?.available?(update.newReleases||[]):[]);
     if(html!==last){last=html;root.innerHTML=html;}
   }};
+  return page;
 }

@@ -1,0 +1,247 @@
+[
+  {
+    "version": "0.58.0",
+    "date": "2026-10-05",
+    "notes": [
+      "Vad är nytt: rubriker för varje version under Inställningar → Uppdatering"
+    ]
+  },
+  {
+    "version": "0.57.1",
+    "date": "2026-10-04",
+    "notes": [
+      "LocoNet frånkopplad skrivs en gång i journalen, inte varje sekund"
+    ]
+  },
+  {
+    "version": "0.57.0",
+    "date": "2026-10-04",
+    "notes": [
+      "Inställningar förklarar sig: räckvidd, konsekvens per rad och status som text"
+    ]
+  },
+  {
+    "version": "0.56.0",
+    "date": "2026-10-04",
+    "notes": [
+      "Den lokala tidtabellen är borttagen; TrainMeet är enda källan"
+    ]
+  },
+  {
+    "version": "0.55.0",
+    "date": "2026-10-04",
+    "notes": [
+      "Adminfönstret heter Inställningar, i tre grupper"
+    ]
+  },
+  {
+    "version": "0.54.0",
+    "date": "2026-10-04",
+    "notes": [
+      "Drift som flik i nederraden; övre högra hörnet är tomt"
+    ]
+  },
+  {
+    "version": "0.53.1",
+    "date": "2026-10-04",
+    "notes": [
+      "Uppdateringsraden att kopiera under Uppdatering"
+    ]
+  },
+  {
+    "version": "0.53.0",
+    "date": "2026-10-04",
+    "notes": [
+      "Sträckrutan visar vem som svarar i andra änden, och Flytta hit"
+    ]
+  },
+  {
+    "version": "0.52.0",
+    "date": "2026-10-03",
+    "notes": [
+      "En parkopplad station är i tjänst utan trafikpass"
+    ]
+  },
+  {
+    "version": "0.51.2",
+    "date": "2026-10-03",
+    "notes": [
+      "En upprepad tågvägsbegäran tar inte längre tillbaka tågvägen"
+    ]
+  },
+  {
+    "version": "0.51.1",
+    "date": "2026-10-03",
+    "notes": [
+      "Sidfoten visar versionen som körs"
+    ]
+  },
+  {
+    "version": "0.51.0",
+    "date": "2026-10-03",
+    "notes": [
+      "Stream Deck-layout per deck, med en ny redigerare"
+    ]
+  },
+  {
+    "version": "0.50.1",
+    "date": "2026-10-03",
+    "notes": [
+      "Mac-installationen sparar driftdata i state och överlever uppdateringar"
+    ]
+  },
+  {
+    "version": "0.50.0",
+    "date": "2026-10-03",
+    "notes": [
+      "CHARLOTTENDAL på en egen rad, ingen zoom"
+    ]
+  },
+  {
+    "version": "0.49.1",
+    "date": "2026-10-03",
+    "notes": [
+      "Mac-appen hamnar i Program"
+    ]
+  },
+  {
+    "version": "0.49.0",
+    "date": "2026-10-03",
+    "notes": [
+      "Notis i statusraden när en ny version kan installeras"
+    ]
+  },
+  {
+    "version": "0.48.0",
+    "date": "2026-10-03",
+    "notes": [
+      "Installation på Mac och Windows-PC med en rad"
+    ]
+  },
+  {
+    "version": "0.47.0",
+    "date": "2026-10-03",
+    "notes": [
+      "Installation på Raspberry Pi med en rad"
+    ]
+  },
+  {
+    "version": "0.46.1",
+    "date": "2026-10-03",
+    "notes": [
+      "Tidtabellsraderna och NU-strecket glider i stället för att hoppa"
+    ]
+  },
+  {
+    "version": "0.46.0",
+    "date": "2026-10-03",
+    "notes": [
+      "Dragbar gräns mellan spårplanen och nederraden"
+    ]
+  },
+  {
+    "version": "0.45.3",
+    "date": "2026-10-02",
+    "notes": [
+      "Träffklockan följer TrainMeet, och försenade tåg står över NU-strecket"
+    ]
+  },
+  {
+    "version": "0.45.2",
+    "date": "2026-10-02",
+    "notes": [
+      "Chip för att ladda om till en ny version, fokusring bara efter Tab"
+    ]
+  },
+  {
+    "version": "0.45.1",
+    "date": "2026-10-02",
+    "notes": [
+      "Kortare statusrad"
+    ]
+  },
+  {
+    "version": "0.45.0",
+    "date": "2026-10-02",
+    "notes": [
+      "Spårbeläggning som flik, Återställ och Styra RBG som chips i statusraden"
+    ]
+  },
+  {
+    "version": "0.44.2",
+    "date": "2026-10-02",
+    "notes": [
+      "Driftshändelser i en egen buffert, så att fältrader inte tränger ut dem"
+    ]
+  },
+  {
+    "version": "0.44.1",
+    "date": "2026-10-01",
+    "notes": [
+      "Händelsekolumnen visar driftshändelser, och TrainMeets observationer journalförs"
+    ]
+  },
+  {
+    "version": "0.44.0",
+    "date": "2026-10-01",
+    "notes": [
+      "Spårplanen, nederraden och statusraden i samma formspråk"
+    ]
+  },
+  {
+    "version": "0.43.0",
+    "date": "2026-10-01",
+    "notes": [
+      "Nederrad med tidtabell och händelser, spårplanen skalad efter bredden"
+    ]
+  },
+  {
+    "version": "0.42.3",
+    "date": "2026-10-01",
+    "notes": [
+      "Läsbar tidsgräns och Försök igen för stationslistan vid parkoppling"
+    ]
+  },
+  {
+    "version": "0.42.2",
+    "date": "2026-10-01",
+    "notes": [
+      "Parkopplingskoden visas som 123-456"
+    ]
+  },
+  {
+    "version": "0.42.1",
+    "date": "2026-10-01",
+    "notes": [
+      "Välj TrainMeet-station ur träffens lista vid parkoppling"
+    ]
+  },
+  {
+    "version": "0.42.0",
+    "date": "2026-10-01",
+    "notes": [
+      "Tågklarering via TrainMeet, Stream Deck och menyn med sex ingångar"
+    ]
+  },
+  {
+    "version": "0.41.1",
+    "date": "2026-09-30",
+    "notes": [
+      "Sex ingångar i adminmenyn"
+    ]
+  },
+  {
+    "version": "0.41.0",
+    "date": "2026-09-26",
+    "notes": [
+      "Anläggningsöversikt och tydligare simulatordiagnostik"
+    ]
+  },
+  {
+    "version": "0.40.0",
+    "date": "2026-09-26",
+    "notes": [
+      "Styra rangerbangården och utökad adminmeny"
+    ]
+  }
+]

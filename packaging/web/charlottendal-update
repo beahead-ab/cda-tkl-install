@@ -69,13 +69,17 @@ rollback() {
 status restarting "Byter till $TO och startar om TKL."
 ln -sfn "$NEW" "$BASE/current.new" && mv -Tf "$BASE/current.new" "$BASE/current"
 systemctl restart charlottendal-tkl || rollback
+# Any answer from TKL means it is up: the public deployment answers a request to
+# 127.0.0.1 with 400 (it only serves its public host), a login page with a redirect.
+# No answer at all, or a server error, is a failed start.
+up() { case "$1" in 000|""|5??) return 1;; *) return 0;; esac; }
 for _ in $(seq 1 20); do
   sleep 1
   code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8910/index.html || true)
-  case "$code" in 2??|3??|401|403) break;; esac
+  up "$code" && break
 done
 systemctl is-active --quiet charlottendal-tkl || rollback
-case "$code" in 2??|3??|401|403) ;; *) rollback;; esac
+up "$code" || rollback
 
 # Keep the five newest releases besides the running one and the one before it.
 { ls -1dt "$BASE"/releases/* 2>/dev/null | grep -v -e "^$NEW\$" -e "^$OLD_DIR\$" | tail -n +6 | xargs -r rm -rf; } || true

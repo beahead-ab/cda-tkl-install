@@ -1,5 +1,12 @@
 [
   {
+    "version": "0.59.1",
+    "date": "2026-10-05",
+    "notes": [
+      "Webbdriftens uppdatering godtar att servern svarar på sin publika adress"
+    ]
+  },
+  {
     "version": "0.59.0",
     "date": "2026-10-05",
     "notes": [

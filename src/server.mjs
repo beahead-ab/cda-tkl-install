@@ -139,6 +139,11 @@ const server = http.createServer(async (req, res) => {
     // On a Raspberry Pi the panel can start cda-tkl-update.service (allowed for the cda-tkl
     // user by the installer's polkit rule). It reinstalls and restarts TKL; the panel then
     // offers a reload. Elsewhere the update is started from Terminal or PowerShell.
+    // Uppdatering → Sök efter ny version: ask cda-tkl-install now rather than at the next hourly check.
+    if(url.pathname==='/api/update/check'){
+      if(!updateCheck)return json(res,{error:'Den här installationen söker inte efter nya versioner.'},409);
+      const view=await updateCheck.check();dirty=true;return json(res,view);
+    }
     if(url.pathname==='/api/update/start'){
       if(!updateCheck?.view().canStart)return json(res,{error:'Uppdateringen startas från Terminal eller PowerShell på den här datorn.'},409);
       const unit=UPDATE_UNITS[updateCheck.kind];

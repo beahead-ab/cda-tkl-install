@@ -11,6 +11,8 @@ export function createUpdatePage({root,api,message}){
     const copy=e.target.closest('[data-copy-line]');
     if(copy){try{await navigator.clipboard.writeText(copy.dataset.copyLine);copy.textContent='Kopierad';}catch{copy.textContent='Markera raden och kopiera';}setTimeout(()=>{copy.textContent='Kopiera raden';},2500);return;}
     if(e.target.closest('[data-start-update]'))openUpdateNotice(view,{api,message});
+    const ask=e.target.closest('[data-check-update]');
+    if(ask){ask.disabled=true;ask.textContent='Söker …';try{const answer=await api('update/check',{});if(answer){view=answer;last='';page.update(answer,args?.[1]);}}finally{ask.disabled=false;ask.textContent='Sök efter ny version';}}
   });
   const line=(kind)=>{const how=UPDATE_LINES[kind];return `<p>Öppna ${esc(how.where)} på ${kind==='mac'?'Macen':'datorn'} och kör:</p><pre class="update-line"><code>${esc(how.line)}</code></pre><button type="button" data-copy-line="${esc(how.line)}">Kopiera raden</button>`;};
   // Label · value · consequence, as in the other sections of Inställningar.
@@ -38,13 +40,15 @@ export function createUpdatePage({root,api,message}){
         :update.latest?[pill('ok','Senaste versionen'),'Inget att göra.']
         :[pill('off','Okänt'),update.error||'Senaste versionen har inte kunnat läsas än. Uppdateringen fungerar ändå.'];
       const who=update.kind==='web'?'Servern':'Pi:n';
+      const checked=update.checkedAt?new Date(update.checkedAt).toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'}):'';
+      const search=`<div class="settings-actions"><button type="button" data-check-update>Sök efter ny version</button><p>Läser installationsförrådet på GitHub nu. Annars sker det varje timme${checked?'; senast '+checked:''}.</p></div>`;
       const how=update.canStart
         ?(update.available?`<div class="settings-actions"><button type="button" class="primary" data-start-update>Uppdatera nu</button><p>${who} hämtar från cda-tkl-install, tar en säkerhetskopia, installerar och startar om TKL själv. Panelen är borta en kort stund${update.kind==='web'?' för alla som är inne':''}.</p></div>`:`<p class="muted">${who} uppdaterar sig själv härifrån när en ny version finns.</p>`)
         :line(update.kind);
       // How the last update on the server went: the updater writes each step.
       const run=update.run,RUN={fetching:['warn','Hämtar'],installing:['warn','Installerar'],backup:['warn','Säkerhetskopierar'],restarting:['warn','Startar om'],done:['ok','Klar'],failed:['off','Misslyckades']}[run?.phase];
       const runRow=RUN?[['Senaste uppdatering',pill(RUN[0],RUN[1]),run.message+(run.at?' '+run.at.replace('T',' ').slice(0,16)+' UTC.':'')]]:[];
-      html=`<section class="card"><h2>Den här installationen</h2>${rows([['Status',state[0],state[1]],['Installerad',esc(update.current),update.kind==='web'?'Webbdriften på cda-tkl.trainmeet.app.':'Den här datorn: '+where+'.'],['Senaste',esc(update.latest||'–'),'Läses från installationsförrådet på GitHub.'],...runRow])}${how}</section>`
+      html=`<section class="card"><h2>Den här installationen</h2>${rows([['Status',state[0],state[1]],['Installerad',esc(update.current),update.kind==='web'?'Webbdriften på cda-tkl.trainmeet.app.':'Den här datorn: '+where+'.'],['Senaste',esc(update.latest||'–'),'Läses från installationsförrådet på GitHub.'],...runRow])}${how}${search}</section>`
         +`<details class="card"><summary>Raden för andra datorer</summary>${['mac','windows'].filter(k=>k!==update.kind).map(line).join('')}<p>Raspberry Pi: <code>curl -fsSL https://raw.githubusercontent.com/beahead-ab/cda-tkl-install/main/install.sh | sudo sh</code></p></details>`
         +'<p class="settings-footnote">Inställningar och driftdata ligger kvar vid uppdateringen, och om den nya versionen inte startar återställs den gamla. Raden går att köra även när ingen ny version visas; då installeras samma version igen.</p>';
     }

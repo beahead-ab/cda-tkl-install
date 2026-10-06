@@ -150,6 +150,7 @@ body.panel-app #panel-console{display:none}
 @media(prefers-reduced-motion:reduce){#track-plan .rail.ranger-request{animation:none}}
 /* Rangerarens vy: the same plan, dimmed outside the ranger's area; TKL's controls are not there. */
 body[data-role=ranger] #track-plan .rail.outside{opacity:.22}
+#track-plan .rail.stub{stroke:#3d444b;stroke-dasharray:3 4;opacity:.8}
 body[data-role=ranger] #track-plan .signal-target.outside{opacity:.25;pointer-events:none}
 body[data-role=ranger] #track-plan .turnout-geometry .outside{pointer-events:none}
 body[data-role=ranger] #panel-bottom #trainmeet-timetable{display:none!important}

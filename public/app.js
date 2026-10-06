@@ -29,6 +29,7 @@ import {createPanelEvents} from './panel-events.js';
 import {createPanelHead} from './panel-head.js';
 import {rangerView} from './ranger-notice.js';
 import {rangerOwnView,createRangerBar} from './ranger-page.js';
+import {rangerScope} from './ranger-scope.js';
 import {createPanelSplit} from './panel-split.js';
 import {openUpdateNotice} from './update-notice.js';
 import {createUpdatePage} from './update-page.js';
@@ -66,7 +67,7 @@ let currentPage='panel',appMenu,contextDialog,panelConsole,panelEvents,panelHead
 let authSession=null;
 // Rangerarens vy (docs/rangerlage.md): #ranger, or always for a user logged in as rangerare. The same
 // plan, dimmed outside the ranger's area; every move goes through /api/ranger/.
-let rangerMode=false,rangerBar=null;
+let rangerMode=false,rangerBar=null,scope=null;
 const pageFromHash=()=>{
   if(location.hash==='#tools/zoom')history.replaceState(null,'','#tools/appearance');
   if(location.hash==='#tools')history.replaceState(null,'','#tools/appearance');
@@ -278,12 +279,15 @@ function headNotice(){
 function buildPlan() {
   layout = panelLayout(panel);
   lineExtents=lineRestrictionExtents(panel,config);
-  const {x,y,width,height}=layout.crop;
+  // The ranger sees the ranger's part: own area, spår 11–13, stubs where TKL's track goes on.
+  scope=rangerMode?rangerScope(panel,config):null;
+  const {x,y,width,height}=scope?scope.crop:layout.crop;
   $('track-plan').setAttribute('viewBox',`${x} ${y} ${width} ${height}`);
   manualFeedback=createManualFeedback({config,plan:$('track-plan'),scroll:document.querySelector('.panel-scroll'),panelView:$('manual-feedback-host'),stateOf:()=>state,online:()=>online,isBlocked,esc,revealPlan:()=>{if(currentPage!=='panel')setPage('panel');}});
   const root = $('track-plan'), track = svg('g', {}, root), turnouts = svg('g', {}, root);
   const flow = svg('g', { id: 'flow-layer', 'pointer-events': 'none' }, root), labels = svg('g', {}, root), icons = svg('g', {}, root), controls = svg('g', {}, root);
   for (const s of panel.segs.filter(s => s.b !== 'frame' && s.b !== 'turntable' && !s.hide && Math.min(s.y1, s.y2) < 850)) {
+    if(scope&&!scope.segments.has(s.id)){const stub=scope.stubs.get(s.id);if(stub)svg('line',{...stub,class:'rail stub','aria-hidden':'true'},track);continue;}
     const node = svg('line', { x1: s.x1, y1: s.y1, x2: s.x2, y2: s.y2, class: 'rail unconfigured' }, track);
     svg('title', {}, node, 'Spårsegment '+s.id+' · '+s.b);
     rails.push({ node, block: s.b, id:s.id, main:!!s.m });
@@ -295,6 +299,7 @@ function buildPlan() {
   }
   for (const t of Object.values(panel.turnouts)) {
     if (t.cy > 850) continue;
+    if(scope&&!scope.turnouts.has(t.name))continue;
     const legs = {},litLegs={},group=svg('g',{'data-turnout':t.name,class:'turnout-geometry'},turnouts);
     for (const [leg, x, y] of [['A', t.ax, t.ay], ['B', t.bx, t.by], ['C', t.ccx, t.ccy]]) {
       legs[leg] = svg('line', { x1: t.cx, y1: t.cy, x2: x, y2: y, class: 'rail unknown turnout-base' }, group);
@@ -309,6 +314,7 @@ function buildPlan() {
   }
   const restrictions=svg('g',{id:'track-restrictions'},root);
   for(const marker of restrictionMarkers(panel,config)){
+    if(scope&&!scope.blocks.has(marker.block))continue;
     const g=svg('g',{class:'track-restriction',transform:`translate(${marker.x} ${marker.y}) rotate(${marker.angle})`,visibility:'hidden',role:'img',tabindex:'-1','aria-label':'Spärrat spår '+marker.block,'data-block':marker.block},restrictions);
     svg('rect',{x:-12,y:-12,width:24,height:24,class:'restriction-hit'},g);
     svg('path',{d:'M-4 -6V6M4 -6V6',class:'restriction-bars','aria-hidden':'true'},g);
@@ -316,11 +322,13 @@ function buildPlan() {
   }
   for (const l of panel.labels.filter(l => !l.hidden && l.y < 840)) {
     if(/Lekby|Vagnsta|Kungsfors/i.test(l.text))continue;
+    if(scope&&!scope.near(l.x+8,l.y+8,40))continue;
     const size=l.size||12;
     if(l.br!=null)svg('rect',{x:l.x-3,y:l.y-3,width:l.text.length*size*.58+12,height:size*1.5+3,fill:`rgb(${l.br},${l.bg},${l.bb})`},labels);
     svg('text',{x:l.x,y:l.y+size,class:'track-label '+labelClass(l.text),...(size===12?{}:{style:`font-size:${size}px`})},labels,l.text);
   }
   for(const fallback of destinationDefaults){
+    if(scope)break;
     const b=layout.controls.find(b=>b.sensor==='htv'+fallback.id);if(!b)continue;
     const right=['Bu','Bn','D'].includes(fallback.id),lower=fallback.id.endsWith('n')||fallback.id==='D',y=b.centerY+(lower?38:-36),arrowX=right?2078:50;
     const group=svg('g',{class:'destination',role:'img','data-destination':fallback.id,display:isOutgoingDestination(fallback.id)?'inline':'none'},labels);
@@ -346,6 +354,7 @@ function buildPlan() {
   accessible(table,'Vändskiva · läge okänt',e=>showInspector('turntable',tt.id,e));
   objectDetails(table,'turntable',tt.id);
   for (const m of panel.micons.filter(m => m.y < 850)) {
+    if(scope&&!scope.showSignal(m))continue;
     const type = iconTypes[m.type] || iconTypes.hsi_2;
     const w = type[3] * (m.scale || 1), h = type[4] * (m.scale || 1);
     const rad = m.deg * Math.PI / 180, rw = Math.abs(w * Math.cos(rad)) + Math.abs(h * Math.sin(rad)), rh = Math.abs(h * Math.cos(rad)) + Math.abs(w * Math.sin(rad));
@@ -365,6 +374,7 @@ function buildPlan() {
   }
   const used = new Set(config.routes.flatMap(r => [r.from, r.to]));
   for (const b of layout.controls) {
+    if(scope&&!scope.showButton(b))continue;
     const isShunt=b.sensor.startsWith('tvv');
     const isButton=(b.act||'').includes('S-on') || isShunt;
     if(!isButton && !/lamp-[gr]|blink-r|free|hw-/.test(b.act||'')) continue;

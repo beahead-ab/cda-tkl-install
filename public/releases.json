@@ -1,5 +1,25 @@
 [
   {
+    "version": "0.61.0",
+    "date": "2026-10-05",
+    "notes": [
+      "Kom igång vid nyinstallation: ägare, AI-tjänst, banan och TrainMeet som steg; panelen visar \"N steg kvar\" tills ägaren markerat klart",
+      "Användare som i TrainMeet Server: ägare och administratörer, inbjudan med engångskod, Inställningar → Användare",
+      "Lokalt behöver operatören ingen inloggning; Inställningar och Objekt och regler kräver ägaren eller en administratör. Webbdriften kräver inloggning överallt som förut",
+      "AI-tjänst i Inställningar: modell och nyckel sparas på TKL-servern med provanrop; miljövariablerna är reservvärden"
+    ]
+  },
+  {
+    "version": "0.60.0",
+    "date": "2026-10-05",
+    "notes": [
+      "Studio: Objekt och regler på /studio.html med stationsplan, Data-vyn och genomgången av avvikelser",
+      "Regelspråk med utkast, simulatorprov och aktivering; förslag ur spårgrafen för dubbelkorsväxlarna X1 och X2",
+      "Chatten och AI-genomgången via Claude API, med nyckeln på servern",
+      "Mät objekt, Kort och MGP med SV2-inventering och Lyssna; i fysisk drift aktiveras ingen profil förrän allt är uppmätt"
+    ]
+  },
+  {
     "version": "0.59.3",
     "date": "2026-10-05",
     "notes": [

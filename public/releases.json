@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.67.0",
+    "date": "2026-10-06",
+    "notes": [
+      "Genomgång mot MGP-modulerna: signalerna beställs på sin huvudutgång ur Cda60.xml (LT200–LT325) och spårledningarna läser LS-ingångarna ur källan, flera ingångar där JMRI har det",
+      "Elva virtuella signaler (3/1, 6/5–9/5, 6/6, 6/7, 6/10–9/10) bekräftas av kärnan själv som i JMRI; infarten till Spår VI blir klar mot riktig utrustning",
+      "Driftbindningarna har en rad per fysisk detektor; Studio visar 0 signaler och 38 spårledningar med bänkadress och en ny rad för virtuella signaler",
+      "Allt är fortfarande ej uppmätt: rapportadress, polaritet och koder bekräftas under Mät objekt"
+    ]
+  },
+  {
     "version": "0.66.2",
     "date": "2026-10-06",
     "notes": [

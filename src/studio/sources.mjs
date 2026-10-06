@@ -27,8 +27,12 @@ export function parseLayoutXml(text) {
   for (const m of text.matchAll(/<signalmastlogic source="([^"]+)">([\s\S]*?)<\/signalmastlogic>/g))
     for (const d of m[2].matchAll(/<destinationMast destination="([^"]+)">/g)) signalRelations.push({ from: m[1], to: d[1] });
   const deb = text.match(/<globalDebounceTimers>\s*<goingActive>(\d+)<\/goingActive>\s*<goingInActive>(\d+)<\/goingInActive>/);
+  // Signalmasterna: en TurnoutSignalMast sätter en JMRI-växel (LT-utgång) per besked, en VirtualSignalMast har ingen utgång alls.
+  const signalMasts = [...text.matchAll(/<(turnoutsignalmast|virtualsignalmast)\b[^>]*>([\s\S]*?)<\/\1>/g)].map(m => ({
+    user: tag(m[2], 'userName'), system: tag(m[2], 'systemName'), type: /:([^:(]+)\(/.exec(tag(m[2], 'systemName') || '')?.[1] || null, virtual: m[1] === 'virtualsignalmast',
+    aspects: [...m[2].matchAll(/<aspect defines="([^"]+)">\s*<turnout>([^<]+)<\/turnout>\s*<turnoutstate>(\w+)<\/turnoutstate>/g)].map(a => ({ name: a[1], turnout: a[2], state: a[3] })) }));
   return { turnouts, sensors, blocks, layoutTurnouts: byIdent('layoutturnout'), segments: byIdent('tracksegment'), points: byIdent('positionablepoint'),
-    crossings: byIdent('levelxing'), conditionals, signalRelations, debounce: deb ? { goingActive: Number(deb[1]), goingInactive: Number(deb[2]) } : null };
+    crossings: byIdent('levelxing'), conditionals, signalRelations, signalMasts, debounce: deb ? { goingActive: Number(deb[1]), goingInactive: Number(deb[2]) } : null };
 }
 
 let cache = null;

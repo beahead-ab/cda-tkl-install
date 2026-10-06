@@ -620,6 +620,7 @@
         "signals": [
           "1/5",
           "2/5",
+          "3/10",
           "3/3",
           "4/10",
           "5/10"
@@ -748,6 +749,7 @@
         "signals": [
           "3/5",
           "4/5",
+          "5/5",
           "5/8",
           "6/8"
         ],
@@ -918,12 +920,15 @@
           "S132b"
         ],
         "signals": [
+          "3/2",
           "3/5",
+          "3/6",
           "4/5",
           "5/5",
           "5/8",
           "6/5",
           "6/6",
+          "6/7",
           "6/8",
           "7/5",
           "8/5",
@@ -1038,8 +1043,12 @@
           "S154c"
         ],
         "signals": [
+          "1/4",
+          "2/4",
           "3/2",
           "3/6",
+          "3/9",
+          "4/9",
           "5/9",
           "6/7",
           "6/9"
@@ -1088,7 +1097,11 @@
           "S152b"
         ],
         "signals": [
+          "1/4",
+          "2/4",
+          "3/2",
           "3/6",
+          "3/9",
           "4/9",
           "5/9",
           "6/9"
@@ -1183,7 +1196,8 @@
           "2/11",
           "2/4",
           "3/11",
-          "3/2"
+          "3/2",
+          "6/7"
         ],
         "inactiveNX": [
           "IN:6e4f8eaf-ae36-47fd-93c2-f26b6df1dcf7",
@@ -1363,6 +1377,7 @@
         "signals": [
           "3/1",
           "6/10",
+          "6/6",
           "7/10",
           "8/10",
           "9/10"
@@ -1403,7 +1418,10 @@
           "S119",
           "S119b"
         ],
-        "signals": [],
+        "signals": [
+          "3/1",
+          "9/10"
+        ],
         "inactiveNX": [
           "IN:38a2817f-928f-46b9-8467-90cee94ffa5f",
           "IN:98f1e18d-6c98-402a-a654-9d3c807a1f0a",
@@ -1441,7 +1459,10 @@
         "signals": [
           "3/1",
           "6/10",
-          "7/10"
+          "6/6",
+          "7/10",
+          "8/10",
+          "9/10"
         ],
         "inactiveNX": [
           "IN:191dce9e-3a56-411e-bac3-92df25fb9c02",
@@ -1481,6 +1502,9 @@
         ],
         "signals": [
           "3/1",
+          "6/10",
+          "6/6",
+          "7/10",
           "8/10",
           "9/10"
         ],
@@ -1523,7 +1547,9 @@
         "signals": [
           "6/5",
           "6/6",
-          "7/5"
+          "7/5",
+          "8/5",
+          "9/5"
         ],
         "inactiveNX": [
           "IN:b40d2819-0552-4586-ab45-2a7aa2087544",
@@ -1559,7 +1585,9 @@
           "S128c"
         ],
         "signals": [
+          "6/5",
           "6/6",
+          "7/5",
           "8/5",
           "9/5"
         ],
@@ -1639,8 +1667,16 @@
         ],
         "signals": [
           "3/2",
+          "3/5",
           "3/6",
-          "6/7"
+          "4/5",
+          "5/5",
+          "6/5",
+          "6/6",
+          "6/7",
+          "7/5",
+          "8/5",
+          "9/5"
         ],
         "inactiveNX": [
           "IN:bff6c4b1-e623-4ebb-b4a4-71d03691011b",
@@ -2148,10 +2184,10 @@
       "owner": "bindings",
       "runsIn": "mgp",
       "status": "unresolved",
-      "reason": "Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.",
+      "reason": "Svenska beskedskoder saknas. Koderna är provisoriska Signal10-CZ-koder ur driftbindningarna.",
       "source": {
         "profile": "signals",
-        "provenance": "Explicit bench binding with provisional Signal10-CZ codes. Swedish aspect mapping not commissioned."
+        "provenance": "Utgången LT290 (D1/4) ur Cda60.xml: Sh0 = THROWN, kör = CLOSED. Rapportadressen antas lika med orderadressen och beskedskoderna är provisoriska Signal10-CZ-koder. Ej uppmätt."
       }
     },
     {
@@ -2190,10 +2226,10 @@
       "owner": "bindings",
       "runsIn": "mgp",
       "status": "unresolved",
-      "reason": "Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.",
+      "reason": "Svenska beskedskoder saknas. Koderna är provisoriska Signal10-CZ-koder ur driftbindningarna.",
       "source": {
         "profile": "signals",
-        "provenance": "Explicit bench binding with provisional Signal10-CZ codes. Swedish aspect mapping not commissioned."
+        "provenance": "Utgången LT270 (S1/6) ur Cda60.xml: Stop and Sh0 = THROWN, kör = CLOSED. Rapportadressen antas lika med orderadressen och beskedskoderna är provisoriska Signal10-CZ-koder. Ej uppmätt."
       }
     },
     {
@@ -2220,10 +2256,10 @@
       "owner": "bindings",
       "runsIn": "mgp",
       "status": "unresolved",
-      "reason": "Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.",
+      "reason": "Svenska beskedskoder saknas. Koderna är provisoriska Signal10-CZ-koder ur driftbindningarna.",
       "source": {
         "profile": "signals",
-        "provenance": "Explicit bench binding with provisional Signal10-CZ codes. Swedish aspect mapping not commissioned."
+        "provenance": "Utgången LT308 ur Cda60.xml: Stop = THROWN, kör = CLOSED. Rapportadressen antas lika med orderadressen och beskedskoderna är provisoriska Signal10-CZ-koder. Ej uppmätt. Utgången är märkt \"M11-Ej använd\" i källan."
       }
     },
     {
@@ -2245,10 +2281,10 @@
       "owner": "bindings",
       "runsIn": "mgp",
       "status": "unresolved",
-      "reason": "Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.",
+      "reason": "Svenska beskedskoder saknas. Koderna är provisoriska Signal10-CZ-koder ur driftbindningarna.",
       "source": {
         "profile": "signals",
-        "provenance": "Explicit bench binding with provisional Signal10-CZ codes. Swedish aspect mapping not commissioned."
+        "provenance": "Utgången LT280 (S1/11) ur Cda60.xml: Stop and Sh0 = THROWN, kör = CLOSED. Rapportadressen antas lika med orderadressen och beskedskoderna är provisoriska Signal10-CZ-koder. Ej uppmätt."
       }
     },
     {
@@ -2276,10 +2312,10 @@
       "owner": "bindings",
       "runsIn": "mgp",
       "status": "unresolved",
-      "reason": "Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.",
+      "reason": "Svenska beskedskoder saknas. Koderna är provisoriska Signal10-CZ-koder ur driftbindningarna.",
       "source": {
         "profile": "signals",
-        "provenance": "Explicit bench binding with provisional Signal10-CZ codes. Swedish aspect mapping not commissioned."
+        "provenance": "Utgången LT200 (S1/1) ur Cda60.xml: Stop = THROWN, kör = CLOSED. Rapportadressen antas lika med orderadressen och beskedskoderna är provisoriska Signal10-CZ-koder. Ej uppmätt."
       }
     },
     {
@@ -2308,10 +2344,10 @@
       "owner": "bindings",
       "runsIn": "mgp",
       "status": "unresolved",
-      "reason": "Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.",
+      "reason": "Svenska beskedskoder saknas. Koderna är provisoriska Signal10-CZ-koder ur driftbindningarna.",
       "source": {
         "profile": "signals",
-        "provenance": "Explicit bench binding with provisional Signal10-CZ codes. Swedish aspect mapping not commissioned."
+        "provenance": "Utgången LT300 (S1/2) ur Cda60.xml: Stop = THROWN, kör = CLOSED. Rapportadressen antas lika med orderadressen och beskedskoderna är provisoriska Signal10-CZ-koder. Ej uppmätt."
       }
     },
     {
@@ -2334,10 +2370,10 @@
       "owner": "bindings",
       "runsIn": "mgp",
       "status": "unresolved",
-      "reason": "Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.",
+      "reason": "Svenska beskedskoder saknas. Koderna är provisoriska Signal10-CZ-koder ur driftbindningarna.",
       "source": {
         "profile": "signals",
-        "provenance": "Explicit bench binding with provisional Signal10-CZ codes. Swedish aspect mapping not commissioned."
+        "provenance": "Utgången LT304 (SSIIIdo) ur Cda60.xml: Unlit = THROWN, kör = CLOSED. Rapportadressen antas lika med orderadressen och beskedskoderna är provisoriska Signal10-CZ-koder. Ej uppmätt."
       }
     },
     {

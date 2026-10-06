@@ -8,7 +8,8 @@ export class Field extends EventEmitter {
     super(); this.profile = profile; this.now = now; this.movementMs = movementMs;
     this.turnouts = Object.fromEntries(Object.keys(profile.turnouts).map(n => [n, { position: 'C', target: 'C', due: 0 }]));
     this.blocks = Object.fromEntries(Object.keys(profile.blocks).map(n => [n, false]));
-    this.signals = Object.fromEntries(Object.keys(profile.signals).map(n => [n, { permission: 'STOP', code: 0, due: 0 }]));
+    // En virtuell signal finns inte i anläggningen: ingen dekoder, ingen rapport. Tåget kör på panelens besked, så den räknas som kör här.
+    this.signals = Object.fromEntries(Object.entries(profile.signals).map(([n, b]) => [n, b.virtual ? { permission: 'GO', code: 8, due: 0, virtual: true } : { permission: 'STOP', code: 0, due: 0 }]));
     this.faults = { turnout: '', signal: '', sensor: '' }; this.train = null; this.trains = []; this.nextTrain = 420;
     this.programming=profile.programming?{relay:'T',active:false,target:false,due:0,fault:false}:null;
     // Simulerade kort: identitet och SV-minne per modul. Svarar på SV2 som ett kort skulle enligt SV v13.
@@ -41,11 +42,12 @@ export class Field extends EventEmitter {
     // Flera ingångar rapporterar alla samma beläggning; simulatorn har ingen egen bild av var på spårledningen tåget står.
     for (const i of b.inputs || [b]) this.emit('frame', sensorReport(i.address, i.activeMeansOccupied ? this.blocks[name] : !this.blocks[name]));
   }
-  reportSignal(name) { this.emit('frame', signalReport(this.profile.signals[name].reportAddress, this.signals[name].code)); }
+  reportSignal(name) { if (!this.signals[name].virtual) this.emit('frame', signalReport(this.profile.signals[name].reportAddress, this.signals[name].code)); }
   allReports() {
     for (const n of Object.keys(this.turnouts)) this.reportTurnout(n);
+    // Varje ingång rapporteras en gång; en spårledning med flera ingångar rapporteras när någon av dem ännu inte gått ut.
     const sent=new Set();
-    for (const n of Object.keys(this.blocks)) if(!sent.has(this.profile.blocks[n].address)) {this.reportBlock(n);sent.add(this.profile.blocks[n].address);}
+    for (const n of Object.keys(this.blocks)) { const inputs=(this.profile.blocks[n].inputs||[this.profile.blocks[n]]).map(i=>i.address); if(inputs.every(a=>sent.has(a))) continue; this.reportBlock(n); for(const a of inputs) sent.add(a); }
     for (const n of Object.keys(this.signals)) this.reportSignal(n);
     this.reportProgramming();
   }
@@ -77,6 +79,7 @@ export class Field extends EventEmitter {
       s.position = s.target; s.due = 0; this.reportTurnout(n);
     }
     for (const [n, s] of Object.entries(this.signals)) {
+      if (s.virtual) continue;
       const p = this.profile.protection[n];
       const alternatives=(p?.alternatives || (p?[p]:[])).filter(option=>Object.entries(option.turnouts).every(([t,pos])=>this.turnouts[t].position===pos));
       const programSafe=option=>!this.programming||(!Object.hasOwn(option.turnouts,this.profile.programming.turnout)&&!option.blocks.some(b=>this.profile.programming.blocks.includes(b)))||(this.programming.relay==='T'&&!this.programming.active);

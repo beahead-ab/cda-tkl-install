@@ -17,9 +17,11 @@ export function deviations(sources, measured = {}) {
   const rows = [];
   const add = (id, title, count, resolvedBy, extra = {}) => rows.push({ id, title, count, resolvedBy, blocking: extra.blocking ?? false, items: extra.items ?? [], note: extra.note ?? '' });
   const benchSignals = registry.signals.filter(s => /bänkadress/.test(s.status));
-  add('signal-bench', 'Signaler med bänkadress', benchSignals.length, 'Bindning ur XML och mätning', { blocking: true });
+  add('signal-bench', 'Signaler med bänkadress', benchSignals.length, 'Bindning ur XML och mätning', { blocking: true, items: benchSignals.map(s => s.id) });
+  const virtualSignals = registry.signals.filter(s => s.virtual);
+  add('signal-virtual', 'Virtuella signaler i JMRI utan utgång', virtualSignals.length, 'Beslut: panelbesked som i JMRI, eller fysisk dvärg', { items: virtualSignals.map(s => s.id), note: 'kärnan bekräftar beskedet själv' });
   const benchBlocks = registry.blocks.filter(b => /bänkadress/.test(b.status));
-  add('block-bench', 'Spårledningar utan verklig ingång', benchBlocks.length, 'detection och mätning', { blocking: true, note: `${new Set(benchBlocks.map(b => b.loconet.report)).size} bänkadresser` });
+  add('block-bench', 'Spårledningar utan verklig ingång', benchBlocks.length, 'detection och mätning', { blocking: true, items: benchBlocks.map(b => b.id), note: `${new Set(benchBlocks.map(b => b.loconet.report)).size} bänkadresser` });
   add('turnout-unmeasured', 'Växeladresser ej uppmätta i fält', registry.turnouts.filter(t => !t.measured?.field).length, 'Mät objekt', { blocking: true, items: registry.turnouts.filter(t => !t.measured?.field).map(t => t.id) });
   add('signal-relations', 'Signalrelationer i JMRI utan tågväg', rel.unmatched.length, 'Tågväg eller uttryckligt undantag', { items: rel.unmatched.map(r => `${r.from} → ${r.to}`) });
   const nxWithout = coverage.nx.filter(n => !n.routes.length);

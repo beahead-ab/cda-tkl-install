@@ -21,7 +21,7 @@ export function fragmentDiff(a, b) {
   // Det regelägda: spårledningarnas ingångar, signalernas koder och vägövergångarna.
   const bind = x => x ? (x.inputs ? x.inputs.map(i => i.address + (i.activeMeansOccupied ? '' : '¬')).join(x.logic === 'all' ? '&' : '|') : String(x.address) + (x.activeMeansOccupied ? '' : '¬')) : null;
   for (const n of Object.keys(b.blocks)) if (bind(a.blocks[n]) !== bind(b.blocks[n])) out.push({ kind: 'detection', object: n, before: bind(a.blocks[n]), after: bind(b.blocks[n]) });
-  const codes = x => x ? `stopp ${x.stopCodes.join(',')} kör ${x.goCodes.join(',')}` : null;
+  const codes = x => x ? x.virtual ? 'virtuell' : `stopp ${x.stopCodes.join(',')} kör ${x.goCodes.join(',')}` : null;
   for (const n of Object.keys(b.signals)) if (codes(a.signals[n]) !== codes(b.signals[n])) out.push({ kind: 'aspect', object: n, before: codes(a.signals[n]), after: codes(b.signals[n]) });
   if (j(a.indications?.indicators || null) !== j(b.indications?.indicators || null)) for (const ind of b.indications?.indicators || []) { const was = (a.indications?.indicators || []).find(x => x.name === ind.name); if (j(was) !== j(ind)) out.push({ kind: 'crossing', object: ind.name, before: was ? was.conditions.length + ' villkor' : null, after: ind.conditions.length + ' villkor' }); }
   return out;

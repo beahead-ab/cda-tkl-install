@@ -7,9 +7,11 @@ export class BindingConfiguration {
     this.base=base;this.storage=storage;this.canActivate=canActivate;this.prepare=prepare;this.now=now;this.sessionId=randomUUID();this.baseHash=createHash('sha256').update(JSON.stringify(base)).digest('hex');
     this.catalog=[];const add=(kind,id,names,values,source)=>this.catalog.push({key:kind+':'+id,kind,id,names,values,source,fields:fields[kind]});
     for(const [n,b] of Object.entries(base.turnouts))add('turnouts',n,[n],{address:b.address,inverted:!!b.inverted},b.source||'');
-    const sensors=new Map();for(const [n,b] of Object.entries(base.blocks)){const id=(b.sourceSensor||n)+'@'+b.address;if(!sensors.has(id))sensors.set(id,[]);sensors.get(id).push(n);}
-    for(const [id,names] of sensors){const b=base.blocks[names[0]];add('blocks',id,names,{address:b.address,activeMeansOccupied:b.activeMeansOccupied},id);}
-    for(const [n,b] of Object.entries(base.signals))add('signals',n,[n],{address:b.address,reportAddress:b.reportAddress,stopCodes:b.stopCodes,goCodes:b.goCodes},b.sourceType||'');
+    // En rad per fysisk detektor: alla spårledningar på samma adress ändras tillsammans. Spårledningar med flera ingångar
+    // ägs av detekteringsregeln i Studio och ligger utanför katalogen; virtuella signaler har ingen utgång att binda.
+    const sensors=new Map();for(const [n,b] of Object.entries(base.blocks)){if(b.inputs)continue;const id=(b.sourceInputs?b.sourceInputs[0]:(b.sourceSensor||n))+'@'+b.address;if(!sensors.has(id))sensors.set(id,[]);sensors.get(id).push(n);}
+    for(const [id,names] of sensors){const b=base.blocks[names[0]];add('blocks',id,names,{address:b.address,activeMeansOccupied:b.activeMeansOccupied},[...new Set(names.map(n=>base.blocks[n].sourceSensor||n))].join(', '));}
+    for(const [n,b] of Object.entries(base.signals))if(!b.virtual)add('signals',n,[n],{address:b.address,reportAddress:b.reportAddress,stopCodes:b.stopCodes,goCodes:b.goCodes},b.sourceType||'');
     if(base.operatingControls?.programming){const p=base.operatingControls.programming;add('programming','track3',[],{relayAddress:p.relayAddress,reportAddress:p.reportAddress},p.rule);}
     for(const r of base.routes)add('routes',r.id,[r.id],{enabled:true},r.source?.rules?.join(', ')||'');
     for(const n of Object.keys(base.turnouts))add('manual',n,[n],{enabled:true},base.manualPolicies?.byTurnout[n]?.rule||'');
@@ -33,7 +35,7 @@ export class BindingConfiguration {
   validate(overrides){const errors=this.shape(overrides);if(errors.length)return errors;const p=this.profile(overrides),orders=new Map(),reports=new Map(),detectors=new Map();
     const unique=(map,address,name)=>{if(map.has(address))errors.push('Adress '+address+' delas av '+map.get(address)+' och '+name+'.');else map.set(address,name);};
     for(const [n,b] of Object.entries(p.turnouts))unique(orders,b.address,n);
-    for(const [n,b] of Object.entries(p.signals)){unique(orders,b.address,'signal '+n);unique(reports,b.reportAddress,'signal '+n);if(b.stopCodes.some(c=>b.goCodes.includes(c)))errors.push('Signal '+n+': samma beskedskod får inte betyda både stopp och kör.');}
+    for(const [n,b] of Object.entries(p.signals)){if(b.virtual)continue;unique(orders,b.address,'signal '+n);unique(reports,b.reportAddress,'signal '+n);if(b.stopCodes.some(c=>b.goCodes.includes(c)))errors.push('Signal '+n+': samma beskedskod får inte betyda både stopp och kör.');}
     for(const row of this.catalog.filter(r=>r.kind==='blocks')){const b=p.blocks[row.names[0]];unique(detectors,b.address,row.id);if(row.names.some(n=>p.blocks[n].address!==b.address||p.blocks[n].activeMeansOccupied!==b.activeMeansOccupied))errors.push('Detektoralias stämmer inte: '+row.id);}
     const pr=p.operatingControls?.programming;if(pr){unique(orders,pr.relayAddress,'programmeringsrelä');unique(detectors,pr.reportAddress,'programmeringsrapport');}
     return errors;

@@ -49,8 +49,9 @@ function activationStatus(proposed){
     if(connectionInfo(proposed).mode==='hardware'){const missing=studioMeasure.missing(proposed);if(missing.length)return deny(`${missing.length} bindningar är inte uppmätta i fält (${missing.slice(0,4).join(', ')}${missing.length>4?' …':''}). Mät dem under Driftsättning först.`);}
     const report=(kind,address)=>{const r=bindingReports.get(kind+':'+address);return r&&Date.now()-r.at<=proposed.staleMs?r.data:null;};
     for(const [n,b] of Object.entries(proposed.turnouts)){const r=report('turnout',b.address);if(!r||!['C','T'].includes(r.position))return deny(n+': den föreslagna adressen saknar aktuellt känt växelläge.');}
-    for(const [n,b] of Object.entries(proposed.blocks)){const r=report('sensor',b.address);if(!r||(b.activeMeansOccupied?r.active:!r.active))return deny(n+': den föreslagna bindningen saknar färsk frirapport.');}
-    for(const [n,b] of Object.entries(proposed.signals)){const r=report('signal',b.reportAddress);if(!r||!b.stopCodes.includes(r.code))return deny(n+': den föreslagna bindningen saknar färskt stoppbesked.');}
+    // Varje ingång till en spårledning ska ha rapporterat fritt; en virtuell signal har ingen utgång och ingen rapport att kräva.
+    for(const [n,b] of Object.entries(proposed.blocks))for(const i of b.inputs||[b]){const r=report('sensor',i.address);if(!r||(i.activeMeansOccupied?r.active:!r.active))return deny(n+': den föreslagna bindningen saknar färsk frirapport.');}
+    for(const [n,b] of Object.entries(proposed.signals)){if(b.virtual)continue;const r=report('signal',b.reportAddress);if(!r||!b.stopCodes.includes(r.code))return deny(n+': den föreslagna bindningen saknar färskt stoppbesked.');}
     const p=proposed.operatingControls?.programming;if(p&&(report('turnout',p.relayAddress)?.position!=='T'||report('sensor',p.reportAddress)?.active!==false))return deny('Föreslaget programmeringsområde saknar färsk normalrapport.');
   }
   return {allowed:true,reason:'AIS aktiv och inga lås. Föreslagna adresser måste ha färska fria lägen och stoppbesked vid aktivering.'};
@@ -190,8 +191,8 @@ const server = http.createServer(async (req, res) => {
       // Signaladresserna ur XML som driftbindningsutkast: utgången LTn blir order- och rapportadress n, status ej uppmätt. Granskas under Driftbindningar.
       if(bindings.data.draft)return json(res,{error:'Det finns redan ett utkast till driftbindningar. Granska eller kasta det först.'},409);
       const registry=buildRegistry(studioSources),proposed=[],skipped=[];
-      for(const s of registry.signals){const out=s.source.find(o=>/^LT\d+$/.test(o.system));const address=out?Number(out.system.slice(2)):null;if(!address){skipped.push(s.id+': ingen LT-utgång i XML');continue;}
-        const row=bindings.objects.get('signals:'+s.id),v=bindings.view();try{bindings.save({sessionId:v.sessionId,revision:v.revision,key:'signals:'+s.id,values:{...row.values,address,reportAddress:address}});proposed.push(s.id);}catch(e){skipped.push(s.id+': '+e.message);}}
+      for(const s of registry.signals){if(s.virtual){skipped.push(s.id+': virtuell mast utan utgång');continue;}const out=s.source.find(o=>/^LT\d+$/.test(o.system));const address=out?Number(out.system.slice(2)):null;if(!address){skipped.push(s.id+': ingen LT-utgång i XML');continue;}
+        const row=bindings.objects.get('signals:'+s.id);if(row.values.address===address&&row.values.reportAddress===address){skipped.push(s.id+': redan bunden till '+out.system);continue;}const v=bindings.view();try{bindings.save({sessionId:v.sessionId,revision:v.revision,key:'signals:'+s.id,values:{...row.values,address,reportAddress:address}});proposed.push(s.id);}catch(e){skipped.push(s.id+': '+e.message);}}
       dirty=true;return json(res,{proposed:proposed.length,skipped,bindings:bindings.view()});}
     if(url.pathname.startsWith('/api/studio/measure/')){const command=url.pathname.slice('/api/studio/measure/'.length);if(!['probe','confirm','cancel','remove'].includes(command))return json(res,{error:'Okänt mätkommando'},404);const result=studioMeasure[command](data,profile);if(command==='confirm')engine.log('studio',`${data.name} uppmätt av ${String(data.by).trim()}.`);dirty=true;return json(res,result);}
     if(url.pathname.startsWith('/api/studio/cards/')){const command=url.pathname.slice('/api/studio/cards/'.length);if(!['discover','identify','read','assign'].includes(command))return json(res,{error:'Okänt kortkommando'},404);return json(res,await studioCards[command](data));}

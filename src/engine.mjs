@@ -17,7 +17,8 @@ export class Engine extends EventEmitter {
     this.connected = false; this.connectionAt = 0; this.storageFault = null; this.revision = 0; this.events = []; this.journal = []; this.operatingEvents = []; this.reportSequence=0;
     this.turnouts = Object.fromEntries(Object.keys(profile.turnouts).map(n => [n, { position: 'unknown', desired: null, updatedAt: 0 }]));
     this.blocks = Object.fromEntries(Object.keys(profile.blocks).map(n => [n, { occupied: null, updatedAt: 0 }]));
-    this.signals = Object.fromEntries(Object.keys(profile.signals).map(n => [n, { aspect: 'unknown', code: null, desired: 'STOP', updatedAt: 0, commandAt: 0 }]));
+    // En virtuell signal (VirtualSignalMast i källan) har ingen utgång: kärnan bekräftar själv det begärda beskedet, som JMRI gjorde.
+    this.signals = Object.fromEntries(Object.entries(profile.signals).map(([n, b]) => [n, { aspect: 'unknown', code: null, desired: 'STOP', updatedAt: 0, commandAt: 0, ...(b.virtual ? { virtual: true } : {}) }]));
     const saved = storage?.load('routes.json', { fingerprint: this.fingerprint, routes: [] });
     if (saved?.routes.length && saved.fingerprint !== this.fingerprint) throw Error('Profilen har ändrats medan lås finns kvar. Återställ profilen före start.');
     this.routes = (saved?.routes || []).map(r => ({ ...r, state: 'held', cancelRequested: false, reason: 'Återställd efter omstart. Kontrollera återrapporter och återta vägen.', nextSignal: -1 }));
@@ -73,7 +74,7 @@ export class Engine extends EventEmitter {
     for (const s of Object.values(this.blocks)) { s.occupied = null; s.updatedAt = 0; }
     for (const s of Object.values(this.signals)) { s.aspect = 'unknown'; s.desired = 'STOP'; s.code = null; s.updatedAt = 0; }
   }
-  fresh(s) { return this.connected && s.updatedAt >= this.connectionAt && this.now() - s.updatedAt <= this.profile.staleMs && s.updatedAt > 0; }
+  fresh(s) { return this.connected && s.updatedAt >= this.connectionAt && (s.virtual || this.now() - s.updatedAt <= this.profile.staleMs) && s.updatedAt > 0; }
   guardSignals(route) {
     if (route.guardSignals) return route.guardSignals;
     return [...new Set(this.profile.routes.filter(r => r.blocks.some(b => route.blocks.includes(b))).flatMap(r => r.signals))].filter(n => !route.signals.includes(n));
@@ -148,6 +149,11 @@ export class Engine extends EventEmitter {
   permission(name, desired) {
     if (desired === 'GO' && (!this.connected || this.storageFault || this.controls.stopAll || this.controls.mode!=='local')) throw Error('Körmedgivande spärrat.');
     const s = this.signals[name]; s.desired = desired; s.commandAt = this.now(); s.commandSequence=this.reportSequence;
+    if (s.virtual) {
+      // Ingen utgång att vänta på: beskedet gäller i panelen i samma ögonblick och räknas som en egen rapport.
+      s.aspect = desired === 'GO' ? 'go' : 'stop'; s.code = null; s.updatedAt = this.now(); s.reportSequence = ++this.reportSequence;
+      this.log('permission', `Signal ${name} (virtuell, bara i panelen): ${desired === 'GO' ? 'kör' : 'stopp'}.`); return;
+    }
     if (this.connected) this.send(switchOrder(this.profile.signals[name].address, desired === 'GO' ? 'C' : 'T'));
     this.log('permission', `Signal ${name}: begär ${desired === 'GO' ? 'körmedgivande' : 'stopp'}.`);
   }
@@ -508,10 +514,14 @@ export class Engine extends EventEmitter {
   observePassage(report) {
     for(const r of this.routes) {
       if(!r.autoRelease || r.cancelRequested || ['held','occupied','cancelling'].includes(r.state)) continue;
+      // Passagen följer spårledningens första ingång (profilens address). En spårledning med flera ingångar
+      // räknas som belagd för tågvägen så snart någon ingång säger det, men passagens ordning läses bara på den första,
+      // så att en detektor som delas mellan flera spårledningar ger ett entydigt avsnitt.
       const index=r.passage.findIndex(p=>p.address===report.address);
       if(index<0) continue;
       const part=r.passage[index], name=r.blocks.find(b=>this.profile.blocks[b].address===report.address);
-      const occupied=this.profile.blocks[name].activeMeansOccupied?report.active:!report.active;
+      const primary=(this.profile.blocks[name].inputs||[this.profile.blocks[name]]).find(i=>i.address===report.address)||this.profile.blocks[name];
+      const occupied=primary.activeMeansOccupied?report.active:!report.active;
       if(occupied && part.state==='pending') {
         const canEnter=r.state==='active' || r.state==='traversing' || (r.state==='clearing' && r.nextSignal<=0 && this.signals[r.signals[0]].aspect==='go');
         if(!canEnter || r.passage.slice(0,index).some(p=>p.state==='pending')) {this.hold(r,'Beläggning kom utanför den förväntade tågpassagen.');continue;}

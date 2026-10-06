@@ -36,9 +36,11 @@ export function rulesFromProfile(profile, { indications = null } = {}) {
     runsIn: 'tkl', status: 'active', source: { profile: 'operatingControls.programming', jmri: pr.rule, provenance: pr.provenance } });
   // Signalbesked per masttyp. Koderna ägs av driftbindningarna tills svenska besked finns; då blir regeln regelägd.
   const byType = {}; for (const [name, sig] of Object.entries(profile.signals || {})) (byType[sig.sourceType || 'okänd'] ??= []).push(name);
-  for (const [mastType, signals] of Object.entries(byType).sort(([a], [b]) => a.localeCompare(b))) { const sig = profile.signals[signals[0]];
-    rules.push({ id: 'aspect:' + mastType, type: 'aspect', object: mastType, signals, stopCodes: sig.stopCodes, goCodes: sig.goCodes, aspects: null, owner: 'bindings', runsIn: 'mgp', status: 'unresolved',
-      reason: 'Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.', source: { profile: 'signals', provenance: sig.provenance } }); }
+  for (const [mastType, signals] of Object.entries(byType).sort(([a], [b]) => a.localeCompare(b))) {
+    // Koderna läses från en signal med utgång; en virtuell mast har inga. Finns bara virtuella av typen bär regeln tomma listor.
+    const sig = signals.map(n => profile.signals[n]).find(s => !s.virtual) || profile.signals[signals[0]];
+    rules.push({ id: 'aspect:' + mastType, type: 'aspect', object: mastType, signals, stopCodes: sig.stopCodes || [], goCodes: sig.goCodes || [], aspects: null, owner: 'bindings', runsIn: 'mgp', status: 'unresolved',
+      reason: 'Svenska beskedskoder saknas. Koderna är provisoriska Signal10-CZ-koder ur driftbindningarna.', source: { profile: 'signals', provenance: sig.provenance } }); }
   // Vägövergångar ur indikeringskatalogen: beräknad visning i dag. Förringning och bomåterrapport är MGP-underlag.
   for (const ind of indications?.indicators || []) {
     const blocks = [...new Set(ind.conditions.filter(c => c.kind === 'sensor').flatMap(c => Object.entries(profile.blocks).filter(([, b]) => [c.id, c.sourceSystem].includes(b.sourceSensor)).map(([name]) => name)))];
@@ -51,7 +53,7 @@ export function rulesFromProfile(profile, { indications = null } = {}) {
 // Polariteten antas aktiv = belagd tills mätningen visar annat. Ersätter bänkbindningen först när regeln aktiveras.
 export function proposeDetectionRules(sections, rules) {
   const live = new Set(rules.filter(r => r.type === 'detection' && isLive(r)).map(r => r.object));
-  return sections.filter(s => s.track && s.inputs?.length && !live.has(s.name)).map(s => ({ id: 'detection:' + s.name, type: 'detection', object: s.name, logic: s.shape === 'all' ? 'all' : 'any',
+  return sections.filter(s => s.track && s.inputs?.length && !s.bound && !live.has(s.name)).map(s => ({ id: 'detection:' + s.name, type: 'detection', object: s.name, logic: s.shape === 'all' ? 'all' : 'any',
     inputs: s.inputDetails.map(d => ({ system: d.system, address: Number(String(d.system).replace(/^LS/, '')) || null, activeMeansOccupied: true, module: d.module || null })), owner: 'rule', runsIn: 'tkl', status: 'proposal',
     reason: s.shape === 'turnoutPart' ? 'Växelberoende del i JMRI, förenklad till någon av ingångarna.' : '', source: { studio: 'xml-ingångar', jmri: s.sourceSensor, provenance: 'LS-nummer ur Cda60.xml som adress, polaritet antagen. Ej uppmätt.' } }));
 }

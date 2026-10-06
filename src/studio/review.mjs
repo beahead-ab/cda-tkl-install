@@ -67,6 +67,8 @@ export function reviewItems(sources, activeRules, profile = sources.profile) {
   fromDev('signal-relations', 'beslut', 'Signalrelationer i JMRI utan tågväg', { action: 'data', text: `${dev['signal-relations']?.count} av ${signalRelationCoverage(sources).total} relationer från signal till signal saknar tågväg i TKL. Antingen saknas en tågväg, eller så används relationen inte och det ska sägas uttryckligen.` });
   fromDev('nx-without-route', 'beslut', 'NX-definitioner utan tågväg', { action: 'data' });
   fromDev('shunt-excluded', 'beslut', 'Undantagna växeltågvägar', { action: 'data' });
+  fromDev('signal-virtual', 'beslut', 'Virtuella signaler i JMRI: besked bara i panelen', { action: 'data', objects: dev['signal-virtual']?.items || [],
+    text: `${dev['signal-virtual']?.items.join(', ')} är VirtualSignalMast i Cda60.xml utan utgång. Kärnan bekräftar deras besked själv, som JMRI gjorde. Beslut: förblir de panelbesked, eller ska fysiska dvärgar kopplas in (3/1 har utgången D3/1 på M02 i källan)?` });
   fromDev('xml-only-turnouts', 'beslut', 'Växlar i källan utan plats i planen', { action: 'data', objects: [], text: `${dev['xml-only-turnouts']?.items.join(', ')} finns i Cda60.xml men inte i planen. Beslut: ta in i planen eller lämna utanför.` });
   // Underlag
   fromDev('turnout-unmeasured', 'underlag', 'Växeladresser ur JMRI, ej uppmätta i fält', { action: 'measure', objects: [] });

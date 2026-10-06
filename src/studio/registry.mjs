@@ -1,7 +1,8 @@
 // Objektregistret: TKL-namn, fysisk bindning och spårbarhet för växlar, signaler, spårledningar och moduler.
 // Allt är läst ur driftprofilen, panelgeometrin och Cda60.xml. Status säger hur mycket som är bevisat: ingenting är uppmätt.
 import { moduleOf } from './sources.mjs';
-const STATUS = { xml: 'ur XML, ej uppmätt', bench: 'bänkadress i simulatorn', none: 'ingen bindning' };
+const STATUS = { xml: 'ur XML, ej uppmätt', bench: 'bänkadress i simulatorn', virtual: 'virtuell i JMRI, ingen utgång', none: 'ingen bindning' };
+const statusOf = (binding, provenance) => binding.virtual ? STATUS.virtual : /bench|bänkadress/i.test(provenance) ? STATUS.bench : /ej uppmätt|not measured/i.test(provenance) ? STATUS.xml : provenance;
 
 // measured: nyckel kind:namn → giltig mätning (samma adress som profilen). Fältmätning räknas för drift, bänkmätning bara i simulatorn.
 export function buildRegistry({ profile, panel, xml }, measured = {}) {
@@ -12,17 +13,17 @@ export function buildRegistry({ profile, panel, xml }, measured = {}) {
   const turnouts = Object.entries(profile.turnouts).map(([id, t]) => {
     const src = lt[id];
     return { id, kind: 'turnout', inPlan: panelTurnouts.has(id), loconet: { order: t.address, report: t.address }, block: t.block,
-      companions: (profile.coupled[id] || [id]).filter(x => x !== id), status: /not measured|ej uppmätt/i.test(t.provenance) ? STATUS.xml : t.provenance,
+      companions: (profile.coupled[id] || [id]).filter(x => x !== id), status: statusOf(t, t.provenance),
       measured: measure('turnout', id), source: src ? trace(src.system, src.comment) : null };
   });
   const signalOutputs = {};
   for (const t of xml.turnouts) { const m = /(?:signal|siganl)\s+([^,]+)/i.exec(t.comment); if (m) (signalOutputs[m[1].trim()] ??= []).push(trace(t.system, t.comment)); }
   const masts = Object.fromEntries(panel.micons.map(m => [m.mast, m]));
-  const signals = Object.entries(profile.signals).map(([id, s]) => ({ id, kind: 'signal', mastType: s.sourceType, inPlan: !!masts[id],
-    loconet: { order: s.address, report: s.reportAddress, stopCodes: s.stopCodes, goCodes: s.goCodes }, status: /bench/i.test(s.provenance) ? STATUS.bench : s.provenance,
-    measured: measure('signal', id), source: signalOutputs[id] || [], swedishAspects: false }));
-  const blocks = Object.entries(profile.blocks).map(([id, b]) => ({ id, kind: 'block', loconet: { report: b.address, activeMeansOccupied: b.activeMeansOccupied },
-    sourceSensor: b.sourceSensor, status: /bench/i.test(b.provenance) ? STATUS.bench : b.provenance, measured: measure('block', id) }));
+  const signals = Object.entries(profile.signals).map(([id, s]) => ({ id, kind: 'signal', mastType: s.sourceType, inPlan: !!masts[id], virtual: !!s.virtual,
+    loconet: s.virtual ? { order: null, report: null, stopCodes: [], goCodes: [] } : { order: s.address, report: s.reportAddress, stopCodes: s.stopCodes, goCodes: s.goCodes }, status: statusOf(s, s.provenance),
+    measured: measure('signal', id), source: signalOutputs[id] || [], output: s.sourceOutput || null, swedishAspects: false }));
+  const blocks = Object.entries(profile.blocks).map(([id, b]) => ({ id, kind: 'block', loconet: { report: b.address, inputs: (b.inputs || [b]).map(i => i.address), logic: b.logic || null, activeMeansOccupied: b.activeMeansOccupied },
+    sourceSensor: b.sourceSensor, sourceInputs: b.sourceInputs || [], status: statusOf(b, b.provenance), measured: measure('block', id) }));
   const modules = {};
   for (const item of [...xml.turnouts.map(t => ({ ...t, io: 'out' })), ...ls.map(s => ({ ...s, io: 'in' }))]) {
     const m = moduleOf(item.comment); if (!m) continue;

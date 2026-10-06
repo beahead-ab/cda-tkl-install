@@ -12,7 +12,7 @@ export function signalLiveView(name,config,state,online) {
   const fresh=!!(online&&state?.connection==='connected'&&signal?.updatedAt>0&&state.serverTime-signal.updatedAt<=config.staleMs);
   return {report:fresh?({go:'Kör återrapporterat',stop:'Stopp återrapporterat'}[signal.aspect]||'Okänt besked'):'Okänt besked',
     permission:fresh?({GO:'Kör begärt',STOP:'Stopp begärt'}[signal.desired]||'—'):'—',
-    raw:fresh&&signal.aspect!=='unknown'&&signal.code!=null?String(signal.code):'—',address:binding?String(binding.reportAddress??binding.address):'Ej inkopplad'};
+    raw:fresh&&signal.aspect!=='unknown'&&signal.code!=null?String(signal.code):'—',address:binding?.virtual?'Virtuell, bara i panelen':binding?String(binding.reportAddress??binding.address):'Ej inkopplad'};
 }
 function el(tag,text,cls){const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;}
 function sourceLink(text,key,openRecord){const b=el('button',text,'signal-source-link');b.type='button';b.onclick=()=>openRecord(key);return b;}

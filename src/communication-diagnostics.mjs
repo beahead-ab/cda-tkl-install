@@ -9,7 +9,7 @@ export function connectionInfo(profile,env=process.env){
 export function commandExpectations(profile,state){
   const rows=[];
   for(const kind of ['turnouts','signals'])for(const [name,b]of Object.entries(profile[kind])){
-    const s=state[kind][name];if(!s?.commandAt||!s.desired)continue;
+    const s=state[kind][name];if(!s?.commandAt||!s.desired||b.virtual)continue;
     const isTurnout=kind==='turnouts',physical=isTurnout?(b.inverted?(s.desired==='C'?'T':'C'):s.desired):(s.desired==='GO'?'C':'T');
     const match=isTurnout?s.position===s.desired:s.aspect===s.desired.toLowerCase();
     const fresh=s.updatedAt>0&&state.serverTime>=s.updatedAt&&state.serverTime-s.updatedAt<=profile.staleMs;
@@ -27,6 +27,7 @@ export function commandExpectations(profile,state){
 export function protocolObjects(profile,decoded){
   if(!decoded?.kind)return [];
   const kinds=decoded.kind==='order'?['turnouts','signals']:decoded.kind==='turnout'?['turnouts']:decoded.kind==='sensor'?['blocks']:decoded.kind==='signal'?['signals']:[];
-  return kinds.flatMap(kind=>Object.entries(profile[kind]).filter(([,b])=>(decoded.kind==='signal'?b.reportAddress:b.address)===decoded.address).map(([name,b])=>({kind,name,
+  const matches=(kind,b)=>decoded.kind==='signal'?b.reportAddress===decoded.address:kind==='blocks'?(b.inputs||[b]).some(i=>i.address===decoded.address):!b.virtual&&b.address===decoded.address;
+  return kinds.flatMap(kind=>Object.entries(profile[kind]).filter(([,b])=>matches(kind,b)).map(([name,b])=>({kind,name,
     ...(decoded.kind==='order'?{expected:kind==='turnouts'?[hex(switchReport(b.address,decoded.position))]:(decoded.position==='T'?b.stopCodes:b.goCodes).map(code=>hex(signalReport(b.reportAddress,code))),provisional:kind==='signals'}:{})})));
 }

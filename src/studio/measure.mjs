@@ -16,6 +16,7 @@ export class Measurements {
   binding(profile, kind, name) {
     if (!KINDS.includes(kind)) fail('Okänt objektslag.');
     const b = profile[kind + 's']?.[name]; if (!b) fail(`${name} finns inte i profilen.`, 404);
+    if (b.virtual) fail(`${name} är en virtuell signal utan utgång och kan inte mätas.`);
     return b;
   }
   // Giltig mätning = samma adress som profilen har nu. Fältmätning är den som räknas för drift.
@@ -30,14 +31,16 @@ export class Measurements {
     for (const kind of KINDS) for (const name of Object.keys(profile[kind + 's'] || {})) { const m = this.item(profile, kind, name); if (m?.current) out[key(kind, name)] = m; }
     return out;
   }
+  // Virtuella signaler har ingen utgång och kan varken mätas eller saknas.
+  names(profile, kind) { return Object.entries(profile[kind + 's'] || {}).filter(([, b]) => !b.virtual).map(([n]) => n); }
   missing(profile) {
     const out = [];
-    for (const kind of KINDS) for (const name of Object.keys(profile[kind + 's'] || {})) if (!this.item(profile, kind, name)?.field) out.push(name);
+    for (const kind of KINDS) for (const name of this.names(profile, kind)) if (!this.item(profile, kind, name)?.field) out.push(name);
     return out;
   }
   view(profile) {
     const counts = {};
-    for (const kind of KINDS) { const names = Object.keys(profile[kind + 's'] || {}); const items = names.map(n => this.item(profile, kind, n)); counts[kind] = { total: names.length, bench: items.filter(m => m?.current && m.mode !== 'hardware').length, field: items.filter(m => m?.field).length }; }
+    for (const kind of KINDS) { const names = this.names(profile, kind); const items = names.map(n => this.item(profile, kind, n)); counts[kind] = { total: names.length, bench: items.filter(m => m?.current && m.mode !== 'hardware').length, field: items.filter(m => m?.field).length }; }
     const items = Object.fromEntries(Object.entries(this.data.items).map(([k, m]) => { const [kind, name] = k.split(/:(.*)/); return [k, this.item(profile, kind, name) || { ...m, current: false, field: false }]; }));
     return { mode: this.mode(), guard: this.guard(), pending: this.pending, counts, items };
   }

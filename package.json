@@ -1,6 +1,6 @@
 {
   "name": "charlottendal-tkl",
-  "version": "0.59.3",
+  "version": "0.61.0",
   "private": true,
   "type": "module",
   "description": "Charlottendal TKL och en separat LocoNet-anläggningssimulator",
@@ -13,13 +13,16 @@
     "simulator": "node src/simulator.mjs",
     "test": "node --test test/*.test.mjs",
     "check": "node scripts/check.mjs",
+    "studio": "node scripts/studio-overview.mjs",
+    "rules": "node scripts/make-rules.mjs",
     "test:integration": "node --test test/integration.mjs test/password-integration.mjs test/serial-integration.mjs test/trainmeet-integration.mjs test/panel-reset-integration.mjs test/yard-integration.mjs",
     "import:xml": "python3 scripts/import-source.py",
     "verify:xml": "python3 scripts/verify-source.py",
-    "import:operations": "python3 scripts/import-operations.py && node scripts/make-network-profile.mjs && node scripts/make-migration.mjs && node scripts/make-train-fields.mjs && python3 scripts/make-signal-catalog.py && node scripts/make-indications.mjs && node scripts/make-signal-endpoints.mjs",
-    "verify:operations": "python3 scripts/import-operations.py --check && node scripts/make-network-profile.mjs --check && node scripts/make-migration.mjs --check && node scripts/make-train-fields.mjs --check && python3 scripts/make-signal-catalog.py --check && node scripts/make-indications.mjs --check && node scripts/make-signal-endpoints.mjs --check"
+    "import:operations": "python3 scripts/import-operations.py && node scripts/make-network-profile.mjs && node scripts/make-rules.mjs && node scripts/make-migration.mjs && node scripts/make-train-fields.mjs && python3 scripts/make-signal-catalog.py && node scripts/make-indications.mjs && node scripts/make-signal-endpoints.mjs",
+    "verify:operations": "python3 scripts/import-operations.py --check && node scripts/make-network-profile.mjs --check && node scripts/make-rules.mjs --check && node scripts/make-migration.mjs --check && node scripts/make-train-fields.mjs --check && python3 scripts/make-signal-catalog.py --check && node scripts/make-indications.mjs --check && node scripts/make-signal-endpoints.mjs --check"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "0.131.0",
     "jose": "6.2.12"
   }
 }

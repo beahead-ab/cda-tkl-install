@@ -4,6 +4,7 @@ import path from 'node:path';
 import {randomUUID,createHash} from 'node:crypto';
 import {EventEmitter} from 'node:events';
 import {decode,fromHex,hex} from './protocol.mjs';
+import { decodeSv, classifyFrame } from './sv2.mjs';
 const ID=/^[a-f0-9-]{36}$/;
 const fail=message=>{throw Object.assign(Error(message),{status:409});};
 export function describeProtocol(direction,line) {
@@ -11,6 +12,12 @@ export function describeProtocol(direction,line) {
   if(line.startsWith(prefix)) {
     try {
       const bytes=fromHex(line.slice(prefix.length)),decoded=decode(bytes);
+      if(decoded.kind==='unsupported'){
+        // SV2 (E5 10, format 2) och de ramar Lyssna känner igen utan att tolka dem. Inget av detta rör ett objekts tillstånd.
+        const sv=decodeSv(bytes);
+        if(sv)return {kind:sv.reply?'sv-reply':'sv-request',valid:true,hex:hex(bytes),decoded:sv,interpretation:sv.identity?`${sv.name} från kort ${sv.dst}: tillverkare ${sv.identity.manufacturer}, utvecklare ${sv.identity.developer}, produkt ${sv.identity.product}, serienummer ${sv.identity.serial}.`:`${sv.name}${sv.reply?' från':' till'} kort ${sv.dst}, SV ${sv.sv}, data ${sv.data.join(' ')}.`};
+        const c=classifyFrame(bytes);return {kind:'unsupported',frame:c.kind,valid:true,hex:hex(bytes),decoded,interpretation:c.note};
+      }
       return {kind:decoded.kind==='order'?(direction==='out'?'order':'received-order'):decoded.kind==='unsupported'?'unsupported':'report',valid:true,hex:hex(bytes),decoded,
         ...(decoded.kind==='signal'?{interpretation:'Preliminär Signal10-CZ-form. Svenskt MGP-besked ej verifierat.'}:{}),
         ...(decoded.kind==='order'&&direction==='in'?{interpretation:'Mottagen order kan vara eko eller en annan avsändare. Ingen utförd manöver kvitteras.'}:{})};

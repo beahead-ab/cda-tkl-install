@@ -5,6 +5,7 @@ import { RoutePolicy } from './route-policy.mjs';
 import { OperatingControls } from './operating-controls.mjs';
 import { splitRouteAt } from './route-sections.mjs';
 import { boundaryCommandReason } from './yard-boundaries.mjs';
+import { forbidReason } from './studio/rules.mjs';
 import { YardControl } from './yard-control.mjs';
 
 const FIELD_ROWS = new Set(['report', 'transport']), FIELD_ORDERS = new Set(['order', 'permission']);
@@ -112,9 +113,16 @@ export class Engine extends EventEmitter {
       state.position = pos; state.updatedAt = now; state.reportSequence=sequence;
     }
     if (d.kind === 'sensor') for (const [name, binding] of Object.entries(this.profile.blocks)) {
-      if (binding.address !== d.address) continue;
-      const occupied = binding.activeMeansOccupied ? d.active : !d.active;
-      const state = this.blocks[name]; changed ||= state.occupied !== occupied;
+      // En spårledning med flera ingångar (detection-regel): belagd när någon av, eller alla, ingångarna säger belagd.
+      const inputs = binding.inputs || [binding]; if (!inputs.some(i => i.address === d.address)) continue;
+      const state = this.blocks[name]; let occupied;
+      if (binding.inputs) {
+        state.inputs ||= {}; state.inputs[d.address] = d.active;
+        const known = inputs.map(i => state.inputs[i.address] === undefined ? null : (i.activeMeansOccupied ? state.inputs[i.address] : !state.inputs[i.address]));
+        occupied = binding.logic === 'all' ? (known.some(v => v === false) ? false : known.every(v => v === true) ? true : null) : (known.some(v => v === true) ? true : known.every(v => v === false) ? false : null);
+        if (occupied === null) continue;
+      } else occupied = binding.activeMeansOccupied ? d.active : !d.active;
+      changed ||= state.occupied !== occupied;
       state.occupied = occupied; state.updatedAt = now; state.reportSequence=sequence;
     }
     if (d.kind === 'signal') for (const [name, binding] of Object.entries(this.profile.signals)) {
@@ -223,7 +231,10 @@ export class Engine extends EventEmitter {
   }
   // Candidate checks are read-only. Reserve and issue commands exactly once,
   // after a complete source-approved path has passed every live interlock.
+  // Rapporterade lägen för alla växlar med färsk rapport. Används för förbjudna kombinationer.
+  knownPositions(){const out={};for(const [n,s] of Object.entries(this.turnouts))if(this.fresh(s)&&['C','T'].includes(s.position))out[n]=s.position;return out;}
   checkRoute(def) {
+    const forbidden=forbidReason(this.profile.rules,{...Object.assign({},...this.routes.map(r=>r.turnouts)),...def.turnouts});if(forbidden)throw Error(forbidden);
     const operatingReason=this.operating.routeReason(def);if(operatingReason)throw Error(operatingReason);
     const blocked = def.blocks.find(b => this.trackBlocked(b));
     if (blocked) throw Error(`${blocked} är administrativt spärrat.`);
@@ -333,6 +344,7 @@ export class Engine extends EventEmitter {
     const names=this.profile.coupled?.[name]||[name];
     const boundaryReason=boundaryCommandReason(this.profile.yardBoundaries,names,position,operator,this.profile.yardArea?.turnouts);
     if(boundaryReason)throw Error(boundaryReason);
+    const forbidden=forbidReason(this.profile.rules,{...this.knownPositions(),...Object.fromEntries(names.map(n=>[n,position]))});if(forbidden)throw Error(forbidden);
     const condition=this.manualStatus(name,operator); if(!condition.allowed) throw Error(condition.reason);
     for (const n of condition.names) this.turnoutOrder(n, position);
   }

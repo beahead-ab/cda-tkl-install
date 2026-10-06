@@ -8,7 +8,7 @@ import {signalRouteControls,signalImage} from './signal-route-controls.js';
 import {createAdminNavigation} from './admin-navigation.js';
 import {createAdminAppearance} from './admin-appearance.js';
 import {createPanelFit} from './panel-fit.js';
-import {syncAdminWorkspaces,registerAdminWorkspace,settingsRows} from './admin-ui.js';
+import {syncAdminWorkspaces,registerAdminWorkspace,settingsRows,createAdminDialog} from './admin-ui.js';
 import {attribute,style,text as setText,flowProgress,createPanelFrames,preparingEndpoints} from './panel-rendering.js';
 import { createManualFeedback } from './manual-feedback.js';
 import { createSourceRegister } from './source-register.js';
@@ -30,6 +30,9 @@ import {createPanelHead} from './panel-head.js';
 import {createPanelSplit} from './panel-split.js';
 import {openUpdateNotice} from './update-notice.js';
 import {createUpdatePage} from './update-page.js';
+import {createAiPage} from './ai-page.js';
+import {createUsersPage} from './users-page.js';
+import {createStartPage} from './start-page.js';
 import {labelClass,objectFromMessage} from './plan-objects.js';
 const $ = id => document.getElementById(id);
 const adminNavigation=createAdminNavigation();
@@ -58,6 +61,7 @@ const routeTargets=createRouteTargets({load:async(from,kind)=>{
   return response.json();
 },onChange:()=>paint()});
 let currentPage='panel',appMenu,contextDialog,panelConsole,panelEvents,panelHead,signalControls,chosenKind=null,clearanceView,streamDeck,streamDeckAdmin,updatePage;
+let authSession=null;
 const pageFromHash=()=>{
   if(location.hash==='#tools/zoom')history.replaceState(null,'','#tools/appearance');
   if(location.hash==='#tools')history.replaceState(null,'','#tools/appearance');
@@ -69,6 +73,8 @@ const pageFromHash=()=>{
 function setPage(page,{historyMode='push'}={}) {
   let hash={panel:'#panel',tools:'#tools',admin:'#register',trainmeet:'#trainmeet',advanced:'#advanced'}[page];
   if(!hash)return;
+  // Lokalt kräver Inställningar en inloggad ägare eller administratör så snart en ägare finns; operatören stannar i panelen.
+  if(page!=='panel'&&authSession?.mode==='local'&&!authSession.user&&!authSession.setup?.needed){const target=location.hash.startsWith(hash)?location.hash:hash;location.assign('/login?next='+encodeURIComponent('/'+target));return;}
   if(historyMode==='replace'&&location.hash.startsWith(hash+'/'))hash=location.hash;
   if(historyMode!=='none'&&location.hash!==hash)history[historyMode==='replace'?'replaceState':'pushState'](null,'',hash);
   closeInspector(false);manualFeedback?.clear();
@@ -127,6 +133,17 @@ function resumeMessage(){
   pauseMessage();const toast=$('message');
   if(toast.hidden||(messageCanPause&&(toast.matches(':hover')||toast.contains(document.activeElement))))return;
   messageTimer=setTimeout(()=>{toast.classList.add('toast-leaving');messageHideTimer=setTimeout(()=>{toast.hidden=true;toast.classList.remove('toast-leaving');},180);},messageDuration);
+}
+// Kom igång at first start: which steps remain, and a way there. Shown once per browser session.
+function openStartNotice(view){
+  const body=document.createElement('div');
+  body.innerHTML='<p>Det här ställverket är nyinstallerat och inte färdigt att användas. Kom igång visar stegen och leder till rätt sida för varje.</p><ul class="start-list"></ul><p class="settings-consequence">Ägaren gör stegen; operatören kan köra panelen redan nu.</p>';
+  const list=body.querySelector('ul');for(const s of view.steps||[]){const li=document.createElement('li');li.textContent=(s.done?'✓ ':s.skipped?'– ':'○ ')+s.label;list.append(li);}
+  const go=document.createElement('button');go.type='button';go.textContent='Öppna Kom igång';
+  const modal=createAdminDialog({title:'Kom igång · '+view.remaining+' steg kvar',body,saveButton:go});
+  const cancel=modal.footer.querySelector('[data-cancel]');if(cancel)cancel.textContent='Senare';
+  // Only the hash changes; the hashchange handler opens the page with the whole address kept.
+  go.onclick=()=>{modal.close();location.hash='#advanced/start';};modal.open();
 }
 function message(text,{error=true,duration=4000}={}) {
   messageDuration=duration;messageCanPause=error;
@@ -644,6 +661,7 @@ async function start() {
   operatingControls=createOperatingControls({api,openSource});
   modelClock=createModelClock({api});trainMeet=createTrainMeet({api,onTimetable:()=>openTools('trainmeet-timetable'),stationHint:()=>config?.profile?.title||'Charlottendal'});feedback=createFeedback();clearanceView=createClearance({api,message,onRequest:()=>panelEvents?.showDrift({auto:true})});
   panelEvents=createPanelEvents();panelConsole=createPanelConsole({onOpen:()=>{appMenu?.close();},onResetComplete:text=>message(text,{error:false,duration:4000}),showDrift:()=>panelEvents?.showDrift()});
+  authSession=await fetch('/api/auth/session').then(r=>r.ok?r.json():null).catch(()=>null);
   [config, panel, registry, signalEndpoints] = await Promise.all(['/api/config', '/data/panel.json', '/data/source/signals.json', '/data/signal-endpoints.json'].map(async url => { const r = await fetch(url); if (r.status === 401 || r.status === 428) { location.assign('/login'); throw Error('Inloggning krävs'); } if (!r.ok) throw Error('Kunde inte läsa underlaget'); return r.json(); }));
   const files = [...new Set([...Object.values(iconTypes).flatMap(a => a.slice(0, 3)), 'Hsi0+Sh1', 'Hdvsi0+Sh1'])];
   // Loading a missing or slow icon must not prevent the track plan from starting.
@@ -674,6 +692,7 @@ async function start() {
   $('reset-ais').onclick=()=>api('all-stop',{enabled:false});
   $('account-link').hidden = !config.accountUrl;
   adminNavigation.setAccount(!!config.accountUrl);
+  adminNavigation.setSession?.(authSession);
   $('field-link').href = config.fieldUrl || 'http://127.0.0.1:8911/'; $('field-link').hidden = false;
   $('route-catalog').innerHTML=`<label>Från<select id="catalog-from"></select></label><label>Till<select id="catalog-to"></select></label><button id="catalog-request" class="primary" disabled>Lägg / återta tågväg</button><p id="catalog-hint" class="muted" hidden></p>`;
   function catalogHint(){const ids=[$('catalog-from').value,$('catalog-to').value].filter(id=>config.buttons[id]?.presentation==='catalog');$('catalog-hint').hidden=!ids.length;$('catalog-hint').textContent=ids.map(label).join(', ')+' väljs i listan. Använd Lägg / återta tågväg även för återtagning.';}
@@ -707,8 +726,16 @@ async function start() {
   createAdminAppearance();
   for(const id of ['appearance','journal','streamdeck'])registerAdminWorkspace('#tools/'+id,$(id+'-tools'));
   $('journal-filter').oninput=paintJournal;
-  for(const id of ['xml','migration','protocol','update'])registerAdminWorkspace('#advanced/'+id,$('advanced-'+id));
+  for(const id of ['xml','migration','protocol','update','ai','users','start'])registerAdminWorkspace('#advanced/'+id,$('advanced-'+id));
   updatePage=createUpdatePage({root:$('advanced-update-content'),api,message});
+  const aiPage=createAiPage({root:$('advanced-ai-content'),api,message});
+  const usersPage=createUsersPage({root:$('advanced-users-content'),api,message,session:()=>authSession});
+  const startPage=createStartPage({root:$('advanced-start-content'),api,message,session:()=>authSession,onChange:v=>{config.onboarding={done:v.done,remaining:v.remaining};panelHead?.startNotice(config.onboarding);startStatus();}});
+  const startStatus=()=>{const o=config.onboarding,el=$('start-status');if(el)el.textContent=o&&!o.done?'· '+o.remaining+' kvar':'';};
+  panelHead?.startNotice(config.onboarding);startStatus();
+  // First start: tell the owner once per browser session that Kom igång is waiting; the chip stays until it is done.
+  if(config.onboarding&&!config.onboarding.done&&!(()=>{try{return sessionStorage.getItem('start-seen');}catch{return false;}})()){try{sessionStorage.setItem('start-seen','1');}catch{}openStartNotice(config.onboarding);}
+  const loadSettingsPages=()=>{if(location.hash.startsWith('#advanced/ai'))aiPage?.load();if(location.hash.startsWith('#advanced/users'))usersPage?.load();if(location.hash.startsWith('#advanced/start'))startPage?.load();};window.addEventListener('hashchange',loadSettingsPages);loadSettingsPages();
   document.addEventListener('click',e=>{
     const section=e.target.closest('[data-tools-section]');
     if(section){e.preventDefault();openTools(section.dataset.toolsSection);return;}

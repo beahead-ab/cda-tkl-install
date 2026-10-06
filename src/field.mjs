@@ -1,5 +1,6 @@
 import { EventEmitter } from 'node:events';
 import { decode, switchReport, sensorReport, signalReport } from './protocol.mjs';
+import { decodeSv, svReply, identityReply, SV_CMD } from './sv2.mjs';
 
 // Independent field state: no Engine import, route state or TKL HTTP access.
 export class Field extends EventEmitter {
@@ -10,6 +11,23 @@ export class Field extends EventEmitter {
     this.signals = Object.fromEntries(Object.keys(profile.signals).map(n => [n, { permission: 'STOP', code: 0, due: 0 }]));
     this.faults = { turnout: '', signal: '', sensor: '' }; this.train = null; this.trains = []; this.nextTrain = 420;
     this.programming=profile.programming?{relay:'T',active:false,target:false,due:0,fault:false}:null;
+    // Simulerade kort: identitet och SV-minne per modul. Svarar på SV2 som ett kort skulle enligt SV v13.
+    this.modules=(profile.modules||[]).map(m=>({...m,sv:{...(m.sv||{})}}));
+  }
+  answerSv(sv) {
+    const identity=m=>this.emit('frame',identityReply(sv,m.address,m));
+    const value=(m,n)=>m.sv[n]??0, reply=(m,data)=>this.emit('frame',svReply(sv,{dst:m.address,data}));
+    if(sv.cmd===SV_CMD.discover){for(const m of this.modules)identity(m);return;}
+    if(sv.cmd===SV_CMD.changeAddress){const m=this.modules.find(x=>x.manufacturer===(sv.sv&0xff)&&x.developer===(sv.sv>>8)&&x.product===(sv.data[0]|(sv.data[1]<<8))&&x.serial===(sv.data[2]|(sv.data[3]<<8)));if(m){m.address=sv.dst;identity(m);}return;}
+    for(const m of this.modules.filter(x=>x.address===sv.dst)){
+      if(sv.cmd===SV_CMD.identify)identity(m);
+      else if(sv.cmd===SV_CMD.read)reply(m,[value(m,sv.sv)]);
+      else if(sv.cmd===SV_CMD.read4)reply(m,[0,1,2,3].map(i=>value(m,sv.sv+i)));
+      else if(sv.cmd===SV_CMD.write){m.sv[sv.sv]=sv.data[0];reply(m,[value(m,sv.sv)]);}
+      else if(sv.cmd===SV_CMD.maskedWrite){m.sv[sv.sv]=(value(m,sv.sv)&~sv.data[1])|(sv.data[0]&sv.data[1]);reply(m,[value(m,sv.sv)]);}
+      else if(sv.cmd===SV_CMD.write4){[0,1,2,3].forEach(i=>{m.sv[sv.sv+i]=sv.data[i];});reply(m,[0,1,2,3].map(i=>value(m,sv.sv+i)));}
+      else if(sv.cmd===SV_CMD.reconfigure)reply(m,[]);
+    }
   }
   reportTurnout(name) {
     if (this.faults.turnout === name) return;
@@ -19,7 +37,9 @@ export class Field extends EventEmitter {
   }
   reportBlock(name) {
     if (this.faults.sensor && this.profile.blocks[this.faults.sensor].address === this.profile.blocks[name].address) return;
-    const b = this.profile.blocks[name]; this.emit('frame', sensorReport(b.address, b.activeMeansOccupied ? this.blocks[name] : !this.blocks[name]));
+    const b = this.profile.blocks[name];
+    // Flera ingångar rapporterar alla samma beläggning; simulatorn har ingen egen bild av var på spårledningen tåget står.
+    for (const i of b.inputs || [b]) this.emit('frame', sensorReport(i.address, i.activeMeansOccupied ? this.blocks[name] : !this.blocks[name]));
   }
   reportSignal(name) { this.emit('frame', signalReport(this.profile.signals[name].reportAddress, this.signals[name].code)); }
   allReports() {
@@ -32,6 +52,7 @@ export class Field extends EventEmitter {
   reportProgramming(){const p=this.programming,b=this.profile.programming;if(p&&!p.fault){this.emit('frame',switchReport(b.relayAddress,p.relay));this.emit('frame',sensorReport(b.reportAddress,p.active));}}
   setProgrammingFault(enabled){if(!this.programming||typeof enabled!=='boolean')throw Error('Ogiltigt programmeringsfel.');this.programming.fault=enabled;this.tick();this.reportProgramming();}
   accept(bytes) {
+    const sv=decodeSv(bytes); if(sv){ if(!sv.reply) this.answerSv(sv); return; }
     const d = decode(bytes); if (d.kind !== 'order' || !d.on) return;
     if(this.programming&&d.address===this.profile.programming.relayAddress){this.programming.target=d.position==='C';this.programming.relay='unknown';this.programming.due=this.now()+this.movementMs;this.reportProgramming();}
     for (const [name, b] of Object.entries(this.profile.turnouts)) {

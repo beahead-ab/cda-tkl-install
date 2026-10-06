@@ -1,0 +1,3369 @@
+{
+  "id": "charlottendal-rules-v1",
+  "profile": "charlottendal-network-v1",
+  "sourceHash": "c69a865ae9a85cdb842d70c34d2573dde4b11c50f601a561d5b941136ac6fa87",
+  "generatedFrom": "profiles/charlottendal-network.json",
+  "note": "Dagens beteende som regler. Kompilerar till profilens coupled, manualPolicies, yardBoundaries och operatingControls utan skillnad; signalbesked och vägövergångar är härledda och ägs av driftbindningarna respektive indikeringskatalogen.",
+  "rules": [
+    {
+      "id": "follow:Vx100+Vx101",
+      "type": "follow",
+      "objects": [
+        "Vx100",
+        "Vx101"
+      ],
+      "relation": "same",
+      "bothWays": true,
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "coupled",
+        "jmri": "IX:AUTO:0007C1",
+        "button": "vxv100/101"
+      }
+    },
+    {
+      "id": "follow:Vx110+Vx117",
+      "type": "follow",
+      "objects": [
+        "Vx110",
+        "Vx117"
+      ],
+      "relation": "same",
+      "bothWays": true,
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "coupled",
+        "jmri": "IX:AUTO:0007C5",
+        "button": "vxv110/117"
+      }
+    },
+    {
+      "id": "follow:Vx111+Vx118",
+      "type": "follow",
+      "objects": [
+        "Vx111",
+        "Vx118"
+      ],
+      "relation": "same",
+      "bothWays": true,
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "coupled",
+        "jmri": "IX:AUTO:0007C23",
+        "button": "vxv111/118"
+      }
+    },
+    {
+      "id": "follow:Vx120+Vx121",
+      "type": "follow",
+      "objects": [
+        "Vx120",
+        "Vx121"
+      ],
+      "relation": "same",
+      "bothWays": true,
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "coupled",
+        "jmri": "IX:AUTO:0007C9",
+        "button": "vxv120/121"
+      }
+    },
+    {
+      "id": "follow:Vx140+Vx142",
+      "type": "follow",
+      "objects": [
+        "Vx140",
+        "Vx142"
+      ],
+      "relation": "same",
+      "bothWays": true,
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "coupled",
+        "jmri": null,
+        "button": null
+      }
+    },
+    {
+      "id": "follow:Vx153+Vx161",
+      "type": "follow",
+      "objects": [
+        "Vx153",
+        "Vx161"
+      ],
+      "relation": "same",
+      "bothWays": true,
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "coupled",
+        "jmri": "IX:AUTO:0007C16",
+        "button": "vxv153/161"
+      }
+    },
+    {
+      "id": "follow:Vx162+Vx165",
+      "type": "follow",
+      "objects": [
+        "Vx162",
+        "Vx165"
+      ],
+      "relation": "same",
+      "bothWays": true,
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "coupled",
+        "jmri": null,
+        "button": null
+      }
+    },
+    {
+      "id": "authority:Vx112",
+      "type": "authority",
+      "object": "Vx112",
+      "tkl": [
+        "C",
+        "T"
+      ],
+      "ranger": [
+        "T"
+      ],
+      "detail": {
+        "ports": {
+          "C": [
+            "A",
+            "B"
+          ],
+          "T": [
+            "A",
+            "C"
+          ]
+        },
+        "tklLegs": [
+          "B"
+        ],
+        "yardLegs": [
+          "A",
+          "C"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "yardBoundaries",
+        "button": "vxv102/112",
+        "provenance": "Anläggningsägarens manöverregel 2026-09-26, granskad mot XML-portarna. Fysisk överlämningsanslutning återstår."
+      }
+    },
+    {
+      "id": "authority:Vx131",
+      "type": "authority",
+      "object": "Vx131",
+      "tkl": [
+        "C",
+        "T"
+      ],
+      "ranger": [
+        "T"
+      ],
+      "detail": {
+        "ports": {
+          "C": [
+            "A",
+            "C"
+          ],
+          "T": [
+            "A",
+            "B"
+          ]
+        },
+        "tklLegs": [
+          "C"
+        ],
+        "yardLegs": [
+          "A",
+          "B"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "yardBoundaries",
+        "button": "vxv131/132",
+        "provenance": "Anläggningsägarens manöverregel 2026-09-26, granskad mot XML-portarna. Fysisk överlämningsanslutning återstår."
+      }
+    },
+    {
+      "id": "authority:Vx154",
+      "type": "authority",
+      "object": "Vx154",
+      "tkl": [
+        "C",
+        "T"
+      ],
+      "ranger": [
+        "C"
+      ],
+      "detail": {
+        "ports": {
+          "C": [
+            "A",
+            "C"
+          ],
+          "T": [
+            "A",
+            "B"
+          ]
+        },
+        "tklLegs": [
+          "A",
+          "C"
+        ],
+        "yardLegs": [
+          "B"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "yardBoundaries",
+        "button": "vxv144/154",
+        "provenance": "Anläggningsägarens manöverregel 2026-09-26, granskad mot XML-portarna. Fysisk överlämningsanslutning återstår."
+      }
+    },
+    {
+      "id": "condition:manual:vxv100/101",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx100",
+        "Vx101"
+      ],
+      "button": "vxv100/101",
+      "requires": {
+        "freeSensors": [
+          "slS100",
+          "slS101"
+        ],
+        "blocks": [
+          "S100",
+          "S101"
+        ],
+        "signals": [
+          "1/10",
+          "1/5",
+          "2/10",
+          "2/5",
+          "3/10",
+          "4/10",
+          "5/10"
+        ],
+        "inactiveNX": [
+          "IN:ae2e9664-5541-4c5e-8412-451de18c57ea",
+          "IN:429040bc-67f8-49a6-8934-ae57c3462b1e",
+          "IN:8ebd3482-4061-423c-8b43-ad01fd3b1add",
+          "IN:c94fa9cb-863d-473f-a699-13c9e44cf9fe",
+          "IN:6bd97aec-4fd3-41f9-9b8a-12d73cc8dfbd",
+          "IN:a802cc6d-3f3a-490b-900e-14619fcdf4cf",
+          "IN:533504cb-b0e9-45ec-a8b8-3bbc68953533",
+          "IN:0ed73b3e-35e5-43f7-8c19-f9eb86e71e3c",
+          "IN:871a7269-712d-4f47-9cb9-c5b316eb2967",
+          "IN:42714135-f6d9-42b6-baa6-ef93873dfb83",
+          "IN:d12211a5-28ae-4add-bb48-7fb55e571843",
+          "IN:17dd1cdb-033d-4257-9e5f-8d96cc80c348",
+          "IN:77561b23-7836-48d7-b3e8-54d33c423de2",
+          "IN:72191ed1-b72d-4ae0-b9d8-f75c36539b10",
+          "IN:6f3c8c04-94ac-47da-8d6c-846982cafd5f",
+          "IN:fa61129e-5542-488b-88d4-600c63c448e3",
+          "IN:f634a24b-7043-4c2d-9ee0-8378dea7cfe2",
+          "IN:a1600f94-e4a0-4013-8607-455702f83e44"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C1"
+      }
+    },
+    {
+      "id": "condition:manual:vxv102/112",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx102",
+        "Vx112"
+      ],
+      "button": "vxv102/112",
+      "requires": {
+        "freeSensors": [
+          "slS102",
+          "slS112"
+        ],
+        "blocks": [
+          "S102",
+          "S112",
+          "S112a"
+        ],
+        "signals": [
+          "1/5",
+          "2/10",
+          "2/5",
+          "3/10",
+          "3/3",
+          "4/10",
+          "5/10"
+        ],
+        "inactiveNX": [
+          "IN:429040bc-67f8-49a6-8934-ae57c3462b1e",
+          "IN:8ebd3482-4061-423c-8b43-ad01fd3b1add",
+          "IN:c94fa9cb-863d-473f-a699-13c9e44cf9fe",
+          "IN:6bd97aec-4fd3-41f9-9b8a-12d73cc8dfbd",
+          "IN:a802cc6d-3f3a-490b-900e-14619fcdf4cf",
+          "IN:533504cb-b0e9-45ec-a8b8-3bbc68953533",
+          "IN:0ed73b3e-35e5-43f7-8c19-f9eb86e71e3c",
+          "IN:871a7269-712d-4f47-9cb9-c5b316eb2967",
+          "IN:d12211a5-28ae-4add-bb48-7fb55e571843",
+          "IN:17dd1cdb-033d-4257-9e5f-8d96cc80c348",
+          "IN:4114a7e3-f4c1-43cd-a92e-a4844d979ad6",
+          "IN:57ba1105-5758-43de-9110-7f48a66b528b",
+          "IN:7d4463d7-4c9f-4296-9f98-b8ee8433e7fa",
+          "IN:8be10a2c-1459-4b9d-9437-49d4a1e30a63",
+          "IN:77561b23-7836-48d7-b3e8-54d33c423de2",
+          "IN:72191ed1-b72d-4ae0-b9d8-f75c36539b10",
+          "IN:4ff1b10a-8b50-4ca3-bd1e-d5e1c3379ec2",
+          "IN:6f3c8c04-94ac-47da-8d6c-846982cafd5f",
+          "IN:fa61129e-5542-488b-88d4-600c63c448e3",
+          "IN:c5877801-d9df-4504-a527-52f4ad57ed62",
+          "IN:f634a24b-7043-4c2d-9ee0-8378dea7cfe2",
+          "IN:a1600f94-e4a0-4013-8607-455702f83e44"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "unresolved",
+      "reason": "Knappgruppens fullständiga växelkoppling är inte verifierad i XML-layouten.",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C2"
+      }
+    },
+    {
+      "id": "condition:manual:vxv113",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx113"
+      ],
+      "button": "vxv113",
+      "requires": {
+        "freeSensors": [
+          "slS113"
+        ],
+        "blocks": [
+          "S113",
+          "S113a",
+          "S113b",
+          "S113c"
+        ],
+        "signals": [
+          "1/5",
+          "2/5",
+          "3/10",
+          "3/3",
+          "4/10",
+          "5/10"
+        ],
+        "inactiveNX": [
+          "IN:8ebd3482-4061-423c-8b43-ad01fd3b1add",
+          "IN:c94fa9cb-863d-473f-a699-13c9e44cf9fe",
+          "IN:6bd97aec-4fd3-41f9-9b8a-12d73cc8dfbd",
+          "IN:533504cb-b0e9-45ec-a8b8-3bbc68953533",
+          "IN:0ed73b3e-35e5-43f7-8c19-f9eb86e71e3c",
+          "IN:871a7269-712d-4f47-9cb9-c5b316eb2967",
+          "IN:4114a7e3-f4c1-43cd-a92e-a4844d979ad6",
+          "IN:57ba1105-5758-43de-9110-7f48a66b528b",
+          "IN:7d4463d7-4c9f-4296-9f98-b8ee8433e7fa",
+          "IN:8be10a2c-1459-4b9d-9437-49d4a1e30a63",
+          "IN:77561b23-7836-48d7-b3e8-54d33c423de2",
+          "IN:72191ed1-b72d-4ae0-b9d8-f75c36539b10",
+          "IN:4ff1b10a-8b50-4ca3-bd1e-d5e1c3379ec2",
+          "IN:6f3c8c04-94ac-47da-8d6c-846982cafd5f",
+          "IN:fa61129e-5542-488b-88d4-600c63c448e3",
+          "IN:c5877801-d9df-4504-a527-52f4ad57ed62",
+          "IN:f634a24b-7043-4c2d-9ee0-8378dea7cfe2",
+          "IN:a1600f94-e4a0-4013-8607-455702f83e44"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C3"
+      }
+    },
+    {
+      "id": "condition:manual:vxv116",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx116"
+      ],
+      "button": "vxv116",
+      "requires": {
+        "freeSensors": [
+          "slS116"
+        ],
+        "blocks": [
+          "S116",
+          "S116a",
+          "S116c"
+        ],
+        "signals": [
+          "1/5",
+          "2/5",
+          "3/3",
+          "4/10",
+          "5/10"
+        ],
+        "inactiveNX": [
+          "IN:c94fa9cb-863d-473f-a699-13c9e44cf9fe",
+          "IN:6bd97aec-4fd3-41f9-9b8a-12d73cc8dfbd",
+          "IN:0ed73b3e-35e5-43f7-8c19-f9eb86e71e3c",
+          "IN:871a7269-712d-4f47-9cb9-c5b316eb2967",
+          "IN:57ba1105-5758-43de-9110-7f48a66b528b",
+          "IN:7d4463d7-4c9f-4296-9f98-b8ee8433e7fa",
+          "IN:4ff1b10a-8b50-4ca3-bd1e-d5e1c3379ec2",
+          "IN:6f3c8c04-94ac-47da-8d6c-846982cafd5f",
+          "IN:fa61129e-5542-488b-88d4-600c63c448e3",
+          "IN:c5877801-d9df-4504-a527-52f4ad57ed62",
+          "IN:f634a24b-7043-4c2d-9ee0-8378dea7cfe2",
+          "IN:a1600f94-e4a0-4013-8607-455702f83e44"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C4"
+      }
+    },
+    {
+      "id": "condition:manual:vxv110/117",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx110",
+        "Vx117"
+      ],
+      "button": "vxv110/117",
+      "requires": {
+        "freeSensors": [
+          "slS110",
+          "slS117"
+        ],
+        "blocks": [
+          "S110",
+          "S117"
+        ],
+        "signals": [
+          "1/10",
+          "1/5",
+          "2/10",
+          "2/5"
+        ],
+        "inactiveNX": [
+          "IN:ae2e9664-5541-4c5e-8412-451de18c57ea",
+          "IN:429040bc-67f8-49a6-8934-ae57c3462b1e",
+          "IN:42714135-f6d9-42b6-baa6-ef93873dfb83",
+          "IN:d12211a5-28ae-4add-bb48-7fb55e571843",
+          "IN:17dd1cdb-033d-4257-9e5f-8d96cc80c348"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C5"
+      }
+    },
+    {
+      "id": "condition:manual:vxv122",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx122"
+      ],
+      "button": "vxv122",
+      "requires": {
+        "freeSensors": [
+          "slS122"
+        ],
+        "blocks": [
+          "S122"
+        ],
+        "signals": [
+          "1/8",
+          "2/7",
+          "2/8",
+          "3/8",
+          "4/8"
+        ],
+        "inactiveNX": [
+          "IN:a7396c65-4eea-46f6-b197-ff6119abe71a",
+          "IN:0938c621-8dcb-4add-9783-28d6824b0f8d",
+          "IN:a4607e61-cc12-4f46-9c30-fb534204d98a",
+          "IN:52be6d9f-956b-4e6c-a476-1f8803639586",
+          "IN:c664f521-df47-4557-89d7-f65fb3644fd3",
+          "IN:941b374c-f243-4308-8829-b77dad2253dd",
+          "IN:1c8b77e7-e6a7-465f-a580-c95cbb8a88e8",
+          "IN:02071f89-8e14-4603-8b23-4f86301200ed"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C6"
+      }
+    },
+    {
+      "id": "condition:manual:vxv123",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx123"
+      ],
+      "button": "vxv123",
+      "requires": {
+        "freeSensors": [
+          "slS123"
+        ],
+        "blocks": [
+          "S123",
+          "S123b",
+          "S123c"
+        ],
+        "signals": [
+          "3/5",
+          "4/5",
+          "5/8",
+          "6/8"
+        ],
+        "inactiveNX": [
+          "IN:0793ab5d-0ae4-44e1-9d20-d8cd3b66af97",
+          "IN:30bca77d-457b-4e67-a418-1c1190064ebf",
+          "IN:8abf0b18-94ad-47b3-9c58-f48f68da4654",
+          "IN:9af8d60e-52c9-4694-b1d6-1cb7d1a25b2b",
+          "IN:8b500613-a031-465d-a3b7-de0b654f22a0",
+          "IN:ef097bcf-7770-4019-a1d7-60731f8b254a",
+          "IN:6af610f4-2e48-4b05-b33b-c327971b047d",
+          "IN:c789a119-83a8-49f6-99e0-ddf1b8a0c450"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C7"
+      }
+    },
+    {
+      "id": "condition:manual:vxv126",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx126"
+      ],
+      "button": "vxv126",
+      "requires": {
+        "freeSensors": [
+          "slS126"
+        ],
+        "blocks": [
+          "S123a",
+          "S126",
+          "S126c"
+        ],
+        "signals": [
+          "3/5",
+          "4/5",
+          "5/5",
+          "5/8",
+          "6/8"
+        ],
+        "inactiveNX": [
+          "IN:0793ab5d-0ae4-44e1-9d20-d8cd3b66af97",
+          "IN:30bca77d-457b-4e67-a418-1c1190064ebf",
+          "IN:a7c38e71-3385-46d7-825d-ad64f78e9fbf",
+          "IN:8abf0b18-94ad-47b3-9c58-f48f68da4654",
+          "IN:9af8d60e-52c9-4694-b1d6-1cb7d1a25b2b",
+          "IN:68af5f58-3f09-460e-95fc-d88791f18a73",
+          "IN:8b500613-a031-465d-a3b7-de0b654f22a0",
+          "IN:ef097bcf-7770-4019-a1d7-60731f8b254a",
+          "IN:6af610f4-2e48-4b05-b33b-c327971b047d",
+          "IN:c789a119-83a8-49f6-99e0-ddf1b8a0c450",
+          "IN:1a77e99e-db90-453b-aa4e-85b71071b2db",
+          "IN:d3a73449-9685-4aac-ae15-3d7b7e6cbee5"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C8"
+      }
+    },
+    {
+      "id": "condition:manual:vxv120/121",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx120",
+        "Vx121"
+      ],
+      "button": "vxv120/121",
+      "requires": {
+        "freeSensors": [
+          "slS120",
+          "slS121"
+        ],
+        "blocks": [
+          "S120",
+          "S121",
+          "S121b"
+        ],
+        "signals": [
+          "1/7",
+          "1/8",
+          "2/7",
+          "2/8"
+        ],
+        "inactiveNX": [
+          "IN:b137bbde-b5bc-4b51-90d2-56c1ec28a478",
+          "IN:ccb213d2-edb8-48d1-bfef-01fc35ccc32f",
+          "IN:c664f521-df47-4557-89d7-f65fb3644fd3",
+          "IN:a7396c65-4eea-46f6-b197-ff6119abe71a",
+          "IN:0938c621-8dcb-4add-9783-28d6824b0f8d",
+          "IN:941b374c-f243-4308-8829-b77dad2253dd"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C9"
+      }
+    },
+    {
+      "id": "condition:manual:vxv125",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx125"
+      ],
+      "button": "vxv125",
+      "requires": {
+        "freeSensors": [
+          "slS125"
+        ],
+        "blocks": [
+          "S125"
+        ],
+        "signals": [
+          "2/7",
+          "3/8",
+          "4/8"
+        ],
+        "inactiveNX": [
+          "IN:a4607e61-cc12-4f46-9c30-fb534204d98a",
+          "IN:52be6d9f-956b-4e6c-a476-1f8803639586",
+          "IN:1c8b77e7-e6a7-465f-a580-c95cbb8a88e8",
+          "IN:02071f89-8e14-4603-8b23-4f86301200ed"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C10"
+      }
+    },
+    {
+      "id": "condition:manual:vxv131/132",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx131",
+        "Vx132"
+      ],
+      "button": "vxv131/132",
+      "requires": {
+        "freeSensors": [
+          "slS131",
+          "slS132"
+        ],
+        "blocks": [
+          "S126a",
+          "S131",
+          "S131a",
+          "S131c",
+          "S132",
+          "S132a",
+          "S132b"
+        ],
+        "signals": [
+          "3/5",
+          "4/5",
+          "5/5",
+          "5/8",
+          "6/5",
+          "6/6",
+          "6/8",
+          "7/5",
+          "8/5",
+          "9/5"
+        ],
+        "inactiveNX": [
+          "IN:8b500613-a031-465d-a3b7-de0b654f22a0",
+          "IN:ef097bcf-7770-4019-a1d7-60731f8b254a",
+          "IN:6af610f4-2e48-4b05-b33b-c327971b047d",
+          "IN:c789a119-83a8-49f6-99e0-ddf1b8a0c450",
+          "IN:1a77e99e-db90-453b-aa4e-85b71071b2db",
+          "IN:d3a73449-9685-4aac-ae15-3d7b7e6cbee5",
+          "IN:ae4dcfd1-31eb-4a2b-ae55-c156aa18c973",
+          "IN:b40d2819-0552-4586-ab45-2a7aa2087544",
+          "IN:d29a79dc-dc0b-48ff-8553-ba218dac09fe",
+          "IN:9637bfe4-0334-4ee1-8b2a-6f54d18b80d7",
+          "IN:60c05de6-7b87-4156-8000-a73c8a4c9c45",
+          "IN:28fd5177-1f83-4b70-ab20-8dfa7d9d5bca",
+          "IN:3d360610-3f48-455c-9476-5d3d877014b2",
+          "IN:82fca6a8-90ed-41b7-8780-4c6afe4b8ac5",
+          "IN:6ab85d5e-781c-4fc5-82c1-35ee572f6b28"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "unresolved",
+      "reason": "Knappgruppens fullständiga växelkoppling är inte verifierad i XML-layouten.",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C11"
+      }
+    },
+    {
+      "id": "condition:manual:vxv140/141/142/143",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx140",
+        "Vx141",
+        "Vx142",
+        "Vx143"
+      ],
+      "button": "vxv140/141/142/143",
+      "requires": {
+        "freeSensors": [
+          "slS140",
+          "slS141",
+          "slS142",
+          "slS143"
+        ],
+        "blocks": [
+          "S140",
+          "S140a",
+          "S140b",
+          "S140c",
+          "S141",
+          "S141a",
+          "S141b",
+          "S141c",
+          "S142",
+          "S142a",
+          "S142c",
+          "S143",
+          "S143a",
+          "S143c"
+        ],
+        "signals": [
+          "1/6",
+          "1/9",
+          "2/6",
+          "2/9"
+        ],
+        "inactiveNX": [
+          "IN:3781af48-05c1-45d1-8822-1dfd3dfb660a",
+          "IN:e9518f14-ef23-4c67-9935-abec0d8732da",
+          "IN:5e81014d-615b-4aed-adbf-e4f677ef8b76",
+          "IN:d79e35da-7afa-48f9-a234-16e20dd1f8db",
+          "IN:671e0660-36cb-4d49-b155-e0307c177596",
+          "IN:478af43f-3bfc-4c77-9380-bdb8586d815f",
+          "IN:a98d6d8d-ff9c-4125-8689-291682944520",
+          "IN:5b52eaa8-1395-441d-be3e-15657f40349e"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "unresolved",
+      "reason": "Knappgruppens fullständiga växelkoppling är inte verifierad i XML-layouten.",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C12"
+      }
+    },
+    {
+      "id": "condition:manual:vxv144/154",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx144",
+        "Vx154"
+      ],
+      "button": "vxv144/154",
+      "requires": {
+        "freeSensors": [
+          "slS144",
+          "slS154"
+        ],
+        "blocks": [
+          "S144",
+          "S144a",
+          "S144b",
+          "S151b",
+          "S154",
+          "S154b",
+          "S154c"
+        ],
+        "signals": [
+          "3/2",
+          "3/6",
+          "5/9",
+          "6/7",
+          "6/9"
+        ],
+        "inactiveNX": [
+          "IN:aca159e6-947d-4248-a417-12249bbd9d20",
+          "IN:447e1f19-0c48-4f93-9702-46f8b1b59c3d",
+          "IN:bff6c4b1-e623-4ebb-b4a4-71d03691011b",
+          "IN:27d9d2ff-a551-440c-8095-4f8a6713efac",
+          "IN:c718d9b8-d667-40bf-9279-26a6110d33be",
+          "IN:ae76e106-8150-4ea1-a430-678127a4c5e0",
+          "IN:bbfb9823-1ff0-4ca5-96ca-7f6498bd93fc",
+          "IN:4e5ca277-55c7-409c-9b8c-ca2531f711be",
+          "IN:8b3b3a92-0ebc-4099-838c-a3baa13e53f4",
+          "IN:721d8239-bf96-4733-a4c4-277eed3c5003",
+          "IN:0632870a-0526-43c4-a82f-0a371537bf8e",
+          "IN:8f1f7f38-cb7c-4349-81a3-f6a0e5dc78be",
+          "IN:b0c82045-3dfe-49f5-92ae-2c1b8f0a00fa",
+          "IN:03942f9b-cfc0-4779-85dd-a52c310e8a63",
+          "IN:fc05bf08-09e9-493b-b9db-2f3aa6446c34"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "unresolved",
+      "reason": "Knappgruppens fullständiga växelkoppling är inte verifierad i XML-layouten.",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C13"
+      }
+    },
+    {
+      "id": "condition:manual:vxv151",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx151"
+      ],
+      "button": "vxv151",
+      "requires": {
+        "freeSensors": [
+          "slS151"
+        ],
+        "blocks": [
+          "S151",
+          "S151c",
+          "S152b"
+        ],
+        "signals": [
+          "3/6",
+          "4/9",
+          "5/9",
+          "6/9"
+        ],
+        "inactiveNX": [
+          "IN:28420481-c3c3-4304-9a12-f02b5295b7aa",
+          "IN:97115fc4-90e0-4bb1-8571-e5e9b5a927cf",
+          "IN:ac505f13-77bf-4ad4-b7d8-3510d036701b",
+          "IN:899f9f4c-f813-44f7-9797-11130faad22c",
+          "IN:c718d9b8-d667-40bf-9279-26a6110d33be",
+          "IN:ae76e106-8150-4ea1-a430-678127a4c5e0"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C14"
+      }
+    },
+    {
+      "id": "condition:manual:vxv152",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx152"
+      ],
+      "button": "vxv152",
+      "requires": {
+        "freeSensors": [
+          "slS152"
+        ],
+        "blocks": [
+          "S152",
+          "S152c",
+          "S153b"
+        ],
+        "signals": [
+          "1/4",
+          "2/4",
+          "3/2",
+          "3/6",
+          "3/9",
+          "4/9",
+          "5/9",
+          "6/9"
+        ],
+        "inactiveNX": [
+          "IN:c8e0a325-eec5-4ce7-803b-90d7514b12bf",
+          "IN:28420481-c3c3-4304-9a12-f02b5295b7aa",
+          "IN:97115fc4-90e0-4bb1-8571-e5e9b5a927cf",
+          "IN:ac505f13-77bf-4ad4-b7d8-3510d036701b",
+          "IN:c86e61af-d30f-4034-8c84-234f9d601f62",
+          "IN:899f9f4c-f813-44f7-9797-11130faad22c",
+          "IN:c718d9b8-d667-40bf-9279-26a6110d33be",
+          "IN:ae76e106-8150-4ea1-a430-678127a4c5e0"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C15"
+      }
+    },
+    {
+      "id": "condition:manual:vxv153/161",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx153",
+        "Vx161"
+      ],
+      "button": "vxv153/161",
+      "requires": {
+        "freeSensors": [
+          "slS153",
+          "slS161"
+        ],
+        "blocks": [
+          "S153",
+          "S153c",
+          "S161",
+          "S161a",
+          "S161b",
+          "S161c"
+        ],
+        "signals": [
+          "1/4",
+          "2/11",
+          "2/4",
+          "3/11",
+          "3/2"
+        ],
+        "inactiveNX": [
+          "IN:6e4f8eaf-ae36-47fd-93c2-f26b6df1dcf7",
+          "IN:ffa579d7-ecec-4eba-9c94-9018e30153b8",
+          "IN:ea56af37-dad8-4c2d-9891-23783b74f325",
+          "IN:4edf0950-9c34-4bd8-8a68-4ec191243de0",
+          "IN:b7da8647-7366-4a3a-b2e1-5e60acc04527",
+          "IN:04e4337d-e4ec-4c7a-957e-d5fec082d167",
+          "IN:b4d7b7fd-bda4-4650-82ec-c55ea564a455"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C16"
+      }
+    },
+    {
+      "id": "condition:manual:vxv160",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx160"
+      ],
+      "button": "vxv160",
+      "requires": {
+        "freeSensors": [
+          "slS160"
+        ],
+        "blocks": [
+          "S160",
+          "S160a",
+          "S160b",
+          "S160c"
+        ],
+        "signals": [
+          "1/11",
+          "1/4",
+          "10/11",
+          "2/4"
+        ],
+        "inactiveNX": [
+          "IN:02bf8516-c5ce-4638-b51b-5ba11b02bd92",
+          "IN:75288d04-f50b-4816-9879-11c6a45eff47",
+          "IN:7270481f-f9e5-43f2-9ee7-b78863087ebf",
+          "IN:38153432-a6c0-4029-92b1-875f06fde7c6",
+          "IN:7d509c52-6580-4349-9a19-fa78faecef2d",
+          "IN:9925d20b-5e18-4f47-a8d5-6fdcf0664a0c",
+          "IN:915d1120-9a5f-4302-8ca8-acdb62708add",
+          "IN:711c1b7f-8d0f-4f98-bec6-205260b2ef25"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C17"
+      }
+    },
+    {
+      "id": "condition:manual:vxv162/163/165/166",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx162",
+        "Vx163",
+        "Vx165",
+        "Vx166"
+      ],
+      "button": "vxv162/163/165/166",
+      "requires": {
+        "freeSensors": [
+          "slS162",
+          "slS163",
+          "slS165",
+          "slS166"
+        ],
+        "blocks": [
+          "S162",
+          "S162c",
+          "S163",
+          "S163c",
+          "S165",
+          "S165b",
+          "S165c",
+          "S166",
+          "S166b",
+          "S166c"
+        ],
+        "signals": [
+          "1/11",
+          "1/4",
+          "10/11",
+          "2/11",
+          "2/4",
+          "3/11"
+        ],
+        "inactiveNX": []
+      },
+      "runsIn": "tkl",
+      "status": "unresolved",
+      "reason": "Knappgruppens fullständiga växelkoppling är inte verifierad i XML-layouten.",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C18"
+      }
+    },
+    {
+      "id": "condition:manual:vxv103",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx103"
+      ],
+      "button": "vxv103",
+      "requires": {
+        "freeSensors": [
+          "slS103"
+        ],
+        "blocks": [
+          "S103",
+          "S103a",
+          "S103b"
+        ],
+        "signals": [
+          "3/1",
+          "3/10",
+          "4/10",
+          "5/10",
+          "6/10",
+          "7/10",
+          "8/10",
+          "9/10"
+        ],
+        "inactiveNX": [
+          "IN:8be10a2c-1459-4b9d-9437-49d4a1e30a63",
+          "IN:4ff1b10a-8b50-4ca3-bd1e-d5e1c3379ec2",
+          "IN:c5877801-d9df-4504-a527-52f4ad57ed62",
+          "IN:191dce9e-3a56-411e-bac3-92df25fb9c02",
+          "IN:9982aa3c-ff40-41e0-bff3-78cc97fa910d",
+          "IN:dd499956-c2e9-474b-bf11-f0dffae62507",
+          "IN:84c62fd8-2843-452d-825e-5487a68a6d8d",
+          "IN:b03a6776-1851-46bc-839c-878145f6b949",
+          "IN:cf714c10-830f-49ba-8b6d-886d2c755876",
+          "IN:6b9dd993-29d8-4964-a975-9c180c3868b7",
+          "IN:4d96cbd2-21ef-484a-8949-a156abde3825"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C19"
+      }
+    },
+    {
+      "id": "condition:manual:vxv114",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx114"
+      ],
+      "button": "vxv114",
+      "requires": {
+        "freeSensors": [
+          "slS114",
+          "rsAckRangeFri"
+        ],
+        "blocks": [
+          "S103c",
+          "S114"
+        ],
+        "signals": [
+          "3/1",
+          "6/10",
+          "7/10",
+          "8/10",
+          "9/10"
+        ],
+        "inactiveNX": [
+          "IN:191dce9e-3a56-411e-bac3-92df25fb9c02",
+          "IN:9982aa3c-ff40-41e0-bff3-78cc97fa910d",
+          "IN:dd499956-c2e9-474b-bf11-f0dffae62507",
+          "IN:84c62fd8-2843-452d-825e-5487a68a6d8d",
+          "IN:b03a6776-1851-46bc-839c-878145f6b949",
+          "IN:cf714c10-830f-49ba-8b6d-886d2c755876",
+          "IN:6b9dd993-29d8-4964-a975-9c180c3868b7",
+          "IN:4d96cbd2-21ef-484a-8949-a156abde3825"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C20"
+      }
+    },
+    {
+      "id": "condition:manual:vxv119",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx119"
+      ],
+      "button": "vxv119",
+      "requires": {
+        "freeSensors": [
+          "slS119",
+          "rsAckRangeFri"
+        ],
+        "blocks": [
+          "S119",
+          "S119b"
+        ],
+        "signals": [],
+        "inactiveNX": [
+          "IN:38a2817f-928f-46b9-8467-90cee94ffa5f",
+          "IN:98f1e18d-6c98-402a-a654-9d3c807a1f0a",
+          "IN:879b4f03-de61-4f8b-bcfb-132c85e4785d",
+          "IN:afc2b3dd-02e4-4a07-8fea-3d3b9ab65cc0"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C21"
+      }
+    },
+    {
+      "id": "condition:manual:vxv115",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx115"
+      ],
+      "button": "vxv115",
+      "requires": {
+        "freeSensors": [
+          "slS115",
+          "rsAckRangeFri"
+        ],
+        "blocks": [
+          "S114a",
+          "S115",
+          "S115a",
+          "S115b"
+        ],
+        "signals": [
+          "3/1",
+          "6/10",
+          "7/10"
+        ],
+        "inactiveNX": [
+          "IN:191dce9e-3a56-411e-bac3-92df25fb9c02",
+          "IN:9982aa3c-ff40-41e0-bff3-78cc97fa910d",
+          "IN:b03a6776-1851-46bc-839c-878145f6b949",
+          "IN:cf714c10-830f-49ba-8b6d-886d2c755876"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C22"
+      }
+    },
+    {
+      "id": "condition:manual:vxv111/118",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx111",
+        "Vx118"
+      ],
+      "button": "vxv111/118",
+      "requires": {
+        "freeSensors": [
+          "slS111",
+          "slS118",
+          "rsAckRangeFri"
+        ],
+        "blocks": [
+          "S111",
+          "S114b",
+          "S118",
+          "S119a"
+        ],
+        "signals": [
+          "3/1",
+          "8/10",
+          "9/10"
+        ],
+        "inactiveNX": [
+          "IN:dd499956-c2e9-474b-bf11-f0dffae62507",
+          "IN:84c62fd8-2843-452d-825e-5487a68a6d8d",
+          "IN:6b9dd993-29d8-4964-a975-9c180c3868b7",
+          "IN:4d96cbd2-21ef-484a-8949-a156abde3825",
+          "IN:879b4f03-de61-4f8b-bcfb-132c85e4785d",
+          "IN:afc2b3dd-02e4-4a07-8fea-3d3b9ab65cc0"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C23"
+      }
+    },
+    {
+      "id": "condition:manual:vxv127",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx127"
+      ],
+      "button": "vxv127",
+      "requires": {
+        "freeSensors": [
+          "slS127",
+          "rsAckRangeFri"
+        ],
+        "blocks": [
+          "S127",
+          "S127a",
+          "S127b",
+          "S127c"
+        ],
+        "signals": [
+          "6/5",
+          "6/6",
+          "7/5"
+        ],
+        "inactiveNX": [
+          "IN:b40d2819-0552-4586-ab45-2a7aa2087544",
+          "IN:d29a79dc-dc0b-48ff-8553-ba218dac09fe",
+          "IN:28fd5177-1f83-4b70-ab20-8dfa7d9d5bca",
+          "IN:3d360610-3f48-455c-9476-5d3d877014b2"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C24"
+      }
+    },
+    {
+      "id": "condition:manual:vxv128",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx128"
+      ],
+      "button": "vxv128",
+      "requires": {
+        "freeSensors": [
+          "slS128",
+          "rsAckRangeFri"
+        ],
+        "blocks": [
+          "S128",
+          "S128b",
+          "S128c"
+        ],
+        "signals": [
+          "6/6",
+          "8/5",
+          "9/5"
+        ],
+        "inactiveNX": [
+          "IN:9637bfe4-0334-4ee1-8b2a-6f54d18b80d7",
+          "IN:60c05de6-7b87-4156-8000-a73c8a4c9c45",
+          "IN:82fca6a8-90ed-41b7-8780-4c6afe4b8ac5",
+          "IN:6ab85d5e-781c-4fc5-82c1-35ee572f6b28"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C25"
+      }
+    },
+    {
+      "id": "condition:manual:vxv130",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx130"
+      ],
+      "button": "vxv130",
+      "requires": {
+        "freeSensors": [
+          "slS130",
+          "rsAckRangeFri"
+        ],
+        "blocks": [
+          "S130",
+          "S130a"
+        ],
+        "signals": [
+          "6/5",
+          "6/6",
+          "7/5",
+          "8/5",
+          "9/5"
+        ],
+        "inactiveNX": [
+          "IN:b40d2819-0552-4586-ab45-2a7aa2087544",
+          "IN:d29a79dc-dc0b-48ff-8553-ba218dac09fe",
+          "IN:9637bfe4-0334-4ee1-8b2a-6f54d18b80d7",
+          "IN:60c05de6-7b87-4156-8000-a73c8a4c9c45",
+          "IN:28fd5177-1f83-4b70-ab20-8dfa7d9d5bca",
+          "IN:3d360610-3f48-455c-9476-5d3d877014b2",
+          "IN:82fca6a8-90ed-41b7-8780-4c6afe4b8ac5",
+          "IN:6ab85d5e-781c-4fc5-82c1-35ee572f6b28"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C26"
+      }
+    },
+    {
+      "id": "condition:manual:vxv133",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx133"
+      ],
+      "button": "vxv133",
+      "requires": {
+        "freeSensors": [
+          "slS133",
+          "rsAckRangeFri"
+        ],
+        "blocks": [
+          "S133"
+        ],
+        "signals": [
+          "3/2",
+          "3/6",
+          "6/7"
+        ],
+        "inactiveNX": [
+          "IN:bff6c4b1-e623-4ebb-b4a4-71d03691011b",
+          "IN:27d9d2ff-a551-440c-8095-4f8a6713efac",
+          "IN:721d8239-bf96-4733-a4c4-277eed3c5003",
+          "IN:0632870a-0526-43c4-a82f-0a371537bf8e",
+          "IN:b0c82045-3dfe-49f5-92ae-2c1b8f0a00fa",
+          "IN:8f1f7f38-cb7c-4349-81a3-f6a0e5dc78be",
+          "IN:fc05bf08-09e9-493b-b9db-2f3aa6446c34",
+          "IN:03942f9b-cfc0-4779-85dd-a52c310e8a63"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C27"
+      }
+    },
+    {
+      "id": "condition:manual:vxv150",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx150"
+      ],
+      "button": "vxv150",
+      "requires": {
+        "freeSensors": [
+          "slS150",
+          "rsAckRangeFri"
+        ],
+        "blocks": [
+          "S150",
+          "S150a"
+        ],
+        "signals": [
+          "3/2",
+          "6/7"
+        ],
+        "inactiveNX": [
+          "IN:bff6c4b1-e623-4ebb-b4a4-71d03691011b",
+          "IN:27d9d2ff-a551-440c-8095-4f8a6713efac",
+          "IN:721d8239-bf96-4733-a4c4-277eed3c5003",
+          "IN:0632870a-0526-43c4-a82f-0a371537bf8e",
+          "IN:b0c82045-3dfe-49f5-92ae-2c1b8f0a00fa",
+          "IN:8f1f7f38-cb7c-4349-81a3-f6a0e5dc78be",
+          "IN:fc05bf08-09e9-493b-b9db-2f3aa6446c34",
+          "IN:03942f9b-cfc0-4779-85dd-a52c310e8a63",
+          "IN:aca159e6-947d-4248-a417-12249bbd9d20",
+          "IN:bbfb9823-1ff0-4ca5-96ca-7f6498bd93fc",
+          "IN:4e5ca277-55c7-409c-9b8c-ca2531f711be"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C28"
+      }
+    },
+    {
+      "id": "condition:manual:vxv155",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx155"
+      ],
+      "button": "vxv155",
+      "requires": {
+        "freeSensors": [
+          "slS155",
+          "rsAckRangeFri"
+        ],
+        "blocks": [
+          "S155"
+        ],
+        "signals": [
+          "3/2",
+          "6/7"
+        ],
+        "inactiveNX": [
+          "IN:bbfb9823-1ff0-4ca5-96ca-7f6498bd93fc",
+          "IN:4e5ca277-55c7-409c-9b8c-ca2531f711be",
+          "IN:aca159e6-947d-4248-a417-12249bbd9d20",
+          "IN:bff6c4b1-e623-4ebb-b4a4-71d03691011b",
+          "IN:8b3b3a92-0ebc-4099-838c-a3baa13e53f4",
+          "IN:721d8239-bf96-4733-a4c4-277eed3c5003"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C29"
+      }
+    },
+    {
+      "id": "condition:manual:vxv164",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx164"
+      ],
+      "button": "vxv164",
+      "requires": {
+        "freeSensors": [
+          "slS164"
+        ],
+        "blocks": [
+          "S164"
+        ],
+        "signals": [
+          "3/11",
+          "3/2",
+          "6/11"
+        ],
+        "inactiveNX": [
+          "IN:4edf0950-9c34-4bd8-8a68-4ec191243de0",
+          "IN:bbfb9823-1ff0-4ca5-96ca-7f6498bd93fc",
+          "IN:4e5ca277-55c7-409c-9b8c-ca2531f711be",
+          "IN:b7da8647-7366-4a3a-b2e1-5e60acc04527",
+          "IN:8c8af86b-6435-43c2-aa35-9a8b58768e5e"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C30"
+      }
+    },
+    {
+      "id": "condition:manual:vxv95",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx95"
+      ],
+      "button": "vxv95",
+      "requires": {
+        "freeSensors": [
+          "slS95"
+        ],
+        "blocks": [
+          "S95"
+        ],
+        "signals": [
+          "1/1",
+          "1/12",
+          "1/3"
+        ],
+        "inactiveNX": [
+          "IN:a70398d9-449e-40d0-aad2-fed824eae1f2",
+          "IN:fb4ade76-3447-49f6-b101-3c7a639adfb9",
+          "IN:d3d2bf5f-932b-4656-bdb1-3a7e0dc6d452",
+          "IN:01272e56-6bd4-494e-8cf1-2aaacc5337d1"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C31"
+      }
+    },
+    {
+      "id": "condition:manual:vxv96",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx96"
+      ],
+      "button": "vxv96",
+      "requires": {
+        "freeSensors": [
+          "slS96"
+        ],
+        "blocks": [
+          "S96"
+        ],
+        "signals": [
+          "2/1",
+          "2/12",
+          "2/3"
+        ],
+        "inactiveNX": [
+          "IN:acc972f4-0307-4563-a7fe-8f89ba1b3430",
+          "IN:2c8db810-5b61-45bf-9170-da390e70bf26",
+          "IN:4eabd950-d9ce-414a-a5bd-cb8177149880",
+          "IN:9e4f1c1c-e4a3-49ea-b9f5-0f183be2556f"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C32"
+      }
+    },
+    {
+      "id": "condition:manual:vxv170",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx170"
+      ],
+      "button": "vxv170",
+      "requires": {
+        "freeSensors": [
+          "slS170"
+        ],
+        "blocks": [
+          "S170"
+        ],
+        "signals": [
+          "1/11",
+          "10/11",
+          "2/11",
+          "2/2",
+          "3/11"
+        ],
+        "inactiveNX": [
+          "IN:df91a6da-781b-434b-ac6a-88aa95244141",
+          "IN:8dd72135-1f25-4e76-93f4-5ac0e677f598",
+          "IN:7c752f05-9cf3-4234-a372-b59b46328820",
+          "IN:4eadefa7-37c8-42f0-9a14-8bda9962c8e6"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C35"
+      }
+    },
+    {
+      "id": "condition:manual:vxv171",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx171"
+      ],
+      "button": "vxv171",
+      "requires": {
+        "freeSensors": [],
+        "blocks": [
+          "S171"
+        ],
+        "signals": [
+          "1/11",
+          "10/11",
+          "2/11",
+          "2/2",
+          "3/11"
+        ],
+        "inactiveNX": [
+          "IN:8dd72135-1f25-4e76-93f4-5ac0e677f598",
+          "IN:df91a6da-781b-434b-ac6a-88aa95244141",
+          "IN:7c752f05-9cf3-4234-a372-b59b46328820",
+          "IN:4eadefa7-37c8-42f0-9a14-8bda9962c8e6"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C36"
+      }
+    },
+    {
+      "id": "condition:manual:vxv172",
+      "type": "condition",
+      "trigger": "manual",
+      "objects": [
+        "Vx172"
+      ],
+      "button": "vxv172",
+      "requires": {
+        "freeSensors": [],
+        "blocks": [
+          "S172"
+        ],
+        "signals": [],
+        "inactiveNX": []
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "reason": "",
+      "source": {
+        "profile": "manualPolicies.rules",
+        "jmri": "IX:AUTO:0007C37"
+      }
+    },
+    {
+      "id": "condition:line:AN",
+      "type": "condition",
+      "trigger": "line",
+      "object": "AN",
+      "label": "A nedspår",
+      "button": "htvAn",
+      "sourceSensor": "ssAN",
+      "requires": {
+        "blocks": [
+          "SN2A"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "operatingControls.lines",
+        "jmri": "IX:AUTO:0023C1"
+      }
+    },
+    {
+      "id": "condition:line:AU",
+      "type": "condition",
+      "trigger": "line",
+      "object": "AU",
+      "label": "A uppspår",
+      "button": "htvAu",
+      "sourceSensor": "ssAU",
+      "requires": {
+        "blocks": [
+          "SU2A"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "operatingControls.lines",
+        "jmri": "IX:AUTO:0023C2"
+      }
+    },
+    {
+      "id": "condition:line:BN",
+      "type": "condition",
+      "trigger": "line",
+      "object": "BN",
+      "label": "B nedspår",
+      "button": "htvBn",
+      "sourceSensor": "ssBN",
+      "requires": {
+        "blocks": [
+          "SN1A"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "operatingControls.lines",
+        "jmri": "IX:AUTO:0023C3"
+      }
+    },
+    {
+      "id": "condition:line:BU",
+      "type": "condition",
+      "trigger": "line",
+      "object": "BU",
+      "label": "B uppspår",
+      "button": "htvBu",
+      "sourceSensor": "ssBU",
+      "requires": {
+        "blocks": [
+          "SU1A"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "operatingControls.lines",
+        "jmri": "IX:AUTO:0023C4"
+      }
+    },
+    {
+      "id": "condition:line:CN",
+      "type": "condition",
+      "trigger": "line",
+      "object": "CN",
+      "label": "C nedspår",
+      "button": "htvCn",
+      "sourceSensor": "ssCN",
+      "requires": {
+        "blocks": [
+          "SN4A"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "operatingControls.lines",
+        "jmri": "IX:AUTO:0023C5"
+      }
+    },
+    {
+      "id": "condition:line:CU",
+      "type": "condition",
+      "trigger": "line",
+      "object": "CU",
+      "label": "C uppspår",
+      "button": "htvCu",
+      "sourceSensor": "ssCU",
+      "requires": {
+        "blocks": [
+          "SU4A"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "operatingControls.lines",
+        "jmri": "IX:AUTO:0023C6"
+      }
+    },
+    {
+      "id": "condition:line:D",
+      "type": "condition",
+      "trigger": "line",
+      "object": "D",
+      "label": "D",
+      "button": "htvD",
+      "sourceSensor": "ssD",
+      "requires": {
+        "blocks": [
+          "SL1a"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "operatingControls.lines",
+        "jmri": "IX:AUTO:0023C7"
+      }
+    },
+    {
+      "id": "condition:programming",
+      "type": "condition",
+      "trigger": "programming",
+      "object": "Vx133",
+      "requiredPosition": "C",
+      "requires": {
+        "blocks": [
+          "S133",
+          "SLIII",
+          "S133c"
+        ],
+        "clearBlocks": [
+          "S133"
+        ]
+      },
+      "relay": {
+        "address": 134,
+        "reportAddress": 940,
+        "sourceRelay": "LT134",
+        "sourceReport": "LS940"
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "operatingControls.programming",
+        "jmri": "IX:AUTO:0025C1",
+        "provenance": "Source LT134 and LS940. Independent B1/B2 feedback is a conservative replacement; physical module behavior not commissioned."
+      }
+    },
+    {
+      "id": "aspect:dvsi_4",
+      "type": "aspect",
+      "object": "dvsi_4",
+      "signals": [
+        "1/4",
+        "2/4",
+        "3/1",
+        "3/2",
+        "3/3",
+        "6/10",
+        "6/11",
+        "6/5",
+        "6/6",
+        "6/7",
+        "6/8",
+        "6/9",
+        "7/10",
+        "7/5",
+        "8/10",
+        "8/5",
+        "9/10",
+        "9/5"
+      ],
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "aspects": null,
+      "owner": "bindings",
+      "runsIn": "mgp",
+      "status": "unresolved",
+      "reason": "Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.",
+      "source": {
+        "profile": "signals",
+        "provenance": "Explicit bench binding with provisional Signal10-CZ codes. Swedish aspect mapping not commissioned."
+      }
+    },
+    {
+      "id": "aspect:hdvsi_8",
+      "type": "aspect",
+      "object": "hdvsi_8",
+      "signals": [
+        "1/6",
+        "1/9",
+        "10/11",
+        "2/6",
+        "2/9",
+        "3/10",
+        "3/11",
+        "3/5",
+        "3/6",
+        "3/8",
+        "3/9",
+        "4/10",
+        "4/5",
+        "4/8",
+        "4/9",
+        "5/10",
+        "5/5",
+        "5/8",
+        "5/9"
+      ],
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "aspects": null,
+      "owner": "bindings",
+      "runsIn": "mgp",
+      "status": "unresolved",
+      "reason": "Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.",
+      "source": {
+        "profile": "signals",
+        "provenance": "Explicit bench binding with provisional Signal10-CZ codes. Swedish aspect mapping not commissioned."
+      }
+    },
+    {
+      "id": "aspect:hsi_2",
+      "type": "aspect",
+      "object": "hsi_2",
+      "signals": [
+        "L1",
+        "N1",
+        "N2",
+        "N4",
+        "U1",
+        "U2",
+        "U4"
+      ],
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "aspects": null,
+      "owner": "bindings",
+      "runsIn": "mgp",
+      "status": "unresolved",
+      "reason": "Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.",
+      "source": {
+        "profile": "signals",
+        "provenance": "Explicit bench binding with provisional Signal10-CZ codes. Swedish aspect mapping not commissioned."
+      }
+    },
+    {
+      "id": "aspect:hsi_3+dvsi",
+      "type": "aspect",
+      "object": "hsi_3+dvsi",
+      "signals": [
+        "1/11",
+        "2/11"
+      ],
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "aspects": null,
+      "owner": "bindings",
+      "runsIn": "mgp",
+      "status": "unresolved",
+      "reason": "Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.",
+      "source": {
+        "profile": "signals",
+        "provenance": "Explicit bench binding with provisional Signal10-CZ codes. Swedish aspect mapping not commissioned."
+      }
+    },
+    {
+      "id": "aspect:hsi_4",
+      "type": "aspect",
+      "object": "hsi_4",
+      "signals": [
+        "1/1",
+        "1/10",
+        "1/12",
+        "1/3",
+        "1/8",
+        "2/10",
+        "2/12",
+        "4/2"
+      ],
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "aspects": null,
+      "owner": "bindings",
+      "runsIn": "mgp",
+      "status": "unresolved",
+      "reason": "Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.",
+      "source": {
+        "profile": "signals",
+        "provenance": "Explicit bench binding with provisional Signal10-CZ codes. Swedish aspect mapping not commissioned."
+      }
+    },
+    {
+      "id": "aspect:hsi_5",
+      "type": "aspect",
+      "object": "hsi_5",
+      "signals": [
+        "1/2",
+        "1/5",
+        "1/7",
+        "2/1",
+        "2/2",
+        "2/3",
+        "2/5",
+        "2/7",
+        "2/8"
+      ],
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "aspects": null,
+      "owner": "bindings",
+      "runsIn": "mgp",
+      "status": "unresolved",
+      "reason": "Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.",
+      "source": {
+        "profile": "signals",
+        "provenance": "Explicit bench binding with provisional Signal10-CZ codes. Swedish aspect mapping not commissioned."
+      }
+    },
+    {
+      "id": "aspect:sly_2",
+      "type": "aspect",
+      "object": "sly_2",
+      "signals": [
+        "IIIdo",
+        "IIIev",
+        "Xv"
+      ],
+      "stopCodes": [
+        0
+      ],
+      "goCodes": [
+        8,
+        18
+      ],
+      "aspects": null,
+      "owner": "bindings",
+      "runsIn": "mgp",
+      "status": "unresolved",
+      "reason": "Svenska beskedskoder saknas. Koderna är Signal10-CZ-prov ur bänkbindningen.",
+      "source": {
+        "profile": "signals",
+        "provenance": "Explicit bench binding with provisional Signal10-CZ codes. Swedish aspect mapping not commissioned."
+      }
+    },
+    {
+      "id": "crossing:V1",
+      "type": "crossing",
+      "object": "V1",
+      "logic": "any",
+      "conditions": [
+        {
+          "kind": "nx",
+          "id": "IN:429040bc-67f8-49a6-8934-ae57c3462b1e",
+          "label": "1/5 → 2/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:8ebd3482-4061-423c-8b43-ad01fd3b1add",
+          "label": "1/5 → 3/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:ae2e9664-5541-4c5e-8412-451de18c57ea",
+          "label": "1/5 → 1/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:c94fa9cb-863d-473f-a699-13c9e44cf9fe",
+          "label": "1/5 → 4/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:6bd97aec-4fd3-41f9-9b8a-12d73cc8dfbd",
+          "label": "1/5 → 5/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:42714135-f6d9-42b6-baa6-ef93873dfb83",
+          "label": "1/10 → 1/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:a802cc6d-3f3a-490b-900e-14619fcdf4cf",
+          "label": "2/5 → 2/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:533504cb-b0e9-45ec-a8b8-3bbc68953533",
+          "label": "2/5 → 3/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:0ed73b3e-35e5-43f7-8c19-f9eb86e71e3c",
+          "label": "2/5 → 4/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:871a7269-712d-4f47-9cb9-c5b316eb2967",
+          "label": "2/5 → 5/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:d12211a5-28ae-4add-bb48-7fb55e571843",
+          "label": "2/10 → 1/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:17dd1cdb-033d-4257-9e5f-8d96cc80c348",
+          "label": "2/10 → 2/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:175be8fb-84e8-47dd-b696-3fc1a5ccd8d0",
+          "label": "3/1 → 3/3"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:b03a6776-1851-46bc-839c-878145f6b949",
+          "label": "3/1 → 6/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:cf714c10-830f-49ba-8b6d-886d2c755876",
+          "label": "3/1 → 7/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:6b9dd993-29d8-4964-a975-9c180c3868b7",
+          "label": "3/1 → 8/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:4d96cbd2-21ef-484a-8949-a156abde3825",
+          "label": "3/1 → 9/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:77561b23-7836-48d7-b3e8-54d33c423de2",
+          "label": "3/10 → 1/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:72191ed1-b72d-4ae0-b9d8-f75c36539b10",
+          "label": "3/10 → 2/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:8be10a2c-1459-4b9d-9437-49d4a1e30a63",
+          "label": "3/10 → IIIev"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:6f3c8c04-94ac-47da-8d6c-846982cafd5f",
+          "label": "4/10 → 1/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:fa61129e-5542-488b-88d4-600c63c448e3",
+          "label": "4/10 → 2/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:4ff1b10a-8b50-4ca3-bd1e-d5e1c3379ec2",
+          "label": "4/10 → IIIev"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:f634a24b-7043-4c2d-9ee0-8378dea7cfe2",
+          "label": "5/10 → 1/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:a1600f94-e4a0-4013-8607-455702f83e44",
+          "label": "5/10 → 2/12"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:c5877801-d9df-4504-a527-52f4ad57ed62",
+          "label": "5/10 → IIIev"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:191dce9e-3a56-411e-bac3-92df25fb9c02",
+          "label": "6/10 → IIIev"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:9982aa3c-ff40-41e0-bff3-78cc97fa910d",
+          "label": "7/10 → IIIev"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:dd499956-c2e9-474b-bf11-f0dffae62507",
+          "label": "8/10 → IIIev"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:84c62fd8-2843-452d-825e-5487a68a6d8d",
+          "label": "9/10 → IIIev"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS100",
+          "label": "slS100",
+          "sourceSystem": "IS24"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS101",
+          "label": "slS101",
+          "sourceSystem": "IS25"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS103",
+          "label": "slS103",
+          "sourceSystem": "IS27"
+        }
+      ],
+      "blocks": [
+        "S100",
+        "S101",
+        "S103",
+        "S103a",
+        "S103b"
+      ],
+      "lamps": {
+        "g": {
+          "name": "V1g",
+          "sourceSystem": "IS251"
+        },
+        "r": {
+          "name": "V1r",
+          "sourceSystem": "IS252"
+        }
+      },
+      "preRingMs": null,
+      "feedback": null,
+      "detail": {
+        "name": "V1",
+        "rule": "IX:AUTO:0012C1",
+        "sourceKey": "f215025be768c7c399e0",
+        "logic": "any",
+        "conditions": [
+          {
+            "kind": "nx",
+            "id": "IN:429040bc-67f8-49a6-8934-ae57c3462b1e",
+            "label": "1/5 → 2/7"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:8ebd3482-4061-423c-8b43-ad01fd3b1add",
+            "label": "1/5 → 3/5"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:ae2e9664-5541-4c5e-8412-451de18c57ea",
+            "label": "1/5 → 1/7"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:c94fa9cb-863d-473f-a699-13c9e44cf9fe",
+            "label": "1/5 → 4/5"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:6bd97aec-4fd3-41f9-9b8a-12d73cc8dfbd",
+            "label": "1/5 → 5/5"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:42714135-f6d9-42b6-baa6-ef93873dfb83",
+            "label": "1/10 → 1/12"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:a802cc6d-3f3a-490b-900e-14619fcdf4cf",
+            "label": "2/5 → 2/7"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:533504cb-b0e9-45ec-a8b8-3bbc68953533",
+            "label": "2/5 → 3/5"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:0ed73b3e-35e5-43f7-8c19-f9eb86e71e3c",
+            "label": "2/5 → 4/5"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:871a7269-712d-4f47-9cb9-c5b316eb2967",
+            "label": "2/5 → 5/5"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:d12211a5-28ae-4add-bb48-7fb55e571843",
+            "label": "2/10 → 1/12"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:17dd1cdb-033d-4257-9e5f-8d96cc80c348",
+            "label": "2/10 → 2/12"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:175be8fb-84e8-47dd-b696-3fc1a5ccd8d0",
+            "label": "3/1 → 3/3"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:b03a6776-1851-46bc-839c-878145f6b949",
+            "label": "3/1 → 6/5"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:cf714c10-830f-49ba-8b6d-886d2c755876",
+            "label": "3/1 → 7/5"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:6b9dd993-29d8-4964-a975-9c180c3868b7",
+            "label": "3/1 → 8/5"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:4d96cbd2-21ef-484a-8949-a156abde3825",
+            "label": "3/1 → 9/5"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:77561b23-7836-48d7-b3e8-54d33c423de2",
+            "label": "3/10 → 1/12"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:72191ed1-b72d-4ae0-b9d8-f75c36539b10",
+            "label": "3/10 → 2/12"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:8be10a2c-1459-4b9d-9437-49d4a1e30a63",
+            "label": "3/10 → IIIev"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:6f3c8c04-94ac-47da-8d6c-846982cafd5f",
+            "label": "4/10 → 1/12"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:fa61129e-5542-488b-88d4-600c63c448e3",
+            "label": "4/10 → 2/12"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:4ff1b10a-8b50-4ca3-bd1e-d5e1c3379ec2",
+            "label": "4/10 → IIIev"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:f634a24b-7043-4c2d-9ee0-8378dea7cfe2",
+            "label": "5/10 → 1/12"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:a1600f94-e4a0-4013-8607-455702f83e44",
+            "label": "5/10 → 2/12"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:c5877801-d9df-4504-a527-52f4ad57ed62",
+            "label": "5/10 → IIIev"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:191dce9e-3a56-411e-bac3-92df25fb9c02",
+            "label": "6/10 → IIIev"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:9982aa3c-ff40-41e0-bff3-78cc97fa910d",
+            "label": "7/10 → IIIev"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:dd499956-c2e9-474b-bf11-f0dffae62507",
+            "label": "8/10 → IIIev"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:84c62fd8-2843-452d-825e-5487a68a6d8d",
+            "label": "9/10 → IIIev"
+          },
+          {
+            "kind": "sensor",
+            "id": "slS100",
+            "label": "slS100",
+            "sourceSystem": "IS24"
+          },
+          {
+            "kind": "sensor",
+            "id": "slS101",
+            "label": "slS101",
+            "sourceSystem": "IS25"
+          },
+          {
+            "kind": "sensor",
+            "id": "slS103",
+            "label": "slS103",
+            "sourceSystem": "IS27"
+          }
+        ],
+        "lamps": {
+          "g": {
+            "name": "V1g",
+            "sourceSystem": "IS251"
+          },
+          "r": {
+            "name": "V1r",
+            "sourceSystem": "IS252"
+          }
+        },
+        "crossing": {
+          "line": {
+            "id": "T152",
+            "x1": 450,
+            "y1": 215,
+            "x2": 450,
+            "y2": 435
+          },
+          "blocks": [
+            "S100",
+            "S101",
+            "S103"
+          ]
+        }
+      },
+      "owner": "bindings",
+      "runsIn": "tkl",
+      "status": "unresolved",
+      "reason": "Beräknad visning i panelen. Förringning, bomåterrapport och spärr av tågväg väntar på MGP-underlag.",
+      "source": {
+        "jmri": "IX:AUTO:0012C1",
+        "profile": "indications"
+      }
+    },
+    {
+      "id": "crossing:V2",
+      "type": "crossing",
+      "object": "V2",
+      "logic": "any",
+      "conditions": [
+        {
+          "kind": "nx",
+          "id": "IN:b137bbde-b5bc-4b51-90d2-56c1ec28a478",
+          "label": "1/7 → 1/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:ccb213d2-edb8-48d1-bfef-01fc35ccc32f",
+          "label": "1/8 → 1/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:c664f521-df47-4557-89d7-f65fb3644fd3",
+          "label": "1/8 → 2/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:a7396c65-4eea-46f6-b197-ff6119abe71a",
+          "label": "2/7 → 1/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:0938c621-8dcb-4add-9783-28d6824b0f8d",
+          "label": "2/7 → 2/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:a4607e61-cc12-4f46-9c30-fb534204d98a",
+          "label": "2/7 → 3/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:52be6d9f-956b-4e6c-a476-1f8803639586",
+          "label": "2/7 → 4/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:941b374c-f243-4308-8829-b77dad2253dd",
+          "label": "2/8 → 2/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:8b500613-a031-465d-a3b7-de0b654f22a0",
+          "label": "3/5 → 5/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:ef097bcf-7770-4019-a1d7-60731f8b254a",
+          "label": "3/5 → 6/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:1c8b77e7-e6a7-465f-a580-c95cbb8a88e8",
+          "label": "3/8 → 2/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:6af610f4-2e48-4b05-b33b-c327971b047d",
+          "label": "4/5 → 5/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:c789a119-83a8-49f6-99e0-ddf1b8a0c450",
+          "label": "4/5 → 6/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:02071f89-8e14-4603-8b23-4f86301200ed",
+          "label": "4/8 → 2/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:1a77e99e-db90-453b-aa4e-85b71071b2db",
+          "label": "5/5 → 5/9"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:d3a73449-9685-4aac-ae15-3d7b7e6cbee5",
+          "label": "5/5 → 6/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:0793ab5d-0ae4-44e1-9d20-d8cd3b66af97",
+          "label": "5/8 → 3/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:30bca77d-457b-4e67-a418-1c1190064ebf",
+          "label": "5/8 → 4/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:a7c38e71-3385-46d7-825d-ad64f78e9fbf",
+          "label": "5/8 → 5/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:28fd5177-1f83-4b70-ab20-8dfa7d9d5bca",
+          "label": "6/5 → 6/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:b40d2819-0552-4586-ab45-2a7aa2087544",
+          "label": "6/6 → 6/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:d29a79dc-dc0b-48ff-8553-ba218dac09fe",
+          "label": "6/6 → 7/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:9637bfe4-0334-4ee1-8b2a-6f54d18b80d7",
+          "label": "6/6 → 8/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:60c05de6-7b87-4156-8000-a73c8a4c9c45",
+          "label": "6/6 → 9/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:8abf0b18-94ad-47b3-9c58-f48f68da4654",
+          "label": "6/8 → 3/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:9af8d60e-52c9-4694-b1d6-1cb7d1a25b2b",
+          "label": "6/8 → 4/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:68af5f58-3f09-460e-95fc-d88791f18a73",
+          "label": "6/8 → 5/10"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:3d360610-3f48-455c-9476-5d3d877014b2",
+          "label": "7/5 → 6/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:82fca6a8-90ed-41b7-8780-4c6afe4b8ac5",
+          "label": "8/5 → 6/7"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:6ab85d5e-781c-4fc5-82c1-35ee572f6b28",
+          "label": "9/5 → 6/7"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS120",
+          "label": "slS120",
+          "sourceSystem": "IS38"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS125",
+          "label": "slS125",
+          "sourceSystem": "IS42"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS126",
+          "label": "slS126",
+          "sourceSystem": "IS43"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS130",
+          "label": "slS130",
+          "sourceSystem": "IS46"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS131",
+          "label": "slS131",
+          "sourceSystem": "IS47"
+        }
+      ],
+      "blocks": [
+        "S120",
+        "S125",
+        "S126",
+        "S123a",
+        "S126c",
+        "S130a",
+        "S130",
+        "S131",
+        "S126a",
+        "S131c",
+        "S131a"
+      ],
+      "lamps": {
+        "g": {
+          "name": "V2g",
+          "sourceSystem": "IS253"
+        },
+        "r": {
+          "name": "V2r",
+          "sourceSystem": "IS254"
+        }
+      },
+      "preRingMs": null,
+      "feedback": null,
+      "detail": {
+        "name": "V2",
+        "rule": "IX:AUTO:0012C2",
+        "sourceKey": "36eac1fe4e0da1e1aad9",
+        "logic": "any",
+        "conditions": [
+          {
+            "kind": "nx",
+            "id": "IN:b137bbde-b5bc-4b51-90d2-56c1ec28a478",
+            "label": "1/7 → 1/9"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:ccb213d2-edb8-48d1-bfef-01fc35ccc32f",
+            "label": "1/8 → 1/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:c664f521-df47-4557-89d7-f65fb3644fd3",
+            "label": "1/8 → 2/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:a7396c65-4eea-46f6-b197-ff6119abe71a",
+            "label": "2/7 → 1/9"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:0938c621-8dcb-4add-9783-28d6824b0f8d",
+            "label": "2/7 → 2/9"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:a4607e61-cc12-4f46-9c30-fb534204d98a",
+            "label": "2/7 → 3/9"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:52be6d9f-956b-4e6c-a476-1f8803639586",
+            "label": "2/7 → 4/9"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:941b374c-f243-4308-8829-b77dad2253dd",
+            "label": "2/8 → 2/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:8b500613-a031-465d-a3b7-de0b654f22a0",
+            "label": "3/5 → 5/9"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:ef097bcf-7770-4019-a1d7-60731f8b254a",
+            "label": "3/5 → 6/7"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:1c8b77e7-e6a7-465f-a580-c95cbb8a88e8",
+            "label": "3/8 → 2/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:6af610f4-2e48-4b05-b33b-c327971b047d",
+            "label": "4/5 → 5/9"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:c789a119-83a8-49f6-99e0-ddf1b8a0c450",
+            "label": "4/5 → 6/7"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:02071f89-8e14-4603-8b23-4f86301200ed",
+            "label": "4/8 → 2/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:1a77e99e-db90-453b-aa4e-85b71071b2db",
+            "label": "5/5 → 5/9"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:d3a73449-9685-4aac-ae15-3d7b7e6cbee5",
+            "label": "5/5 → 6/7"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:0793ab5d-0ae4-44e1-9d20-d8cd3b66af97",
+            "label": "5/8 → 3/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:30bca77d-457b-4e67-a418-1c1190064ebf",
+            "label": "5/8 → 4/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:a7c38e71-3385-46d7-825d-ad64f78e9fbf",
+            "label": "5/8 → 5/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:28fd5177-1f83-4b70-ab20-8dfa7d9d5bca",
+            "label": "6/5 → 6/7"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:b40d2819-0552-4586-ab45-2a7aa2087544",
+            "label": "6/6 → 6/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:d29a79dc-dc0b-48ff-8553-ba218dac09fe",
+            "label": "6/6 → 7/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:9637bfe4-0334-4ee1-8b2a-6f54d18b80d7",
+            "label": "6/6 → 8/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:60c05de6-7b87-4156-8000-a73c8a4c9c45",
+            "label": "6/6 → 9/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:8abf0b18-94ad-47b3-9c58-f48f68da4654",
+            "label": "6/8 → 3/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:9af8d60e-52c9-4694-b1d6-1cb7d1a25b2b",
+            "label": "6/8 → 4/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:68af5f58-3f09-460e-95fc-d88791f18a73",
+            "label": "6/8 → 5/10"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:3d360610-3f48-455c-9476-5d3d877014b2",
+            "label": "7/5 → 6/7"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:82fca6a8-90ed-41b7-8780-4c6afe4b8ac5",
+            "label": "8/5 → 6/7"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:6ab85d5e-781c-4fc5-82c1-35ee572f6b28",
+            "label": "9/5 → 6/7"
+          },
+          {
+            "kind": "sensor",
+            "id": "slS120",
+            "label": "slS120",
+            "sourceSystem": "IS38"
+          },
+          {
+            "kind": "sensor",
+            "id": "slS125",
+            "label": "slS125",
+            "sourceSystem": "IS42"
+          },
+          {
+            "kind": "sensor",
+            "id": "slS126",
+            "label": "slS126",
+            "sourceSystem": "IS43"
+          },
+          {
+            "kind": "sensor",
+            "id": "slS130",
+            "label": "slS130",
+            "sourceSystem": "IS46"
+          },
+          {
+            "kind": "sensor",
+            "id": "slS131",
+            "label": "slS131",
+            "sourceSystem": "IS47"
+          }
+        ],
+        "lamps": {
+          "g": {
+            "name": "V2g",
+            "sourceSystem": "IS253"
+          },
+          "r": {
+            "name": "V2r",
+            "sourceSystem": "IS254"
+          }
+        },
+        "crossing": {
+          "line": {
+            "id": "T166",
+            "x1": 1030,
+            "y1": 785,
+            "x2": 1030,
+            "y2": 215
+          },
+          "blocks": [
+            "S120",
+            "S121",
+            "S125",
+            "S126",
+            "S130"
+          ]
+        }
+      },
+      "owner": "bindings",
+      "runsIn": "tkl",
+      "status": "unresolved",
+      "reason": "Beräknad visning i panelen. Förringning, bomåterrapport och spärr av tågväg väntar på MGP-underlag.",
+      "source": {
+        "jmri": "IX:AUTO:0012C2",
+        "profile": "indications"
+      }
+    },
+    {
+      "id": "crossing:V3",
+      "type": "crossing",
+      "object": "V3",
+      "logic": "any",
+      "conditions": [
+        {
+          "kind": "nx",
+          "id": "IN:02bf8516-c5ce-4638-b51b-5ba11b02bd92",
+          "label": "1/4 → 1/6"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:a11b8ed1-24f9-4827-b96a-25daace45b25",
+          "label": "1/4 → 2/6"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:6e4f8eaf-ae36-47fd-93c2-f26b6df1dcf7",
+          "label": "1/4 → 3/6"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:75288d04-f50b-4816-9879-11c6a45eff47",
+          "label": "1/11 → N1"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:7270481f-f9e5-43f2-9ee7-b78863087ebf",
+          "label": "1/11 → U1"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:38153432-a6c0-4029-92b1-875f06fde7c6",
+          "label": "2/4 → 1/6"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:ffa579d7-ecec-4eba-9c94-9018e30153b8",
+          "label": "2/4 → 2/6"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:ea56af37-dad8-4c2d-9891-23783b74f325",
+          "label": "2/4 → 3/6"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:df91a6da-781b-434b-ac6a-88aa95244141",
+          "label": "2/11 → N1"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:347531c7-bd3d-4311-8688-d9613e64b03a",
+          "label": "2/11 → U1"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:04e4337d-e4ec-4c7a-957e-d5fec082d167",
+          "label": "3/11 → N1"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:b4d7b7fd-bda4-4650-82ec-c55ea564a455",
+          "label": "3/11 → U1"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:b7da8647-7366-4a3a-b2e1-5e60acc04527",
+          "label": "3/11 → IIIdo"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:8c8af86b-6435-43c2-aa35-9a8b58768e5e",
+          "label": "6/11 → IIIdo"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:9925d20b-5e18-4f47-a8d5-6fdcf0664a0c",
+          "label": "10/11 → N1"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:915d1120-9a5f-4302-8ca8-acdb62708add",
+          "label": "10/11 → U1"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS3d",
+          "label": "slS3d",
+          "sourceSystem": "IS9"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS165",
+          "label": "slS165",
+          "sourceSystem": "IS64"
+        },
+        {
+          "kind": "sensor",
+          "id": "slS166",
+          "label": "slS166",
+          "sourceSystem": "IS65"
+        }
+      ],
+      "blocks": [
+        "SIIID",
+        "S165",
+        "S165c",
+        "S166",
+        "S166c"
+      ],
+      "lamps": {
+        "g": {
+          "name": "V3g",
+          "sourceSystem": "IS255"
+        },
+        "r": {
+          "name": "V3r",
+          "sourceSystem": "IS256"
+        }
+      },
+      "preRingMs": null,
+      "feedback": null,
+      "detail": {
+        "name": "V3",
+        "rule": "IX:AUTO:0012C3",
+        "sourceKey": "e895639fba61081e9bdd",
+        "logic": "any",
+        "conditions": [
+          {
+            "kind": "nx",
+            "id": "IN:02bf8516-c5ce-4638-b51b-5ba11b02bd92",
+            "label": "1/4 → 1/6"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:a11b8ed1-24f9-4827-b96a-25daace45b25",
+            "label": "1/4 → 2/6"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:6e4f8eaf-ae36-47fd-93c2-f26b6df1dcf7",
+            "label": "1/4 → 3/6"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:75288d04-f50b-4816-9879-11c6a45eff47",
+            "label": "1/11 → N1"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:7270481f-f9e5-43f2-9ee7-b78863087ebf",
+            "label": "1/11 → U1"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:38153432-a6c0-4029-92b1-875f06fde7c6",
+            "label": "2/4 → 1/6"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:ffa579d7-ecec-4eba-9c94-9018e30153b8",
+            "label": "2/4 → 2/6"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:ea56af37-dad8-4c2d-9891-23783b74f325",
+            "label": "2/4 → 3/6"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:df91a6da-781b-434b-ac6a-88aa95244141",
+            "label": "2/11 → N1"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:347531c7-bd3d-4311-8688-d9613e64b03a",
+            "label": "2/11 → U1"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:04e4337d-e4ec-4c7a-957e-d5fec082d167",
+            "label": "3/11 → N1"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:b4d7b7fd-bda4-4650-82ec-c55ea564a455",
+            "label": "3/11 → U1"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:b7da8647-7366-4a3a-b2e1-5e60acc04527",
+            "label": "3/11 → IIIdo"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:8c8af86b-6435-43c2-aa35-9a8b58768e5e",
+            "label": "6/11 → IIIdo"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:9925d20b-5e18-4f47-a8d5-6fdcf0664a0c",
+            "label": "10/11 → N1"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:915d1120-9a5f-4302-8ca8-acdb62708add",
+            "label": "10/11 → U1"
+          },
+          {
+            "kind": "sensor",
+            "id": "slS3d",
+            "label": "slS3d",
+            "sourceSystem": "IS9"
+          },
+          {
+            "kind": "sensor",
+            "id": "slS165",
+            "label": "slS165",
+            "sourceSystem": "IS64"
+          },
+          {
+            "kind": "sensor",
+            "id": "slS166",
+            "label": "slS166",
+            "sourceSystem": "IS65"
+          }
+        ],
+        "lamps": {
+          "g": {
+            "name": "V3g",
+            "sourceSystem": "IS255"
+          },
+          "r": {
+            "name": "V3r",
+            "sourceSystem": "IS256"
+          }
+        },
+        "crossing": {
+          "line": {
+            "id": "T172",
+            "x1": 1765,
+            "y1": 215,
+            "x2": 1765,
+            "y2": 450
+          },
+          "blocks": [
+            "S165a",
+            "S166a",
+            "SIIID"
+          ]
+        }
+      },
+      "owner": "bindings",
+      "runsIn": "tkl",
+      "status": "unresolved",
+      "reason": "Beräknad visning i panelen. Förringning, bomåterrapport och spärr av tågväg väntar på MGP-underlag.",
+      "source": {
+        "jmri": "IX:AUTO:0012C3",
+        "profile": "indications"
+      }
+    },
+    {
+      "id": "crossing:V4",
+      "type": "crossing",
+      "object": "V4",
+      "logic": "any",
+      "conditions": [
+        {
+          "kind": "nx",
+          "id": "IN:38a2817f-928f-46b9-8467-90cee94ffa5f",
+          "label": "9/10 → LastSp1in"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:98f1e18d-6c98-402a-a654-9d3c807a1f0a",
+          "label": "9/10 → LastSp2in"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:879b4f03-de61-4f8b-bcfb-132c85e4785d",
+          "label": "LastSp1ut → 9/5"
+        },
+        {
+          "kind": "nx",
+          "id": "IN:afc2b3dd-02e4-4a07-8fea-3d3b9ab65cc0",
+          "label": "LastSp2ut → 9/5"
+        },
+        {
+          "kind": "sensor",
+          "id": "slSL1",
+          "label": "slSL1",
+          "sourceSystem": "IS21"
+        },
+        {
+          "kind": "sensor",
+          "id": "slSL2",
+          "label": "slSL2",
+          "sourceSystem": "IS22"
+        }
+      ],
+      "blocks": [
+        "SLI",
+        "SLII"
+      ],
+      "lamps": {
+        "g": {
+          "name": "V4g",
+          "sourceSystem": "IS257"
+        },
+        "r": {
+          "name": "V4r",
+          "sourceSystem": "IS258"
+        }
+      },
+      "preRingMs": null,
+      "feedback": null,
+      "detail": {
+        "name": "V4",
+        "rule": "IX:AUTO:0012C4",
+        "sourceKey": "fab0975e0cdeea69fc6d",
+        "logic": "any",
+        "conditions": [
+          {
+            "kind": "nx",
+            "id": "IN:38a2817f-928f-46b9-8467-90cee94ffa5f",
+            "label": "9/10 → LastSp1in"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:98f1e18d-6c98-402a-a654-9d3c807a1f0a",
+            "label": "9/10 → LastSp2in"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:879b4f03-de61-4f8b-bcfb-132c85e4785d",
+            "label": "LastSp1ut → 9/5"
+          },
+          {
+            "kind": "nx",
+            "id": "IN:afc2b3dd-02e4-4a07-8fea-3d3b9ab65cc0",
+            "label": "LastSp2ut → 9/5"
+          },
+          {
+            "kind": "sensor",
+            "id": "slSL1",
+            "label": "slSL1",
+            "sourceSystem": "IS21"
+          },
+          {
+            "kind": "sensor",
+            "id": "slSL2",
+            "label": "slSL2",
+            "sourceSystem": "IS22"
+          }
+        ],
+        "lamps": {
+          "g": {
+            "name": "V4g",
+            "sourceSystem": "IS257"
+          },
+          "r": {
+            "name": "V4r",
+            "sourceSystem": "IS258"
+          }
+        }
+      },
+      "owner": "bindings",
+      "runsIn": "tkl",
+      "status": "unresolved",
+      "reason": "Beräknad visning i panelen. Förringning, bomåterrapport och spärr av tågväg väntar på MGP-underlag.",
+      "source": {
+        "jmri": "IX:AUTO:0012C4",
+        "profile": "indications"
+      }
+    }
+  ]
+}

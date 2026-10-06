@@ -40,6 +40,9 @@ Mac och PC beskrivs nedan.
 
 ### Efter installationen
 
+- **Kom igång.** Ställverket visar *Kom igång · N steg kvar* tills ägaren har skapats, banan har kontakt,
+  och AI-tjänstens nyckel och TrainMeet är inlagda eller uttryckligen överhoppade. Öppna det från
+  chippen i ställverket eller under **⋯ → Kom igång**.
 - TKL startar av sig själv när du loggar in och startas om om det skulle stanna.
 - Appen **Charlottendal TKL** ligger i mappen **Program**. Dra den till Dock för att ha den nära till
   hands. Den öppnar ställverket i ett eget fönster i Chrome. (Utan administratörsrätt hamnar den i
@@ -118,6 +121,7 @@ Om Windows Defender SmartScreen eller brandväggen frågar: TKL lyssnar bara på
 
 ### Efter installationen
 
+- **Kom igång:** som på Mac; chippen *Kom igång · N steg kvar* leder till stegen.
 - TKL startar dolt när du loggar in (genväg i mappen *Autostart*) och startas om om det stannar.
 - Genvägen **Charlottendal TKL** på skrivbordet öppnar ställverket i ett eget fönster i Edge eller Chrome.
 - **Stream Deck:** koppla in den, öppna menyn **⋯ → Stream Deck** och tryck **Anslut** en gång.
@@ -170,12 +174,18 @@ Den sista raden tar även bort driftdata och inställningar.
 
 - **Simulator.** Alla installationer kör mot den inbyggda anläggningssimulatorn. Riktig anläggning via
   LocoBuffer kopplas in i driftsättningssteget.
-- **Ingen inloggning.** TKL svarar bara på datorn själv och kräver därför ingen inloggning.
+- **Inloggning.** TKL svarar bara på datorn själv. Operatören behöver ingen inloggning; Inställningar och
+  Objekt och regler kräver en inloggad ägare eller administratör så snart ägaren är skapad (se
+  `docs/anvandare.md`). Ägaren skapas i Kom igång vid första starten.
 - **En TKL per dator.** Alla använder portarna 8910–8912.
 - **Ny version.** Varje installation tittar efter nya versioner i `beahead-ab/cda-tkl-install` när den
   startar och sedan var sjätte timme; den läser bara versionsnumret och skickar inget om datorn.
   På Raspberry Pi startar knappen **Uppdatera nu** uppdateringen direkt från ställverket.
-- **Säkerhetskopia.** Kopiera katalogen med driftdata (`state`) och `app.env` medan TKL är stoppat.
+- **AI-tjänst.** Chatten och AI-genomgången i Objekt och regler behöver en nyckel från Anthropic, inlagd
+  under **Inställningar → Den här datorn → AI-tjänst**; Kom igång frågar efter den. Nyckeln stannar på
+  TKL-servern.
+- **Säkerhetskopia.** Kopiera katalogen med driftdata (`state`) och `app.env` medan TKL är stoppat. Användarna
+  (`users.json`) och AI-nyckeln (`ai.json`) ligger i driftdatan.
 
 ## Provat
 

@@ -11,7 +11,7 @@ export function createAdminNavigation({account=false}={}) {
   document.addEventListener('keydown',e=>{if(e.key==='Tab')document.body.setAttribute('data-nav-keyboard','');},true);
   const popup=document.getElementById('app-menu')||document.createElement('div');popup.id='app-menu';popup.className='shared-menu';popup.hidden=false;
   const fieldLink='<a id="field-link" hidden target="_blank" rel="noopener">Anläggningssimulator ↗</a>';
-  popup.innerHTML=`<div class="admin-nav-items"></div><div class="admin-nav-footer"><button id="toggle-fullscreen" type="button" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path class="fullscreen-expand" d="M7 3H3v4m10-4h4v4M3 13v4h4m10-4v4h-4"/><path class="fullscreen-contract" d="M3 7h4V3m6 0v4h4M7 17v-4H3m10 4v-4h4"/></svg><span>Fullskärm</span></button>${account?fieldLink:''}<a id="account-link" href="/account" hidden>Byt lösenord</a><div id="admin-nav-status"></div><span id="panel-connection" hidden></span></div>`;
+  popup.innerHTML=`<div class="admin-nav-items"></div><div class="admin-nav-footer"><button id="toggle-fullscreen" type="button" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path class="fullscreen-expand" d="M7 3H3v4m10-4h4v4M3 13v4h4m10-4v4h-4"/><path class="fullscreen-contract" d="M3 7h4V3m6 0v4h4M7 17v-4H3m10 4v-4h4"/></svg><span>Fullskärm</span></button>${account?fieldLink:''}<div id="account-session" class="admin-nav-session" hidden><span id="account-user"></span><a id="login-link" href="/login" hidden>Logga in</a><button id="logout-button" type="button" hidden>Logga ut</button></div><a id="account-link" href="/account" hidden>Byt lösenord</a><div id="admin-nav-status"></div><span id="panel-connection" hidden></span></div>`;
   sidebar.replaceChildren(popup);
   const items=popup.querySelector('.admin-nav-items');
   let heading='';
@@ -33,7 +33,7 @@ export function createAdminNavigation({account=false}={}) {
     const row=document.createElement('div');row.className='admin-tab-row';row.hidden=true;row.dataset.section=section.hash;
     for(const tab of section.tabs){
       const a=document.createElement('a');a.textContent=tab.label;
-      if(tab.external){a.id=tab.external;a.hidden=true;a.target='_blank';a.rel='noopener';}
+      if(tab.external){a.id=tab.external;a.hidden=!tab.href;if(tab.href)a.href=prefix+tab.href.slice(1);a.target='_blank';a.rel='noopener';}
       else{a.href=prefix+tab.hash;a.dataset.navHash=tab.hash;if(tab.id)a.id=tab.id;}
       if(tab.status){const status=document.createElement('span');status.id=tab.status;a.append(status);}
       row.append(a);
@@ -95,5 +95,14 @@ export function createAdminNavigation({account=false}={}) {
   }
   function title(){return account?'Byt lösenord':resolveNavigation(location.hash).title;}
   function setAccount(enabled){popup.querySelector('#account-link').hidden=!enabled;}
-  setAccount(account);sync();return {sync,title,setAccount,close};
+  // Vem som är inloggad, i sidomenyns fot: namn och roll, Logga ut; lokalt utan inloggning en länk till Logga in.
+  function setSession(session){
+    const box=popup.querySelector('#account-session'),user=popup.querySelector('#account-user'),login=popup.querySelector('#login-link'),logout=popup.querySelector('#logout-button');
+    if(!session||session.mode==='cloudflare'){box.hidden=true;return;}
+    box.hidden=false;user.textContent=session.user?`${session.user.username} · ${session.user.role==='owner'?'ägare':'administratör'}`:session.setup?.needed?'Ingen ägare än':'Inte inloggad';
+    login.hidden=!!session.user;login.href='/login?next='+encodeURIComponent(location.pathname+location.hash);logout.hidden=!session.user;
+    setAccount(!!session.user);
+    logout.onclick=async()=>{try{await fetch('/api/auth/logout',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});}catch{}location.replace(session.mode==='external'?'/login':'/');};
+  }
+  setAccount(account);sync();return {sync,title,setAccount,setSession,close};
 }

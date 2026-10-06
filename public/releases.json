@@ -1,9 +1,16 @@
 [
   {
+    "version": "0.66.2",
+    "date": "2026-10-06",
+    "notes": [
+      "3d slutar vid slutsignalen IIIdo: 172 är TKL:s igen och växelgatan 3d stick är borttagen"
+    ]
+  },
+  {
     "version": "0.66.1",
     "date": "2026-10-06",
     "notes": [
-      "Växelgatan 3d stick: från 3d via 172 in på stickspåret med stoppbocken; 172 är gränsväxel mot 170"
+      "Växelgatan 3d stick via 172 (tillbakadragen i 0.66.2)"
     ]
   },
   {

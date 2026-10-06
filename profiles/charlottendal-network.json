@@ -527903,34 +527903,6 @@
       ],
       "sourceButton": "vxv164",
       "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
-    },
-    "Vx172": {
-      "tklPositions": [
-        "C",
-        "T"
-      ],
-      "rangerPositions": [
-        "T"
-      ],
-      "ports": {
-        "C": [
-          "A",
-          "B"
-        ],
-        "T": [
-          "A",
-          "C"
-        ]
-      },
-      "tklLegs": [
-        "B"
-      ],
-      "yardLegs": [
-        "A",
-        "C"
-      ],
-      "sourceButton": "vxv172",
-      "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
     }
   },
   "operatingControls": {
@@ -535128,8 +535100,7 @@
       "Vx132",
       "Vx144",
       "Vx154",
-      "Vx164",
-      "Vx172"
+      "Vx164"
     ],
     "segments": [
       "T110",
@@ -535160,7 +535131,6 @@
       "T227",
       "T256",
       "T26",
-      "T274",
       "T41",
       "T42",
       "T43",
@@ -535699,20 +535669,6 @@
         "T71",
         "T58",
         "T150"
-      ],
-      "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
-    },
-    {
-      "id": "3d-stub",
-      "label": "3d till stickspåret",
-      "short": "3d stick",
-      "side": "3d",
-      "turnouts": {
-        "Vx172": "T"
-      },
-      "segments": [
-        "T26",
-        "T274"
       ],
       "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
     }

@@ -20,9 +20,7 @@ const spec=[
   {id:'load-3',label:'Lastspår 3',short:'Last 3',side:'right',from:'T53',to:'T41'},
   {id:'depot-kolgard',label:'Kolgård',short:'Kolgård',side:'depot',from:'T124',to:'T58'},
   {id:'depot-lokstall',label:'Lokstall',short:'Lokstall',side:'depot',from:'T124',to:'T67'},
-  {id:'depot-skiva',label:'Fram till vändskivan',short:'Skiva',side:'depot',from:'T124',to:'T150'},
-  // 3d through 172 to the stub and its buffer stop; out towards 170 comes later.
-  {id:'3d-stub',label:'3d till stickspåret',short:'3d stick',side:'3d',from:'T26',to:'T274'}
+  {id:'depot-skiva',label:'Fram till vändskivan',short:'Skiva',side:'depot',from:'T124',to:'T150'}
 ];
 export function compileRangerPaths(panel,profile){
   const topology=new Topology(panel),own=new Set(profile.yardArea?.turnouts||[]),boundaries=profile.yardBoundaries||{};

@@ -14,9 +14,7 @@ const reviewed={
   Vx132:{id:'TO24',continuing:2,segments:['T123','T43','T45'],tklLegs:['C'],yardLegs:['A','B'],button:'vxv131/132'},
   Vx144:{id:'TO21',continuing:2,segments:['T53','T121','T52'],tklLegs:['C'],yardLegs:['A','B'],button:'vxv144/154'},
   Vx154:{id:'TO20',continuing:4,segments:['T36','T46','T118'],tklLegs:['A','C'],yardLegs:['B'],button:'vxv144/154'},
-  Vx164:{id:'TO0',continuing:2,segments:['T161','T2','T144'],tklLegs:['B'],yardLegs:['A','C'],button:'vxv164'},
-  // 172 (with the reviewed panel connection to 3d): 3d and the stub are the ranger's, 170 TKL's.
-  Vx172:{id:'TO47',continuing:2,segments:['T274','T273','T26'],tklLegs:['B'],yardLegs:['A','C'],button:'vxv172'}
+  Vx164:{id:'TO0',continuing:2,segments:['T161','T2','T144'],tklLegs:['B'],yardLegs:['A','C'],button:'vxv164'}
 };
 
 export function compileYardBoundaries(panel,source) {

@@ -429,6 +429,44 @@
       }
     },
     {
+      "id": "authority:Vx172",
+      "type": "authority",
+      "object": "Vx172",
+      "tkl": [
+        "C",
+        "T"
+      ],
+      "ranger": [
+        "T"
+      ],
+      "detail": {
+        "ports": {
+          "C": [
+            "A",
+            "B"
+          ],
+          "T": [
+            "A",
+            "C"
+          ]
+        },
+        "tklLegs": [
+          "B"
+        ],
+        "yardLegs": [
+          "A",
+          "C"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "yardBoundaries",
+        "button": "vxv172",
+        "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
+      }
+    },
+    {
       "id": "condition:manual:vxv100/101",
       "type": "condition",
       "trigger": "manual",

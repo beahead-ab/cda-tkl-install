@@ -30,6 +30,7 @@ import { StudioAssistant } from './studio/assistant.mjs';
 import { AiSettings } from './ai-settings.mjs';
 import { Onboarding } from './onboarding.mjs';
 import { StudioReview } from './studio/review.mjs';
+import { signalReportKind } from './signal-report.mjs';
 import { spawn } from 'node:child_process';
 
 const baseProfile=loadProfile();
@@ -51,7 +52,7 @@ function activationStatus(proposed){
     for(const [n,b] of Object.entries(proposed.turnouts)){const r=report('turnout',b.address);if(!r||!['C','T'].includes(r.position))return deny(n+': den föreslagna adressen saknar aktuellt känt växelläge.');}
     // Varje ingång till en spårledning ska ha rapporterat fritt; en virtuell signal har ingen utgång och ingen rapport att kräva.
     for(const [n,b] of Object.entries(proposed.blocks))for(const i of b.inputs||[b]){const r=report('sensor',i.address);if(!r||(i.activeMeansOccupied?r.active:!r.active))return deny(n+': den föreslagna bindningen saknar färsk frirapport.');}
-    for(const [n,b] of Object.entries(proposed.signals)){if(b.virtual)continue;const r=report('signal',b.reportAddress);if(!r||!b.stopCodes.includes(r.code))return deny(n+': den föreslagna bindningen saknar färskt stoppbesked.');}
+    for(const [n,b] of Object.entries(proposed.signals)){if(b.virtual)continue;const stopped=signalReportKind(proposed,b)==='switch'?report('turnout',b.reportAddress)?.position==='T':b.stopCodes.includes(report('signal',b.reportAddress)?.code);if(!stopped)return deny(n+': den föreslagna bindningen saknar färskt stoppbesked.');}
     const p=proposed.operatingControls?.programming;if(p&&(report('turnout',p.relayAddress)?.position!=='T'||report('sensor',p.reportAddress)?.active!==false))return deny('Föreslaget programmeringsområde saknar färsk normalrapport.');
   }
   return {allowed:true,reason:'AIS aktiv och inga lås. Föreslagna adresser måste ha färska fria lägen och stoppbesked vid aktivering.'};

@@ -1,6 +1,7 @@
 // Objektregistret: TKL-namn, fysisk bindning och spårbarhet för växlar, signaler, spårledningar och moduler.
 // Allt är läst ur driftprofilen, panelgeometrin och Cda60.xml. Status säger hur mycket som är bevisat: ingenting är uppmätt.
 import { moduleOf } from './sources.mjs';
+import { signalReportKind } from '../signal-report.mjs';
 const STATUS = { xml: 'ur XML, ej uppmätt', bench: 'bänkadress i simulatorn', virtual: 'virtuell i JMRI, ingen utgång', none: 'ingen bindning' };
 const statusOf = (binding, provenance) => binding.virtual ? STATUS.virtual : /bench|bänkadress/i.test(provenance) ? STATUS.bench : /ej uppmätt|not measured/i.test(provenance) ? STATUS.xml : provenance;
 
@@ -20,7 +21,7 @@ export function buildRegistry({ profile, panel, xml }, measured = {}) {
   for (const t of xml.turnouts) { const m = /(?:signal|siganl)\s+([^,]+)/i.exec(t.comment); if (m) (signalOutputs[m[1].trim()] ??= []).push(trace(t.system, t.comment)); }
   const masts = Object.fromEntries(panel.micons.map(m => [m.mast, m]));
   const signals = Object.entries(profile.signals).map(([id, s]) => ({ id, kind: 'signal', mastType: s.sourceType, inPlan: !!masts[id], virtual: !!s.virtual,
-    loconet: s.virtual ? { order: null, report: null, stopCodes: [], goCodes: [] } : { order: s.address, report: s.reportAddress, stopCodes: s.stopCodes, goCodes: s.goCodes }, status: statusOf(s, s.provenance),
+    loconet: s.virtual ? { order: null, report: null, reportKind: null, stopCodes: [], goCodes: [] } : { order: s.address, report: s.reportAddress, reportKind: signalReportKind(profile, s), stopCodes: s.stopCodes, goCodes: s.goCodes }, status: statusOf(s, s.provenance),
     measured: measure('signal', id), source: signalOutputs[id] || [], output: s.sourceOutput || null, swedishAspects: false }));
   const blocks = Object.entries(profile.blocks).map(([id, b]) => ({ id, kind: 'block', loconet: { report: b.address, inputs: (b.inputs || [b]).map(i => i.address), logic: b.logic || null, activeMeansOccupied: b.activeMeansOccupied },
     sourceSensor: b.sourceSensor, sourceInputs: b.sourceInputs || [], status: statusOf(b, b.provenance), measured: measure('block', id) }));

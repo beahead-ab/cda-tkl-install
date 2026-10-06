@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.68.0",
+    "date": "2026-10-06",
+    "notes": [
+      "Signalrapport per profil: SE-telegram (E4) med beskedskoder eller växelrapport (B1, CLOSED kör / THROWN stopp, som JMRI läste), för alla signaler under Driftbindningar → Signalrapport och per signal",
+      "Kärna, simulator, diagnostik, mätning och aktivering följer rapportformen; en B1-signal får inte dela adress med en växel"
+    ]
+  },
+  {
     "version": "0.67.1",
     "date": "2026-10-06",
     "notes": [

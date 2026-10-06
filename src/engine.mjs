@@ -7,6 +7,7 @@ import { splitRouteAt } from './route-sections.mjs';
 import { boundaryCommandReason } from './yard-boundaries.mjs';
 import { forbidReason } from './studio/rules.mjs';
 import { YardControl } from './yard-control.mjs';
+import { signalReportKind, aspectFromSwitch } from './signal-report.mjs';
 
 const FIELD_ROWS = new Set(['report', 'transport']), FIELD_ORDERS = new Set(['order', 'permission']);
 export class Engine extends EventEmitter {
@@ -126,12 +127,14 @@ export class Engine extends EventEmitter {
       changed ||= state.occupied !== occupied;
       state.occupied = occupied; state.updatedAt = now; state.reportSequence=sequence;
     }
-    if (d.kind === 'signal') for (const [name, binding] of Object.entries(this.profile.signals)) {
-      if (binding.reportAddress !== d.address) continue;
-      const aspect = binding.stopCodes.includes(d.code) ? 'stop' : binding.goCodes.includes(d.code) ? 'go' : 'unknown';
-      const state = this.signals[name]; changed ||= state.aspect !== aspect || state.code !== d.code;
+    // Signalens besked kommer antingen som SE-telegram med beskedskod eller, per profil, som växelrapport (B1) på rapportadressen.
+    const reports = d.kind === 'signal' || d.kind === 'turnout' ? Object.entries(this.profile.signals).filter(([, b]) => !b.virtual && b.reportAddress === d.address && signalReportKind(this.profile, b) === (d.kind === 'signal' ? 'se' : 'switch')) : [];
+    for (const [name, binding] of reports) {
+      const code = d.kind === 'signal' ? d.code : d.position;
+      const aspect = d.kind === 'signal' ? (binding.stopCodes.includes(d.code) ? 'stop' : binding.goCodes.includes(d.code) ? 'go' : 'unknown') : aspectFromSwitch(d.position);
+      const state = this.signals[name]; changed ||= state.aspect !== aspect || state.code !== code;
       const unexpected = aspect === 'go' && state.desired === 'STOP';
-      state.aspect = aspect; state.updatedAt = now; state.code = d.code; state.reportSequence=sequence;
+      state.aspect = aspect; state.updatedAt = now; state.code = code; state.reportSequence=sequence;
       if (unexpected) for (const route of this.routes) {
         // A GO received before this route's permission must never be consumed
         // as its acknowledgement, even when both occur in one clock tick.

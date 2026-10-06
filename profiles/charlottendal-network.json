@@ -3,6 +3,10 @@
   "title": "Charlottendal",
   "commissioned": false,
   "sourceHash": "c69a865ae9a85cdb842d70c34d2573dde4b11c50f601a561d5b941136ac6fa87",
+  "signalReport": {
+    "kind": "se",
+    "provenance": "SE-telegram antaget ur det publicerade Signal10-CZ-exemplet; JMRI läste B1 (feedback MONITORING). Avgörs vid Mät objekt."
+  },
   "description": "Utökad anläggningsmodell med källstyrda tågvägsval och signalriktningar. Fysiska MGP-bindningar återstår att verifiera.",
   "transport": {
     "host": "127.0.0.1",

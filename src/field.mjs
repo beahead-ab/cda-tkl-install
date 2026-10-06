@@ -1,6 +1,7 @@
 import { EventEmitter } from 'node:events';
 import { decode, switchReport, sensorReport, signalReport } from './protocol.mjs';
 import { decodeSv, svReply, identityReply, SV_CMD } from './sv2.mjs';
+import { signalReportKind } from './signal-report.mjs';
 
 // Independent field state: no Engine import, route state or TKL HTTP access.
 export class Field extends EventEmitter {
@@ -42,7 +43,11 @@ export class Field extends EventEmitter {
     // Flera ingångar rapporterar alla samma beläggning; simulatorn har ingen egen bild av var på spårledningen tåget står.
     for (const i of b.inputs || [b]) this.emit('frame', sensorReport(i.address, i.activeMeansOccupied ? this.blocks[name] : !this.blocks[name]));
   }
-  reportSignal(name) { if (!this.signals[name].virtual) this.emit('frame', signalReport(this.profile.signals[name].reportAddress, this.signals[name].code)); }
+  reportSignal(name) {
+    const s = this.signals[name], b = this.profile.signals[name]; if (s.virtual) return;
+    // Per profil: SE-telegram med beskedskod, eller växelrapport (B1) där CLOSED = kör och THROWN = stopp.
+    this.emit('frame', signalReportKind(this.profile, b) === 'switch' ? switchReport(b.reportAddress, s.code ? 'C' : 'T') : signalReport(b.reportAddress, s.code));
+  }
   allReports() {
     for (const n of Object.keys(this.turnouts)) this.reportTurnout(n);
     // Varje ingång rapporteras en gång; en spårledning med flera ingångar rapporteras när någon av dem ännu inte gått ut.

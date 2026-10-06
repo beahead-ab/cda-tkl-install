@@ -2,6 +2,7 @@
 // Ekot och transportkvittensen räknas inte. Mätningen sparas med adress, läge och telegram; byter adressen är den inte giltig längre.
 // I fysisk drift kan ingen profil aktiveras förrän alla dess bindningar är uppmätta på sina adresser.
 import { decode, switchOrder, switchReport, signalReport, hex } from '../protocol.mjs';
+import { signalReportKind } from '../signal-report.mjs';
 const fail = (message, status = 400) => { throw Object.assign(Error(message), { status }); };
 export const KINDS = ['turnout', 'signal', 'block'];
 const key = (kind, name) => kind + ':' + name;
@@ -52,10 +53,11 @@ export class Measurements {
     if (this.pending && !this.pending.report) fail(`En mätning av ${this.pending.name} väntar på rapport. Avbryt den först.`, 409);
     let order = null, expect, requested = null;
     if (kind === 'turnout') { if (!['C', 'T'].includes(position)) fail('Ange läge C eller T.'); requested = position; const physical = b.inverted ? (position === 'C' ? 'T' : 'C') : position; order = switchOrder(b.address, physical); expect = { kind: 'turnout', address: b.address, position: physical }; }
-    else if (kind === 'signal') { requested = 'STOP'; order = switchOrder(b.address, 'T'); expect = { kind: 'signal', address: b.reportAddress, codes: b.stopCodes }; }
+    // Signalens stopp bekräftas av SE-koderna eller, per profil, av B1 THROWN på rapportadressen.
+    else if (kind === 'signal') { requested = 'STOP'; order = switchOrder(b.address, 'T'); expect = signalReportKind(profile, b) === 'switch' ? { kind: 'turnout', address: b.reportAddress, position: 'T' } : { kind: 'signal', address: b.reportAddress, codes: b.stopCodes }; }
     else { requested = 'change'; expect = { kind: 'sensor', address: b.address, baseline: this.latest['sensor:' + b.address] ?? null }; }
     // Väntan registreras före ordern: simulatorn kan svara i samma andetag som ordern går ut.
-    const expectHex = kind === 'turnout' ? [hex(switchReport(b.address, expect.position))] : kind === 'signal' ? b.stopCodes.map(c => hex(signalReport(b.reportAddress, c))) : [];
+    const expectHex = kind === 'turnout' ? [hex(switchReport(b.address, expect.position))] : kind === 'signal' ? (expect.kind === 'turnout' ? [hex(switchReport(b.reportAddress, 'T'))] : b.stopCodes.map(c => hex(signalReport(b.reportAddress, c)))) : [];
     this.pending = { kind, name, address: kind === 'signal' ? b.reportAddress : b.address, orderAddress: kind === 'block' ? null : b.address, requested, order: order ? hex(order) : null, expectHex, sentAt: this.now(), expect, report: null, mismatch: null, mode: this.mode() };
     if (order && !this.send(order)) { this.pending = null; fail('Ingen anslutning till LocoNet.', 503); }
     return this.view(profile);

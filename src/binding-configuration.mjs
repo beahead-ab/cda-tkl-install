@@ -1,7 +1,11 @@
 import {createHash,randomUUID} from 'node:crypto';
+import {signalReportKind} from './signal-report.mjs';
 const copy=structuredClone, record=v=>v&&typeof v==='object'&&!Array.isArray(v),equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const fail=(message,status=400)=>{throw Object.assign(Error(message),{status});};
-const fields={turnouts:{address:'address2048',inverted:'boolean'},blocks:{address:'address4096',activeMeansOccupied:'boolean'},signals:{address:'address2048',reportAddress:'address16384',stopCodes:'codes',goCodes:'codes'},programming:{relayAddress:'address2048',reportAddress:'address4096'},routes:{enabled:'boolean'},manual:{enabled:'boolean'}};
+// Signalrapport: 'se' = Signal10:s SE-telegram med beskedskoder, 'switch' = växelrapporten B1 (CLOSED kör, THROWN stopp).
+// Profilraden sätter standarden för alla signaler; en signal kan avvika med reportKind, 'inherit' följer profilen.
+const CHOICES={reportKind:['se','switch'],reportKindInherit:['inherit','se','switch']};
+const fields={turnouts:{address:'address2048',inverted:'boolean'},blocks:{address:'address4096',activeMeansOccupied:'boolean'},signals:{address:'address2048',reportAddress:'address16384',stopCodes:'codes',goCodes:'codes',reportKind:'reportKindInherit'},signalReport:{kind:'reportKind'},programming:{relayAddress:'address2048',reportAddress:'address4096'},routes:{enabled:'boolean'},manual:{enabled:'boolean'}};
 export class BindingConfiguration {
   constructor(base,{storage,canActivate=()=>({allowed:false,reason:'Aktivering ej tillgänglig.'}),prepare=()=>()=>{},now=Date.now}) {
     this.base=base;this.storage=storage;this.canActivate=canActivate;this.prepare=prepare;this.now=now;this.sessionId=randomUUID();this.baseHash=createHash('sha256').update(JSON.stringify(base)).digest('hex');
@@ -11,7 +15,8 @@ export class BindingConfiguration {
     // ägs av detekteringsregeln i Studio och ligger utanför katalogen; virtuella signaler har ingen utgång att binda.
     const sensors=new Map();for(const [n,b] of Object.entries(base.blocks)){if(b.inputs)continue;const id=(b.sourceInputs?b.sourceInputs[0]:(b.sourceSensor||n))+'@'+b.address;if(!sensors.has(id))sensors.set(id,[]);sensors.get(id).push(n);}
     for(const [id,names] of sensors){const b=base.blocks[names[0]];add('blocks',id,names,{address:b.address,activeMeansOccupied:b.activeMeansOccupied},[...new Set(names.map(n=>base.blocks[n].sourceSensor||n))].join(', '));}
-    for(const [n,b] of Object.entries(base.signals))if(!b.virtual)add('signals',n,[n],{address:b.address,reportAddress:b.reportAddress,stopCodes:b.stopCodes,goCodes:b.goCodes},b.sourceType||'');
+    add('signalReport','alla',[],{kind:signalReportKind(base,{address:1,reportAddress:1})},'standard för alla signaler');
+    for(const [n,b] of Object.entries(base.signals))if(!b.virtual)add('signals',n,[n],{address:b.address,reportAddress:b.reportAddress,stopCodes:b.stopCodes,goCodes:b.goCodes,reportKind:CHOICES.reportKind.includes(b.reportKind)?b.reportKind:'inherit'},b.sourceType||'');
     if(base.operatingControls?.programming){const p=base.operatingControls.programming;add('programming','track3',[],{relayAddress:p.relayAddress,reportAddress:p.reportAddress},p.rule);}
     for(const r of base.routes)add('routes',r.id,[r.id],{enabled:true},r.source?.rules?.join(', ')||'');
     for(const n of Object.keys(base.turnouts))add('manual',n,[n],{enabled:true},base.manualPolicies?.byTurnout[n]?.rule||'');
@@ -24,18 +29,21 @@ export class BindingConfiguration {
   get active(){return this.data.versions[this.data.activeVersion];}
   shape(overrides){const errors=[];if(!record(overrides))return ['Ogiltigt ändringslager.'];for(const [key,value] of Object.entries(overrides)){
     const row=this.objects.get(key);if(!row||!record(value)||Object.keys(value).some(k=>!fields[row.kind][k])||Object.keys(value).length!==Object.keys(fields[row?.kind]||{}).length){errors.push('Okänd bindning eller fält: '+key);continue;}
-    for(const [name,type] of Object.entries(fields[row.kind])){const v=value[name];if(type==='boolean'?typeof v!=='boolean':type==='codes'?(!Array.isArray(v)||!v.length||v.length>32||v.some(n=>!Number.isInteger(n)||n<0||n>127)||new Set(v).size!==v.length):(!Number.isInteger(v)||v<1||v>Number(type.slice(7))))errors.push(key+': ogiltigt '+name);}
+    for(const [name,type] of Object.entries(fields[row.kind])){const v=value[name];if(type==='boolean'?typeof v!=='boolean':CHOICES[type]?!CHOICES[type].includes(v):type==='codes'?(!Array.isArray(v)||!v.length||v.length>32||v.some(n=>!Number.isInteger(n)||n<0||n>127)||new Set(v).size!==v.length):(!Number.isInteger(v)||v<1||v>Number(type.slice(7))))errors.push(key+': ogiltigt '+name);}
   }return errors;}
   profile(overrides=this.active.overrides){const p=copy(this.base);for(const [key,values] of Object.entries(overrides)){const row=this.objects.get(key);if(!row)continue;
     if(row.kind==='routes')p.routes.find(r=>r.id===row.id).adminDisabled=!values.enabled;
     else if(row.kind==='manual'){p.manualDisabled||=[];if(!values.enabled)p.manualDisabled.push(row.id);}
     else if(row.kind==='programming')Object.assign(p.operatingControls.programming,copy(values));
-    else for(const n of row.names)Object.assign(p[row.kind][n],copy(values),{provenance:'Operator override; physical binding requires commissioning.'});
+    else if(row.kind==='signalReport')p.signalReport={...(p.signalReport||{}),kind:values.kind};
+    else for(const n of row.names){const v=copy(values);if(v.reportKind==='inherit'){delete v.reportKind;delete p[row.kind][n].reportKind;}Object.assign(p[row.kind][n],v,{provenance:'Operator override; physical binding requires commissioning.'});}
   }p.commissioned=false;return p;}
   validate(overrides){const errors=this.shape(overrides);if(errors.length)return errors;const p=this.profile(overrides),orders=new Map(),reports=new Map(),detectors=new Map();
     const unique=(map,address,name)=>{if(map.has(address))errors.push('Adress '+address+' delas av '+map.get(address)+' och '+name+'.');else map.set(address,name);};
     for(const [n,b] of Object.entries(p.turnouts))unique(orders,b.address,n);
-    for(const [n,b] of Object.entries(p.signals)){if(b.virtual)continue;unique(orders,b.address,'signal '+n);unique(reports,b.reportAddress,'signal '+n);if(b.stopCodes.some(c=>b.goCodes.includes(c)))errors.push('Signal '+n+': samma beskedskod får inte betyda både stopp och kör.');}
+    for(const [n,b] of Object.entries(p.signals)){if(b.virtual)continue;unique(orders,b.address,'signal '+n);unique(reports,b.reportAddress,'signal '+n);if(b.stopCodes.some(c=>b.goCodes.includes(c)))errors.push('Signal '+n+': samma beskedskod får inte betyda både stopp och kör.');
+      // En B1-rapport på en växels adress kan inte skiljas från växelns egen rapport.
+      if(signalReportKind(p,b)==='switch'&&Object.values(p.turnouts).some(t=>t.address===b.reportAddress))errors.push('Signal '+n+': växelrapporten på adress '+b.reportAddress+' tillhör redan en växel.');}
     for(const row of this.catalog.filter(r=>r.kind==='blocks')){const b=p.blocks[row.names[0]];unique(detectors,b.address,row.id);if(row.names.some(n=>p.blocks[n].address!==b.address||p.blocks[n].activeMeansOccupied!==b.activeMeansOccupied))errors.push('Detektoralias stämmer inte: '+row.id);}
     const pr=p.operatingControls?.programming;if(pr){unique(orders,pr.relayAddress,'programmeringsrelä');unique(detectors,pr.reportAddress,'programmeringsrapport');}
     return errors;

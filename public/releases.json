@@ -1,5 +1,14 @@
 [
   {
+    "version": "0.67.1",
+    "date": "2026-10-06",
+    "notes": [
+      "Konstigheterna i källan med bedömning av vad som är rätt, i genomgången och status",
+      "S170 har detektering: JMRI-regeln SN1B sätter även S170 (LS199); inventeringen läser nu regler som sätter flera spårledningar",
+      "4/2 och L1 räknas som panelbesked: deras utgångar LT307/LT308 är märkta Ej använd och linje D är inte i drift"
+    ]
+  },
+  {
     "version": "0.67.0",
     "date": "2026-10-06",
     "notes": [

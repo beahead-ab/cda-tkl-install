@@ -1903,6 +1903,7 @@
           "10/11",
           "2/11",
           "2/2",
+          "2/4",
           "3/11"
         ],
         "inactiveNX": [
@@ -2259,7 +2260,7 @@
       "reason": "Svenska beskedskoder saknas. Koderna är provisoriska Signal10-CZ-koder ur driftbindningarna.",
       "source": {
         "profile": "signals",
-        "provenance": "Utgången LT308 ur Cda60.xml: Stop = THROWN, kör = CLOSED. Rapportadressen antas lika med orderadressen och beskedskoderna är provisoriska Signal10-CZ-koder. Ej uppmätt. Utgången är märkt \"M11-Ej använd\" i källan."
+        "provenance": "Utgången LT303 (SN1) ur Cda60.xml: Stop = THROWN, kör = CLOSED. Rapportadressen antas lika med orderadressen och beskedskoderna är provisoriska Signal10-CZ-koder. Ej uppmätt."
       }
     },
     {

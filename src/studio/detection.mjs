@@ -8,9 +8,9 @@ export function detectionInventory({ profile, xml }) {
   const sensors = Object.fromEntries(xml.sensors.map(s => [s.system, s]));
   const byUser = Object.fromEntries(xml.sensors.filter(s => s.user).map(s => [s.user, s.system]));
   const rules = {};
+  // En regel kan sätta flera spårledningar (SN1B sätter slSN1b och slS170; "S95/96 kors" sätter slS95t och slS96c).
   for (const c of xml.conditionals) {
-    const target = c.actions.find(a => a.type === 9 && a.name.startsWith('sl'));
-    if (target) (rules[target.name] ??= []).push(c);
+    for (const name of new Set(c.actions.filter(a => a.type === 9 && a.name.startsWith('sl')).map(a => a.name))) (rules[name] ??= []).push(c);
   }
   const physical = name => name.startsWith('LS') ? name : (byUser[name]?.startsWith('LS') ? byUser[name] : null);
   const isButton = v => v.name.startsWith('ss');                      // Spärra spår-knapparna i JMRI

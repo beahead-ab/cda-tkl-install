@@ -1,6 +1,7 @@
 // Användare i Charlottendal TKL, funktionellt som i TrainMeet Server: ägare och administratörer med
 // användarnamn och lösenord, inbjudan med engångskod, sessioner i en cookie. Ägaren lägger till och tar
-// bort användare; en administratör sköter hela TKL men inte vilka som har tillgång. Filen users.json delas
+// bort användare; en administratör sköter hela TKL men inte vilka som har tillgång; en rangerare har bara
+// rangerarens vy (docs/rangerlage.md). Filen users.json delas
 // av TKL och simulatorn (0640, gruppen charlottendal-auth i webbdriften) och skrivs alltid atomiskt.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -8,7 +9,7 @@ import { randomBytes, randomInt, scrypt, timingSafeEqual, createHash } from 'nod
 import { promisify } from 'node:util';
 
 const derive = promisify(scrypt), digest = value => createHash('sha256').update(value).digest('hex');
-export const ROLES = ['owner', 'admin'], CODE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ', INVITATION_DAYS = 7, SESSION_HOURS = 12;
+export const ROLES = ['owner', 'admin', 'ranger'], CODE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ', INVITATION_DAYS = 7, SESSION_HOURS = 12;
 const USERNAME = /^[a-z0-9][a-z0-9._-]{2,63}$/i, CODE = /^[A-Z0-9]{4}-?[A-Z0-9]{4}$/;
 const fail = (message, status = 400) => Object.assign(Error(message), { status });
 export function checkUsername(value) {
@@ -73,7 +74,7 @@ export class UserStore {
   hasOwner() { return this.read().users.some(u => u.role === 'owner' && u.hash); }
   summary() {
     const now = this.now(), record = this.read();
-    return { count: record.users.length, hasOwner: record.users.some(u => u.role === 'owner' && u.hash), users: record.users.map(u => publicUser(u, now)).sort((a, b) => a.role === b.role ? a.username.localeCompare(b.username, 'sv') : a.role === 'owner' ? -1 : 1) };
+    return { count: record.users.length, hasOwner: record.users.some(u => u.role === 'owner' && u.hash), users: record.users.map(u => publicUser(u, now)).sort((a, b) => a.role === b.role ? a.username.localeCompare(b.username, 'sv') : ROLES.indexOf(a.role) - ROLES.indexOf(b.role)) };
   }
   user(id) { const u = this.read().users.find(u => u.id === id); return u ? publicUser(u, this.now()) : null; }
   find(record, username) { const name = String(username ?? '').trim().toLowerCase(); return record.users.find(u => u.username.toLowerCase() === name) || null; }
@@ -88,7 +89,7 @@ export class UserStore {
   // Inbjudan: ett namn och en roll ger en engångskod som gäller sju dagar. Koden visas en gång och lagras bara som hash.
   invite({ username, role = 'admin' }) {
     const record = this.read(), name = checkUsername(username);
-    if (!ROLES.includes(role)) throw fail('Rollen är ägare eller administratör.');
+    if (!ROLES.includes(role)) throw fail('Rollen är ägare, administratör eller rangerare.');
     if (this.find(record, name)) throw fail('Användarnamnet finns redan.', 409);
     const code = makeCode(), now = this.now();
     const user = { id: randomBytes(8).toString('hex'), username: name, role, salt: null, hash: null, mustChange: false, createdAt: now, updatedAt: now, invitation: { codeHash: digest(normalizeCode(code)), expires: now + INVITATION_DAYS * 86400000 } };

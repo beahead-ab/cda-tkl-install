@@ -3,7 +3,7 @@
 import {createAdminDialog} from './admin-ui.js';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const when=t=>t?new Date(t).toLocaleString('sv-SE',{dateStyle:'short',timeStyle:'short'}):'';
-const ROLE={owner:'ägare',admin:'administratör'};
+const ROLE={owner:'ägare',admin:'administratör',ranger:'rangerare'};
 export function createUsersPage({root,api,message,session}){
   if(!root)return null;
   let view=null,last='';
@@ -30,7 +30,7 @@ export function createUsersPage({root,api,message,session}){
   const invite=()=>{
     const form=document.createElement('form');form.className='admin-form';
     form.innerHTML=`<label>Användarnamn <input name="username" required maxlength="64" autocomplete="off" autocapitalize="off" spellcheck="false" pattern="[A-Za-z0-9][A-Za-z0-9._\\-]{2,63}"></label><p class="settings-consequence">3–64 tecken: bokstäver, siffror, punkt, bindestreck eller understreck.</p>
-      <label>Roll <select name="role"><option value="admin">Administratör · sköter hela TKL</option><option value="owner">Ägare · även vem som har tillgång</option></select></label>`;
+      <label>Roll <select name="role"><option value="admin">Administratör · sköter hela TKL</option><option value="owner">Ägare · även vem som har tillgång</option><option value="ranger">Rangerare · bara rangerarens vy</option></select></label>`;
     const save=document.createElement('button');save.type='button';save.textContent='Skapa inbjudningskod';
     const modal=createAdminDialog({title:'Bjud in användare',body:form,saveButton:save});
     save.onclick=async()=>{if(!form.reportValidity())return;save.disabled=true;try{const result=await api('users/invite',{username:form.elements.username.value.trim(),role:form.elements.role.value});if(result){modal.close();view={...view,...result};last='';render();showCode(result,'Inbjudningskod skapad');}}finally{save.disabled=false;}};

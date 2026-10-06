@@ -184,35 +184,37 @@ export class Engine extends EventEmitter {
   // doubled press, a second window driving the same Stream Deck, a slow connection) is
   // then harmless. Without an intent the same endpoints toggle as before; the route list
   // and older clients rely on that.
-  request(from, to, intent) {
+  // operator: 'tkl' or 'ranger'. The ranger lays shunt routes inside the yard area and over a
+  // laid request group, and takes back only the routes the ranger laid.
+  request(from, to, intent, {operator='tkl'}={}) {
     if(intent!=null&&intent!=='build'&&intent!=='cancel')throw Error('Okänd avsikt för tågvägen.');
     let plan;
-    try{plan=this.planRequest(from,to);}
+    try{plan=this.planRequest(from,to,operator);}
     catch(error){if(intent!=='cancel')throw error;this.log('route-repeat',`${from} → ${to}: återtagning begärd, men det finns ingen sådan tågväg längre.`);return null;}
     if(intent==='build'&&plan.action!=='build'){const route=plan.chain?.[0]||null;this.log('route-repeat',`${route?.label||from+' → '+to}: begärd igen men ligger redan. Ingen återtagning.`);return route;}
     if(intent==='cancel'&&plan.action==='build'){this.log('route-repeat',`${plan.definition.label||from+' → '+to}: återtagning begärd, men tågvägen ligger inte. Ingenting lades.`);return null;}
-    if(plan.action==='build')return this.establishRoute(plan.definition);
+    if(plan.action==='build')return this.establishRoute(plan.definition,operator);
     if(plan.action==='section')return this.applySectionCancellation(plan);
     this.cancelRoutes(plan.chain);return plan.chain[0];
   }
-  routeTargets(from,kind='main') {
+  routeTargets(from,kind='main',operator='tkl') {
     if(!['main','shunt'].includes(kind))return [];
     const ids=new Set(this.profile.routes.filter(r=>r.kind===kind).flatMap(r=>[r.from,r.to]));
     if(!ids.has(from))return [];
     const targets=[];
     for(const to of ids)if(to!==from){
-      try{const plan=this.planRequest(from,to);targets.push({id:to,action:plan.action==='build'?'build':'cancel'});}
+      try{const plan=this.planRequest(from,to,operator);targets.push({id:to,action:plan.action==='build'?'build':'cancel'});}
       catch{/* A preview never changes field state or bypasses an interlock. */}
     }
     return targets;
   }
-  planRequest(from, to) {
+  planRequest(from, to, operator='tkl') {
     const existing = this.routes.find(r => r.from === from && r.to === to);
-    if (existing) return {action:'cancel',chain:[existing]};
+    if (existing) {this.cancelRight(existing,operator);return {action:'cancel',chain:[existing]};}
     const chain=this.findRouteChain(from,to);
-    if(chain.length>1)return {action:'cancel',chain};
+    if(chain.length>1){for(const r of chain)this.cancelRight(r,operator);return {action:'cancel',chain};}
     const section=this.planSectionCancellation(from,to);
-    if(section)return section;
+    if(section){for(const r of section.chain)this.cancelRight(r,operator);return section;}
     if (!this.connected || this.storageFault) throw Error(this.storageFault ? 'Lagringsfel; manövrering spärrad.' : 'Ingen LocoNet-anslutning.');
     if(this.controls.mode!=='local') throw Error('Fjärrläge: lokal tågvägsläggning är spärrad. Inget fjärrsystem är anslutet ännu.');
     if (this.controls.stopAll) throw Error('Alla signaler i stopp är aktiverat. Återställ AIS före ny tågväg.');
@@ -223,7 +225,7 @@ export class Engine extends EventEmitter {
     const candidates=[def,...(this.profile.routeAlternatives||[]).filter(r=>r.id===def.id)];
     let selected,firstError;
     for(const candidate of candidates) {
-      try { this.checkRoute(candidate); selected=candidate; break; }
+      try { this.checkRoute(candidate,operator); selected=candidate; break; }
       catch(error) { firstError ||= error; }
     }
     if(!selected) throw firstError;
@@ -233,9 +235,10 @@ export class Engine extends EventEmitter {
   // after a complete source-approved path has passed every live interlock.
   // Rapporterade lägen för alla växlar med färsk rapport. Används för förbjudna kombinationer.
   knownPositions(){const out={};for(const [n,s] of Object.entries(this.turnouts))if(this.fresh(s)&&['C','T'].includes(s.position))out[n]=s.position;return out;}
-  checkRoute(def) {
+  cancelRight(route,operator){if(operator==='ranger'&&route.operator!=='ranger')throw Error('Tågvägen är TKL:s. Bara TKL återtar den.');}
+  checkRoute(def,operator='tkl') {
     const forbidden=forbidReason(this.profile.rules,{...Object.assign({},...this.routes.map(r=>r.turnouts)),...def.turnouts});if(forbidden)throw Error(forbidden);
-    const operatingReason=this.operating.routeReason(def);if(operatingReason)throw Error(operatingReason);
+    const operatingReason=this.operating.routeReason(def,operator);if(operatingReason)throw Error(operatingReason);
     const blocked = def.blocks.find(b => this.trackBlocked(b));
     if (blocked) throw Error(`${blocked} är administrativt spärrat.`);
     for (const b of def.blocks) if (!this.fresh(this.blocks[b]) || this.blocks[b].occupied !== false) throw Error(`${b} är belagt eller saknar aktuell återrapport.`);
@@ -251,8 +254,8 @@ export class Engine extends EventEmitter {
     }
     const movementReason=this.turnoutMovementReason(def);if(movementReason)throw Error(movementReason);
   }
-  establishRoute(def) {
-    const r = { ...structuredClone(def), definitionId: def.id, id: randomUUID(), state: 'setting', createdAt: this.now(), cancelRequested: false, nextSignal: def.signals.length - 1, reason: 'Inväntar växlarnas återrapporter.' };
+  establishRoute(def,operator='tkl') {
+    const r = { ...structuredClone(def), definitionId: def.id, id: randomUUID(), ...(operator==='ranger'?{operator}:{}), state: 'setting', createdAt: this.now(), cancelRequested: false, nextSignal: def.signals.length - 1, reason: 'Inväntar växlarnas återrapporter.' };
     if(r.autoRelease) r.passage=[...new Set(r.blocks.map(b=>this.profile.blocks[b].address))].map(address=>({address,state:'pending'}));
     this.routes.push(r); this.persist(); // Locks are durable BEFORE any field commands.
     this.log('route-request', `${r.label}: resurser reserverade.`);
@@ -320,8 +323,9 @@ export class Engine extends EventEmitter {
     }
     return chain[0];
   }
-  cancel(id) {
+  cancel(id,{operator='tkl'}={}) {
     const r=this.routes.find(r=>r.id===id);if(!r)throw Error('Tågvägen finns inte.');
+    this.cancelRight(r,operator);
     this.cancelRoutes([r]);return r;
   }
   cancelRoutes(routes) {
@@ -600,6 +604,7 @@ export class Engine extends EventEmitter {
       turnouts: this.turnouts, blocks: this.blocks, signals: this.signals, routes: this.routes, controls:this.controls, events: this.journal, operatingEvents: this.operatingEvents,
       operating:this.operating.snapshot(),yard:this.yard.snapshot(),
       manual:Object.fromEntries(Object.keys(this.turnouts).map(n=>[n,this.manualStatus(n)])),
+      manualRanger:Object.fromEntries([...(this.profile.yardArea?.turnouts||[]),...(this.profile.yardArea?.boundaries||[])].map(n=>[n,this.manualStatus(n,'ranger')])),
       modeChange:this.modeStatus(),allStopReset:this.allStopResetStatus(),panelReset:this.panelResetStatus(),emergencyRemaining:this.emergencyRemaining().map(r=>r.id),
       catalog: this.profile.routes.map(r => ({ id: r.id, from: r.from, to: r.to, label: r.label })) };
   }

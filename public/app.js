@@ -28,6 +28,7 @@ import { createPanelConsole } from './panel-console.js';
 import {createPanelEvents} from './panel-events.js';
 import {createPanelHead} from './panel-head.js';
 import {rangerView} from './ranger-notice.js';
+import {rangerOwnView,createRangerBar} from './ranger-page.js';
 import {createPanelSplit} from './panel-split.js';
 import {openUpdateNotice} from './update-notice.js';
 import {createUpdatePage} from './update-page.js';
@@ -57,22 +58,26 @@ let state, config, panel, registry, chosen = null, inspected = null, online = fa
 let manualFeedback, sourceRegister, trainInformation, telegramRecorder, operatingControls, modelClock, trainMeet, feedback, layout;
 let routeConfirmation,signalEndpoints;
 const routeTargets=createRouteTargets({load:async(from,kind)=>{
-  const response=await fetch('/api/route-targets?'+new URLSearchParams({from,kind}),{cache:'no-store'});
+  const response=await fetch('/api/route-targets?'+new URLSearchParams({from,kind,...(rangerMode?{operator:'ranger'}:{})}),{cache:'no-store'});
   if(!response.ok)throw Error('Mål kunde inte kontrolleras.');
   return response.json();
 },onChange:()=>paint()});
 let currentPage='panel',appMenu,contextDialog,panelConsole,panelEvents,panelHead,signalControls,chosenKind=null,clearanceView,streamDeck,streamDeckAdmin,updatePage;
 let authSession=null;
+// Rangerarens vy (docs/rangerlage.md): #ranger, or always for a user logged in as rangerare. The same
+// plan, dimmed outside the ranger's area; every move goes through /api/ranger/.
+let rangerMode=false,rangerBar=null;
 const pageFromHash=()=>{
   if(location.hash==='#tools/zoom')history.replaceState(null,'','#tools/appearance');
   if(location.hash==='#tools')history.replaceState(null,'','#tools/appearance');
   if(location.hash==='#tools/connections')history.replaceState(null,'','#register');
   // The local timetable is gone; TrainMeet is the only timetable (docs/installningar-plan.md).
   if(location.hash==='#import'||location.hash.startsWith('#import/'))history.replaceState(null,'','#trainmeet');
+  if(location.hash==='#ranger')rangerMode=true;
   return ({'#register':'admin','#tools':'tools','#trainmeet':'trainmeet','#advanced':'advanced'})[location.hash.split('/')[0]]||'panel';
 };
 function setPage(page,{historyMode='push'}={}) {
-  let hash={panel:'#panel',tools:'#tools',admin:'#register',trainmeet:'#trainmeet',advanced:'#advanced'}[page];
+  let hash={panel:rangerMode?'#ranger':'#panel',tools:'#tools',admin:'#register',trainmeet:'#trainmeet',advanced:'#advanced'}[page];
   if(!hash)return;
   // Lokalt kräver Inställningar en inloggad ägare eller administratör så snart en ägare finns; operatören stannar i panelen.
   if(page!=='panel'&&authSession?.mode==='local'&&!authSession.user&&!authSession.setup?.needed){const target=location.hash.startsWith(hash)?location.hash:hash;location.assign('/login?next='+encodeURIComponent('/'+target));return;}
@@ -80,7 +85,7 @@ function setPage(page,{historyMode='push'}={}) {
   if(historyMode!=='none'&&location.hash!==hash)history[historyMode==='replace'?'replaceState':'pushState'](null,'',hash);
   closeInspector(false);manualFeedback?.clear();
   if(currentPage!==page)clearChoice(false);
-  currentPage=page;document.body.dataset.page=page;
+  currentPage=page;document.body.dataset.page=page;document.body.dataset.role=rangerMode?'ranger':'';
   appMenu?.close();
   for(const p of ['panel','tools','admin','trainmeet','advanced']) {
     $(p+'-view').hidden=p!=='panel'&&p!==page;
@@ -406,10 +411,11 @@ function buildPlan() {
 async function manualTurnout(name,position) {
   if(!usable())return message('Panelen saknar aktuell kontakt med anläggningen.');
   if(chosen)return;
-  if(state.manual?.[name]?.allowed!==true)return message(state.manual?.[name]?.reason||'Ingen verifierad manöverregel är ansluten.');
+  const rights=rangerMode?state.manualRanger:state.manual;
+  if(rights?.[name]?.allowed!==true)return message(rights?.[name]?.reason||(rangerMode?'Växeln tillhör TKL:s område.':'Ingen verifierad manöverregel är ansluten.'));
   if(pending)return;
   manualFeedback.order(name,position);
-  if(!await api('turnout',{name,position}))manualFeedback.failed($('message-text').textContent);
+  if(!await api(rangerMode?'ranger/turnout':'turnout',{name,position}))manualFeedback.failed($('message-text').textContent);
 }
 function showInspector(kind,name,event) {
   appMenu?.close();
@@ -438,13 +444,16 @@ function paintPlan() {
   }
   // The ranger's requests: a group waiting for TKL blinks yellow, a group lying out is steady yellow.
   const rangerPoints=rangerView(state.yard).points;
+  // In the ranger's view everything outside the area is dimmed; a laid group's own route endpoints stay live.
+  const area=rangerMode?new Set(config.yardArea?.segments||[]):null,areaPoints=rangerMode?new Set([...(config.yardArea?.turnouts||[]),...(config.yardArea?.boundaries||[])]):null;
+  const liveButtons=rangerMode?new Set((state.yard?.requests||[]).filter(r=>r.state==='laid').flatMap(r=>{const g=(config.rangerRequests||[]).find(g=>g.id===r.group),route=config.routes.find(x=>x.id===g?.route);return route?[route.from,route.to]:[];})):null;
   blockedTracks=trackRestrictions(config,state);
   blockedLineParts=new Set((state.operating?.lines||[]).filter(l=>l.blocked).flatMap(l=>[...(lineExtents.get(l.id)||[])]));
   for(const marker of blockMarkers){const blocked=blockedTracks.has(marker.address);attribute(marker.g,'visibility',blocked?'visible':'hidden');attribute(marker.g,'tabindex',blocked?'0':'-1');}
   const fresh = online && state?.connection === 'connected';
   for (const r of rails) {
     const value = fresh ? state.blocks[r.block]?.occupied : null;
-    attribute(r.node,'class', 'rail ' + (r.main?'main ':'') + (hasTrackRestriction(r.block)||blockedLineParts.has(r.id)?'blocked ':'') + (!(r.block in config.blocks) ? 'unconfigured' : value === true ? 'occupied' : value === false ? '' : 'unknown'));
+    attribute(r.node,'class', 'rail ' + (r.main?'main ':'') + (area&&!area.has(r.id)?'outside ':'') + (hasTrackRestriction(r.block)||blockedLineParts.has(r.id)?'blocked ':'') + (!(r.block in config.blocks) ? 'unconfigured' : value === true ? 'occupied' : value === false ? '' : 'unknown'));
   }
   for (const t of switches) {
     const display=turnoutDisplay(t,state.turnouts[t.name],{fresh:fresh&&!state.storageFault,now:state.serverTime,timeout:config.commandTimeoutMs});
@@ -454,7 +463,7 @@ function paintPlan() {
     if(display.active)t.seenConfirmed=true;
     turnoutNumbers.get(t.name)?.classList.toggle('locked',!!state?.routes.some(r=>r.turnouts[t.name]));
     for(const [leg,node] of Object.entries(t.legs)){
-      const restricted=hasTrackRestriction(t.block)||blockedLineParts.has('VX:'+t.name+':'+leg),flags=(rangerPoints.has(t.name)?rangerPoints.get(t.name)+' ':'')+(restricted?'blocked ':'')+(occupied?'occupied ':'');
+      const restricted=hasTrackRestriction(t.block)||blockedLineParts.has('VX:'+t.name+':'+leg),flags=(rangerPoints.has(t.name)?rangerPoints.get(t.name)+' ':'')+(areaPoints&&!areaPoints.has(t.name)?'outside ':'')+(restricted?'blocked ':'')+(occupied?'occupied ':'');
       attribute(node,'class','rail turnout-base '+flags+(display.phase==='unknown'?'unknown':leg==='A'&&display.active?'turnout-stem':'branch-off'));
       attribute(t.litLegs[leg],'class','rail turnout-lit '+flags);
       style(t.litLegs[leg],'opacity',display.active&&(leg==='A'||leg===display.active)?'1':'0');
@@ -470,6 +479,7 @@ function paintPlan() {
     s.images.forEach((image,i)=>attribute(image,'visibility',i===selected?'visible':'hidden'));
     style(s.unknown,'display',selected !== 2 ? 'none' : '');
     s.g.classList.toggle('unconfigured', !config.signals[s.mast]);
+    if(area)s.g.classList.toggle('outside',!(s.routeButton&&(area.has(config.buttons[s.routeButton]?.segment)||liveButtons.has(s.routeButton))));
     s.g.classList.toggle('signal-chosen',chosenKind==='shunt'&&s.routeButton===chosen);
     s.g.classList.toggle('route-choice-start',chosenKind==='shunt'&&s.routeButton===chosen);
     s.g.classList.toggle('route-choice-end',routeConfirmation.selection?.kind==='shunt'&&s.routeButton===routeConfirmation.selection.to);
@@ -565,7 +575,7 @@ function animateFlow(now=performance.now()) {
 }
 const statuses = { setting: 'Lägger växlar', establishing: 'Etablerar', clearing: 'Klarsätter', active: 'Klar', traversing:'Tåg passerar', held: 'Stopp · lås kvar', occupied: 'Lås kvar', cancelling: 'Återtar' };
 const frames=createPanelFrames({render:renderPanel,animate:animateFlow});
-routeConfirmation=createRouteConfirmation({submit:({from,to,intent})=>api('route',{from,to,...(intent?{intent}:{})}),valid:()=>!!routeConfirmation.selection&&routeTargets.has(routeConfirmation.selection.to)&&usable()&&!pending&&state.controls?.mode!=='remote'&&!['waiting','interrupted'].includes(state.panelReset?.phase),onChange:finished=>{if(finished)clearChoice(false);paint();}});
+routeConfirmation=createRouteConfirmation({submit:({from,to,intent})=>api(rangerMode?'ranger/route':'route',{from,to,...(intent?{intent}:{})}),valid:()=>!!routeConfirmation.selection&&routeTargets.has(routeConfirmation.selection.to)&&usable()&&!pending&&state.controls?.mode!=='remote'&&!['waiting','interrupted'].includes(state.panelReset?.phase),onChange:finished=>{if(finished)clearChoice(false);paint();}});
 function paint(){frames.paint();}
 function renderPanel() {
   if (!state) return;
@@ -612,7 +622,7 @@ function renderPanel() {
   $('route-summary').textContent=`${state.routes.length} ${state.routes.length===1?'tågväg':'tågvägar'} · ${state.routes.map(r=>statuses[r.state]).filter((v,i,a)=>a.indexOf(v)===i).join(' / ')}`;
   paintJournal();
   $('wire').textContent = (state.trace || []).slice(0, 40).map(e => `${time(e.at)}  ${e.direction === 'out' ? 'SKICKAT ' : 'MOTTAGET'}  ${e.hex}`).join('\n');
-  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());panelHead?.rangerNotice(rangerView(state.yard));
+  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());panelHead?.rangerNotice(rangerMode?rangerOwnView(state.yard):rangerView(state.yard));rangerBar?.update(state,online);
 }
 function paintInspector() {
   if (!inspected || !state) return;
@@ -664,6 +674,7 @@ async function start() {
   modelClock=createModelClock({api});trainMeet=createTrainMeet({api,onTimetable:()=>openTools('trainmeet-timetable'),stationHint:()=>config?.profile?.title||'Charlottendal'});feedback=createFeedback();clearanceView=createClearance({api,message,onRequest:()=>panelEvents?.showDrift({auto:true})});
   panelEvents=createPanelEvents();panelConsole=createPanelConsole({onOpen:()=>{appMenu?.close();},onResetComplete:text=>message(text,{error:false,duration:4000}),showDrift:()=>panelEvents?.showDrift()});
   authSession=await fetch('/api/auth/session').then(r=>r.ok?r.json():null).catch(()=>null);
+  if(authSession?.user?.role==='ranger'||location.hash==='#ranger')rangerMode=true;
   [config, panel, registry, signalEndpoints] = await Promise.all(['/api/config', '/data/panel.json', '/data/source/signals.json', '/data/signal-endpoints.json'].map(async url => { const r = await fetch(url); if (r.status === 401 || r.status === 428) { location.assign('/login'); throw Error('Inloggning krävs'); } if (!r.ok) throw Error('Kunde inte läsa underlaget'); return r.json(); }));
   const files = [...new Set([...Object.values(iconTypes).flatMap(a => a.slice(0, 3)), 'Hsi0+Sh1', 'Hdvsi0+Sh1'])];
   // Loading a missing or slow icon must not prevent the track plan from starting.
@@ -713,7 +724,7 @@ async function start() {
   }
   $('panel-reset').onclick=()=>{message('');resetPanelChoices();return api('panel-reset',{});};
   $('catalog-request').onclick=()=>api('route',{from:$('catalog-from').value,to:$('catalog-to').value});
-  $('active-routes').onclick = e => { const id = e.target.closest('button')?.dataset.cancel; if (id) api('cancel', { id }); };
+  $('active-routes').onclick = e => { const id = e.target.closest('button')?.dataset.cancel; if (id) api(rangerMode?'ranger/cancel':'cancel', { id }); };
   $('inspector').onclick = e => { const source=e.target.closest('[data-source-kind]'); if(source) { openSource(source.dataset.sourceKind,source.dataset.sourceName); return; } const position = e.target.closest('button')?.dataset.manual; if (position) manualTurnout(inspected.name, position); };
   $('clear-selection').onclick = ()=>clearChoice();
   document.addEventListener('keydown', e => { if(e.key==='Escape'){if(document.querySelector('.admin-dialog[open]'))return;if($('inspector-host').open){e.preventDefault();closeInspector();return;}if(fullscreen.active()){fullscreen.exit();return;}manualFeedback.clear();clearChoice();} });
@@ -721,6 +732,7 @@ async function start() {
   try{localStorage.removeItem('charlottendal-skin');}catch{}
   createPanelFit({plan:$('track-plan'),viewport:document.querySelector('.panel-scroll'),stage:$('plan-stage'),controls:$('panel-console')});
   panelHead=createPanelHead({shell:document.querySelector('#panel-view .panel-shell'),onUpdate:view=>openUpdateNotice(view,{api,message}),onRanger:a=>api('ranger/'+a.command,a.command==='answer'?{id:a.id,approved:a.approved}:{id:a.id})});
+  if(rangerMode){document.querySelector('.plan-head-title').textContent='Charlottendal · Rangeraren';rangerBar=createRangerBar({root:$('panel-events'),api});}
   createPanelSplit({bottom:$('panel-bottom'),viewport:document.querySelector('.panel-scroll')});
   // Nothing administrative in the signal box's frame: the update chips join the Drift tab's buttons.
   const headRight=document.getElementById('plan-head-right');if(headRight){document.querySelector('#panel-drift .drift-actions')?.append(...headRight.children);headRight.remove();}

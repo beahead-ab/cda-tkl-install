@@ -27,6 +27,9 @@ skapa ägaren; i webbdriften skapas ägaren på servern.
   bara som hash och fungerar en gång.
 - **Ny kod** nollställer användarens lösenord och avslutar dess inloggningar. **Ta bort** loggar ut användaren
   och tar bort kontot. Den sista ägaren kan inte tas bort, och ingen tar bort sig själv.
+- **Rangerare:** rollen för rangerbangårdens panel (docs/rangerlage.md). Loggar in som
+  alla andra men når bara rangerarens vy (`/#ranger`) och dess API; Inställningar och
+  TKL:s manövrer är stängda.
 - **Utelåst ägare:** `node scripts/recover-user.mjs <namn>` på datorn skriver en ny kod.
 - **Eget lösenord** byts på `/account` (Byt lösenord i sidomenyn). Bytet avslutar användarens andra sessioner.
 

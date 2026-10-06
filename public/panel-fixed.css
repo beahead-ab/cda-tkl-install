@@ -148,6 +148,20 @@ body.panel-app #panel-console{display:none}
 #track-plan .rail.ranger-request:not(.occupied):not(.blocked){stroke:#ffd83f;animation:ranger-request 1.4s infinite}
 #track-plan .rail.ranger-laid:not(.occupied):not(.blocked){stroke:#d9b63a}
 @media(prefers-reduced-motion:reduce){#track-plan .rail.ranger-request{animation:none}}
+/* Rangerarens vy: the same plan, dimmed outside the ranger's area; TKL's controls are not there. */
+body[data-role=ranger] #track-plan .rail.outside{opacity:.22}
+body[data-role=ranger] #track-plan .signal-target.outside{opacity:.25;pointer-events:none}
+body[data-role=ranger] #track-plan .turnout-geometry .outside{pointer-events:none}
+body[data-role=ranger] #panel-bottom #trainmeet-timetable{display:none!important}
+body[data-role=ranger] #panel-bottom-tabs,body[data-role=ranger] .ev-tabs [data-view=drift],body[data-role=ranger] .ev-tabs [data-view=occupancy],body[data-role=ranger] #panel-reset,body[data-role=ranger] #plan-head-start{display:none}
+body[data-role=ranger] #panel-bottom{grid-template-columns:minmax(0,1fr)}
+body[data-role=ranger] #panel-events{grid-template-rows:auto auto minmax(0,1fr)}
+#ranger-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px var(--tt-pad,16px);border-bottom:1px solid #1f2429}
+.ranger-bar-label{font:600 11px var(--font-sans);letter-spacing:.1em;text-transform:uppercase;color:var(--fg-label);margin-right:6px}
+#ranger-bar .chip{font-size:11.5px;color:var(--fg)}
+#ranger-bar .chip[data-state=open]{border-color:var(--yellow);color:var(--yellow-text)}
+#ranger-bar .chip[data-state=laid]{border-color:var(--green);color:var(--fg)}
+#ranger-bar .chip[data-state=laid] .chip-dot{background:var(--green)}
 
 /* ===== Nederrad med tidtabell och händelser · helsideslayout (design 1 oktober 2026) =====
    The bottom row gets what is left; the plan scales to the width in its 2102:688

@@ -43,6 +43,22 @@ export class YardControl {
       const r=this.laid(name);
       if(r&&(operator!=='ranger'||this.group(r.group).out[name]!==position))return `${this.label(r)} ligger ute för rangeraren. Vänta tills den är tillbaka.`;
     }
+    if(operator==='ranger')return this.rangerRouteReason(route);
+    return null;
+  }
+  // The ranger's own shunt routes: inside the area (own turnouts, boundaries in their back
+  // position) or over a request group as it lies. Anything else names the request to make.
+  rangerRouteReason(route){
+    if(route.kind!=='shunt')return 'Rangeraren lägger bara växeltågvägar.';
+    const boundaries=this.e.profile.yardBoundaries||{};
+    for(const [name,position] of Object.entries(route.turnouts||{})){
+      if(this.def?.turnouts.includes(name))continue;
+      if(boundaries[name]?.rangerPositions.includes(position))continue;
+      const laid=this.laid(name);
+      if(laid&&this.group(laid.group).out[name]===position)continue;
+      const group=this.groups.find(g=>g.out[name]===position);
+      return group?`Växeltågvägen kräver begäran ${group.label}.`:`Växeltågvägen går utanför rangerarens område (${name}).`;
+    }
     return null;
   }
   // What the ranger is told before anything is sent to TKL. A route over the group
@@ -90,9 +106,15 @@ export class YardControl {
     this.e.log('ranger-approved',`${group.label} godkänd av TKL. Växlarna läggs.`,{request:id});
     return this.find(id);
   }
-  // The ranger lays the group back; TKL may withdraw it the same way.
+  // The ranger lays the group back; TKL may withdraw it the same way. An open request is
+  // simply taken back by whoever ends it.
   return(id,operator='ranger'){
-    const request=this.find(id);if(!request||request.state!=='laid')throw Error('Begäran ligger inte ute.');
+    const request=this.find(id);if(!request)throw Error('Begäran finns inte längre.');
+    if(request.state==='open'){
+      this.save(this.requests.filter(r=>r!==request));
+      this.e.log(operator==='ranger'?'ranger-withdrawn':'ranger-denied',operator==='ranger'?`${this.label(request)} återkallad av rangeraren.`:`${this.label(request)} nekad av TKL.`,{request:id});
+      return request;
+    }
     const e=this.e,group=this.group(request.group);
     if(!e.connected||e.storageFault)throw Error(e.storageFault?'Lagringsfel; manövrering spärrad.':'Ingen LocoNet-anslutning.');
     if(e.controls.stopAll)throw Error('Alla signaler i stopp är aktiverat.');

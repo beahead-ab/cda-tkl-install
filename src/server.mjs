@@ -143,7 +143,8 @@ const server = http.createServer(async (req, res) => {
       if(url.pathname==='/api/studio/cards')return json(res,studioCards.view());
       if(url.pathname==='/api/studio/mgp/export'){const measured=studioMeasure.measured(profile);const doc={format:'charlottendal-mgp-v1',at:Date.now(),sourceHash:studioSources.profile.sourceHash,mode:connectionInfo(profile).mode,cards:studioCards.view().cards,modules:mgpSummary({profile,xml:studioSources.xml},buildRegistry(studioSources,measured),studioCards.view().cards,{sections:detectionInventory(studioSources).sections,measured})};
         res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Disposition':'attachment; filename="charlottendal-mgp.json"'});return res.end(req.method==='HEAD'?undefined:JSON.stringify(doc,null,2)+'\n');}
-      if(url.pathname==='/api/route-targets')return json(res,{targets:engine.routeTargets(url.searchParams.get('from'),url.searchParams.get('kind')||'main')});
+      // A preview only: the ranger's own targets are a narrower list, never a wider one.
+      if(url.pathname==='/api/route-targets')return json(res,{targets:engine.routeTargets(url.searchParams.get('from'),url.searchParams.get('kind')||'main',url.searchParams.get('operator')==='ranger'?'ranger':'tkl')});
       if (url.pathname === '/api/config') { const {routeAlternatives,...panelProfile}=profile; return json(res, { ...panelProfile,release,bindingVersion:bindings.data.activeVersion, notes, trainFields:trainInformation.catalog(),panelIndications:panelIndications.catalog(), presentation:configuration.presentation(), fieldUrl: process.env.CHARLOTTENDAL_FIELD_URL || `http://127.0.0.1:${Number(process.env.CHARLOTTENDAL_SIM_PORT || 8911)}/`, accountUrl: auth.mode === 'external' ? '/account' : null, authMode: auth.mode, onboarding: (v => ({ done: v.done, remaining: v.remaining, steps: v.steps.map(x => ({ id: x.id, label: x.label, done: x.done, skipped: x.skipped })) }))(onboarding.view(onboardingContext())) }); }
       if (url.pathname === '/api/train-information') return json(res, {...trainInformation.snapshot(),...trainInformation.catalog()});
       if(url.pathname==='/api/bindings')return json(res,bindings.view());
@@ -169,7 +170,7 @@ const server = http.createServer(async (req, res) => {
     const data = await body(req,65536);
     if(url.pathname.startsWith('/api/users/')){
       const command=url.pathname.slice('/api/users/'.length);if(!['invite','reissue','remove'].includes(command))return json(res,{error:'Finns inte'},404);
-      const me=auth.requireRole(req,'owner'),ROLE={owner:'ägare',admin:'administratör'};
+      const me=auth.requireRole(req,'owner'),ROLE={owner:'ägare',admin:'administratör',ranger:'rangerare'};
       if(command==='invite'){const r=auth.users.invite({username:data.username,role:data.role});engine.log('users',`${r.user.username} inbjuden som ${ROLE[r.user.role]} av ${me.username}.`);return json(res,{...r,...auth.users.summary()});}
       if(command==='reissue'){const r=auth.users.reissue(data.id);engine.log('users',`Ny inbjudningskod till ${r.user.username} av ${me.username}; tidigare lösenord och inloggningar gäller inte längre.`);auth.emit('invalidate');return json(res,{...r,...auth.users.summary()});}
       const gone=auth.users.user(data.id),summary=auth.users.remove(data.id,{by:me.id});engine.log('users',`${gone?.username||'Användare'} borttagen av ${me.username}.`);auth.emit('invalidate');return json(res,summary);
@@ -257,6 +258,10 @@ const server = http.createServer(async (req, res) => {
     else if (url.pathname === '/api/ranger/answer') engine.yard.answer(data.id,data.approved===true);
     else if (url.pathname === '/api/ranger/return') engine.yard.return(data.id,'ranger');
     else if (url.pathname === '/api/ranger/withdraw') engine.yard.return(data.id,'tkl');
+    // The ranger's own moves: own turnouts and boundaries back, shunt routes in the area.
+    else if (url.pathname === '/api/ranger/turnout') engine.manual(data.name, data.position, {operator:'ranger'});
+    else if (url.pathname === '/api/ranger/route') engine.request(data.from, data.to, data.intent, {operator:'ranger'});
+    else if (url.pathname === '/api/ranger/cancel') engine.cancel(data.id, {operator:'ranger'});
     else if (url.pathname === '/api/all-stop') engine.allStop(data.enabled);
     else if (url.pathname === '/api/panel-reset') engine.resetPanel();
     else if (url.pathname === '/api/emergency-cancel') engine.emergencyCancelAll();

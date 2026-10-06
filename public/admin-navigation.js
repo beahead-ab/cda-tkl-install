@@ -80,7 +80,8 @@ export function createAdminNavigation({account=false}={}) {
   },true);
   function sync(){
     const current=account?'account':location.hash.split('?')[0]||'#panel';
-    const opened=current!=='#panel';shell.hidden=!opened;shade.hidden=!opened;if(panel)panel.inert=opened;
+    // Rangerarens vy (#ranger) is the panel too, not a settings page.
+    const opened=current!=='#panel'&&current!=='#ranger';shell.hidden=!opened;shade.hidden=!opened;if(panel)panel.inert=opened;
     document.body.toggleAttribute('data-admin-window',opened);if(panelButton)panelButton.setAttribute('aria-expanded',String(opened));
     if(opened&&!account)lastAdmin=location.hash;
     if(opened&&!wasOpen)queueMicrotask(()=>exit.focus({preventScroll:true}));
@@ -99,7 +100,7 @@ export function createAdminNavigation({account=false}={}) {
   function setSession(session){
     const box=popup.querySelector('#account-session'),user=popup.querySelector('#account-user'),login=popup.querySelector('#login-link'),logout=popup.querySelector('#logout-button');
     if(!session||session.mode==='cloudflare'){box.hidden=true;return;}
-    box.hidden=false;user.textContent=session.user?`${session.user.username} · ${session.user.role==='owner'?'ägare':'administratör'}`:session.setup?.needed?'Ingen ägare än':'Inte inloggad';
+    box.hidden=false;user.textContent=session.user?`${session.user.username} · ${({owner:'ägare',admin:'administratör',ranger:'rangerare'})[session.user.role]||session.user.role}`:session.setup?.needed?'Ingen ägare än':'Inte inloggad';
     login.hidden=!!session.user;login.href='/login?next='+encodeURIComponent(location.pathname+location.hash);logout.hidden=!session.user;
     setAccount(!!session.user);
     logout.onclick=async()=>{try{await fetch('/api/auth/logout',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});}catch{}location.replace(session.mode==='external'?'/login':'/');};

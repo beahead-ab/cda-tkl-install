@@ -1,5 +1,14 @@
 [
   {
+    "version": "0.64.0",
+    "date": "2026-10-06",
+    "notes": [
+      "Rangerarläget, steg 3: rangerarens egen vy på /#ranger – samma spårplan med TKL:s område nedtonat, knappraden Begär av TKL, Ångra och Lägg tillbaka i statusraden",
+      "Rangeraren lägger egna växlar, gränsväxlar tillbaka och växeltågvägar inom området samt från spår 11–13 när gruppen ligger ute; återtar bara sina egna",
+      "Användarrollen rangerare: når bara rangerarens vy och dess API"
+    ]
+  },
+  {
     "version": "0.63.0",
     "date": "2026-10-06",
     "notes": [

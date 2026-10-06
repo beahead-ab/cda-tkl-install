@@ -16,6 +16,8 @@ const fail = (message, status = 401) => Object.assign(Error(message), { status }
 const ADMIN_PAGES = new Set(['/studio.html']);
 const ADMIN_API = ['/api/studio', '/api/ai', '/api/users', '/api/onboarding', '/api/bindings', '/api/recordings', '/api/update/', '/api/configuration/', '/api/destinations', '/api/note', '/api/trainmeet/configure', '/api/trainmeet/pair', '/api/trainmeet/refresh', '/api/trainmeet/disconnect'];
 const STREAMDECK_OPERATOR = new Set(['/api/streamdeck/seen']);
+// Rangerarens inloggning ger bara rangerarens vy: sidorna, läsning och /api/ranger/ (docs/rangerlage.md).
+const isRangerRoute = (pathname, method) => ['GET', 'HEAD'].includes(method) ? !isAdminRoute(pathname) : pathname.startsWith('/api/ranger/') || pathname.startsWith('/api/auth/');
 export function isAdminRoute(pathname) {
   if (ADMIN_PAGES.has(pathname)) return true;
   if (pathname.startsWith('/api/streamdeck/')) return !STREAMDECK_OPERATOR.has(pathname);
@@ -92,6 +94,7 @@ export class UserAuth extends EventEmitter {
       throw fail(session ? 'Byt det tillfälliga lösenordet först' : 'Logga in för att fortsätta', session ? 428 : 401);
     }
     if (this.mode === 'external' && req.method === 'POST' && req.headers.origin !== this.origin) throw fail('Otillåtet ursprung', 403);
+    if (session.user.role === 'ranger' && !isRangerRoute(route, req.method)) throw fail('Rangerarens inloggning ger bara rangerarens vy.', 403);
     return false;
   }
   // Efter handle: vem som frågar. expires styr händelseströmmens livslängd; user är null för operatören lokalt.
@@ -101,17 +104,20 @@ export class UserAuth extends EventEmitter {
     return session ? session.expires : null;
   }
   access(req) { const s = this.session(req); return s ? { expires: s.expires, user: s.user } : { expires: null, user: null }; }
+  // Vem som manövrerar: en inloggad rangerare är rangeraren, alla andra är TKL. Aldrig ett fält i anropet.
+  operator(req) { return this.session(req)?.user.role === 'ranger' ? 'ranger' : 'tkl'; }
   // Ägarens åtgärder i Inställningar → Användare. Alla inloggade ser listan; bara ägaren ändrar vem som har tillgång.
   requireRole(req, role) {
     const session = this.session(req); if (!session) throw fail('Logga in för att fortsätta');
     if (role === 'owner' && session.user.role !== 'owner') throw fail('Bara ägaren lägger till och tar bort användare.', 403);
+    if (session.user.role === 'ranger') throw fail('Rangerarens inloggning ger bara rangerarens vy.', 403);
     return session.user;
   }
 }
 export function createAuth(root, primary = false, env = process.env, { stateDir } = {}) {
   const dir = stateDir || env.CHARLOTTENDAL_STATE_DIR || path.join(root, '..', 'var');
   if (env.CHARLOTTENDAL_AUTH_MODE === 'password') return new UserAuth({ env, root, primary, stateDir: dir, mode: 'external' });
-  if (env.CHARLOTTENDAL_AUTH_MODE === 'cloudflare') return { mode: 'cloudflare', authenticate: createAccessGuard(env), handle: async () => false, on: () => {}, access: () => ({ expires: null, user: null }), users: null, requireRole: () => { throw fail('Användare hanteras inte i det här läget', 409); }, view: () => ({ mode: 'cloudflare', authenticated: true, user: null, mustChange: false, setup: { needed: false, allowed: false } }) };
+  if (env.CHARLOTTENDAL_AUTH_MODE === 'cloudflare') return { mode: 'cloudflare', authenticate: createAccessGuard(env), handle: async () => false, on: () => {}, access: () => ({ expires: null, user: null }), users: null, requireRole: () => { throw fail('Användare hanteras inte i det här läget', 409); }, operator: () => 'tkl', view: () => ({ mode: 'cloudflare', authenticated: true, user: null, mustChange: false, setup: { needed: false, allowed: false } }) };
   if (env.CHARLOTTENDAL_AUTH_MODE && env.CHARLOTTENDAL_AUTH_MODE !== 'local') throw Error('Okänt inloggningsläge');
   return new UserAuth({ env, root, primary, stateDir: dir, mode: 'local' });
 }

@@ -14,8 +14,8 @@ export class OperatingControls {
   checkCommand({sessionId,revision}){if(sessionId!==this.sessionId||revision!==this.revision)throw Object.assign(Error('Manöverläget har ändrats. Läs senaste läget och försök igen.'),{status:409});}
   affected(route) {return !!this.def&&(Object.hasOwn(route.turnouts||{},this.def.turnout)||(route.blocks||[]).some(n=>this.def.blocks.some(b=>this.e.profile.blocks[b].address===this.e.profile.blocks[n].address)));}
   lineAffects(line,route){return [route.from,route.to].includes(line.button)||(route.blocks||[]).some(n=>line.blocks.some(b=>this.e.profile.blocks[b].address===this.e.profile.blocks[n].address));}
-  routeReason(route) {
-    const yardReason=this.e.yard?.routeReason(route);if(yardReason)return yardReason;
+  routeReason(route,operator=route.operator||'tkl') {
+    const yardReason=this.e.yard?.routeReason(route,operator);if(yardReason)return yardReason;
     const line=this.e.controls.lines.map(id=>this.catalog.lines[id]).find(l=>this.lineAffects(l,route));
     if(line)return line.label+' är spärrat.';
     if(this.affected(route)&&(this.reservation.reserved||!this.normalKnown()))return 'Programmeringsområdet är låst eller saknar bekräftad normaldrift.';

@@ -19,6 +19,9 @@ CONFIG_DIR=/etc/cda-tkl
 NODE_DIR="$BASE/node"
 NODE_MAJOR=22
 DESKTOP_USER=${CDA_TKL_DESKTOP_USER:-${SUDO_USER:-}}
+# A rangerare's station: only the kiosk browser, pointed at the signal box's Pi, e.g.
+# CDA_TKL_KIOSK_URL=http://cda-tkl.local:8910/#ranger. No TKL or simulator runs here.
+KIOSK_URL=${CDA_TKL_KIOSK_URL:-}
 SYSTEMD=true
 [ -d /run/systemd/system ] || SYSTEMD=false
 VERSION=$(sed -n 's/^ *"version": *"\([^"]*\)".*/\1/p' "$SOURCE_DIR/package.json" | head -n 1)
@@ -81,6 +84,11 @@ if [ ! -f "$CONFIG_DIR/app.env" ]; then
 fi
 # Older installations lack the setting that turns on the update notice.
 grep -q '^CHARLOTTENDAL_INSTALL_KIND=' "$CONFIG_DIR/app.env" || printf '\nCHARLOTTENDAL_INSTALL_KIND=raspberry-pi\n' >> "$CONFIG_DIR/app.env"
+if [ -n "$KIOSK_URL" ]; then
+  sed -i '/^CHARLOTTENDAL_KIOSK_URL=/d' "$CONFIG_DIR/app.env" && printf 'CHARLOTTENDAL_KIOSK_URL=%s\n' "$KIOSK_URL" >> "$CONFIG_DIR/app.env"
+fi
+KIOSK_URL=$(sed -n 's/^CHARLOTTENDAL_KIOSK_URL=//p' "$CONFIG_DIR/app.env" | tail -n 1)
+KIOSK_ORIGIN=$(printf '%s' "$KIOSK_URL" | sed -E 's#^(https?://[^/]+).*#\1#')
 if [ -n "${CDA_TKL_TOKEN:-}" ]; then
   umask 077 && printf '%s\n' "$CDA_TKL_TOKEN" > "$CONFIG_DIR/github-token" && umask 022
 fi
@@ -102,7 +110,11 @@ install -m 0644 "$PACKAGING/50-cda-tkl-streamdeck.rules" /etc/udev/rules.d/50-cd
 if command -v udevadm >/dev/null 2>&1; then udevadm control --reload-rules 2>/dev/null || true; udevadm trigger 2>/dev/null || true; fi
 for POLICY_DIR in /etc/chromium/policies/managed /etc/chromium-browser/policies/managed; do
   install -d -m 0755 "$POLICY_DIR"
-  install -m 0644 "$PACKAGING/chromium-policy.json" "$POLICY_DIR/cda-tkl.json"
+  if [ -n "$KIOSK_ORIGIN" ]; then
+    sed "s#\"http://localhost:8910\" ]#\"http://localhost:8910\", \"$KIOSK_ORIGIN\" ]#" "$PACKAGING/chromium-policy.json" > "$POLICY_DIR/cda-tkl.json" && chmod 0644 "$POLICY_DIR/cda-tkl.json"
+  else
+    install -m 0644 "$PACKAGING/chromium-policy.json" "$POLICY_DIR/cda-tkl.json"
+  fi
 done
 
 BROWSER_ENABLED=false
@@ -132,7 +144,11 @@ if command -v labwc >/dev/null 2>&1 && [ -n "${DESKTOP_USER:-}" ] && id "$DESKTO
   BROWSER_ENABLED=true
 fi
 
-if [ "$SYSTEMD" = true ]; then
+if [ "$SYSTEMD" = true ] && [ -n "$KIOSK_URL" ]; then
+  # The rangerare's station shows another Pi's TKL; nothing runs here but the browser.
+  systemctl daemon-reload
+  systemctl disable --now cda-tkl-simulator.service cda-tkl.service >/dev/null 2>&1 || true
+elif [ "$SYSTEMD" = true ]; then
   systemctl daemon-reload
   systemctl enable cda-tkl-simulator.service cda-tkl.service >/dev/null
   # `enable --now` would leave a running old process in place on an update.
@@ -158,6 +174,11 @@ else
 fi
 
 echo
+if [ -n "$KIOSK_URL" ]; then
+  echo "Rangerarens station är installerad. Chromium öppnar $KIOSK_URL i helskärm efter omstart:  sudo reboot"
+  echo "Logga in med en användare som har rollen rangerare. Stream Deck kopplas upp av sig själv."
+  exit 0
+fi
 echo "Charlottendal TKL $VERSION är installerad och startar automatiskt."
 echo "Ställverket:  http://127.0.0.1:8910  (på den här datorn)"
 echo "Anläggningssimulatorn:  http://127.0.0.1:8911"

@@ -4,8 +4,11 @@ export function json(res, value, status = 200) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
   res.end(JSON.stringify(value));
 }
-export function guard(req, port, publicOrigin = process.env.CHARLOTTENDAL_PUBLIC_ORIGIN) {
-  const allowed = publicOrigin ? new Set([new URL(publicOrigin).host]) : new Set([`127.0.0.1:${port}`, `localhost:${port}`, `[::1]:${port}`]);
+// lanHosts: the names other computers on the layout's own network use for this one
+// (CHARLOTTENDAL_LAN_HOSTS, for example cda-tkl.local:8910). Requests from there log in.
+export function guard(req, port, publicOrigin = process.env.CHARLOTTENDAL_PUBLIC_ORIGIN, lanHosts = process.env.CHARLOTTENDAL_LAN_HOSTS) {
+  const lan = publicOrigin ? [] : String(lanHosts || '').split(',').map(h => h.trim()).filter(Boolean);
+  const allowed = publicOrigin ? new Set([new URL(publicOrigin).host]) : new Set([`127.0.0.1:${port}`, `localhost:${port}`, `[::1]:${port}`, ...lan]);
   const origins = publicOrigin ? [publicOrigin] : [...allowed].map(h => 'http://' + h);
   if (!allowed.has(req.headers.host)) throw Error('Otillåten värd');
   if (!['GET', 'HEAD', 'POST'].includes(req.method)) throw Error('Otillåten metod');

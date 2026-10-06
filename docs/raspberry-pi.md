@@ -191,6 +191,36 @@ ssh -L 8910:127.0.0.1:8910 -L 8911:127.0.0.1:8911 pi@cda-tkl.local
 Låt fönstret vara öppet och öppna <http://localhost:8910> (ställverket) och
 <http://localhost:8911> (anläggningssimulatorn) i webbläsaren på den andra datorn.
 
+### Rangerarens station
+
+Rangeraren kör från en egen skärm, ett eget Stream Deck eller båda, mot **samma** TKL som
+ställverket (docs/rangerlage.md). Stationen är en andra Pi (eller valfri dator med Chromium)
+på anläggningens nät.
+
+1. **På ställverkets Pi:** öppna TKL för nätet. Lägg till i `/etc/cda-tkl/app.env` och starta om:
+
+   ```sh
+   CHARLOTTENDAL_LISTEN=0.0.0.0
+   CHARLOTTENDAL_LAN_HOSTS=cda-tkl.local:8910
+   ```
+
+   `sudo systemctl restart cda-tkl`. `LAN_HOSTS` är namnet (eller adressen, kommaseparerat)
+   som stationen använder för Pi:n. Allt som kommer från en annan dator måste logga in, även
+   i lokalt läge; Pi:ns egen skärm gör det inte.
+2. **Bjud in rangeraren** under Inställningar → Användare med rollen **Rangerare**.
+3. **På stationens Pi:** installera med stationens adress, starta om och logga in en gång:
+
+   ```sh
+   curl -fsSL https://raw.githubusercontent.com/beahead-ab/cda-tkl-install/main/install.sh | sudo CDA_TKL_KIOSK_URL=http://cda-tkl.local:8910/#ranger sh
+   ```
+
+   Stationen kör ingen egen TKL. Chromium öppnar rangerarens vy i helskärm och Stream Deck
+   kopplas upp av sig själv: växelgatorna och begäran först, sedan de egna växlarna.
+   **Bara Stream Deck:** samma installation utan skärm, eller med skärmen släckt.
+
+Inloggningen går okrypterat över anläggningens eget nät. Använd det inte över ett nät som
+andra delar.
+
 ## 11. Säkerhetskopiera
 
 Driftdata och inställningar ligger i två kataloger:
@@ -269,8 +299,9 @@ Starta om efter en ändring: `sudo systemctl restart cda-tkl`.
 
 - **Riktig anläggning.** Installationen kör mot anläggningssimulatorn. LocoNet via LocoBuffer på
   USB (`scripts/locobuffer-gateway.mjs`) kopplas in i driftsättningssteget, när MGP-underlaget finns.
-- **Åtkomst från iPad eller annan dator** utan ssh-tunnel kräver inloggning och läggs till när det
-  behövs.
+- **Åtkomst från iPad eller annan dator** utan ssh-tunnel: med `CHARLOTTENDAL_LISTEN` och
+  `CHARLOTTENDAL_LAN_HOSTS` (avsnitt 10) och inloggning. Rangerarens station är provad i
+  simulering, inte på två riktiga Pi.
 - **TrainMeet Server på samma Pi** går bra; de använder olika portar (8787 och 1883 mot 8910–8912).
   Båda installationerna öppnar då var sitt helskärmsfönster.
 - **Provat** i en Debian 12-container på arm64 (samma processorarkitektur som Pi 5) med systemd: ny

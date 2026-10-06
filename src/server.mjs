@@ -275,7 +275,8 @@ const server = http.createServer(async (req, res) => {
   } catch (e) { json(res, { error: e.message }, e.status || 400); }
 });
 let tick, publish;
-server.listen(port, '127.0.0.1', () => {
+// CHARLOTTENDAL_LISTEN=0.0.0.0 lets the rangerare's station reach TKL over the layout's network.
+server.listen(port, process.env.CHARLOTTENDAL_LISTEN || '127.0.0.1', () => {
   console.log(`Charlottendal TKL: http://127.0.0.1:${port}`); client.start();
   tick = setInterval(() => {protect(() => engine.tick());recorder.tick();modelClock.checkpoint();trainMeet.tick();if(Date.now()-clockPublished>1000){dirty=true;clockPublished=Date.now();}}, 100);
   publish = setInterval(() => {

@@ -1,17 +1,27 @@
 #!/bin/sh
 # Opens the signal box full screen when the desktop starts, and again if Chromium is
 # closed or crashes. Started from labwc's autostart for the logged-in desktop user.
+# CHARLOTTENDAL_KIOSK_URL in /etc/cda-tkl/app.env picks another page: the rangerare's
+# station opens http://<TKL>:8910/#ranger on the signal box's own Pi.
 set -eu
 exec 9>/tmp/cda-tkl-browser.lock
 flock -n 9 || exit 0
 URL=http://127.0.0.1:8910/#panel
+[ -r /etc/cda-tkl/app.env ] && KIOSK=$(sed -n 's/^CHARLOTTENDAL_KIOSK_URL=//p' /etc/cda-tkl/app.env | tail -n 1) || KIOSK=
+[ -n "${KIOSK:-}" ] && URL=$KIOSK
+ORIGIN=$(printf '%s' "$URL" | sed -E 's#^(https?://[^/]+).*#\1#')
 BROWSER=$(command -v chromium || command -v chromium-browser || true)
 [ -n "$BROWSER" ] || { echo "Chromium saknas."; exit 1; }
-wait_for_tkl() { until curl -fsS --max-time 2 -o /dev/null http://127.0.0.1:8910/api/config 2>/dev/null; do sleep 1; done; }
+# Another computer on the layout's network is plain http; Chromium only lets the Stream
+# Deck (WebHID) reach a page it treats as secure, so it is told to treat this one so.
+EXTRA=
+case "$ORIGIN" in http://127.0.0.1:*|http://localhost:*|https://*) ;; *) EXTRA="--unsafely-treat-insecure-origin-as-secure=$ORIGIN --user-data-dir=$HOME/.config/cda-tkl-kiosk" ;; esac
+wait_for_tkl() { until curl -fsS --max-time 2 -o /dev/null "$ORIGIN/api/auth/session" 2>/dev/null; do sleep 2; done; }
 wait_for_tkl
 while true; do
+  # shellcheck disable=SC2086
   "$BROWSER" \
-    --kiosk --app="$URL" \
+    --kiosk --app="$URL" $EXTRA \
     --noerrdialogs --no-first-run --disable-infobars \
     --disable-session-crashed-bubble --disable-features=Translate \
     --overscroll-history-navigation=0 --password-store=basic \

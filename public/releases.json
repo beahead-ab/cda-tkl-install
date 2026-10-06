@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.63.0",
+    "date": "2026-10-06",
+    "notes": [
+      "Rangerarläget, steg 2: TKL svarar i statusraden – \"Rangeraren begär Höger 11\" med Godkänn och Neka, och \"ligger ute för rangeraren\" med Dra tillbaka",
+      "Gruppens växlar blinkar gult i spårplanen medan begäran väntar och lyser gult medan den ligger ute"
+    ]
+  },
+  {
     "version": "0.62.0",
     "date": "2026-10-06",
     "notes": [

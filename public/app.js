@@ -27,6 +27,7 @@ import { createContextDialog } from './context-dialog.js';
 import { createPanelConsole } from './panel-console.js';
 import {createPanelEvents} from './panel-events.js';
 import {createPanelHead} from './panel-head.js';
+import {rangerView} from './ranger-notice.js';
 import {createPanelSplit} from './panel-split.js';
 import {openUpdateNotice} from './update-notice.js';
 import {createUpdatePage} from './update-page.js';
@@ -435,14 +436,15 @@ function paintPlan() {
     setText(n.nameNode,d.name.toUpperCase());const x=n.right?n.x-width:n.x+n.nameNode.getComputedTextLength()+8;attribute(n.nameNode,'x',n.right?n.x-(d.phone?width+8:0):n.x);setText(n.number,d.phone?'('+d.phone+')':'');attribute(n.box,'x',x);attribute(n.box,'width',width);attribute(n.number,'x',x+width/2);attribute(n.number,'text-anchor','middle');attribute(n.badge,'visibility',d.phone?'visible':'hidden');
     const nameLen=n.nameNode.getComputedTextLength(),nameX=Number(n.nameNode.getAttribute('x')),numLen=d.phone?n.number.getComputedTextLength():0,plateStart=(n.right?Math.min(nameX-nameLen,d.phone?x+width/2-numLen/2:Infinity):n.x-22)-9,plateEnd=(n.right?n.x+22:Math.max(nameX+nameLen,d.phone?x+width/2+numLen/2:0))+9;attribute(n.plate,'x',plateStart);attribute(n.plate,'width',Math.max(0,plateEnd-plateStart));attribute(n.group,'aria-label',d.name+(d.phone?' · telefon '+d.phone:'')+' · '+d.sourceLabel);
   }
-  const yardParts=new Set(),yardPoints=new Set();
+  // The ranger's requests: a group waiting for TKL blinks yellow, a group lying out is steady yellow.
+  const rangerPoints=rangerView(state.yard).points;
   blockedTracks=trackRestrictions(config,state);
   blockedLineParts=new Set((state.operating?.lines||[]).filter(l=>l.blocked).flatMap(l=>[...(lineExtents.get(l.id)||[])]));
   for(const marker of blockMarkers){const blocked=blockedTracks.has(marker.address);attribute(marker.g,'visibility',blocked?'visible':'hidden');attribute(marker.g,'tabindex',blocked?'0':'-1');}
   const fresh = online && state?.connection === 'connected';
   for (const r of rails) {
     const value = fresh ? state.blocks[r.block]?.occupied : null;
-    attribute(r.node,'class', 'rail ' + (r.main?'main ':'') + (yardParts.has(r.id)?'yard-delegated ':'') + (hasTrackRestriction(r.block)||blockedLineParts.has(r.id)?'blocked ':'') + (!(r.block in config.blocks) ? 'unconfigured' : value === true ? 'occupied' : value === false ? '' : 'unknown'));
+    attribute(r.node,'class', 'rail ' + (r.main?'main ':'') + (hasTrackRestriction(r.block)||blockedLineParts.has(r.id)?'blocked ':'') + (!(r.block in config.blocks) ? 'unconfigured' : value === true ? 'occupied' : value === false ? '' : 'unknown'));
   }
   for (const t of switches) {
     const display=turnoutDisplay(t,state.turnouts[t.name],{fresh:fresh&&!state.storageFault,now:state.serverTime,timeout:config.commandTimeoutMs});
@@ -452,7 +454,7 @@ function paintPlan() {
     if(display.active)t.seenConfirmed=true;
     turnoutNumbers.get(t.name)?.classList.toggle('locked',!!state?.routes.some(r=>r.turnouts[t.name]));
     for(const [leg,node] of Object.entries(t.legs)){
-      const restricted=hasTrackRestriction(t.block)||blockedLineParts.has('VX:'+t.name+':'+leg),flags=(yardPoints.has(t.name)?'yard-delegated ':'')+(restricted?'blocked ':'')+(occupied?'occupied ':'');
+      const restricted=hasTrackRestriction(t.block)||blockedLineParts.has('VX:'+t.name+':'+leg),flags=(rangerPoints.has(t.name)?rangerPoints.get(t.name)+' ':'')+(restricted?'blocked ':'')+(occupied?'occupied ':'');
       attribute(node,'class','rail turnout-base '+flags+(display.phase==='unknown'?'unknown':leg==='A'&&display.active?'turnout-stem':'branch-off'));
       attribute(t.litLegs[leg],'class','rail turnout-lit '+flags);
       style(t.litLegs[leg],'opacity',display.active&&(leg==='A'||leg===display.active)?'1':'0');
@@ -610,7 +612,7 @@ function renderPanel() {
   $('route-summary').textContent=`${state.routes.length} ${state.routes.length===1?'tågväg':'tågvägar'} · ${state.routes.map(r=>statuses[r.state]).filter((v,i,a)=>a.indexOf(v)===i).join(' / ')}`;
   paintJournal();
   $('wire').textContent = (state.trace || []).slice(0, 40).map(e => `${time(e.at)}  ${e.direction === 'out' ? 'SKICKAT ' : 'MOTTAGET'}  ${e.hex}`).join('\n');
-  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());
+  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());panelHead?.rangerNotice(rangerView(state.yard));
 }
 function paintInspector() {
   if (!inspected || !state) return;
@@ -718,7 +720,7 @@ async function start() {
   // Original is the only active panel. Retired skin preferences must not restore it differently.
   try{localStorage.removeItem('charlottendal-skin');}catch{}
   createPanelFit({plan:$('track-plan'),viewport:document.querySelector('.panel-scroll'),stage:$('plan-stage'),controls:$('panel-console')});
-  panelHead=createPanelHead({shell:document.querySelector('#panel-view .panel-shell'),onUpdate:view=>openUpdateNotice(view,{api,message})});
+  panelHead=createPanelHead({shell:document.querySelector('#panel-view .panel-shell'),onUpdate:view=>openUpdateNotice(view,{api,message}),onRanger:a=>api('ranger/'+a.command,a.command==='answer'?{id:a.id,approved:a.approved}:{id:a.id})});
   createPanelSplit({bottom:$('panel-bottom'),viewport:document.querySelector('.panel-scroll')});
   // Nothing administrative in the signal box's frame: the update chips join the Drift tab's buttons.
   const headRight=document.getElementById('plan-head-right');if(headRight){document.querySelector('#panel-drift .drift-actions')?.append(...headRight.children);headRight.remove();}

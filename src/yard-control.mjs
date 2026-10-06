@@ -10,7 +10,7 @@ import { forbidReason } from './studio/rules.mjs';
 const STATES=['open','laid'];
 export class YardControl {
   constructor(engine){
-    this.e=engine;this.def=engine.profile.yardArea||null;this.groups=engine.profile.rangerRequests||[];
+    this.e=engine;this.def=engine.profile.yardArea||null;this.groups=engine.profile.rangerRequests||[];this.paths=engine.profile.rangerPaths||[];
     const saved=engine.controls.yard;
     // Older state carried the handover owner; the request model replaces it.
     if(!saved||'owner' in saved){
@@ -130,8 +130,39 @@ export class YardControl {
     this.e.log(operator==='ranger'?'ranger-returned':'ranger-withdrawn',operator==='ranger'?`${group.label} lagd tillbaka av rangeraren.`:`${group.label} dragen tillbaka av TKL.`,{request:id});
     return request;
   }
+  // A point chain: the ranger's own turnouts straight out to a track, laid with the same
+  // conditions as a manual move. Every turnout is checked before any order is sent.
+  pathStatus(id){
+    const e=this.e,path=this.paths.find(p=>p.id===id),deny=reason=>({allowed:false,reason});
+    if(!path)return deny('Okänd växelgata.');
+    if(!e.connected||e.storageFault)return deny(e.storageFault?'Lagringsfel; manövrering spärrad.':'Ingen LocoNet-anslutning.');
+    if(e.controls.mode!=='local')return deny('Fjärrläge: manövrering är spärrad.');
+    if(e.controls.stopAll)return deny('Alla signaler i stopp är aktiverat.');
+    const forbidden=forbidReason(e.profile.rules,{...e.knownPositions(),...path.turnouts});if(forbidden)return deny(forbidden);
+    for(const [name,position] of Object.entries(path.turnouts)){
+      if(e.turnoutConfirmed(name,position))continue;
+      const condition=e.manualStatus(name,'ranger');
+      if(!condition.allowed)return deny(`${name} kan inte läggas: ${condition.reason}`);
+    }
+    return {allowed:true,reason:'Växlarna är fria.'};
+  }
+  pathLaid(path){return Object.entries(path.turnouts).every(([n,p])=>this.e.turnoutConfirmed(n,p));}
+  layPath(id){
+    const check=this.pathStatus(id);if(!check.allowed)throw Error(check.reason);
+    const path=this.paths.find(p=>p.id===id);
+    if(this.pathLaid(path)){this.e.log('ranger-path',`${path.label}: gatan ligger redan.`);return path;}
+    this.lay(path.turnouts);
+    this.e.log('ranger-path',`Rangeraren lägger gatan till ${path.label}.`);
+    return path;
+  }
+  // Each turnout once, its coupled peers included: a chain naming both halves of a pair
+  // must not order the pair twice.
   lay(positions){
-    for(const [name,position] of Object.entries(positions))for(const n of this.e.profile.coupled?.[name]||[name])if(!this.e.turnoutConfirmed(n,position))this.e.turnoutOrder(n,position);
+    const ordered=new Set();
+    for(const [name,position] of Object.entries(positions))for(const n of this.e.profile.coupled?.[name]||[name]){
+      if(ordered.has(n))continue;ordered.add(n);
+      if(!this.e.turnoutConfirmed(n,position))this.e.turnoutOrder(n,position);
+    }
   }
   save(requests){
     const previous=this.e.controls.yard;
@@ -154,7 +185,8 @@ export class YardControl {
   snapshot(){
     if(!this.def)return null;
     return {own:this.def.turnouts,boundaries:this.def.boundaries,
-      groups:this.groups.map(g=>{const r=this.requests.find(r=>r.group===g.id)||null;return {id:g.id,label:g.label,side:g.side,track:g.track||null,out:g.out,back:g.back,state:r?r.state:'idle',request:r,can:r?null:this.requestStatus(g.id)};}),
+      groups:this.groups.map(g=>{const r=this.requests.find(r=>r.group===g.id)||null;return {id:g.id,label:g.label,short:g.short||g.label,side:g.side,track:g.track||null,out:g.out,back:g.back,state:r?r.state:'idle',request:r,can:r?null:this.requestStatus(g.id)};}),
+      paths:this.paths.map(p=>({id:p.id,label:p.label,short:p.short,side:p.side,turnouts:p.turnouts,laid:this.pathLaid(p),can:this.pathStatus(p.id)})),
       requests:this.requests.map(r=>({...r,label:this.label(r)}))};
   }
 }

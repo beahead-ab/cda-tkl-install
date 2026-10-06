@@ -698,7 +698,7 @@ async function start() {
   signalControls=signalRouteControls(config,registry,signalEndpoints);
   buildPlan();
   const deckPluppar=()=>buttons.filter(b=>b.isRoute).map(b=>({id:b.id,kind:b.kind,node:b.g,label:label(b.id)}));
-  streamDeck=createStreamDeck({pluppar:deckPluppar,choose,clearChoice,api,message,state:()=>state,online:()=>online&&state?.connection==='connected',chosen:()=>chosen,trainMeet:()=>state?.trainMeet,layout:()=>state?.streamDeck,onChange:()=>streamDeckAdmin?.devices()});
+  streamDeck=createStreamDeck({pluppar:deckPluppar,choose,clearChoice,api,message,state:()=>state,online:()=>online&&state?.connection==='connected',chosen:()=>chosen,trainMeet:()=>state?.trainMeet,layout:()=>state?.streamDeck,onChange:()=>streamDeckAdmin?.devices(),ranger:()=>rangerMode});
   streamDeckAdmin=createStreamDeckAdmin({pluppar:deckPluppar,lines:()=>state?.trainMeet?.context?.lines||[],context:()=>state?.trainMeet?.context||null,deck:streamDeck});
   trainInformation=createTrainInformation({catalog:config.trainFields,controls:layout.controls,plan:$('track-plan'),displayName,openSource,onOpen:()=>openTools('train-information')});
   $('close-inspector').onclick=()=>closeInspector();

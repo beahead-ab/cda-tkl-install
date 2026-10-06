@@ -46,6 +46,33 @@ export function systemSpec(key,{stopAll=false,chosen=false,page=0,pages=1,remote
   if(key.id==='yard-authority')return {...base,lines:['Ranger-','begäran'],caption:yard?.open||yard?.laid||'',blink:!!yard?.open,fill:yard?.open?COLORS.held:'',dim:!yard||(!yard.open&&!yard.laid)};
   return base;
 }
+// Rangeraren's own deck (docs/rangerlage.md): the point chains and the requests first,
+// then the own turnouts one by one; every page starts with the page key.
+export function buildRangerPages(keyCount,{paths=[],groups=[],turnouts=[]}={}){
+  const keys=[...paths.map(p=>({type:'ranger-path',id:p.id,title:p.label,text:p.short||p.label})),
+    ...groups.map(g=>({type:'ranger-request',id:g.id,title:g.label,text:g.short||g.label})),
+    ...turnouts.map(n=>({type:'ranger-turnout',id:n,title:'Växel '+n.replace('Vx',''),text:'Vx '+n.replace('Vx','')}))];
+  const pages=[];let i=0;
+  do{const page=[{type:'system',...SYSTEM_KEYS[0]}];while(page.length<keyCount&&i<keys.length)page.push(keys[i++]);pages.push(page);}while(i<keys.length);
+  return pages;
+}
+// yard is the kernel's view (paths, groups); manual the ranger's rights; turnouts the reported positions.
+export function rangerSpec(key,{yard=null,manual={},turnouts={}}={}){
+  const base={kind:'system',id:key.type+'-'+key.id,title:key.title,lines:splitLabel(key.text||key.title),caption:'',fill:'',ring:'',dim:false,blink:false,blocked:false};
+  if(key.type==='ranger-path'){
+    const p=yard?.paths?.find(p=>p.id===key.id);if(!p)return {...base,dim:true,caption:'saknas'};
+    return {...base,fill:p.laid?COLORS.route:'',caption:p.laid?'ligger':p.can?.allowed?'':'går inte',dim:!p.laid&&!p.can?.allowed};
+  }
+  if(key.type==='ranger-request'){
+    const g=yard?.groups?.find(g=>g.id===key.id);if(!g)return {...base,dim:true,caption:'saknas'};
+    return {...base,fill:g.state==='laid'?COLORS.route:g.state==='open'?COLORS.held:'',blink:g.state==='open',caption:g.state==='open'?'väntar · håll: ångra':g.state==='laid'?'ute · håll: tillbaka':g.can?.allowed?'':'går inte',dim:g.state==='idle'&&!g.can?.allowed};
+  }
+  if(key.type==='ranger-turnout'){
+    const s=turnouts[key.id],m=manual[key.id],position=s?.position==='C'?'rakt':s?.position==='T'?'avvikande':'okänt';
+    return {...base,lines:[key.text||key.id],caption:position,dim:!m?.allowed};
+  }
+  return base;
+}
 export function splitLabel(text){
   const words=String(text).split(' ');if(words.length<2)return [text];
   const mid=Math.ceil(words.length/2);return [words.slice(0,mid).join(' '),words.slice(mid).join(' ')];

@@ -260,6 +260,7 @@ const server = http.createServer(async (req, res) => {
     else if (url.pathname === '/api/ranger/withdraw') engine.yard.return(data.id,'tkl');
     // The ranger's own moves: own turnouts and boundaries back, shunt routes in the area.
     else if (url.pathname === '/api/ranger/turnout') engine.manual(data.name, data.position, {operator:'ranger'});
+    else if (url.pathname === '/api/ranger/path') engine.yard.layPath(data.id);
     else if (url.pathname === '/api/ranger/route') engine.request(data.from, data.to, data.intent, {operator:'ranger'});
     else if (url.pathname === '/api/ranger/cancel') engine.cancel(data.id, {operator:'ranger'});
     else if (url.pathname === '/api/all-stop') engine.allStop(data.enabled);

@@ -7,7 +7,7 @@
 // drawn by stream-deck-render.js, the same code the layout editor uses. Nothing here
 // talks to the field.
 import sd from './vendor/elgato-stream-deck-webhid.js';
-import {buildPages,pluppSpec,signature} from './stream-deck-layout.js';
+import {buildPages,buildRangerPages,rangerSpec,pluppSpec,signature} from './stream-deck-layout.js';
 import {departureKey,arrivalKey} from './stream-deck-trains.js';
 import {turnSpec} from './stream-deck-turns.js';
 import {layoutPages,fits,modelFor,MODELS} from './stream-deck-profile.js';
@@ -21,7 +21,8 @@ async function post(path,data){
 export const cleanSerial=v=>String(v??'').replace(/[^A-Za-z0-9._-]/g,'').replace(/^[^A-Za-z0-9]+/,'').slice(0,64);
 // hid, library and locks are the browser's WebHID, the Stream Deck library and Web Locks;
 // tests pass stand-ins.
-export function createStreamDeck({pluppar,choose,clearChoice,api,message,state,online,chosen,trainMeet,layout,onChange,hid=typeof navigator!=='undefined'?navigator.hid:null,library=sd,locks=typeof navigator!=='undefined'?navigator.locks:null}){
+// ranger: true when the window is the ranger's view; the deck then shows the ranger's own keys.
+export function createStreamDeck({pluppar,choose,clearChoice,api,message,state,online,chosen,trainMeet,layout,onChange,ranger=()=>false,hid=typeof navigator!=='undefined'?navigator.hid:null,library=sd,locks=typeof navigator!=='undefined'?navigator.locks:null}){
   const $=id=>document.getElementById(id),statusNode=$('streamdeck-status'),connectButton=$('streamdeck-connect'),disconnectButton=$('streamdeck-disconnect'),originNode=$('streamdeck-origin'),pagesNode=$('streamdeck-pages');
   const supported=!!hid&&typeof window!=='undefined'&&window.isSecureContext;
   const units=new Map(),previews=new Map();
@@ -128,6 +129,11 @@ export function createStreamDeck({pluppar,choose,clearChoice,api,message,state,o
     return null;
   }
   function keys(unit){
+    if(ranger()){
+      const s=state(),yard=s?.yard,sig='ranger|'+unit.controls.length+'|'+(yard?.paths?.length||0)+'|'+(yard?.groups?.length||0)+'|'+(yard?.own?.length||0);
+      if(sig!==unit.pagesSig){unit.pagesSig=sig;unit.saved=null;unit.pages=buildRangerPages(unit.controls.length,{paths:yard?.paths||[],groups:yard?.groups||[],turnouts:[...(yard?.own||[]),...(yard?.boundaries||[])]});if(unit.page>=unit.pages.length)unit.page=0;describe();}
+      return unit.pages;
+    }
     const list=pluppar(),current=lines(),saved=savedFor(unit),sig=list.length+'|'+current.map(l=>l.id).join(',')+'|'+unit.controls.length+'|'+(saved?.version||'auto');
     if(sig!==unit.pagesSig){unit.pagesSig=sig;unit.saved=saved;unit.pages=saved?layoutPages(saved.layout,{pluppar:list,lines:current}):buildPages(list,unit.controls.length,current);if(unit.page>=unit.pages.length)unit.page=0;describe();}
     return unit.pages;
@@ -147,6 +153,7 @@ export function createStreamDeck({pluppar,choose,clearChoice,api,message,state,o
     const s=state(),nodes=new Map(pluppar().map(p=>[p.id,p.node]));
     const yard=s?.yard?{open:s.yard.requests.find(r=>r.state==='open')?.label||'',laid:s.yard.requests.filter(r=>r.state==='laid').map(r=>r.label).join(', ')}:null;
     return {plupp:k=>pluppSpec(k,new Set(nodes.get(k.id)?.classList||[]),nodes.get(k.id)?.dataset.routePhase||''),train:trainSpec,turn:k=>turnSpec(k,context()),
+      ranger:k=>rangerSpec(k,{yard:s?.yard,manual:s?.manualRanger||{},turnouts:s?.turnouts||{}}),
       system:{stopAll:!!s?.controls?.stopAll,chosen:!!chosen(),page,pages,remote:s?.controls?.mode==='remote',yard},online:online()};
   }
   function act(spec,action){
@@ -177,6 +184,15 @@ export function createStreamDeck({pluppar,choose,clearChoice,api,message,state,o
       return message(spec.number?`Tåg ${spec.number}: ${spec.text}.`:spec.text,{error:false});
     }
     const s=state();
+    // The ranger's keys: a chain is laid, a request is made (held: taken back), a turnout is thrown.
+    if(key.type==='ranger-path')return api('ranger/path',{id:key.id});
+    if(key.type==='ranger-request'){
+      const g=s?.yard?.groups?.find(g=>g.id===key.id);if(!g)return;
+      if(g.state==='idle')return api('ranger/request',{group:key.id});
+      if(held>=LONG_PRESS)return api('ranger/return',{id:g.request.id});
+      return message(g.label+(g.state==='open'?' väntar på TKL. Håll in för att ångra.':' ligger ute. Håll in för att lägga tillbaka.'),{error:false});
+    }
+    if(key.type==='ranger-turnout'){const position=s?.turnouts?.[key.id]?.position;return api('ranger/turnout',{name:key.id,position:position==='C'?'T':'C'});}
     switch(key.id){
       case 'page':return go((unit.page+1)%pages.length);
       case 'all-stop':return api('all-stop',{enabled:true});

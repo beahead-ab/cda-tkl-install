@@ -5,15 +5,15 @@
 // lay at any time. A request is therefore configuration, never a guess: a group
 // whose route or boundary does not match the profile fails the build.
 const spec=[
-  {id:'left-11',label:'Vänster 11',side:'left',track:'11',route:'tvv3/1--tvv3/5',extra:{Vx102:'C'},protect:['Vx102']},
-  {id:'left-12',label:'Vänster 12',side:'left',track:'12',route:'tvv3/1--tvv4/5',extra:{Vx102:'C'},protect:['Vx102']},
-  {id:'left-13',label:'Vänster 13',side:'left',track:'13',route:'tvv3/1--tvv5/5',extra:{Vx102:'C'},protect:['Vx102']},
-  {id:'right-11',label:'Höger 11',side:'right',track:'11',route:'tvv6/6--tvv3/10'},
-  {id:'right-12',label:'Höger 12',side:'right',track:'12',route:'tvv6/6--tvv4/10'},
-  {id:'right-13',label:'Höger 13',side:'right',track:'13',route:'tvv6/6--tvv5/10'},
+  {id:'left-11',label:'Vänster 11',short:'Vänster 11',side:'left',track:'11',route:'tvv3/1--tvv3/5',extra:{Vx102:'C'},protect:['Vx102']},
+  {id:'left-12',label:'Vänster 12',short:'Vänster 12',side:'left',track:'12',route:'tvv3/1--tvv4/5',extra:{Vx102:'C'},protect:['Vx102']},
+  {id:'left-13',label:'Vänster 13',short:'Vänster 13',side:'left',track:'13',route:'tvv3/1--tvv5/5',extra:{Vx102:'C'},protect:['Vx102']},
+  {id:'right-11',label:'Höger 11',short:'Höger 11',side:'right',track:'11',route:'tvv6/6--tvv3/10'},
+  {id:'right-12',label:'Höger 12',short:'Höger 12',side:'right',track:'12',route:'tvv6/6--tvv4/10'},
+  {id:'right-13',label:'Höger 13',short:'Höger 13',side:'right',track:'13',route:'tvv6/6--tvv5/10'},
   // 6/7 → 6/9 ends at 154; the pair 144/154 is laid together so the move continues to 3/11.
-  {id:'six-154',label:'Spår 6 ut via 154',side:'six',route:'tvv6/7--tvv6/9',extra:{Vx154:'T'}},
-  {id:'3d-left',label:'3d ut åt vänster',side:'3d',route:'tvv3/2--tvv3/6'}
+  {id:'six-154',label:'Spår 6 ut via 154',short:'Spår 6 ut',side:'six',route:'tvv6/7--tvv6/9',extra:{Vx154:'T'}},
+  {id:'3d-left',label:'3d ut åt vänster',short:'3d ut',side:'3d',route:'tvv3/2--tvv3/6'}
 ];
 export function compileRangerRequests(profile){
   const boundaries=profile.yardBoundaries||{};
@@ -34,6 +34,6 @@ export function compileRangerRequests(profile){
     if(!Object.keys(back).length)throw Error('Begäran passerar ingen gränsväxel: '+s.id);
     // 153 is coupled with 161 and closes 3d off from 161 when thrown.
     if(s.id==='3d-left')back.Vx153='T';
-    return {id:s.id,label:s.label,side:s.side,...(s.track?{track:s.track}:{}),route:s.route,out,back,provenance:'Anläggningsägarens beslut 2026-10-06; lägen ur profilens växeltågväg '+route.label+'.'};
+    return {id:s.id,label:s.label,short:s.short,side:s.side,...(s.track?{track:s.track}:{}),route:s.route,out,back,provenance:'Anläggningsägarens beslut 2026-10-06; lägen ur profilens växeltågväg '+route.label+'.'};
   });
 }

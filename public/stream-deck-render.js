@@ -27,6 +27,7 @@ export function keySpec(key,env){
       spec={...system,id:'nav-'+key.to,title:NAV_TARGETS[key.to],lines:[key.text||n.text],icon:n.icon,caption:`${page+1} / ${pages}`,dim:pages<2};break;
     }
     case 'missing':spec={...system,id:'missing',title:key.title,lines:[key.title,key.label],dim:true};break;
+    case 'ranger-path':case 'ranger-request':case 'ranger-turnout':spec=env.ranger?env.ranger(key):{...system,id:key.type,title:key.title,lines:splitLabel(key.text||key.title),dim:true};break;
     default:spec=systemSpec(key,env.system);if(key.text)spec={...spec,lines:splitLabel(key.text)};
   }
   if(key.icon&&spec.kind==='system')spec={...spec,icon:key.icon};

@@ -15,21 +15,30 @@ export function rangerOwnView(yard){
 export function createRangerBar({root,api}){
   if(!root)return null;
   const bar=document.createElement('div');bar.id='ranger-bar';bar.setAttribute('role','group');bar.setAttribute('aria-label','Rangerarens begäran');root.prepend(bar);
-  const label=document.createElement('span');label.className='ranger-bar-label';label.textContent='Begär av TKL';bar.append(label);
+  const row=(id,text)=>{const r=document.createElement('div');r.className='ranger-row';r.id=id;const label=document.createElement('span');label.className='ranger-bar-label';label.textContent=text;r.append(label);bar.append(r);return r;};
+  // Växelgator first: the ranger's own moves. Then what is asked of TKL.
+  const paths=row('ranger-paths','Växelgator'),groups=row('ranger-groups','Begär av TKL');
   let last='';
-  bar.addEventListener('click',e=>{const b=e.target.closest('button[data-group]');if(b&&!b.disabled)api('ranger/request',{group:b.dataset.group});});
+  bar.addEventListener('click',e=>{const b=e.target.closest('button[data-group],button[data-path]');if(!b||b.disabled)return;if(b.dataset.path)api('ranger/path',{id:b.dataset.path});else api('ranger/request',{group:b.dataset.group});});
+  const chip=(text)=>{const b=document.createElement('button');b.type='button';b.className='chip';b.innerHTML='<i class="chip-dot" aria-hidden="true"></i><span></span>';b.querySelector('span').textContent=text;return b;};
   return {update(state,online){
-    const groups=state?.yard?.groups||[];
-    const key=JSON.stringify([online,groups.map(g=>[g.id,g.state,g.can?.allowed,g.can?.reason])]);
+    const yard=state?.yard,list=yard?.groups||[],chains=yard?.paths||[];
+    const key=JSON.stringify([online,list.map(g=>[g.id,g.state,g.can?.allowed,g.can?.reason]),chains.map(p=>[p.id,p.laid,p.can?.allowed,p.can?.reason])]);
     if(key===last)return;last=key;
     bar.querySelectorAll('button').forEach(b=>b.remove());
-    for(const g of groups){
-      const b=document.createElement('button');b.type='button';b.className='chip';b.dataset.group=g.id;b.dataset.state=g.state;
-      b.innerHTML='<i class="chip-dot" aria-hidden="true"></i><span></span>';b.querySelector('span').textContent=GROUP_SHORT[g.id]||g.label;
+    paths.hidden=!chains.length;
+    for(const p of chains){
+      const b=chip(p.short||p.label);b.dataset.path=p.id;b.dataset.state=p.laid?'laid':'idle';b.dataset.tone=p.laid?'on':'';
+      b.disabled=!online||!p.can?.allowed;
+      b.title=p.laid?p.label+': gatan ligger.':p.can?.allowed?'Lägg gatan till '+p.label+'.':p.can?.reason||'';
+      paths.append(b);
+    }
+    for(const g of list){
+      const b=chip(GROUP_SHORT[g.id]||g.short||g.label);b.dataset.group=g.id;b.dataset.state=g.state;
       b.disabled=!online||g.state!=='idle'||!g.can?.allowed;
       b.title=g.state==='open'?g.label+' är begärd. TKL svarar.':g.state==='laid'?g.label+' ligger ute. Lägg tillbaka i statusraden.':g.can?.allowed?'Begär '+g.label+' av TKL.':g.can?.reason||'';
       b.dataset.tone=g.state==='open'?'warn':g.state==='laid'?'on':'';
-      bar.append(b);
+      groups.append(b);
     }
   }};
 }

@@ -535278,6 +535278,7 @@
     {
       "id": "left-11",
       "label": "Vänster 11",
+      "short": "Vänster 11",
       "side": "left",
       "track": "11",
       "route": "tvv3/1--tvv3/5",
@@ -535296,6 +535297,7 @@
     {
       "id": "left-12",
       "label": "Vänster 12",
+      "short": "Vänster 12",
       "side": "left",
       "track": "12",
       "route": "tvv3/1--tvv4/5",
@@ -535315,6 +535317,7 @@
     {
       "id": "left-13",
       "label": "Vänster 13",
+      "short": "Vänster 13",
       "side": "left",
       "track": "13",
       "route": "tvv3/1--tvv5/5",
@@ -535334,6 +535337,7 @@
     {
       "id": "right-11",
       "label": "Höger 11",
+      "short": "Höger 11",
       "side": "right",
       "track": "11",
       "route": "tvv6/6--tvv3/10",
@@ -535352,6 +535356,7 @@
     {
       "id": "right-12",
       "label": "Höger 12",
+      "short": "Höger 12",
       "side": "right",
       "track": "12",
       "route": "tvv6/6--tvv4/10",
@@ -535370,6 +535375,7 @@
     {
       "id": "right-13",
       "label": "Höger 13",
+      "short": "Höger 13",
       "side": "right",
       "track": "13",
       "route": "tvv6/6--tvv5/10",
@@ -535387,6 +535393,7 @@
     {
       "id": "six-154",
       "label": "Spår 6 ut via 154",
+      "short": "Spår 6 ut",
       "side": "six",
       "route": "tvv6/7--tvv6/9",
       "out": {
@@ -535403,6 +535410,7 @@
     {
       "id": "3d-left",
       "label": "3d ut åt vänster",
+      "short": "3d ut",
       "side": "3d",
       "route": "tvv3/2--tvv3/6",
       "out": {
@@ -535415,6 +535423,254 @@
         "Vx153": "T"
       },
       "provenance": "Anläggningsägarens beslut 2026-10-06; lägen ur profilens växeltågväg 3/2 → 3/6."
+    }
+  ],
+  "rangerPaths": [
+    {
+      "id": "left-g51",
+      "label": "Godsspår 51 från vänster",
+      "short": "V 51",
+      "side": "left",
+      "turnouts": {
+        "Vx103": "T",
+        "Vx114": "C",
+        "Vx115": "T"
+      },
+      "segments": [
+        "T13",
+        "T148",
+        "T219",
+        "T68",
+        "T110"
+      ],
+      "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
+    },
+    {
+      "id": "left-g52",
+      "label": "Godsspår 52 från vänster",
+      "short": "V 52",
+      "side": "left",
+      "turnouts": {
+        "Vx103": "T",
+        "Vx114": "C",
+        "Vx115": "C"
+      },
+      "segments": [
+        "T13",
+        "T148",
+        "T219",
+        "T69",
+        "T227",
+        "T195"
+      ],
+      "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
+    },
+    {
+      "id": "left-g53",
+      "label": "Godsspår 53 från vänster",
+      "short": "V 53",
+      "side": "left",
+      "turnouts": {
+        "Vx103": "T",
+        "Vx114": "T",
+        "Vx111": "C",
+        "Vx118": "C"
+      },
+      "segments": [
+        "T13",
+        "T148",
+        "T220",
+        "T221",
+        "T191",
+        "T64"
+      ],
+      "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
+    },
+    {
+      "id": "left-g54",
+      "label": "Godsspår 54 från vänster",
+      "short": "V 54",
+      "side": "left",
+      "turnouts": {
+        "Vx103": "T",
+        "Vx114": "T",
+        "Vx111": "T",
+        "Vx118": "T"
+      },
+      "segments": [
+        "T13",
+        "T148",
+        "T220",
+        "T221",
+        "T79",
+        "T188"
+      ],
+      "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
+    },
+    {
+      "id": "load-1",
+      "label": "Lastspår 1",
+      "short": "Last 1",
+      "side": "left",
+      "turnouts": {
+        "Vx119": "T"
+      },
+      "segments": [
+        "T222",
+        "T224",
+        "T216"
+      ],
+      "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
+    },
+    {
+      "id": "load-2",
+      "label": "Lastspår 2",
+      "short": "Last 2",
+      "side": "left",
+      "turnouts": {
+        "Vx119": "C"
+      },
+      "segments": [
+        "T222",
+        "T185",
+        "T15"
+      ],
+      "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
+    },
+    {
+      "id": "right-g52",
+      "label": "Godsspår 52 från höger",
+      "short": "H 52",
+      "side": "right",
+      "turnouts": {
+        "Vx132": "C",
+        "Vx130": "C",
+        "Vx127": "C"
+      },
+      "segments": [
+        "T124",
+        "T123",
+        "T43",
+        "T56",
+        "T65",
+        "T195"
+      ],
+      "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
+    },
+    {
+      "id": "right-g53",
+      "label": "Godsspår 53 från höger",
+      "short": "H 53",
+      "side": "right",
+      "turnouts": {
+        "Vx132": "C",
+        "Vx130": "T",
+        "Vx128": "T"
+      },
+      "segments": [
+        "T124",
+        "T123",
+        "T43",
+        "T57",
+        "T48",
+        "T64"
+      ],
+      "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
+    },
+    {
+      "id": "right-g54",
+      "label": "Godsspår 54 från höger",
+      "short": "H 54",
+      "side": "right",
+      "turnouts": {
+        "Vx132": "C",
+        "Vx130": "T",
+        "Vx128": "C"
+      },
+      "segments": [
+        "T124",
+        "T123",
+        "T43",
+        "T57",
+        "T226",
+        "T60",
+        "T188"
+      ],
+      "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
+    },
+    {
+      "id": "load-3",
+      "label": "Lastspår 3",
+      "short": "Last 3",
+      "side": "right",
+      "turnouts": {
+        "Vx133": "T"
+      },
+      "segments": [
+        "T53",
+        "T42",
+        "T41"
+      ],
+      "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
+    },
+    {
+      "id": "depot-kolgard",
+      "label": "Kolgård",
+      "short": "Kolgård",
+      "side": "depot",
+      "turnouts": {
+        "Vx133": "C",
+        "Vx144": "C",
+        "Vx150": "T"
+      },
+      "segments": [
+        "T124",
+        "T53",
+        "T121",
+        "T71",
+        "T58"
+      ],
+      "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
+    },
+    {
+      "id": "depot-lokstall",
+      "label": "Lokstall",
+      "short": "Lokstall",
+      "side": "depot",
+      "turnouts": {
+        "Vx133": "C",
+        "Vx144": "C",
+        "Vx150": "C"
+      },
+      "segments": [
+        "T124",
+        "T53",
+        "T121",
+        "T71",
+        "T67"
+      ],
+      "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
+    },
+    {
+      "id": "depot-skiva",
+      "label": "Fram till vändskivan",
+      "short": "Skiva",
+      "side": "depot",
+      "turnouts": {
+        "Vx133": "C",
+        "Vx144": "C",
+        "Vx150": "T",
+        "Vx155": "C"
+      },
+      "segments": [
+        "T124",
+        "T53",
+        "T121",
+        "T71",
+        "T58",
+        "T150"
+      ],
+      "provenance": "Ur spårgrafen vid profilbygget; anläggningsägarens växelgator 2026-10-06."
     }
   ]
 }

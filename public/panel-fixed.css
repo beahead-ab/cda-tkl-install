@@ -157,7 +157,9 @@ body[data-role=ranger] #panel-bottom #trainmeet-timetable{display:none!important
 body[data-role=ranger] #panel-bottom-tabs,body[data-role=ranger] .ev-tabs [data-view=drift],body[data-role=ranger] .ev-tabs [data-view=occupancy],body[data-role=ranger] #panel-reset,body[data-role=ranger] #plan-head-start{display:none}
 body[data-role=ranger] #panel-bottom{grid-template-columns:minmax(0,1fr)}
 body[data-role=ranger] #panel-events{grid-template-rows:auto auto minmax(0,1fr)}
-#ranger-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px var(--tt-pad,16px);border-bottom:1px solid #1f2429}
+#ranger-bar{display:flex;flex-direction:column;gap:6px;padding:8px var(--tt-pad,16px);border-bottom:1px solid #1f2429}
+.ranger-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.ranger-row[hidden]{display:none}
+.ranger-bar-label{min-width:104px}
 .ranger-bar-label{font:600 11px var(--font-sans);letter-spacing:.1em;text-transform:uppercase;color:var(--fg-label);margin-right:6px}
 #ranger-bar .chip{font-size:11.5px;color:var(--fg)}
 #ranger-bar .chip[data-state=open]{border-color:var(--yellow);color:var(--yellow-text)}

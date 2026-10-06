@@ -348,11 +348,13 @@ export class Engine extends EventEmitter {
     const condition=this.manualStatus(name,operator); if(!condition.allowed) throw Error(condition.reason);
     for (const n of condition.names) this.turnoutOrder(n, position);
   }
-  manualStatus(name,operator='tkl') {
+  // kernel: the yard's own group moves, which lay a request's turnouts under the
+  // same field conditions as a manual move but outside the operators' rights.
+  manualStatus(name,operator='tkl',{kernel=false}={}) {
     const refuse=reason=>({allowed:false,reason});
     if(!this.profile.turnouts[name]) return refuse('Okänd växel.');
     const names=this.profile.coupled?.[name]||[name];
-    const yardReason=this.yard.manualReason(names,operator);if(yardReason)return refuse(yardReason);
+    const yardReason=kernel?null:this.yard.manualReason(names,operator);if(yardReason)return refuse(yardReason);
     if(names.some(n=>this.profile.manualDisabled?.includes(n)))return refuse('Direktmanövern är avstängd i driftinställningarna.');
     const programReason=this.operating.manualReason(names,this.profile.manualPolicies?.byTurnout[name]?.blocks);if(programReason)return refuse(programReason);
     if(!this.connected||this.storageFault||this.controls.stopAll) return refuse('Manövrering spärrad: anslutning, lagring eller AIS.');
@@ -530,6 +532,7 @@ export class Engine extends EventEmitter {
     for (const s of Object.values(this.blocks)) if (!this.fresh(s)) s.occupied = null;
     for (const s of Object.values(this.signals)) if (!this.fresh(s)) s.aspect = 'unknown';
     if(this.controls.panelReset?.completedAt===null){this.finishPanelReset();this.emit('change');return;}
+    this.yard.tick();
     for (const r of [...this.routes]) {
       const free = r.blocks.every(b => this.fresh(this.blocks[b]) && this.blocks[b].occupied === false);
       const known = Object.keys(r.turnouts).every(n => this.fresh(this.turnouts[n]) && this.turnouts[n].position !== 'unknown' && this.turnouts[n].updatedAt >= (this.turnouts[n].commandAt || 0));

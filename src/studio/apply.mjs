@@ -44,7 +44,8 @@ export function applyRules(profile, rules, field = null) {
   let nextField = null;
   if (field) {
     nextField = structuredClone(field); nextField.coupled = next.coupled;
-    for (const p of Object.values(nextField.protection)) for (const a of p.alternatives) retune(a, blockOf, next.coupled);
+    // The legacy commissioning plant has no protection table.
+    for (const p of Object.values(nextField.protection || {})) for (const a of p.alternatives || []) retune(a, blockOf, next.coupled);
     for (const s of [...(nextField.scenarios || []), ...(nextField.scenarioAlternatives || [])]) retune(s, blockOf, next.coupled);
     if (nextField.programming && next.operatingControls.programming) nextField.programming = { ...next.operatingControls.programming };
     for (const [n, b] of Object.entries(compiled.blocks)) if (nextField.blocks[n]) nextField.blocks[n] = { ...nextField.blocks[n], ...b };

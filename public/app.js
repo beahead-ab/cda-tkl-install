@@ -435,7 +435,7 @@ function paintPlan() {
     setText(n.nameNode,d.name.toUpperCase());const x=n.right?n.x-width:n.x+n.nameNode.getComputedTextLength()+8;attribute(n.nameNode,'x',n.right?n.x-(d.phone?width+8:0):n.x);setText(n.number,d.phone?'('+d.phone+')':'');attribute(n.box,'x',x);attribute(n.box,'width',width);attribute(n.number,'x',x+width/2);attribute(n.number,'text-anchor','middle');attribute(n.badge,'visibility',d.phone?'visible':'hidden');
     const nameLen=n.nameNode.getComputedTextLength(),nameX=Number(n.nameNode.getAttribute('x')),numLen=d.phone?n.number.getComputedTextLength():0,plateStart=(n.right?Math.min(nameX-nameLen,d.phone?x+width/2-numLen/2:Infinity):n.x-22)-9,plateEnd=(n.right?n.x+22:Math.max(nameX+nameLen,d.phone?x+width/2+numLen/2:0))+9;attribute(n.plate,'x',plateStart);attribute(n.plate,'width',Math.max(0,plateEnd-plateStart));attribute(n.group,'aria-label',d.name+(d.phone?' · telefon '+d.phone:'')+' · '+d.sourceLabel);
   }
-  const yardParts=new Set(state.yard?.owner==='ranger'?config.yardArea?.segments:[]),yardPoints=new Set(state.yard?.owner==='ranger'?config.yardArea?.turnouts:[]);
+  const yardParts=new Set(),yardPoints=new Set();
   blockedTracks=trackRestrictions(config,state);
   blockedLineParts=new Set((state.operating?.lines||[]).filter(l=>l.blocked).flatMap(l=>[...(lineExtents.get(l.id)||[])]));
   for(const marker of blockMarkers){const blocked=blockedTracks.has(marker.address);attribute(marker.g,'visibility',blocked?'visible':'hidden');attribute(marker.g,'tabindex',blocked?'0':'-1');}
@@ -709,7 +709,6 @@ async function start() {
     // viewport, appearance and any unfinished administrative edits intact.
     if($('track-plan').contains(document.activeElement))document.activeElement.blur();
   }
-  $('yard-authority').onclick=()=>api('yard-authority',{owner:state.yard.owner==='ranger'?'tkl':'ranger',sessionId:state.operating.sessionId,revision:state.operating.revision});
   $('panel-reset').onclick=()=>{message('');resetPanelChoices();return api('panel-reset',{});};
   $('catalog-request').onclick=()=>api('route',{from:$('catalog-from').value,to:$('catalog-to').value});
   $('active-routes').onclick = e => { const id = e.target.closest('button')?.dataset.cancel; if (id) api('cancel', { id }); };

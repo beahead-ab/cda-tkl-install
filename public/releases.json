@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.62.0",
+    "date": "2026-10-06",
+    "notes": [
+      "Rangerarläget, steg 1: rangerarens eget område och åtta begäran (Vänster/Höger 11–13, Spår 6 ut via 154, 3d ut åt vänster) som växelgrupper i profilen",
+      "Begäran i kärnan: svar direkt till rangeraren när en tågväg ligger över gruppen, Godkänn/Neka för TKL, lagd grupp låst för TKL, rangeraren lägger tillbaka",
+      "Gränsväxlarna 102, 103, 112, 131, 132, 144, 154 och 164 med ett tillbaka-läge var; spår 11–13 är TKL:s",
+      "Lämna över rangerbangården är borta; Stream Deck-knappen Rangerbegäran godkänner med kort tryck och nekar med långt"
+    ]
+  },
+  {
     "version": "0.61.0",
     "date": "2026-10-05",
     "notes": [

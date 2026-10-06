@@ -125,9 +125,47 @@
       }
     },
     {
-      "id": "authority:Vx112",
+      "id": "authority:Vx102",
       "type": "authority",
-      "object": "Vx112",
+      "object": "Vx102",
+      "tkl": [
+        "C",
+        "T"
+      ],
+      "ranger": [
+        "C"
+      ],
+      "detail": {
+        "ports": {
+          "C": [
+            "A",
+            "B"
+          ],
+          "T": [
+            "A",
+            "C"
+          ]
+        },
+        "tklLegs": [
+          "A",
+          "B"
+        ],
+        "yardLegs": [
+          "C"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "yardBoundaries",
+        "button": "vxv102/112",
+        "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
+      }
+    },
+    {
+      "id": "authority:Vx103",
+      "type": "authority",
+      "object": "Vx103",
       "tkl": [
         "C",
         "T"
@@ -158,8 +196,46 @@
       "status": "active",
       "source": {
         "profile": "yardBoundaries",
+        "button": "vxv103",
+        "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
+      }
+    },
+    {
+      "id": "authority:Vx112",
+      "type": "authority",
+      "object": "Vx112",
+      "tkl": [
+        "C",
+        "T"
+      ],
+      "ranger": [
+        "C"
+      ],
+      "detail": {
+        "ports": {
+          "C": [
+            "A",
+            "B"
+          ],
+          "T": [
+            "A",
+            "C"
+          ]
+        },
+        "tklLegs": [
+          "A",
+          "B"
+        ],
+        "yardLegs": [
+          "C"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "yardBoundaries",
         "button": "vxv102/112",
-        "provenance": "Anläggningsägarens manöverregel 2026-09-26, granskad mot XML-portarna. Fysisk överlämningsanslutning återstår."
+        "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
       }
     },
     {
@@ -171,7 +247,7 @@
         "T"
       ],
       "ranger": [
-        "T"
+        "C"
       ],
       "detail": {
         "ports": {
@@ -182,6 +258,44 @@
           "T": [
             "A",
             "B"
+          ]
+        },
+        "tklLegs": [
+          "A",
+          "C"
+        ],
+        "yardLegs": [
+          "B"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "yardBoundaries",
+        "button": "vxv131/132",
+        "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
+      }
+    },
+    {
+      "id": "authority:Vx132",
+      "type": "authority",
+      "object": "Vx132",
+      "tkl": [
+        "C",
+        "T"
+      ],
+      "ranger": [
+        "C"
+      ],
+      "detail": {
+        "ports": {
+          "C": [
+            "A",
+            "B"
+          ],
+          "T": [
+            "A",
+            "C"
           ]
         },
         "tklLegs": [
@@ -197,7 +311,45 @@
       "source": {
         "profile": "yardBoundaries",
         "button": "vxv131/132",
-        "provenance": "Anläggningsägarens manöverregel 2026-09-26, granskad mot XML-portarna. Fysisk överlämningsanslutning återstår."
+        "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
+      }
+    },
+    {
+      "id": "authority:Vx144",
+      "type": "authority",
+      "object": "Vx144",
+      "tkl": [
+        "C",
+        "T"
+      ],
+      "ranger": [
+        "C"
+      ],
+      "detail": {
+        "ports": {
+          "C": [
+            "A",
+            "B"
+          ],
+          "T": [
+            "A",
+            "C"
+          ]
+        },
+        "tklLegs": [
+          "C"
+        ],
+        "yardLegs": [
+          "A",
+          "B"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "yardBoundaries",
+        "button": "vxv144/154",
+        "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
       }
     },
     {
@@ -235,7 +387,45 @@
       "source": {
         "profile": "yardBoundaries",
         "button": "vxv144/154",
-        "provenance": "Anläggningsägarens manöverregel 2026-09-26, granskad mot XML-portarna. Fysisk överlämningsanslutning återstår."
+        "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
+      }
+    },
+    {
+      "id": "authority:Vx164",
+      "type": "authority",
+      "object": "Vx164",
+      "tkl": [
+        "C",
+        "T"
+      ],
+      "ranger": [
+        "T"
+      ],
+      "detail": {
+        "ports": {
+          "C": [
+            "A",
+            "B"
+          ],
+          "T": [
+            "A",
+            "C"
+          ]
+        },
+        "tklLegs": [
+          "B"
+        ],
+        "yardLegs": [
+          "A",
+          "C"
+        ]
+      },
+      "runsIn": "tkl",
+      "status": "active",
+      "source": {
+        "profile": "yardBoundaries",
+        "button": "vxv164",
+        "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
       }
     },
     {

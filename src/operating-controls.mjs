@@ -45,10 +45,9 @@ export class OperatingControls {
     const s=this.e.turnouts[this.def.turnout];if(!this.e.fresh(s)||s.position==='unknown'||s.reportSequence<=(s.commandSequence??-1))return 'Växel 133 saknar aktuellt läge.';
     return null;
   }
-  enableStatus(){const reason=(this.e.yard?.delegated?'Återta rangerbangården före programmering.':null)||this.environmentReason()||(this.e.controls.stopAll?'Återställ AIS före programmering.':this.reservation.reserved?'Programmeringsområdet är redan reserverat.':!this.normalKnown()?'Invänta bekräftad normaldrift.':this.e.turnouts[this.def.turnout].position!==this.def.requiredPosition?'Växel 133 måste ligga rakt.':null);return {allowed:!reason,reason:reason||'Växel 133 rakt, skyddande signaler i stopp och inga berörda tågvägslås. Ett lok får stå på Lastspår 3.'};}
+  enableStatus(){const reason=this.environmentReason()||(this.e.controls.stopAll?'Återställ AIS före programmering.':this.reservation.reserved?'Programmeringsområdet är redan reserverat.':!this.normalKnown()?'Invänta bekräftad normaldrift.':this.e.turnouts[this.def.turnout].position!==this.def.requiredPosition?'Växel 133 måste ligga rakt.':null);return {allowed:!reason,reason:reason||'Växel 133 rakt, skyddande signaler i stopp och inga berörda tågvägslås. Ett lok får stå på Lastspår 3.'};}
   setProgramming(enabled) {
     if(typeof enabled!=='boolean'||!this.def)throw Error('Ogiltig programmeringsmanöver.');
-    if(enabled&&this.e.yard?.delegated)throw Error('Återta rangerbangården före programmering.');
     if(enabled){const check=this.enableStatus();if(!check.allowed)throw Error(check.reason);}
     else if(!this.e.connected||this.e.storageFault)throw Error('Anslutning och fungerande lagring krävs för att begära normaldrift.');
     this.revision++;this.e.controls.programming={reserved:true,desired:enabled,fingerprint:this.e.fingerprint};this.e.persistControls();

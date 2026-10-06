@@ -1,11 +1,20 @@
-// Reviewed boundary rights, specified by the layout owner on 2026-09-26.
-// Positions below are logical XML positions. Electrical inversion belongs to
-// Engine.turnoutOrder, not to this permission check.
+// Reviewed boundary rights, specified by the layout owner on 2026-09-26 (112, 131,
+// 154) and extended on 2026-10-06 with the other half of each pair and the ranger's
+// gate turnouts (102, 103, 132, 144, 164): docs/rangerlage.md. Each boundary has
+// exactly one isolating position, the one the ranger may lay freely (the "back"
+// position of a request group). Positions below are logical XML positions.
+// Electrical inversion belongs to Engine.turnoutOrder, not to this permission check.
 const sourceHash='c69a865ae9a85cdb842d70c34d2573dde4b11c50f601a561d5b941136ac6fa87';
 const reviewed={
-  Vx112:{id:'TO12',continuing:2,segments:['T117','T126','T129'],tklLegs:['B'],yardLegs:['A','C'],button:'vxv102/112'},
-  Vx131:{id:'TO26',continuing:4,segments:['T49','T44','T116'],tklLegs:['C'],yardLegs:['A','B'],button:'vxv131/132'},
-  Vx154:{id:'TO20',continuing:4,segments:['T36','T46','T118'],tklLegs:['A','C'],yardLegs:['B'],button:'vxv144/154'}
+  Vx102:{id:'TO11',continuing:2,segments:['T73','T78','T126'],tklLegs:['A','B'],yardLegs:['C'],button:'vxv102/112'},
+  Vx103:{id:'TO5',continuing:2,segments:['T13','T135','T148'],tklLegs:['B'],yardLegs:['A','C'],button:'vxv103'},
+  // Spår 11–13 are TKL's, so 112's leg towards 113 and 131's leg towards 126 are TKL legs.
+  Vx112:{id:'TO12',continuing:2,segments:['T117','T126','T129'],tklLegs:['A','B'],yardLegs:['C'],button:'vxv102/112'},
+  Vx131:{id:'TO26',continuing:4,segments:['T49','T44','T116'],tklLegs:['A','C'],yardLegs:['B'],button:'vxv131/132'},
+  Vx132:{id:'TO24',continuing:2,segments:['T123','T43','T45'],tklLegs:['C'],yardLegs:['A','B'],button:'vxv131/132'},
+  Vx144:{id:'TO21',continuing:2,segments:['T53','T121','T52'],tklLegs:['C'],yardLegs:['A','B'],button:'vxv144/154'},
+  Vx154:{id:'TO20',continuing:4,segments:['T36','T46','T118'],tklLegs:['A','C'],yardLegs:['B'],button:'vxv144/154'},
+  Vx164:{id:'TO0',continuing:2,segments:['T161','T2','T144'],tklLegs:['B'],yardLegs:['A','C'],button:'vxv164'}
 };
 
 export function compileYardBoundaries(panel,source) {
@@ -22,7 +31,7 @@ export function compileYardBoundaries(panel,source) {
     const rangerPositions=Object.keys(positions).filter(p=>!opens(positions[p]));
     if(rangerPositions.length!==1)throw Error('Inget entydigt skyddsläge vid rangergränsen: '+name);
     return [name,{tklPositions:['C','T'],rangerPositions,ports:positions,tklLegs:r.tklLegs,yardLegs:r.yardLegs,sourceButton:r.button,
-      provenance:'Anläggningsägarens manöverregel 2026-09-26, granskad mot XML-portarna. Fysisk överlämningsanslutning återstår.'}];
+      provenance:'Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten.'}];
   }));
 }
 
@@ -37,7 +46,7 @@ export function boundaryCommandReason(boundaries,names,position,operator,yardTur
   for(const name of names){
     const rule=boundaries?.[name];
     if(!rule){if(yardTurnouts.includes(name))continue;return name+': rangerarens manöverrätt är inte ansluten.';}
-    if(!rule.rangerPositions.includes(position))return name+': endast TKL får öppna förbindelsen mot TKL:s område.';
+    if(!rule.rangerPositions.includes(position))return name+': endast TKL får öppna förbindelsen mot TKL:s område. Begär den i stället.';
   }
   return null;
 }

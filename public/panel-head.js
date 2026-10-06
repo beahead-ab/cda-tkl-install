@@ -1,6 +1,6 @@
 // Status bar in its own row above the plan: CHARLOTTENDAL with the current notice beside
 // it on the left; on the right the update and reload chips when they apply, and the push
-// buttons (Återställ, Styra RBG) that app.js moves in. Presentation only; app.js hands it
+// buttons (Återställ) that app.js moves in. Presentation only; app.js hands it
 // the texts, it sends nothing.
 const esc=v=>String(v??'');
 export function createPanelHead({shell,onUpdate}){

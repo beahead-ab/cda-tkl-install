@@ -2,9 +2,6 @@
 export function createPanelConsole({onOpen,onResetComplete,showDrift}) {
   const $=id=>document.getElementById(id),root=$('panel-console');
   root.innerHTML='<div id="panel-quick-actions"><button type="button" class="chip" id="panel-reset" aria-label="Återställ panel"><i class="chip-dot" aria-hidden="true"></i><span id="panel-reset-label">Återställ</span></button></div><div class="panel-runtime-info"><span id="panel-reset-status" role="status"></span><span id="panel-mode-status"></span><span id="panel-selection-slot"></span></div>';
-  const yard=$('panel-reset').cloneNode(true);yard.id='yard-authority';yard.hidden=true;
-  yard.querySelector('defs')?.remove();yard.querySelector('#panel-reset-label').id='yard-authority-label';
-  yard.removeAttribute('aria-label');$('panel-quick-actions').append(yard);
   // Drift: the bottom row's third tab holds everything an operator does while trains
   // run, so nothing operational is left in the administration window
   // (docs/installningar-plan.md). The parts are the same elements as before; only
@@ -47,13 +44,6 @@ export function createPanelConsole({onOpen,onResetComplete,showDrift}) {
   function route(){const m=location.hash.split('?')[0].match(/^#tools\/operations(?:\/(\w+))?$/);if(!m)return;history.replaceState(null,'','#panel');window.dispatchEvent(new HashChangeEvent('hashchange'));open(ADDRESSES[m[1]]||'panel-drift');}
   window.addEventListener('hashchange',route);queueMicrotask(route);
   return {open,close,update(state,online){
-    const authority=state.yard,delegated=authority?.owner==='ranger';
-    yard.hidden=!authority;yard.disabled=!online||!authority?.change.allowed;
-    yard.setAttribute('aria-pressed',String(delegated));yard.dataset.tone=delegated?'warn':'';
-    const action=delegated?'Återta rangerbangården':'Lämna över rangerbangården';
-    // Styra RBG: plain while TKL controls the yard, struck through while the ranger does.
-    $('yard-authority-label').textContent='Styra RBG';yard.classList.toggle('chip-off',delegated);yard.setAttribute('aria-label',action);
-    yard.title='Manöverrätt: '+(delegated?'Rangerställverket':'TKL')+'. '+(authority?.change.reason||'');
     const stopped=!!state.controls?.stopAll,remote=state.controls?.mode==='remote',shunt=$('route-mode').value==='shunt';
     const reset=state.panelReset,waiting=reset?.phase==='waiting';
     $('panel-reset').setAttribute('aria-label',waiting?'Återställer…':'Återställ panel');

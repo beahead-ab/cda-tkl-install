@@ -42,7 +42,7 @@ function activationStatus(proposed){
   const deny=reason=>({allowed:false,reason});
   if(!engine||!engine.controls.stopAll)return deny('Aktivera Alla signaler i stopp före profilbyte.');
   if(!engine.connected||engine.storageFault)return deny('Anslutning och fungerande lagring krävs.');
-  if(engine.routes.length||engine.controls.programming.reserved||engine.yard.delegated)return deny('Återta tågvägar, programmeringslås och rangerbangårdens manöverrätt först.');
+  if(engine.routes.length||engine.controls.programming.reserved||engine.yard.requests.length)return deny('Återta tågvägar, programmeringslås och rangerarens begäran först.');
   if(recorder.active||recorder.pending)return deny('Avsluta och spara telegraminspelningen först.');
   if(proposed){
     // I fysisk drift får en profil bara aktiveras när varje bindning är uppmätt i fält på den adress profilen har.
@@ -60,16 +60,21 @@ function createRuntime(p){
   const c=new LocoNetClient({host:target.host,port:target.port,silenceMs:p.staleMs});
   const e=new Engine(p,{storage,send:bytes=>c.send(bytes)});if(e.storageFault)throw Error(e.storageFault);
   return {profile:p,client:c,engine:e,
-    configuration:new Configuration(p,{storage,canActivate:()=>!e.routes.length&&!e.controls.programming.reserved&&!e.yard.delegated&&!e.storageFault}),
+    configuration:new Configuration(p,{storage,canActivate:()=>!e.routes.length&&!e.controls.programming.reserved&&!e.yard.requests.length&&!e.storageFault}),
     trainInformation:new TrainInformation(JSON.parse(fs.readFileSync(new URL('../public/data/train-fields.json',import.meta.url))),p,{storage}),
     // Vägövergångarna ur profilen när en crossing-regel äger dem, annars ur katalogen.
     panelIndications:new PanelIndications(p.indications||JSON.parse(fs.readFileSync(new URL('../public/data/indications.json',import.meta.url))),p),
     recorder:new TelegramRecorder(storage.directory,p,{connectionInfo:target})};
 }
-const bindings=new BindingConfiguration(baseProfile,{storage,canActivate:activationStatus,prepare:p=>{const next=createRuntime(studioDrafts.apply(p).profile);return ()=>installRuntime(next);}});
+// Studio's rules describe the network profile; another profile (the legacy commissioning
+// one) runs as it is.
+const withRules=p=>p.id===studioSources.profile.id?studioDrafts.apply(p).profile:p;
+const bindings=new BindingConfiguration(baseProfile,{storage,canActivate:activationStatus,prepare:p=>{const next=createRuntime(withRules(p));return ()=>installRuntime(next);}});
 // Studio: reglerna ovanpå driftbindningarna. Kärnan får alltid den kompilerade profilen, aldrig utkastet.
 const studioSources=loadSources();
-const studioDrafts=new StudioDrafts({base:baseProfile,field:loadProfile('field',{activated:false}),rules:studioSources.rules?.rules||rulesFromProfile(baseProfile,{indications:studioSources.indications}),storage,canActivate:activationStatus,
+// The reviewed rules file belongs to the network profile; another profile (the legacy
+// commissioning one) gets its own rules read out of itself.
+const studioDrafts=new StudioDrafts({base:baseProfile,field:loadProfile('field',{activated:false}),rules:(studioSources.rules?.profile===baseProfile.id?studioSources.rules.rules:null)||rulesFromProfile(baseProfile,{indications:studioSources.indications}),storage,canActivate:activationStatus,
   prepare:(p,f)=>{storage.save('studio-field-profile.json',f);const next=createRuntime(p);return ()=>installRuntime(next);},
   proposal:()=>{const r=studioRules(studioSources,studioDrafts.activeRules());return {proposals:r.proposals,replaces:r.replaces};}});
 // Chatten och AI-genomgången: Claude API med nyckeln på servern. Webbläsaren talar bara med TKL.
@@ -107,7 +112,7 @@ function installRuntime(next,start=true){
   if(start)c.start();dirty=true;
 }
 trainMeet.on('change',()=>{dirty=true;});trainMeet.on('journal',text=>{engine.log('trainmeet',text);dirty=true;});
-installRuntime(createRuntime(studioDrafts.apply(bindings.profile()).profile),false);
+installRuntime(createRuntime(withRules(bindings.profile())),false);
 // Layouts are checked against the live profile's pluppar, so the store is created once the runtime exists.
 const streamDeckLayouts=new StreamDeckLayouts(storage,{pluppIds:()=>Object.keys(profile?.buttons||{})});
 // The version this process was started with. An open panel compares it with the
@@ -244,7 +249,14 @@ const server = http.createServer(async (req, res) => {
     else if (url.pathname === '/api/track-block') engine.blockTrack(data.name, data.blocked);
     else if (url.pathname === '/api/line-block') {engine.operating.checkCommand(data);engine.operating.blockLine(data.id,data.blocked);}
     else if (url.pathname === '/api/programming') {engine.operating.checkCommand(data);engine.operating.setProgramming(data.enabled);}
-    else if (url.pathname === '/api/yard-authority') {engine.operating.checkCommand(data);engine.yard.setOwner(data.owner);}
+    // The ranger's requests (docs/rangerlage.md). request and return are the ranger's
+    // actions, answer and withdraw TKL's; the action itself names the operator, never
+    // a client field. The ranger's own view and login come in a later step; until
+    // then the authenticated panel can play both parts.
+    else if (url.pathname === '/api/ranger/request') engine.yard.request(data.group);
+    else if (url.pathname === '/api/ranger/answer') engine.yard.answer(data.id,data.approved===true);
+    else if (url.pathname === '/api/ranger/return') engine.yard.return(data.id,'ranger');
+    else if (url.pathname === '/api/ranger/withdraw') engine.yard.return(data.id,'tkl');
     else if (url.pathname === '/api/all-stop') engine.allStop(data.enabled);
     else if (url.pathname === '/api/panel-reset') engine.resetPanel();
     else if (url.pathname === '/api/emergency-cancel') engine.emergencyCancelAll();

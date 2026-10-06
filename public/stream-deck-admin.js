@@ -13,7 +13,7 @@ import {keySpec,drawKey} from './stream-deck-render.js';
 import {turnList} from './stream-deck-turns.js';
 const HASH='#tools/streamdeck/layout',REMEMBER='charlottendal-streamdeck-admin',PX=144;
 const DOT={plupp:COLORS.free,turn:'#9ad0ff',train:'#4a7fb5',system:COLORS.muted,nav:COLORS.muted,page:COLORS.muted};
-const SYSTEM_NOTES={'all-stop':'Ställer alla signaler i stopp.','reset-ais':'Häver Alla signaler i stopp.','panel-reset':'Återställer panelen. Kräver alltid minst en sekunds tryck.',cancel:'Avbryter ett påbörjat tågvägsval.','yard-authority':'Lämnar över eller återtar rangerbangården. Överstruken medan rangerställverket styr.',page:'Bläddrar till nästa sida.'};
+const SYSTEM_NOTES={'all-stop':'Ställer alla signaler i stopp.','reset-ais':'Häver Alla signaler i stopp.','panel-reset':'Återställer panelen. Kräver alltid minst en sekunds tryck.',cancel:'Avbryter ett påbörjat tågvägsval.','yard-authority':'Blinkar när rangeraren begär en växelgrupp. Kort tryck godkänner, långt tryck nekar.',page:'Bläddrar till nästa sida.'};
 const NAV_NOTES={next:'Går till nästa sida, och efter den sista till den första.',prev:'Går till föregående sida, och från den första till den sista.',home:'Går till första sidan.'};
 const icon=(id,size=20)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICONS[id].d}"/></svg>`;
 const when=iso=>{const t=Date.parse(iso);return Number.isFinite(t)?new Intl.DateTimeFormat('sv-SE',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}).format(t):'';};

@@ -525622,8 +525622,7 @@
         "rule": "IX:AUTO:0007C2",
         "button": "vxv102/112",
         "names": [
-          "Vx102",
-          "Vx112"
+          "Vx102"
         ],
         "freeSensors": [
           "slS102",
@@ -525667,8 +525666,13 @@
           "4/10",
           "5/10"
         ],
-        "status": "unresolved",
-        "reason": "Knappgruppens fullständiga växelkoppling är inte verifierad i XML-layouten."
+        "status": "ready",
+        "reason": "",
+        "guardTurnouts": [
+          "Vx102",
+          "Vx112"
+        ],
+        "reviewedBoundary": true
       },
       "Vx112": {
         "rule": "IX:AUTO:0007C2",
@@ -526127,7 +526131,6 @@
         "rule": "IX:AUTO:0007C11",
         "button": "vxv131/132",
         "names": [
-          "Vx131",
           "Vx132"
         ],
         "freeSensors": [
@@ -526172,8 +526175,13 @@
           "8/5",
           "9/5"
         ],
-        "status": "unresolved",
-        "reason": "Knappgruppens fullständiga växelkoppling är inte verifierad i XML-layouten."
+        "status": "ready",
+        "reason": "",
+        "guardTurnouts": [
+          "Vx131",
+          "Vx132"
+        ],
+        "reviewedBoundary": true
       },
       "Vx140": {
         "rule": "IX:AUTO:0007C12",
@@ -526379,8 +526387,7 @@
         "rule": "IX:AUTO:0007C13",
         "button": "vxv144/154",
         "names": [
-          "Vx144",
-          "Vx154"
+          "Vx144"
         ],
         "freeSensors": [
           "slS144",
@@ -526419,8 +526426,13 @@
           "6/7",
           "6/9"
         ],
-        "status": "unresolved",
-        "reason": "Knappgruppens fullständiga växelkoppling är inte verifierad i XML-layouten."
+        "status": "ready",
+        "reason": "",
+        "guardTurnouts": [
+          "Vx144",
+          "Vx154"
+        ],
+        "reviewedBoundary": true
       },
       "Vx154": {
         "rule": "IX:AUTO:0007C13",
@@ -527339,6 +527351,62 @@
       }
     },
     "boundaryOverrides": {
+      "Vx102": {
+        "rule": "IX:AUTO:0007C2",
+        "button": "vxv102/112",
+        "names": [
+          "Vx102"
+        ],
+        "freeSensors": [
+          "slS102",
+          "slS112"
+        ],
+        "blocks": [
+          "S102",
+          "S112",
+          "S112a"
+        ],
+        "inactiveNX": [
+          "IN:429040bc-67f8-49a6-8934-ae57c3462b1e",
+          "IN:8ebd3482-4061-423c-8b43-ad01fd3b1add",
+          "IN:c94fa9cb-863d-473f-a699-13c9e44cf9fe",
+          "IN:6bd97aec-4fd3-41f9-9b8a-12d73cc8dfbd",
+          "IN:a802cc6d-3f3a-490b-900e-14619fcdf4cf",
+          "IN:533504cb-b0e9-45ec-a8b8-3bbc68953533",
+          "IN:0ed73b3e-35e5-43f7-8c19-f9eb86e71e3c",
+          "IN:871a7269-712d-4f47-9cb9-c5b316eb2967",
+          "IN:d12211a5-28ae-4add-bb48-7fb55e571843",
+          "IN:17dd1cdb-033d-4257-9e5f-8d96cc80c348",
+          "IN:4114a7e3-f4c1-43cd-a92e-a4844d979ad6",
+          "IN:57ba1105-5758-43de-9110-7f48a66b528b",
+          "IN:7d4463d7-4c9f-4296-9f98-b8ee8433e7fa",
+          "IN:8be10a2c-1459-4b9d-9437-49d4a1e30a63",
+          "IN:77561b23-7836-48d7-b3e8-54d33c423de2",
+          "IN:72191ed1-b72d-4ae0-b9d8-f75c36539b10",
+          "IN:4ff1b10a-8b50-4ca3-bd1e-d5e1c3379ec2",
+          "IN:6f3c8c04-94ac-47da-8d6c-846982cafd5f",
+          "IN:fa61129e-5542-488b-88d4-600c63c448e3",
+          "IN:c5877801-d9df-4504-a527-52f4ad57ed62",
+          "IN:f634a24b-7043-4c2d-9ee0-8378dea7cfe2",
+          "IN:a1600f94-e4a0-4013-8607-455702f83e44"
+        ],
+        "signals": [
+          "1/5",
+          "2/10",
+          "2/5",
+          "3/10",
+          "3/3",
+          "4/10",
+          "5/10"
+        ],
+        "status": "ready",
+        "reason": "",
+        "guardTurnouts": [
+          "Vx102",
+          "Vx112"
+        ],
+        "reviewedBoundary": true
+      },
       "Vx112": {
         "rule": "IX:AUTO:0007C2",
         "button": "vxv102/112",
@@ -527451,6 +527519,113 @@
         ],
         "reviewedBoundary": true
       },
+      "Vx132": {
+        "rule": "IX:AUTO:0007C11",
+        "button": "vxv131/132",
+        "names": [
+          "Vx132"
+        ],
+        "freeSensors": [
+          "slS131",
+          "slS132"
+        ],
+        "blocks": [
+          "S126a",
+          "S131",
+          "S131a",
+          "S131c",
+          "S132",
+          "S132a",
+          "S132b"
+        ],
+        "inactiveNX": [
+          "IN:8b500613-a031-465d-a3b7-de0b654f22a0",
+          "IN:ef097bcf-7770-4019-a1d7-60731f8b254a",
+          "IN:6af610f4-2e48-4b05-b33b-c327971b047d",
+          "IN:c789a119-83a8-49f6-99e0-ddf1b8a0c450",
+          "IN:1a77e99e-db90-453b-aa4e-85b71071b2db",
+          "IN:d3a73449-9685-4aac-ae15-3d7b7e6cbee5",
+          "IN:ae4dcfd1-31eb-4a2b-ae55-c156aa18c973",
+          "IN:b40d2819-0552-4586-ab45-2a7aa2087544",
+          "IN:d29a79dc-dc0b-48ff-8553-ba218dac09fe",
+          "IN:9637bfe4-0334-4ee1-8b2a-6f54d18b80d7",
+          "IN:60c05de6-7b87-4156-8000-a73c8a4c9c45",
+          "IN:28fd5177-1f83-4b70-ab20-8dfa7d9d5bca",
+          "IN:3d360610-3f48-455c-9476-5d3d877014b2",
+          "IN:82fca6a8-90ed-41b7-8780-4c6afe4b8ac5",
+          "IN:6ab85d5e-781c-4fc5-82c1-35ee572f6b28"
+        ],
+        "signals": [
+          "3/5",
+          "4/5",
+          "5/5",
+          "5/8",
+          "6/5",
+          "6/6",
+          "6/8",
+          "7/5",
+          "8/5",
+          "9/5"
+        ],
+        "status": "ready",
+        "reason": "",
+        "guardTurnouts": [
+          "Vx131",
+          "Vx132"
+        ],
+        "reviewedBoundary": true
+      },
+      "Vx144": {
+        "rule": "IX:AUTO:0007C13",
+        "button": "vxv144/154",
+        "names": [
+          "Vx144"
+        ],
+        "freeSensors": [
+          "slS144",
+          "slS154"
+        ],
+        "blocks": [
+          "S144",
+          "S144a",
+          "S144b",
+          "S151b",
+          "S154",
+          "S154b",
+          "S154c"
+        ],
+        "inactiveNX": [
+          "IN:aca159e6-947d-4248-a417-12249bbd9d20",
+          "IN:447e1f19-0c48-4f93-9702-46f8b1b59c3d",
+          "IN:bff6c4b1-e623-4ebb-b4a4-71d03691011b",
+          "IN:27d9d2ff-a551-440c-8095-4f8a6713efac",
+          "IN:c718d9b8-d667-40bf-9279-26a6110d33be",
+          "IN:ae76e106-8150-4ea1-a430-678127a4c5e0",
+          "IN:bbfb9823-1ff0-4ca5-96ca-7f6498bd93fc",
+          "IN:4e5ca277-55c7-409c-9b8c-ca2531f711be",
+          "IN:8b3b3a92-0ebc-4099-838c-a3baa13e53f4",
+          "IN:721d8239-bf96-4733-a4c4-277eed3c5003",
+          "IN:0632870a-0526-43c4-a82f-0a371537bf8e",
+          "IN:8f1f7f38-cb7c-4349-81a3-f6a0e5dc78be",
+          "IN:b0c82045-3dfe-49f5-92ae-2c1b8f0a00fa",
+          "IN:03942f9b-cfc0-4779-85dd-a52c310e8a63",
+          "IN:fc05bf08-09e9-493b-b9db-2f3aa6446c34"
+        ],
+        "signals": [
+          "3/2",
+          "3/6",
+          "5/9",
+          "6/7",
+          "6/9"
+        ],
+        "status": "ready",
+        "reason": "",
+        "guardTurnouts": [
+          "Vx144",
+          "Vx154"
+        ],
+        "reviewedBoundary": true
+      },
       "Vx154": {
         "rule": "IX:AUTO:0007C13",
         "button": "vxv144/154",
@@ -527505,7 +527680,35 @@
     }
   },
   "yardBoundaries": {
-    "Vx112": {
+    "Vx102": {
+      "tklPositions": [
+        "C",
+        "T"
+      ],
+      "rangerPositions": [
+        "C"
+      ],
+      "ports": {
+        "C": [
+          "A",
+          "B"
+        ],
+        "T": [
+          "A",
+          "C"
+        ]
+      },
+      "tklLegs": [
+        "A",
+        "B"
+      ],
+      "yardLegs": [
+        "C"
+      ],
+      "sourceButton": "vxv102/112",
+      "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
+    },
+    "Vx103": {
       "tklPositions": [
         "C",
         "T"
@@ -527530,8 +527733,36 @@
         "A",
         "C"
       ],
+      "sourceButton": "vxv103",
+      "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
+    },
+    "Vx112": {
+      "tklPositions": [
+        "C",
+        "T"
+      ],
+      "rangerPositions": [
+        "C"
+      ],
+      "ports": {
+        "C": [
+          "A",
+          "B"
+        ],
+        "T": [
+          "A",
+          "C"
+        ]
+      },
+      "tklLegs": [
+        "A",
+        "B"
+      ],
+      "yardLegs": [
+        "C"
+      ],
       "sourceButton": "vxv102/112",
-      "provenance": "Anläggningsägarens manöverregel 2026-09-26, granskad mot XML-portarna. Fysisk överlämningsanslutning återstår."
+      "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
     },
     "Vx131": {
       "tklPositions": [
@@ -527539,7 +527770,7 @@
         "T"
       ],
       "rangerPositions": [
-        "T"
+        "C"
       ],
       "ports": {
         "C": [
@@ -527549,6 +527780,34 @@
         "T": [
           "A",
           "B"
+        ]
+      },
+      "tklLegs": [
+        "A",
+        "C"
+      ],
+      "yardLegs": [
+        "B"
+      ],
+      "sourceButton": "vxv131/132",
+      "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
+    },
+    "Vx132": {
+      "tklPositions": [
+        "C",
+        "T"
+      ],
+      "rangerPositions": [
+        "C"
+      ],
+      "ports": {
+        "C": [
+          "A",
+          "B"
+        ],
+        "T": [
+          "A",
+          "C"
         ]
       },
       "tklLegs": [
@@ -527559,7 +527818,35 @@
         "B"
       ],
       "sourceButton": "vxv131/132",
-      "provenance": "Anläggningsägarens manöverregel 2026-09-26, granskad mot XML-portarna. Fysisk överlämningsanslutning återstår."
+      "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
+    },
+    "Vx144": {
+      "tklPositions": [
+        "C",
+        "T"
+      ],
+      "rangerPositions": [
+        "C"
+      ],
+      "ports": {
+        "C": [
+          "A",
+          "B"
+        ],
+        "T": [
+          "A",
+          "C"
+        ]
+      },
+      "tklLegs": [
+        "C"
+      ],
+      "yardLegs": [
+        "A",
+        "B"
+      ],
+      "sourceButton": "vxv144/154",
+      "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
     },
     "Vx154": {
       "tklPositions": [
@@ -527587,7 +527874,35 @@
         "B"
       ],
       "sourceButton": "vxv144/154",
-      "provenance": "Anläggningsägarens manöverregel 2026-09-26, granskad mot XML-portarna. Fysisk överlämningsanslutning återstår."
+      "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
+    },
+    "Vx164": {
+      "tklPositions": [
+        "C",
+        "T"
+      ],
+      "rangerPositions": [
+        "T"
+      ],
+      "ports": {
+        "C": [
+          "A",
+          "B"
+        ],
+        "T": [
+          "A",
+          "C"
+        ]
+      },
+      "tklLegs": [
+        "B"
+      ],
+      "yardLegs": [
+        "A",
+        "C"
+      ],
+      "sourceButton": "vxv164",
+      "provenance": "Anläggningsägarens manöverregel 2026-09-26 och 2026-10-06, granskad mot XML-portarna. Rangerarens vy är ännu inte ansluten."
     }
   },
   "operatingControls": {
@@ -534765,55 +535080,45 @@
   "releasePolicy": "whole-route-after-ordered-passage-and-stop-feedback",
   "yardArea": {
     "turnouts": [
-      "Vx103",
       "Vx111",
-      "Vx113",
       "Vx114",
       "Vx115",
-      "Vx116",
       "Vx118",
       "Vx119",
-      "Vx123",
-      "Vx126",
       "Vx127",
       "Vx128",
       "Vx130",
-      "Vx132",
       "Vx133",
-      "Vx144",
       "Vx150",
       "Vx155"
     ],
+    "boundaries": [
+      "Vx102",
+      "Vx103",
+      "Vx112",
+      "Vx131",
+      "Vx132",
+      "Vx144",
+      "Vx154",
+      "Vx164"
+    ],
     "segments": [
       "T110",
-      "T117",
       "T121",
       "T123",
       "T124",
-      "T127",
-      "T128",
-      "T129",
       "T13",
-      "T130",
-      "T132",
-      "T133",
-      "T134",
-      "T135",
-      "T136",
       "T14",
       "T144",
       "T145",
       "T148",
       "T15",
       "T150",
+      "T161",
       "T185",
       "T188",
       "T191",
       "T195",
-      "T201",
-      "T203",
-      "T204",
-      "T206",
       "T216",
       "T219",
       "T220",
@@ -534825,25 +535130,13 @@
       "T226",
       "T227",
       "T256",
-      "T262",
-      "T263",
-      "T264",
-      "T265",
-      "T266",
+      "T26",
       "T41",
       "T42",
       "T43",
-      "T44",
-      "T45",
-      "T46",
       "T47",
       "T48",
-      "T49",
-      "T50",
-      "T51",
-      "T52",
       "T53",
-      "T54",
       "T56",
       "T57",
       "T58",
@@ -534871,36 +535164,19 @@
       "T93"
     ],
     "blocks": [
-      "S103",
-      "S103a",
       "S103b",
       "S103c",
       "S111",
-      "S112b",
-      "S113",
-      "S113a",
-      "S113b",
-      "S113c",
       "S114",
       "S114a",
       "S114b",
       "S115",
       "S115a",
       "S115b",
-      "S116",
-      "S116a",
-      "S116c",
       "S118",
       "S119",
       "S119a",
       "S119b",
-      "S123",
-      "S123a",
-      "S123b",
-      "S123c",
-      "S126",
-      "S126a",
-      "S126c",
       "S127",
       "S127a",
       "S127b",
@@ -534910,36 +535186,29 @@
       "S128c",
       "S130",
       "S130a",
-      "S131a",
-      "S132",
       "S132a",
-      "S132b",
       "S133",
       "S133a",
       "S133c",
-      "S144",
       "S144a",
-      "S144b",
       "S150",
       "S150a",
       "S150b",
       "S150c",
-      "S154b",
       "S155",
       "S155b",
       "S155c",
+      "S164",
       "S164b",
       "SG51",
       "SG52",
       "SG53",
       "SG54",
-      "SIIIA",
+      "SIIID",
       "SIIIE",
-      "SIVA",
       "SLI",
       "SLII",
       "SLIII",
-      "SVA",
       "SVI",
       "Slokstall1",
       "Slokstall2",
@@ -534971,8 +535240,12 @@
       "3/3",
       "3/5",
       "3/6",
+      "3/8",
+      "3/9",
       "4/10",
       "4/5",
+      "4/8",
+      "4/9",
       "5/10",
       "5/5",
       "5/8",
@@ -534999,50 +535272,149 @@
       "U2",
       "U4"
     ],
-    "accessRoutes": [
-      "htvAu--htvSpIIIA",
-      "htvAu--htvSpIVA",
-      "htvAu--htvSpVA",
-      "htvAn--htvSpIIIA",
-      "htvAn--htvSpIVA",
-      "htvAn--htvSpVA",
-      "htvCu--htvSpIIIA",
-      "htvCu--htvSpIVA",
-      "htvCu--htvSpVA",
-      "htvCn--htvSpIIIA",
-      "htvCn--htvSpIVA",
-      "htvCn--htvSpVA",
-      "htvBu--htvSpIIIA",
-      "htvBu--htvSpIVA",
-      "htvBu--htvSpVA",
-      "htvBn--htvSpIIIA",
-      "htvBn--htvSpIVA",
-      "htvBn--htvSpVA",
-      "htvSpIIIA--htvSpVB",
-      "htvSpIIIA--htvAn",
-      "htvSpIIIA--htvAu",
-      "htvSpIIIA--htvBn",
-      "htvSpIIIA--htvBu",
-      "htvSpIIIA--htvCn",
-      "htvSpIIIA--htvCu",
-      "htvSpIVA--htvSpVB",
-      "htvSpIVA--htvAn",
-      "htvSpIVA--htvAu",
-      "htvSpIVA--htvBn",
-      "htvSpIVA--htvBu",
-      "htvSpIVA--htvCn",
-      "htvSpIVA--htvCu",
-      "htvSpVA--htvSpVB",
-      "htvSpVA--htvAn",
-      "htvSpVA--htvAu",
-      "htvSpVA--htvBn",
-      "htvSpVA--htvBu",
-      "htvSpVA--htvCn",
-      "htvSpVA--htvCu",
-      "htvSpVB--htvSpIIIA",
-      "htvSpVB--htvSpIVA",
-      "htvSpVB--htvSpVA"
-    ],
-    "provenance": "Egen central manöverrätt. Topologiskt avgränsad vid övriga växlar; TKL behåller 112, 131 och 154."
-  }
+    "provenance": "Rangerarens eget område enligt docs/rangerlage.md. Topologiskt avgränsat vid gränsväxlarnas TKL-ben; spår 11–13 är TKL:s."
+  },
+  "rangerRequests": [
+    {
+      "id": "left-11",
+      "label": "Vänster 11",
+      "side": "left",
+      "track": "11",
+      "route": "tvv3/1--tvv3/5",
+      "out": {
+        "Vx103": "C",
+        "Vx112": "T",
+        "Vx113": "T",
+        "Vx102": "C"
+      },
+      "back": {
+        "Vx103": "T",
+        "Vx112": "C"
+      },
+      "provenance": "Anläggningsägarens beslut 2026-10-06; lägen ur profilens växeltågväg 3/1 → 3/5."
+    },
+    {
+      "id": "left-12",
+      "label": "Vänster 12",
+      "side": "left",
+      "track": "12",
+      "route": "tvv3/1--tvv4/5",
+      "out": {
+        "Vx103": "C",
+        "Vx112": "T",
+        "Vx113": "C",
+        "Vx116": "T",
+        "Vx102": "C"
+      },
+      "back": {
+        "Vx103": "T",
+        "Vx112": "C"
+      },
+      "provenance": "Anläggningsägarens beslut 2026-10-06; lägen ur profilens växeltågväg 3/1 → 4/5."
+    },
+    {
+      "id": "left-13",
+      "label": "Vänster 13",
+      "side": "left",
+      "track": "13",
+      "route": "tvv3/1--tvv5/5",
+      "out": {
+        "Vx103": "C",
+        "Vx112": "T",
+        "Vx113": "C",
+        "Vx116": "C",
+        "Vx102": "C"
+      },
+      "back": {
+        "Vx103": "T",
+        "Vx112": "C"
+      },
+      "provenance": "Anläggningsägarens beslut 2026-10-06; lägen ur profilens växeltågväg 3/1 → 5/5."
+    },
+    {
+      "id": "right-11",
+      "label": "Höger 11",
+      "side": "right",
+      "track": "11",
+      "route": "tvv6/6--tvv3/10",
+      "out": {
+        "Vx132": "T",
+        "Vx131": "T",
+        "Vx126": "C",
+        "Vx123": "C"
+      },
+      "back": {
+        "Vx132": "C",
+        "Vx131": "C"
+      },
+      "provenance": "Anläggningsägarens beslut 2026-10-06; lägen ur profilens växeltågväg 6/6 → 3/10."
+    },
+    {
+      "id": "right-12",
+      "label": "Höger 12",
+      "side": "right",
+      "track": "12",
+      "route": "tvv6/6--tvv4/10",
+      "out": {
+        "Vx132": "T",
+        "Vx131": "T",
+        "Vx126": "C",
+        "Vx123": "T"
+      },
+      "back": {
+        "Vx132": "C",
+        "Vx131": "C"
+      },
+      "provenance": "Anläggningsägarens beslut 2026-10-06; lägen ur profilens växeltågväg 6/6 → 4/10."
+    },
+    {
+      "id": "right-13",
+      "label": "Höger 13",
+      "side": "right",
+      "track": "13",
+      "route": "tvv6/6--tvv5/10",
+      "out": {
+        "Vx132": "T",
+        "Vx131": "T",
+        "Vx126": "T"
+      },
+      "back": {
+        "Vx132": "C",
+        "Vx131": "C"
+      },
+      "provenance": "Anläggningsägarens beslut 2026-10-06; lägen ur profilens växeltågväg 6/6 → 5/10."
+    },
+    {
+      "id": "six-154",
+      "label": "Spår 6 ut via 154",
+      "side": "six",
+      "route": "tvv6/7--tvv6/9",
+      "out": {
+        "Vx133": "C",
+        "Vx144": "T",
+        "Vx154": "T"
+      },
+      "back": {
+        "Vx144": "C",
+        "Vx154": "C"
+      },
+      "provenance": "Anläggningsägarens beslut 2026-10-06; lägen ur profilens växeltågväg 6/7 → 6/9."
+    },
+    {
+      "id": "3d-left",
+      "label": "3d ut åt vänster",
+      "side": "3d",
+      "route": "tvv3/2--tvv3/6",
+      "out": {
+        "Vx164": "C",
+        "Vx153": "C",
+        "Vx161": "C"
+      },
+      "back": {
+        "Vx164": "T",
+        "Vx153": "T"
+      },
+      "provenance": "Anläggningsägarens beslut 2026-10-06; lägen ur profilens växeltågväg 3/2 → 3/6."
+    }
+  ]
 }

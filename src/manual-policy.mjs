@@ -37,9 +37,12 @@ export function compileManualPolicies(source, {turnouts,blocks,coupled,protectio
   const boundaryOverrides={};
   for(const [name,boundary] of Object.entries(yardBoundaries)) {
     const original=byTurnout[name];
+    if(original?.button!==boundary.sourceButton||coupled[name]?.length!==1)throw Error('Rangergränsens manuella källvillkor har ändrats: '+name);
+    // A boundary with its own ready single-turnout button (103, 164) keeps that rule.
+    if(original.status==='ready'&&original.names.length===1)continue;
     // Replace only the unresolved grouped button, retaining ALL its detector,
     // signal, NX and peer-turnout guards. Do not guess a mechanical coupling.
-    if(original?.button!==boundary.sourceButton||original.reason!=='Knappgruppens fullständiga växelkoppling är inte verifierad i XML-layouten.'||coupled[name]?.length!==1)throw Error('Rangergränsens manuella källvillkor har ändrats: '+name);
+    if(original.reason!=='Knappgruppens fullständiga växelkoppling är inte verifierad i XML-layouten.')throw Error('Rangergränsens manuella källvillkor har ändrats: '+name);
     const replacement={...original,names:[name],guardTurnouts:original.names,status:'ready',reason:'',reviewedBoundary:true};
     byTurnout[name]=replacement;boundaryOverrides[name]=replacement;
   }

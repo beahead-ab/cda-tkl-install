@@ -145,7 +145,7 @@ export function createStreamDeck({pluppar,choose,clearChoice,api,message,state,o
   // Everything a key's look depends on, for the deck and for the editor's copy of it.
   function environment({page=0,pages=1}={}){
     const s=state(),nodes=new Map(pluppar().map(p=>[p.id,p.node]));
-    const yard=s?.yard?{delegated:s.yard.owner==='ranger',allowed:!!s.yard.change?.allowed}:null;
+    const yard=s?.yard?{open:s.yard.requests.find(r=>r.state==='open')?.label||'',laid:s.yard.requests.filter(r=>r.state==='laid').map(r=>r.label).join(', ')}:null;
     return {plupp:k=>pluppSpec(k,new Set(nodes.get(k.id)?.classList||[]),nodes.get(k.id)?.dataset.routePhase||''),train:trainSpec,turn:k=>turnSpec(k,context()),
       system:{stopAll:!!s?.controls?.stopAll,chosen:!!chosen(),page,pages,remote:s?.controls?.mode==='remote',yard},online:online()};
   }
@@ -183,11 +183,11 @@ export function createStreamDeck({pluppar,choose,clearChoice,api,message,state,o
       case 'reset-ais':if(s?.controls?.stopAll)return api('all-stop',{enabled:false});return message('Alla signaler i stopp är inte aktiv.');
       case 'cancel':return clearChoice();
       case 'panel-reset':return $('panel-reset')?.click();
+      // Rangerbegäran: a short press approves the request waiting for TKL, a long press denies it.
       case 'yard-authority':{
-        const button=$('yard-authority');
-        if(!button||button.hidden)return message('Rangerbangården kan inte lämnas över här.');
-        if(button.disabled)return message(s?.yard?.change?.reason||'Manöverrätten kan inte ändras just nu.');
-        return button.click();
+        const open=s?.yard?.requests.find(r=>r.state==='open');
+        if(!open)return message(s?.yard?.requests.length?'Rangeraren har '+s.yard.requests.map(r=>r.label).join(', ')+' ute.':'Ingen begäran från rangeraren.',{error:false});
+        return api('ranger/answer',{id:open.id,approved:held<LONG_PRESS});
       }
     }
   }

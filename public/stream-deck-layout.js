@@ -8,8 +8,8 @@ export const SYSTEM_KEYS=[
   {id:'reset-ais',title:'Återställ stopp'},
   {id:'panel-reset',title:'Återställ panel',caption:'håll 1 s'},
   {id:'cancel',title:'Avbryt val'},
-  // Not on the automatic layout: placed by hand where the rangerbangård is run from.
-  {id:'yard-authority',title:'Styra RBG',optional:true}
+  // Not on the automatic layout: placed by hand where the ranger's requests are answered.
+  {id:'yard-authority',title:'Rangerbegäran',optional:true}
 ];
 export const COLORS={background:'#141413',free:'#d8d6cc',route:'#67df8d',held:'#ecc074',occupied:'#ff6067',choice:'#fff5bd',destination:'#9ad0ff',preparing:'#cbb876',text:'#efefed',muted:'#7d8791'};
 const collator=new Intl.Collator('sv',{numeric:true});
@@ -42,8 +42,8 @@ export function systemSpec(key,{stopAll=false,chosen=false,page=0,pages=1,remote
   if(key.id==='reset-ais')return {...base,dim:!stopAll};
   if(key.id==='cancel')return {...base,dim:!chosen};
   if(key.id==='panel-reset')return {...base,dim:remote};
-  // Styra RBG: plain while TKL controls the yard, struck through while the ranger does.
-  if(key.id==='yard-authority')return {...base,lines:['Styra','RBG'],strike:!!yard?.delegated,caption:yard?.delegated?'RBG styr':'',dim:!yard||!yard.allowed};
+  // Rangerbegäran: blinks with the request waiting for TKL, shows the group lying out, dim when idle.
+  if(key.id==='yard-authority')return {...base,lines:['Ranger-','begäran'],caption:yard?.open||yard?.laid||'',blink:!!yard?.open,fill:yard?.open?COLORS.held:'',dim:!yard||(!yard.open&&!yard.laid)};
   return base;
 }
 export function splitLabel(text){

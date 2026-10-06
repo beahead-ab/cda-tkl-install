@@ -71,7 +71,10 @@ export function compileRules(rules, { turnoutNames }) {
   const yardBoundaries = {}, boundaryOverrides = {};
   for (const r of rules.filter(r => r.type === 'authority' && isLive(r))) {
     yardBoundaries[r.object] = { tklPositions: r.tkl, rangerPositions: r.ranger, ports: r.detail.ports, tklLegs: r.detail.tklLegs, yardLegs: r.detail.yardLegs, sourceButton: r.source.button, provenance: r.source.provenance };
-    const original = byTurnout[r.object], replacement = { ...original, names: [r.object], guardTurnouts: original.names, status: 'ready', reason: '', reviewedBoundary: true };
+    const original = byTurnout[r.object];
+    // Same as compileManualPolicies: a boundary with its own ready single-turnout button keeps that rule.
+    if (original.status === 'ready' && original.names.length === 1) continue;
+    const replacement = { ...original, names: [r.object], guardTurnouts: original.names, status: 'ready', reason: '', reviewedBoundary: true };
     byTurnout[r.object] = replacement; boundaryOverrides[r.object] = replacement;
   }
   const lines = {};

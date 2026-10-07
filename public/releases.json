@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.70.0",
+    "date": "2026-10-07",
+    "notes": [
+      "Hjälp i Studio: ?-knappen i sidhuvudet (eller tangenten ?) öppnar en panel med en text per flik i arbetsordningen – vad man gör där, vilka knappar som finns och vad de leder till; den aktiva fliken är utfälld",
+      "Escape stänger, / går till sök"
+    ]
+  },
+  {
     "version": "0.69.0",
     "date": "2026-10-07",
     "notes": [

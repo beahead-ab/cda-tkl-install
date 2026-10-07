@@ -4,6 +4,7 @@ import {buildStudioModel,SETS,TABS,relationsFor,rowsFor,columnsFor,cellsFor,walk
 import {createPlan} from './studio-plan.js';
 import {esc,$,mono,pill,kv,card,measuredPill} from './studio-ui.js';
 import * as drift from './studio-drift.js';
+import {createHelp} from './studio-help.js';
 const NAV=()=>({
   konfigurera:[['Stationsplan','#konfigurera'],['Signaler','#data?set=signaler','66'],['Växlar','#data?set=vaxlar','49'],['Spårledningar','#data?set=sparledningar','197'],['Regler och chatten','#konfigurera/regler',String(model.rules.filter(r=>r.status!=='proposal').length)],['Övriga delar','#konfigurera/ovriga'],['Prova i simulatorn','#driftsattning/andringar']],
   data:[['Alla mängder','#data'],['Tågvägar','#data?set=tagvagar','340']],
@@ -348,6 +349,7 @@ function renderLater(main){
 // ---------- händelser ----------
 window.addEventListener('hashchange',()=>{const link=parseHash(location.hash);if(link.object&&model?.objects.has(link.object)){state.object=link.object;if(link.tab==='driftsattning'&&link.view==='mat')state.measureObject=link.object;}if(link.sets.length)state.sets=new Set(link.sets);state.tab=link.tab;state.view=link.view;session.save();render();});
 $('#st-search').addEventListener('keydown',e=>{if(e.key!=='Enter'||!model)return;const q=e.target.value.trim().toLocaleLowerCase('sv');const hit=[...model.objects.keys()].find(id=>id.toLocaleLowerCase('sv')===q)||[...model.objects.values()].find(o=>(o.label||'').toLocaleLowerCase('sv')===q)?.id;if(hit){select(hit);if(state.tab!=='konfigurera'&&state.tab!=='data')go('konfigurera');}});
+createHelp({button:$('#st-help-btn'),getState:()=>({tab:state.tab,view:state.view})});
 $('#st-theme').addEventListener('click',e=>{const light=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=light?'light':'';e.currentTarget.textContent=light?'Mörkt':'Ljust';e.currentTarget.setAttribute('aria-pressed',light);try{localStorage.setItem('studio-theme',light?'light':'dark');}catch{}});
 try{if(localStorage.getItem('studio-theme')==='light'){document.documentElement.dataset.theme='light';$('#st-theme').textContent='Mörkt';}}catch{}
 load().catch(e=>{$('#st-main').innerHTML=`<p class="st-error">Studio kunde inte läsa stationen: ${esc(e.message)}</p>`;});

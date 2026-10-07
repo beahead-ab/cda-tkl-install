@@ -27,6 +27,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,[tabindex]:focus-visibl
 .st-btn:hover{background:var(--kr-panel-3);text-decoration:none}.st-btn-primary{background:var(--kr-blue);border-color:var(--kr-blue);color:var(--kr-blue-ink)}.st-btn-primary:hover{filter:brightness(1.08);background:var(--kr-blue)}
 .st-btn[aria-pressed=true]{background:var(--kr-blue-soft);border-color:var(--kr-blue);color:var(--kr-blue)}.st-btn[disabled]{opacity:.5;cursor:default}
 .st-toggle{min-height:28px;padding:0 9px;border-radius:999px;font-size:12px}
+/* hjälpen */
+.st-help-btn{width:30px;padding:0;justify-content:center;font:700 14px var(--mono)}.st-help-btn[aria-pressed=true]{background:var(--kr-blue-soft);border-color:var(--kr-blue);color:var(--kr-blue)}
+.st-help{position:fixed;top:44px;right:0;bottom:0;width:460px;max-width:100%;z-index:20;background:var(--kr-panel);border-left:1px solid var(--kr-line-2);box-shadow:-20px 0 40px rgba(0,0,0,.45);display:flex;flex-direction:column}
+.st-help-head{display:flex;align-items:center;gap:10px;padding:14px 18px 10px;border-bottom:1px solid var(--kr-line)}.st-help-head b{font-size:15px}.st-help-sub{font-size:11.5px;color:var(--kr-mute)}.st-help-head .st-btn{margin-left:auto;width:28px;height:28px;padding:0;justify-content:center;font:600 14px var(--mono)}
+.st-help-body{padding:6px 18px 18px;overflow:auto;display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--kr-ink-2);line-height:1.5}.st-help-body p{margin:0}.st-help-body b{color:var(--kr-ink)}.st-help-intro{margin:8px 0 10px!important;color:var(--kr-ink)!important}
+.st-help-section{border:1px solid var(--kr-line);border-radius:8px}.st-help-section[open]{border-color:var(--kr-line-2);background:var(--kr-panel-2)}.st-help-section summary{padding:9px 12px;cursor:pointer;font-weight:600;color:var(--kr-ink);display:flex;align-items:center;gap:8px;list-style:none}.st-help-section summary::-webkit-details-marker{display:none}
+.st-help-n{font:700 11px var(--mono);color:var(--kr-blue)}.st-help-here{margin-left:auto;font-size:11px;color:var(--kr-mute);font-weight:500}.st-help-section>div{padding:0 12px 10px;display:flex;flex-direction:column;gap:6px}
+.st-help-tips{margin-top:10px!important;padding:10px 12px;border-radius:8px;background:var(--kr-blue-soft);font-size:12px}.st-help-tips kbd{font:600 11px var(--mono);padding:1px 5px;border:1px solid var(--kr-line-2);border-radius:4px;background:var(--kr-panel-2);color:var(--kr-ink)}
+@media(max-width:700px){.st-help{width:100%}}
 /* kropp */
 .st-body{display:flex;flex-grow:1;align-items:stretch}
 .st-nav{flex:0 0 176px;display:flex;flex-direction:column;gap:2px;padding:10px 8px;background:var(--kr-panel);border-right:1px solid var(--kr-line)}

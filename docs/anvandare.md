@@ -1,18 +1,24 @@
 # Användare och inloggning
 
 Charlottendal TKL har samma användarhantering som TrainMeet Server, funktionellt självständig: ägare och
-administratörer med användarnamn och lösenord, inbjudan med engångskod, sessioner i en cookie.
+administratörer med e-postadress och lösenord, inbjudan med engångskod, sessioner i en cookie.
 Ägaren lägger till och tar bort användare; en administratör sköter hela TKL men inte vilka som har tillgång.
+
+**Publicerad: 0.71.1** (cda-tkl main `96461c9`, `beahead-ab/cda-tkl-install` main `018de42`, 7 oktober). Sedan
+0.71.1 är användarnamnet e-postadressen när ett konto skapas (Skapa ägaren, inbjudan, `create-owner.mjs`);
+äldre konton med vanligt namn loggar in som förut, och lösenordet är 6–128 tecken. Webbdriften tar versionen med
+Uppdatera nu under Inställningar → Uppdatering; en Pi, Mac eller PC kör installationsraden igen eller väljer
+Uppdatering.
 
 ## Vad som kräver inloggning
 
-| Läge | Operatören (panelen, tågvägar, AIS, klockan, TrainMeet-rörelser) | Inställningar, Objekt och regler, deras API |
+| Läge | Operatören (panelen, tågvägar, AIS, klockan, TrainMeet-rörelser) | Inställningar, Studio, deras API |
 |---|---|---|
 | Lokalt (ingen `CHARLOTTENDAL_AUTH_MODE`; Pi, Mac, PC) | ingen inloggning | ägare eller administratör, så snart en ägare finns |
 | Webbdriften (`CHARLOTTENDAL_AUTH_MODE=password`) | inloggning krävs överallt | inloggning krävs överallt |
 | `cloudflare` | JWT-vakten som förut | JWT-vakten som förut |
 
-Vilka vägar som räknas som administration står i `src/auth.mjs` (`isAdminRoute`): Objekt och regler, AI-tjänsten,
+Vilka vägar som räknas som administration står i `src/auth.mjs` (`isAdminRoute`): Studio, AI-tjänsten,
 Användare, driftbindningar, inspelningar, uppdatering, visningsinställningar, orter, anteckningar och TrainMeets
 anslutning. Allt annat är operatörens. Innan den första ägaren finns är allt öppet lokalt, så att Kom igång kan
 skapa ägaren; i webbdriften skapas ägaren på servern.

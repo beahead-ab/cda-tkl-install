@@ -11,9 +11,9 @@ const NAV=()=>({
   driftsattning:[['Ändringar och aktivering','#driftsattning/andringar'],['Mät objekt','#driftsattning/mat',measuredLabel()],['Lyssna','#driftsattning/lyssna'],['Kort och MGP','#driftsattning/kort',model.cards?.cards.length?String(model.cards.cards.length)+' kort':''],['Driftbindningar','/#register/bindings','i dag']],
   anslutning:[['TrainMeet','/#trainmeet','i dag'],['Stream Deck','/#tools/streamdeck','i dag']]});
 const measuredLabel=()=>{const c=model.counts.measured,t=model.counts.turnouts+model.counts.signals+model.counts.blocks;return c.field?`${c.field}/${t}`:c.bench?`${c.bench} bänk`:'0/'+t;};
-const state={tab:'konfigurera',view:'',sets:new Set(['vaxlar','signaler','sparledningar','tagvagar']),object:null,layers:new Set(['numbers','signalNames','labels','dev']),width:2600,search:{}};
+const state={tab:'konfigurera',view:'',sets:new Set(['vaxlar','signaler','sparledningar','tagvagar']),object:null,layers:new Set(['numbers','signalNames','labels','dev']),width:null,panel:true,search:{}};
 let model,geo,plan,order;
-const session={load(){try{return JSON.parse(sessionStorage.getItem('studio-state')||'{}');}catch{return {};}},save(){try{sessionStorage.setItem('studio-state',JSON.stringify({sets:[...state.sets],object:state.object,layers:[...state.layers],width:state.width}));}catch{}}};
+const session={load(){try{return JSON.parse(sessionStorage.getItem('studio-state')||'{}');}catch{return {};}},save(){try{sessionStorage.setItem('studio-state',JSON.stringify({sets:[...state.sets],object:state.object,layers:[...state.layers],width:state.width,panel:state.panel}));}catch{}}};
 
 async function load(){
   const get=u=>fetch(u).then(r=>{if(!r.ok)throw Error(`${u}: ${r.status}`);return r.json();});
@@ -27,7 +27,7 @@ async function load(){
   state.object=link.object&&model.objects.has(link.object)?link.object:(saved.object&&model.objects.has(saved.object)?saved.object:null);
   if(link.view==='mat'&&state.object)state.measureObject=state.object;
   drift.init({model:()=>model,state,session,notice:()=>notice,setNotice:v=>{notice=v;},reloadStudio,render});
-  if(saved.layers)state.layers=new Set(saved.layers);if(saved.width)state.width=saved.width;
+  if(saved.layers)state.layers=new Set(saved.layers);if(saved.width)state.width=saved.width;if(saved.panel===false)state.panel=false;
   render();
 }
 function go(tab,view=''){state.tab=tab;state.view=view;history.replaceState(null,'',`#${tab}${view?'/'+view:''}`);render();}
@@ -53,6 +53,7 @@ function render(){
     return `<a href="${href}"${current?' aria-current="page"':''}>${esc(label)}${count?`<span class="st-count">${esc(count)}</span>`:''}</a>`;}).join('')
     +`<div class="st-nav-foot"><strong>Ett utkast för hela stationen</strong><br>Allt här är läst ur källorna. Ingenting är uppmätt och ingenting ändras härifrån.<br><span class="mono">profil ${esc(model.sourceHash.slice(0,12))}</span></div>`;
   const main=$('#st-main');
+  document.body.classList.toggle('st-fill',state.tab==='konfigurera'&&!state.view);
   drift.stopPoll();
   if(state.tab==='konfigurera'&&state.view==='regler')renderRegler(main);else if(state.tab==='konfigurera'&&state.view==='ovriga')drift.renderOvriga(main);else if(state.tab==='driftsattning'&&state.view==='andringar')renderAndringar(main);
   else if(state.tab==='driftsattning'&&state.view==='mat')drift.renderMat(main);else if(state.tab==='driftsattning'&&state.view==='lyssna')drift.renderLyssna(main);else if(state.tab==='driftsattning'&&state.view==='kort')drift.renderKort(main);
@@ -65,27 +66,30 @@ function stats(){const c=model.counts,d=model.detection;return `<div class="st-s
 // ---------- Konfigurera ----------
 function renderKonfigurera(main){
   const layers=[['numbers','Växelnummer'],['signalNames','Signalnamn'],['blockLabels','Spårledningar'],['addresses','Adresser'],['modules','MGP-modul'],['dev','Avvikelser']];
-  main.innerHTML=`<div class="st-title"><div><div class="st-eyebrow">KONFIGURERA · STATIONSPLAN</div><h1>Charlottendal</h1><p>Hela stationen i hög upplösning. Rulla i sidled och gå igenom objekten från vänster till höger.</p></div><span class="st-grow"></span>
+  // En verktygsrad: gå igenom, lager, zoom och panelen. Planen tar höjden som blir över (body.st-fill), objektet och avvikelserna ligger till höger.
+  main.innerHTML=`<div class="st-title"><div><div class="st-eyebrow">KONFIGURERA · STATIONSPLAN</div><h1>Charlottendal</h1></div><p>Hela stationen. Klicka på ett objekt, eller gå igenom från vänster till höger.</p><span class="st-grow"></span>
     <a class="st-btn" href="#genomgang">Avvikelser</a><a class="st-btn st-btn-primary" href="#data">Visa i data</a></div>${stats()}
-    ${card('Stationsplan',`<div class="st-toolbar" id="st-walk"></div><div class="st-toolbar"><span class="st-eyebrow">LAGER</span>${layers.map(([k,l])=>`<button type="button" class="st-btn st-toggle" data-layer="${k}" aria-pressed="${state.layers.has(k)}">${l}</button>`).join('')}
-      <span class="st-grow"></span><span class="st-eyebrow">ZOOM</span><button type="button" class="st-btn" data-zoom="-">−</button><span class="mono" id="st-zoom"></span><button type="button" class="st-btn" data-zoom="+">+</button><button type="button" class="st-btn" data-zoom="fit">Fyll bredden</button></div>
-      <div id="st-plan-host"></div>`,{right:pill('Ingen rapport · ingen hårdvara','',false),foot:`<span class="st-legend"><span><i></i>Spår</span><span><i class="dash"></i>Ingen detektering i källan</span><span>Röd punkt: avvikelse</span><span class="st-grow"></span>Ritad ur panel.json av Studios egen kod.</span>`})}
-    <div class="st-two"><div id="st-object"></div>${deviationCard()}</div>`;
+    <section class="st-card st-card-plan"><div class="st-toolbar"><span id="st-walk" style="display:contents"></span><span class="st-sep"></span><span class="st-eyebrow">LAGER</span>${layers.map(([k,l])=>`<button type="button" class="st-btn st-toggle" data-layer="${k}" aria-pressed="${state.layers.has(k)}">${l}</button>`).join('')}
+      <span class="st-grow"></span><button type="button" class="st-btn st-toggle" data-zoom="-" aria-label="Zooma ut">−</button><span class="mono" id="st-zoom"></span><button type="button" class="st-btn st-toggle" data-zoom="+" aria-label="Zooma in">+</button><button type="button" class="st-btn st-toggle" data-zoom="fit" aria-label="Fyll bredden">Bredd</button><button type="button" class="st-btn st-toggle" data-zoom="height" aria-label="Fyll höjden">Höjd</button><button type="button" class="st-btn st-toggle" data-panel aria-pressed="${state.panel}">Panel</button></div>
+      <div class="st-plan-wrap"><div id="st-plan-host"></div><aside class="st-side" id="st-side" aria-label="Valt objekt och avvikelser"${state.panel?'':' hidden'}><div id="st-object"></div>${deviationCard()}</aside></div>
+      <div class="st-card-foot"><span class="st-legend"><span><i></i>Spår</span><span><i class="dash"></i>Ingen detektering i källan</span><span>Röd punkt: avvikelse</span><span class="st-grow"></span>${pill('Ingen rapport · ingen hårdvara','',false)}</span></div></section>`;
   const info=id=>{const o=model.objects.get(id);if(!o)return {};return {address:o.loconet?.order??o.loconet?.report,module:o.kind==='turnout'?o.source?.module?.name:o.kind==='signal'?o.source[0]?.module?.name:null};};
   plan=createPlan($('#st-plan-host'),geo,{onSelect:id=>select(id,{center:false}),info});
-  plan.setWidth(state.width);plan.setLayers(state.layers);$('#st-zoom').textContent=Math.round(state.width/ (geo.viewBox[2]) * 100)+' %';
+  // Utan sparad zoom visas hela stationen i den höjd fönstret ger.
+  if(state.width)plan.setWidth(state.width);else{plan.fitHeight();state.width=plan.width();}plan.setLayers(state.layers);$('#st-zoom').textContent=Math.round(state.width/ (geo.viewBox[2]) * 100)+' %';
   const badTurnouts=model.companions.filter(c=>!c.ok).flatMap(c=>c.pair),undetected=[...model.detection.undetected.noSensor,...model.detection.undetected.noRule];
   plan.markDeviations({blocks:undetected,turnouts:[...badTurnouts,...model.turnouts.filter(t=>!t.inPlan).map(t=>t.id)]});
   main.onclick=e=>{const b=e.target.closest('[data-layer],[data-zoom],[data-walk],[data-select]');if(!b)return;
     if(b.dataset.layer){const k=b.dataset.layer;state.layers.has(k)?state.layers.delete(k):state.layers.add(k);b.setAttribute('aria-pressed',state.layers.has(k));plan.setLayers(state.layers);session.save();}
-    if(b.dataset.zoom){state.width=b.dataset.zoom==='fit'?$('#st-plan-host .st-plan-scroll').clientWidth-2:state.width*(b.dataset.zoom==='+'?1.25:0.8);plan.setWidth(state.width);state.width=plan.width();$('#st-zoom').textContent=Math.round(state.width/geo.viewBox[2]*100)+' %';session.save();}
+    if(b.dataset.zoom){if(b.dataset.zoom==='fit')plan.fit();else if(b.dataset.zoom==='height')plan.fitHeight();else plan.setWidth(state.width*(b.dataset.zoom==='+'?1.25:0.8));state.width=plan.width();$('#st-zoom').textContent=Math.round(state.width/geo.viewBox[2]*100)+' %';session.save();}
+    if('panel' in b.dataset){state.panel=!state.panel;b.setAttribute('aria-pressed',state.panel);$('#st-side').hidden=!state.panel;session.save();}
     if(b.dataset.walk){const i=order.indexOf(state.object),next=i<0?order[0]:order[i+Number(b.dataset.walk)];if(next)select(next);}
     if(b.dataset.select)select(b.dataset.select);};
   if(state.object&&order.includes(state.object))plan.select(state.object,{center:true});else if(state.object)plan.select(state.object);
   renderObjectCard();
 }
 function renderWalk(){const i=order.indexOf(state.object);const host=$('#st-walk');if(!host)return;
-  host.innerHTML=`<span class="st-eyebrow">GÅ IGENOM FRÅN VÄNSTER TILL HÖGER</span><button type="button" class="st-btn" data-walk="-1"${i<=0?' disabled':''}>‹ ${esc(order[i-1]||'')}</button><span class="st-walk">${esc(state.object||'–')}</span><button type="button" class="st-btn" data-walk="1"${i>=order.length-1?' disabled':''}>${esc(i<0?'Börja vid '+order[0]:order[i+1]+' ›')}</button><span class="st-eyebrow">${i>=0?`${i+1} AV ${order.length}`:state.object?'UTANFÖR GÅ IGENOM':`${order.length} VÄXLAR OCH SIGNALER`}</span>`;}
+  host.innerHTML=`<span class="st-eyebrow">GÅ IGENOM</span><button type="button" class="st-btn st-toggle" data-walk="-1"${i<=0?' disabled':''} aria-label="Föregående: ${esc(order[i-1]||'')}">‹ ${esc(order[i-1]||'')}</button><span class="st-walk">${esc(state.object||'–')}${i>=0?` <span style="color:var(--kr-mute);font-weight:600">${i+1}/${order.length}</span>`:''}</span><button type="button" class="st-btn st-toggle" data-walk="1"${i>=order.length-1?' disabled':''} aria-label="Nästa: ${esc(order[i+1]||'')}">${esc(i<0?'Börja vid '+order[0]:order[i+1]+' ›')}</button>`;}
 function renderObjectCard(){
   renderWalk();const host=$('#st-object');if(!host)return;const o=model.objects.get(state.object);
   if(!o){host.innerHTML=card('Inget objekt valt','<p class="st-empty">Klicka på en växel, signal eller spårledning i planen.</p>');return;}

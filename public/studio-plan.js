@@ -55,5 +55,5 @@ export function createPlan(host,geo,{onSelect,info=()=>({})}){
   let drag=null;scroll.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('[data-id]'))return;drag={x:e.clientX,left:scroll.scrollLeft};scroll.setPointerCapture(e.pointerId);});
   scroll.addEventListener('pointermove',e=>{if(drag)scroll.scrollLeft=drag.left-(e.clientX-drag.x);});scroll.addEventListener('pointerup',()=>{drag=null;});
   setWidth(width);
-  return {setWidth,width:()=>width,fit:()=>setWidth(scroll.clientWidth-2),select,setLayers,markDeviations,selected:()=>selected};
+  return {setWidth,width:()=>width,fit:()=>setWidth(scroll.clientWidth-2),fitHeight:()=>setWidth((scroll.clientHeight-2)*vw/vh),select,setLayers,markDeviations,selected:()=>selected};
 }

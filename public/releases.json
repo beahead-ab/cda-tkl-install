@@ -1,5 +1,14 @@
 [
   {
+    "version": "0.69.0",
+    "date": "2026-10-07",
+    "notes": [
+      "Studio på bärbar dator: sidhuvud på en rad, nyckeltalen som remsa, en verktygsrad, och stationsplanen fyller höjden som blir över i stället för 70 % av fönstret",
+      "Valt objekt och avvikelserna ligger i en panel till höger om planen som fälls in med Panel; Höjd visar hela stationen i fönstret och är startläget",
+      "På en stor skärm (från 1700×1000) blir nyckeltalen kort igen"
+    ]
+  },
+  {
     "version": "0.68.0",
     "date": "2026-10-06",
     "notes": [

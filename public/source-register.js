@@ -37,7 +37,7 @@ function sourceXML(node, depth=0) {
   if(!node.children.length && !node.text) return `${indent}<${node.tag}${attrs} />`;
   return `${indent}<${node.tag}${attrs}>${node.text?.trim()?esc(node.text.trim()):''}${node.children.length?'\n'+node.children.map(c=>sourceXML(c,depth+1)).join('\n')+'\n'+indent:''}</${node.tag}>`;
 }
-export function createSourceRegister({config, panel, saveNote, onActive}) {
+export function createSourceRegister({config, panel, saveNote, onActive, editors=true}) {
   let station, destinations, configuration, bindingConfiguration, signalCatalog, signalDetails, lastState, lastOnline=false;
   let index, migration, ready, treeReady, nodeMap, category='signals', page=0, selected, query='', status='all';
   const $=id=>document.getElementById(id), pageSize=50;
@@ -115,11 +115,13 @@ export function createSourceRegister({config, panel, saveNote, onActive}) {
     const note=$('source-note').closest('.source-note');note.insertAdjacentHTML('beforebegin','<h3>Egen anteckning</h3><p id="source-note-display"></p><button id="source-note-edit">Redigera anteckning</button>');
     noteModal=createAdminDialog({title:'Egen anteckning',body:note,saveButton:$('source-save'),dirty:()=>$('source-note').value!==noteBaseline,busy:()=>$('source-save').disabled});
     $('source-note-edit').onclick=()=>{if(!selected)return;$('source-note').value=config.notes[selected.noteKey||'xml:'+selected.key]||'';noteBaseline=$('source-note').value;noteModal.open();};
+    if(editors){
     station=createStationWorkspace({root:$('station-editor'),index,panel,config,openRecord:key=>{const r=recordByKey(key);if(r)showRecord(r);}});station.update(lastState,lastOnline);
     destinations=createDestinations($('destinations-editor'));destinations.update(lastState,lastOnline);
     configuration=createConfiguration({root:$('configuration-editor'),config,onActive});
     configuration.updateState(lastState,lastOnline);
     bindingConfiguration=createBindingConfiguration({root:$('binding-editor')});bindingConfiguration.updateState(lastState,lastOnline);
+    } else for(const id of ['station-editor','destinations-editor','configuration-editor','binding-editor'])$(id)?.remove();
     $('migration-groups').innerHTML=(migration?.groups||[]).map(g=>`<div class="migration-row"><button data-group="${esc(g.id)}">${esc(g.name)}</button><span>${esc(migrationLabels[g.status])} · ${g.rules.length} ${g.rules.length===1?'regel':'regler'}</span><p>${esc(g.behavior)}</p></div>`).join('');
     $('migration-limitations').textContent=migration?.limitations.join(' ')||'';
     $('migration-groups').onclick=e=>{const id=e.target.closest('button')?.dataset.group;if(id){const record=index.records.find(r=>r.system===id);if(record)showRecord(record);}};
@@ -150,5 +152,6 @@ export function createSourceRegister({config, panel, saveNote, onActive}) {
     if(!kind&&location.hash.startsWith('#register/object')){const key=new URLSearchParams(location.hash.split('?')[1]||'').get('record'),record=recordByKey(key);if(record&&selected!==record)await showRecord(record);else if(!record)detailPage.close();}
     if(kind){category=kind;query='';status='all';page=0;$('search').value='';$('registry-status').value='all';render();if(name){const record=index.records.find(r=>r.category===kind&&r.name===name);if(record)await showRecord(record);}}
   }
-  return {open,presentationChanged(){if(index){render();if(selected)$('source-detail-heading').textContent=presentation(selected).name||selected.name;}},updateState(state,online){lastState=state;lastOnline=online;station?.update(state,online);destinations?.update(state,online);configuration?.updateState(state,online);bindingConfiguration?.updateState(state,online);signalDetails?.update(state,online);}};
+  async function openKey(key){await open();const record=recordByKey(key);if(record)await showRecord(record);return !!record;}
+  return {open,openKey,presentationChanged(){if(index){render();if(selected)$('source-detail-heading').textContent=presentation(selected).name||selected.name;}},updateState(state,online){lastState=state;lastOnline=online;station?.update(state,online);destinations?.update(state,online);configuration?.updateState(state,online);bindingConfiguration?.updateState(state,online);signalDetails?.update(state,online);}};
 }

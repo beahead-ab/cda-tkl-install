@@ -5,11 +5,14 @@ import {createPlan} from './studio-plan.js';
 import {esc,$,mono,pill,kv,card,measuredPill} from './studio-ui.js';
 import * as drift from './studio-drift.js';
 import {createHelp} from './studio-help.js';
+import {createLegacyHost,isLegacyView} from './studio-legacy.js';
+import {studioTarget} from './admin-navigation-model.js';
+const legacy=createLegacyHost();
 const NAV=()=>({
-  konfigurera:[['Stationsplan','#konfigurera'],['Signaler','#data?set=signaler','66'],['Växlar','#data?set=vaxlar','49'],['Spårledningar','#data?set=sparledningar','197'],['Regler och chatten','#konfigurera/regler',String(model.rules.filter(r=>r.status!=='proposal').length)],['Övriga delar','#konfigurera/ovriga'],['Prova i simulatorn','#driftsattning/andringar']],
-  data:[['Alla mängder','#data'],['Tågvägar','#data?set=tagvagar','340']],
-  genomgang:[['Genomgång och avvikelser','#genomgang',model.review?.last?String(model.review.last.cards.length)+' kort':'']],
-  driftsattning:[['Ändringar och aktivering','#driftsattning/andringar'],['Mät objekt','#driftsattning/mat',measuredLabel()],['Lyssna','#driftsattning/lyssna'],['Kort och MGP','#driftsattning/kort',model.cards?.cards.length?String(model.cards.cards.length)+' kort':''],['Driftbindningar','/#register/bindings','i dag']],
+  konfigurera:[['Stationsplan','#konfigurera'],['Signaler','#data?set=signaler','66'],['Växlar','#data?set=vaxlar','49'],['Spårledningar','#data?set=sparledningar','197'],['Regler och chatten','#konfigurera/regler',String(model.rules.filter(r=>r.status!=='proposal').length)],['Visning','#konfigurera/visning'],['Orter och telefon','#konfigurera/orter'],['Övriga delar','#konfigurera/ovriga'],['Prova i simulatorn','#driftsattning/andringar']],
+  data:[['Alla mängder','#data'],['Tågvägar','#data?set=tagvagar','340'],['Källa (XML)','#data/kalla']],
+  genomgang:[['Genomgång och avvikelser','#genomgang',model.review?.last?String(model.review.last.cards.length)+' kort':''],['Införandestatus','#genomgang/inforande']],
+  driftsattning:[['Ändringar och aktivering','#driftsattning/andringar'],['Driftbindningar','#driftsattning/bindningar'],['Mät objekt','#driftsattning/mat',measuredLabel()],['Lyssna','#driftsattning/lyssna'],['Kort och MGP','#driftsattning/kort',model.cards?.cards.length?String(model.cards.cards.length)+' kort':'']],
   anslutning:[['TrainMeet','/#trainmeet','i dag'],['Stream Deck','/#tools/streamdeck','i dag']]});
 const measuredLabel=()=>{const c=model.counts.measured,t=model.counts.turnouts+model.counts.signals+model.counts.blocks;return c.field?`${c.field}/${t}`:c.bench?`${c.bench} bänk`:'0/'+t;};
 const state={tab:'konfigurera',view:'',sets:new Set(['vaxlar','signaler','sparledningar','tagvagar']),object:null,layers:new Set(['numbers','signalNames','labels','dev']),width:null,panel:true,search:{}};
@@ -23,6 +26,7 @@ async function load(){
   const undetected=new Set([...studio.detection.undetected.noSensor,...studio.detection.undetected.noRule]);
   geo=planGeometry(panel,undetected);
   $('#st-mode').textContent=profile.commissioned?'DRIFT':'SIMULERING · ingen hårdvara';
+  {const old=studioTarget(location.hash);if(old)history.replaceState(null,'',old.replace('/studio.html',''));}
   const saved=session.load(),link=parseHash(location.hash);
   state.tab=link.tab;state.view=link.view;if(link.sets.length)state.sets=new Set(link.sets);else if(saved.sets)state.sets=new Set(saved.sets);
   state.object=link.object&&model.objects.has(link.object)?link.object:(saved.object&&model.objects.has(saved.object)?saved.object:null);
@@ -55,7 +59,8 @@ function render(){
     +`<div class="st-nav-foot"><strong>Ett utkast för hela stationen</strong><br>Allt här är läst ur källorna. Ingenting är uppmätt och ingenting ändras härifrån.<br><span class="mono">profil ${esc(model.sourceHash.slice(0,12))}</span></div>`;
   const main=$('#st-main');
   document.body.classList.toggle('st-fill',state.tab==='konfigurera'&&!state.view);
-  drift.stopPoll();
+  drift.stopPoll();legacy.stop();
+  if(isLegacyView(state.tab,state.view))return void legacy.render(main,state.tab,state.view);
   if(state.tab==='konfigurera'&&state.view==='regler')renderRegler(main);else if(state.tab==='konfigurera'&&state.view==='ovriga')drift.renderOvriga(main);else if(state.tab==='driftsattning'&&state.view==='andringar')renderAndringar(main);
   else if(state.tab==='driftsattning'&&state.view==='mat')drift.renderMat(main);else if(state.tab==='driftsattning'&&state.view==='lyssna')drift.renderLyssna(main);else if(state.tab==='driftsattning'&&state.view==='kort')drift.renderKort(main);
   else if(state.tab==='konfigurera')renderKonfigurera(main);else if(state.tab==='data')renderData(main);else if(state.tab==='genomgang')renderGenomgang(main);else renderLater(main);
@@ -347,7 +352,10 @@ function renderLater(main){
   main.innerHTML=`<div class="st-title"><div><div class="st-eyebrow">${esc(state.tab.toUpperCase())}</div><h1>${esc(TABS.find(t=>t.id===state.tab).label)}</h1><p>${esc(text)}</p></div></div>`;
 }
 // ---------- händelser ----------
-window.addEventListener('hashchange',()=>{const link=parseHash(location.hash);if(link.object&&model?.objects.has(link.object)){state.object=link.object;if(link.tab==='driftsattning'&&link.view==='mat')state.measureObject=link.object;}if(link.sets.length)state.sets=new Set(link.sets);state.tab=link.tab;state.view=link.view;session.save();render();});
+window.addEventListener('hashchange',()=>{
+  // Adresser från Inställningar (#register…, #advanced/xml…) leder till samma sida i Studio.
+  const old=studioTarget(location.hash);if(old){history.replaceState(null,'',old.replace('/studio.html',''));}
+  const link=parseHash(location.hash);if(link.object&&model?.objects.has(link.object)){state.object=link.object;if(link.tab==='driftsattning'&&link.view==='mat')state.measureObject=link.object;}if(link.sets.length)state.sets=new Set(link.sets);state.tab=link.tab;state.view=link.view;session.save();render();});
 $('#st-search').addEventListener('keydown',e=>{if(e.key!=='Enter'||!model)return;const q=e.target.value.trim().toLocaleLowerCase('sv');const hit=[...model.objects.keys()].find(id=>id.toLocaleLowerCase('sv')===q)||[...model.objects.values()].find(o=>(o.label||'').toLocaleLowerCase('sv')===q)?.id;if(hit){select(hit);if(state.tab!=='konfigurera'&&state.tab!=='data')go('konfigurera');}});
 createHelp({button:$('#st-help-btn'),getState:()=>({tab:state.tab,view:state.view})});
 $('#st-theme').addEventListener('click',e=>{const light=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=light?'light':'';e.currentTarget.textContent=light?'Mörkt':'Ljust';e.currentTarget.setAttribute('aria-pressed',light);try{localStorage.setItem('studio-theme',light?'light':'dark');}catch{}});

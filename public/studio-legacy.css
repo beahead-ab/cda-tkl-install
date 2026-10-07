@@ -1,0 +1,40 @@
+/* Anläggningens sidor från Inställningar, inbäddade i Studio (studio-legacy.js): samma markup, Studios formspråk.
+   admin.css ger dialogernas form; här mappas dess variabler till Studios och de vanliga elementen stylas inom .st-legacy. */
+html{scrollbar-gutter:auto!important}
+.st-legacy,.admin-dialog{--text:var(--kr-ink);--muted:var(--kr-mute);--border:var(--kr-line-2);--card:var(--kr-panel);--surface:var(--kr-panel);--page:var(--kr-bg);--accent:var(--kr-blue)}
+.st-legacy{display:flex;flex-direction:column;gap:14px;color:var(--kr-ink);font-size:13px;line-height:1.5}
+.st-legacy .admin-workspace{display:flex;flex-direction:column;gap:14px}
+.st-legacy .card,.st-legacy .source-detail{background:var(--kr-panel);border:1px solid var(--kr-line);border-radius:14px;padding:14px 16px;margin:0;min-width:0}
+.st-legacy .card h2,.st-legacy .source-detail h2{margin:0 0 6px;font-size:14px;font-weight:700}.st-legacy h3{margin:12px 0 6px;font-size:13px;font-weight:700}
+.st-legacy .card>p,.st-legacy p{margin:0 0 8px}.st-legacy .muted,.st-legacy small{color:var(--kr-mute)}
+.st-legacy .card-heading,.st-legacy .toolbar,.st-legacy .configuration-toolbar,.st-legacy .actions,.st-legacy .admin-actions,.st-legacy .source-pagination,.st-legacy .source-filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.st-legacy .card-heading{justify-content:space-between;margin-bottom:8px}
+.st-legacy label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:600;color:var(--kr-ink-2)}
+.st-legacy :is(input,select,textarea),.admin-dialog :is(input,select,textarea){font:13px var(--font);color:var(--kr-ink);background:var(--kr-panel-2);border:1px solid var(--kr-line-2);border-radius:8px;padding:6px 10px;min-height:32px}
+.st-legacy select[size]{min-height:160px;padding:4px;width:100%}.st-legacy textarea{min-height:64px;resize:vertical}
+.st-legacy button,.admin-dialog button{font:600 12.5px var(--font);color:var(--kr-ink);background:var(--kr-panel-2);border:1px solid var(--kr-line-2);border-radius:8px;min-height:32px;padding:0 12px;cursor:pointer}
+.st-legacy button:hover:not(:disabled),.admin-dialog button:hover:not(:disabled){background:var(--kr-panel-3)}
+.st-legacy button:disabled,.admin-dialog button:disabled{opacity:.5;cursor:default}
+.st-legacy .primary,.admin-dialog .primary{background:var(--kr-blue);border-color:var(--kr-blue);color:var(--kr-blue-ink)}
+.st-legacy a{color:var(--kr-blue)}
+.st-legacy :is(button,a,input,select,textarea):focus-visible,.admin-dialog :is(button,a,input,select,textarea):focus-visible{outline:2px solid var(--kr-blue);outline-offset:2px}
+.st-legacy .table-wrap{overflow:auto;max-height:60vh;border:1px solid var(--kr-line);border-radius:10px}
+.st-legacy table{width:100%;border-collapse:collapse;font-size:12.5px}
+.st-legacy th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--kr-mute);padding:7px 10px;border-bottom:1px solid var(--kr-line);position:sticky;top:0;background:var(--kr-panel)}
+.st-legacy td{padding:6px 10px;border-bottom:1px solid var(--kr-line);vertical-align:top;overflow-wrap:anywhere}
+.st-legacy .configuration-grid{display:grid;grid-template-columns:minmax(220px,320px) minmax(0,1fr);gap:16px;align-items:start}
+.st-legacy .configuration-review,.st-legacy .configuration-history{margin-top:12px;padding-top:12px;border-top:1px solid var(--kr-line)}
+.st-legacy .admin-selected-object{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.st-legacy .admin-summary{display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 14px;margin:8px 0}.st-legacy .admin-summary dt{color:var(--kr-mute)}.st-legacy .admin-summary dd{margin:0;overflow-wrap:anywhere}
+.st-legacy .source-badge{display:inline-flex;align-items:center;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--kr-panel-3);color:var(--kr-ink-2)}.st-legacy .source-badge.connected{background:var(--kr-blue-soft);color:var(--kr-blue)}
+.st-legacy .source-open,.st-legacy .source-relations button,.st-legacy .migration-row button{border:0;background:transparent;color:var(--kr-blue);padding:0;min-height:0;font-weight:700;text-align:left}
+.st-legacy .source-section{margin:2px}
+.st-legacy .source-node{border-left:1px solid var(--kr-line-2);padding-left:10px;margin:4px 0}.st-legacy .source-node summary{cursor:pointer;font-weight:600}
+.st-legacy .source-field{display:flex;gap:10px;padding:2px 0}.st-legacy .source-field dt{flex:0 0 200px;color:var(--kr-mute)}.st-legacy .source-field dd{margin:0;overflow-wrap:anywhere}
+.st-legacy .source-path,.st-legacy pre{font:12px var(--mono);color:var(--kr-ink-2);white-space:pre-wrap;overflow-wrap:anywhere}.st-legacy pre{max-height:50vh;overflow:auto;background:var(--kr-panel-2);border-radius:8px;padding:10px}
+.st-legacy .migration-row{padding:8px 0;border-bottom:1px solid var(--kr-line)}.st-legacy .migration-row span{margin-left:10px;color:var(--kr-ink-2)}.st-legacy .migration-row p{margin:4px 0 0;color:var(--kr-mute)}
+.st-legacy .source-operational{color:var(--kr-amber)}
+.st-legacy .error,.st-legacy [role=status].error{color:var(--kr-red)}
+.admin-dialog{background:var(--kr-panel);color:var(--kr-ink);border-color:var(--kr-line-2)}.admin-dialog label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:600;color:var(--kr-ink-2)}
+@media(max-width:900px){.st-legacy .configuration-grid{grid-template-columns:1fr}.st-legacy .source-field dt{flex-basis:120px}}
+.st-legacy button{width:auto;max-width:100%}.st-legacy .source-detail>button,.st-legacy #source-note-edit{align-self:flex-start;display:inline-flex;align-items:center;margin:4px 0}

@@ -48,7 +48,9 @@ export function confirmAdmin({title,message,button='Bekräfta',action}){
   save.onclick=async()=>{busy=true;save.disabled=true;modal.setBusy(true);try{if(await action()!==false)modal.close(true);}catch(e){modal.message(e.message);}finally{busy=false;save.disabled=false;modal.setBusy(false);}};
   modal.element.addEventListener('close',()=>modal.element.remove(),{once:true});modal.open();
 }
-const workspaces=new Map();let hiddenNodes=new Map();
+const workspaces=new Map();let hiddenNodes=new Map(),embedded=false;
+// Studio monterar samma sidor i sina egna vyer: arbetsytan visas direkt, öppna och stäng rör inte adressen.
+export function embedAdminWorkspaces(){embedded=true;}
 export function syncAdminWorkspaces(){
   for(const [node,hidden] of hiddenNodes)node.hidden=hidden;hiddenNodes=new Map();
   for(const {element} of workspaces.values())element.hidden=true;
@@ -60,6 +62,7 @@ export function syncAdminWorkspaces(){
   }
 }
 export function registerAdminWorkspace(hash,element,{dirty=()=>false,onDiscard=()=>{}}={}){
+  if(embedded){element.classList.add('admin-workspace');unsavedChecks.add(()=>element.isConnected&&dirty());return {open(){element.hidden=false;element.scrollIntoView?.({block:'nearest'});},close(){element.hidden=true;}};}
   element.classList.add('admin-workspace');element.hidden=true;workspaces.set(hash,{element,dirty,onDiscard});unsavedChecks.add(()=>element.isConnected&&dirty());syncAdminWorkspaces();
   return {open(suffix=''){if(typeof suffix!=='string')suffix='';location.hash=hash+suffix;syncAdminWorkspaces();element.querySelector('h1,h2')?.focus();},close(){location.hash=hash.split('/')[0];syncAdminWorkspaces();}};
 }

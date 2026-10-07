@@ -24,25 +24,29 @@ export const NAVIGATION_SECTIONS=[
   {group:'datorn',hash:'#advanced/ai',label:'AI-tjänst',id:'ai-tab',title:'AI-tjänst',tabs:[]},
   {group:'datorn',hash:'#advanced/users',label:'Användare',id:'users-tab',title:'Användare',tabs:[]},
   {group:'datorn',hash:'#advanced/update',label:'Uppdatering',id:'update-tab',title:'Uppdatera TKL',tabs:[]},
-  // #advanced itself, the old overview page, now opens the register.
-  {group:'anlaggningen',hash:'#register',label:'Anläggning',id:'admin-tab',title:'Anläggningsregister',members:['#advanced'],tabs:[
-    {hash:'#register',label:'Anläggningsregister'},
-    {hash:'#register/station',label:'Anläggningsöversikt'},
-    {hash:'#register/destinations',label:'Orter och telefon',title:'Orter och telefonnummer'},
-    {hash:'#register/presentation',label:'Visningsinställningar'},
-    {hash:'#register/bindings',label:'Driftinställningar'},
-    {hash:'#advanced/xml',label:'XML-granskning'},
-    {hash:'#advanced/migration',label:'Införandestatus'},
-    {external:'studio-link',href:'/studio.html',label:'Objekt och regler ↗'}]}
+  // Everything about the station lives in Studio (0.71.0): the group is one link out of Inställningar.
+  {group:'anlaggningen',href:'/studio.html',label:'Studio',id:'admin-tab',title:'Studio',tabs:[]}
 ];
 // Pages that only led on to others: they open their first real page instead.
-export const REDIRECTS={'#advanced':'#register','#tools':'#tools/appearance'};
+export const REDIRECTS={'#advanced':'#advanced/start','#tools':'#tools/appearance'};
+// The old Anläggning pages and where they live in Studio. Bookmarks, the docs and the panel's
+// object links keep working: each old address opens its Studio page.
+export const STUDIO_ROUTES=[
+  ['#register/station','#konfigurera'],['#register/destinations','#konfigurera/orter'],['#register/presentation','#konfigurera/visning'],
+  ['#register/bindings','#driftsattning/bindningar'],['#advanced/xml','#data/kalla'],['#advanced/migration','#genomgang/inforande'],['#register','#data/kalla']];
+export function studioTarget(hash){
+  const [path,query='']=String(hash||'').split('?'),params=new URLSearchParams(query);
+  if(path==='#register/object'&&params.get('record'))return '/studio.html#data/kalla?post='+encodeURIComponent(params.get('record'));
+  if(path==='#register/station'&&params.get('object'))return '/studio.html#konfigurera?objekt='+encodeURIComponent(params.get('object').replace(/^[a-z]+:/i,''));
+  const hit=STUDIO_ROUTES.find(([from])=>path===from||path.startsWith(from+'/'));
+  return hit?'/studio.html'+hit[1]:null;
+}
 const within=(hash,base)=>hash===base||hash.startsWith(base+'/');
 // Resolves a location hash to its section, the deepest matching tab and a page title.
 export function resolveNavigation(hash){
   const current=String(hash||'#panel').split('?')[0]||'#panel';
   if(current==='#panel')return {section:null,tab:null,exact:false,title:'Ställverk'};
-  const section=NAVIGATION_SECTIONS.find(s=>within(current,s.hash)||(s.members||[]).some(m=>within(current,m)));
+  const section=NAVIGATION_SECTIONS.find(s=>(s.hash&&within(current,s.hash))||(s.members||[]).some(m=>within(current,m)));
   if(!section)return {section:null,tab:null,exact:false,title:'Inställningar'};
   const tab=section.tabs.filter(t=>t.hash&&within(current,t.hash)).sort((a,b)=>b.hash.length-a.hash.length)[0]||null;
   return {section,tab,exact:tab?.hash===current,title:tab?.title||tab?.label||section.title};

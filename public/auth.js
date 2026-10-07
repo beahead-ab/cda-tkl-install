@@ -1,5 +1,5 @@
 // Inloggning, inbjudningskod, första ägaren och lösenordsbyte. Lokalt behöver operatören aldrig hit;
-// sidan nås när Inställningar eller Objekt och regler öppnas utan inloggning, och leder tillbaka dit (?next=).
+// sidan nås när Inställningar eller Studio öppnas utan inloggning, och leder tillbaka dit (?next=).
 const $ = id => document.getElementById(id);
 let state, busy = false, navigationMounted = false, view = 'login';
 const next = (() => { const n = new URLSearchParams(location.search).get('next') || '/'; return /^\/(?!\/)/.test(n) ? n : '/'; })();
@@ -31,7 +31,7 @@ function render() {
   $('intro').textContent = authenticated ? (state.mustChange ? 'Byt det tillfälliga lösenordet innan du fortsätter.' : `Inloggad som ${state.user?.username || ''} (${state.user?.role === 'owner' ? 'ägare' : 'administratör'}). Här byter du lösenord.`)
     : view === 'setup' ? 'Ingen ägare finns än. Ägaren är den som lägger till och tar bort användare; en administratör sköter hela TKL men inte vilka som har tillgång.'
     : view === 'redeem' ? 'Ägaren har gett dig ett användarnamn och en engångskod. Välj ditt lösenord här.'
-    : state.mode === 'external' ? 'Inloggning krävs överallt i webbdriften.' : 'Inställningar och Objekt och regler kräver inloggning. Operatören behöver inte logga in på den här datorn.';
+    : state.mode === 'external' ? 'Inloggning krävs överallt i webbdriften.' : 'Inställningar och Studio kräver inloggning. Operatören behöver inte logga in på den här datorn.';
   if (!authenticated) (view === 'setup' ? $('setup-username') : view === 'redeem' ? $('redeem-username') : $('username')).focus();
   if (authenticated && !account && !state.mustChange) location.replace(next);
 }

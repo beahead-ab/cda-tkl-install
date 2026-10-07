@@ -1,5 +1,14 @@
 [
   {
+    "version": "0.71.0",
+    "date": "2026-10-07",
+    "notes": [
+      "Allt om anläggningen bor i Studio: Källa (XML-registret), Visning, Orter och telefon, Driftbindningar och Införandestatus är sidor i Studio",
+      "Inställningar behåller Träffen och Den här datorn; Anläggningen är en länk till Studio, och Studios knapp Inställningar leder tillbaka",
+      "Gamla adresser (#register…, #advanced/xml, #advanced/migration) och panelens objektlänkar öppnar rätt sida i Studio"
+    ]
+  },
+  {
     "version": "0.70.0",
     "date": "2026-10-07",
     "notes": [

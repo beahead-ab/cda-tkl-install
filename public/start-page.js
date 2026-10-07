@@ -12,7 +12,7 @@ export function createStartPage({root,api,message,session,onChange}){
     const user=session?.()?.user;
     switch(s.id){
       case 'owner':return s.done?['Ägaren finns.'+(user?' Du är inloggad som '+user.username+'.':''),'']:s.how==='script'?['Webbdriften: ägaren skapas på servern som användaren charlottendal. Lösenordet läses från standard input.','']:['Ägaren är den som lägger till och tar bort användare; en administratör sköter hela TKL men inte vilka som har tillgång. Operatören behöver inte logga in på den här datorn.',''];
-      case 'ai':return s.done?[`Ansluten med ${s.model}.`+(s.tested?' Provet gick igenom.':' Prova anslutningen under AI-tjänst så att fel syns där och inte först i Objekt och regler.'),'']:['Chatten och AI-genomgången i Objekt och regler använder Claude via en nyckel från Anthropic. Utan nyckel fungerar de inte; allt annat i TKL fungerar.','Hoppa över om AI-tjänsten inte ska användas på den här installationen.'];
+      case 'ai':return s.done?[`Ansluten med ${s.model}.`+(s.tested?' Provet gick igenom.':' Prova anslutningen under AI-tjänst så att fel syns där och inte först i Studio.'),'']:['Chatten och AI-genomgången i Studio använder Claude via en nyckel från Anthropic. Utan nyckel fungerar de inte; allt annat i TKL fungerar.','Hoppa över om AI-tjänsten inte ska användas på den här installationen.'];
       case 'connection':return s.done?[`Kontakt med ${CONNECTION[s.mode]||s.mode}.`,'']:[`Ingen kontakt med ${CONNECTION[s.mode]||'banan'}. Läget (simulator eller LocoBuffer) ställs i app.env vid installationen; status och porten syns under Banan (LocoNet).`,''];
       case 'trainmeet':return s.done?['TrainMeet är anslutet'+(s.origin?' till '+s.origin:'')+'.','']:['TrainMeet ger tåg till och från grannstationerna. Anslut med adress och parningskod under Träffen → TrainMeet.','Hoppa över om stationen körs fristående.'];
     }return ['',''];
@@ -31,7 +31,7 @@ export function createStartPage({root,api,message,session,onChange}){
     const foot=view.done?`<div class="settings-actions"><button type="button" data-reopen>Öppna Kom igång igen</button><p>Markerad som klar ${esc(when(view.finishedAt))}${view.finishedBy?' av '+esc(view.finishedBy):''}. Stegen ovan visar ändå alltid dagens läge.</p></div>`
       :`<div class="settings-actions"><button type="button" class="primary" data-finish${canFinish?'':' disabled'}>Markera Kom igång som klar</button><p>${canFinish?'Panelen slutar visa "steg kvar". Det som hoppats över går att göra senare under Inställningar.':'Gör de krävda stegen och hoppa uttryckligen över det som inte ska användas.'}</p></div>`;
     const html=`<section class="card"><h2>${view.done?'Klart':view.remaining+' steg kvar'}</h2><div class="start-steps">${steps}</div>${foot}
-      <p class="settings-footnote">${view.mode==='external'?'Webbdriften: inloggning krävs överallt. ':'Den här datorn: operatören behöver inte logga in; Inställningar och Objekt och regler kräver ägaren eller en administratör. '}Nyckeln till AI-tjänsten lagras på TKL-servern och visas aldrig igen i sin helhet.</p></section>`;
+      <p class="settings-footnote">${view.mode==='external'?'Webbdriften: inloggning krävs överallt. ':'Den här datorn: operatören behöver inte logga in; Inställningar och Studio kräver ägaren eller en administratör. '}Nyckeln till AI-tjänsten lagras på TKL-servern och visas aldrig igen i sin helhet.</p></section>`;
     if(html!==last){last=html;root.innerHTML=html;}
   };
   root.addEventListener('click',async e=>{

@@ -6,6 +6,7 @@ import {createRouteConfirmation} from './route-confirmation.js';
 import {trackRestrictions,restrictionMarkers,lineRestrictionExtents} from './track-restrictions.js';
 import {signalRouteControls,signalImage} from './signal-route-controls.js';
 import {createAdminNavigation} from './admin-navigation.js';
+import {studioTarget} from './admin-navigation-model.js';
 import {createAdminAppearance} from './admin-appearance.js';
 import {createPanelFit} from './panel-fit.js';
 import {syncAdminWorkspaces,registerAdminWorkspace,settingsRows,createAdminDialog} from './admin-ui.js';
@@ -72,6 +73,8 @@ const pageFromHash=()=>{
   if(location.hash==='#tools/zoom')history.replaceState(null,'','#tools/appearance');
   if(location.hash==='#tools')history.replaceState(null,'','#tools/appearance');
   if(location.hash==='#tools/connections')history.replaceState(null,'','#register');
+  // The old Anläggning pages now live in Studio (admin-navigation-model.js, STUDIO_ROUTES).
+  const studio=studioTarget(location.hash);if(studio){location.replace(studio);return 'panel';}
   // The local timetable is gone; TrainMeet is the only timetable (docs/installningar-plan.md).
   if(location.hash==='#import'||location.hash.startsWith('#import/'))history.replaceState(null,'','#trainmeet');
   if(location.hash==='#ranger')rangerMode=true;
@@ -102,7 +105,7 @@ function openTools(section) {
   if(panelConsole?.open(section))return;
   const target=$(section);if(target)location.hash='#tools/'+section.replace('-tools','');
 }
-async function openSource(kind,name) { await setPage('admin'); await sourceRegister.open(kind,name); }
+async function openSource(kind,name) { location.assign('/studio.html#data/kalla?kategori='+encodeURIComponent(kind)+'&namn='+encodeURIComponent(name)); }
 let blockedTracks=new Map(),blockedLineParts=new Set(),lineExtents=new Map();
 const blockMarkers=[];
 const destinationNodes=[], rails = [], switches = [], signals = [], buttons = [], indicatorLamps = [], sourceLamps=[],routeNodes = new Map(),turnoutNumbers=new Map();
@@ -650,7 +653,7 @@ function paintInspector() {
   if(inspected.kind==='indication')return paintIndication(inspected.name);
   const { kind, name } = inspected, b = kind === 'signal' ? config.signals[name] : config.turnouts[name];
   const sourceKind = kind === 'signal' ? 'signals' : 'layoutTurnouts';
-  const sourceButton = `<a href="#register/station?object=${encodeURIComponent((kind==='signal'?'signals:':'turnouts:')+name)}">Visa i anläggningsöversikten →</a><button class="source-inspect" data-source-kind="${sourceKind}" data-source-name="${esc(name)}">${kind === 'signal' ? 'Signalbesked och källuppgifter' : 'Visa alla källuppgifter'} →</button>`;
+  const sourceButton = `<a href="/studio.html#konfigurera?objekt=${encodeURIComponent(name)}">Visa i Studio →</a><button class="source-inspect" data-source-kind="${sourceKind}" data-source-name="${esc(name)}">${kind === 'signal' ? 'Signalbesked och källuppgifter' : 'Visa alla källuppgifter'} →</button>`;
   const original = kind === 'signal' ? registry.signals.find(r=>r.id===name) : null;
   const presentationKind=kind==='signal'?'signals':'turnouts', display=displayName(presentationKind,name), description=presentationDescription(presentationKind,name);
   const sourceInfo = (display!==name?`<h2>${esc(display)}</h2>`:'')+(description?`<p>${esc(description)}</p>`:'')+(original ? `<p class="muted">${esc(original.type)} · Besked i XML: ${esc(original.aspects.join(', '))}</p>` : '');

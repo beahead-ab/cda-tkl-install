@@ -1,5 +1,5 @@
 // Åtkomst till TKL och simulatorn. Tre lägen:
-//  - lokalt (ingen CHARLOTTENDAL_AUTH_MODE): operatören behöver ingen inloggning; Inställningar, Objekt och regler
+//  - lokalt (ingen CHARLOTTENDAL_AUTH_MODE): operatören behöver ingen inloggning; Inställningar, Studio
 //    och deras API kräver en inloggad ägare eller administratör så snart en ägare finns. Innan dess är allt öppet,
 //    så att onboardingen kan skapa ägaren.
 //  - password (webbdriften, CHARLOTTENDAL_PUBLIC_ORIGIN över HTTPS): inloggning krävs överallt, även för operatören.

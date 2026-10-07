@@ -1,7 +1,7 @@
 // Kom igång: det en ny installation måste ha innan den fungerar som väntat. Stegen räknas ur det som finns
 // (ägare, AI-nyckel, kontakt med banan, TrainMeet); bara "klar" och vad som medvetet hoppats över sparas i
 // onboarding.json. Ägaren och kontakten med banan krävs; AI-tjänsten och TrainMeet får hoppas över, men
-// bara uttryckligen, så att en saknad nyckel aldrig är en överraskning i Objekt och regler.
+// bara uttryckligen, så att en saknad nyckel aldrig är en överraskning i Studio.
 const fail = (message, status = 400) => { throw Object.assign(Error(message), { status }); };
 export const STEP_IDS = ['owner', 'ai', 'connection', 'trainmeet'];
 export class Onboarding {

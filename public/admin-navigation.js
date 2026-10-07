@@ -18,7 +18,8 @@ export function createAdminNavigation({account=false}={}) {
   for(const section of NAVIGATION_SECTIONS){
     if(section.group!==heading){heading=section.group;const label=document.createElement('span');label.className='admin-nav-heading';label.textContent=NAVIGATION_GROUPS.find(g=>g.key===heading)?.label||'';items.append(label);}
     const group=document.createElement('div');group.className='admin-nav-group';group.dataset.section=section.hash;
-    const link=document.createElement('a');link.href=prefix+section.hash;link.textContent=section.label;link.id=section.id;link.dataset.navHash=section.hash;
+    const link=document.createElement('a');link.textContent=section.label;link.id=section.id;
+    if(section.href){link.href=section.href;link.dataset.studio='';const arrow=document.createElement('span');arrow.className='admin-nav-status';arrow.textContent='↗';link.append(arrow);}else{link.href=prefix+section.hash;link.dataset.navHash=section.hash;}
     if(section.status){const status=document.createElement('span');status.id=section.status;status.className='admin-nav-status';link.append(status);}
     group.append(link);items.append(group);
   }
@@ -29,7 +30,7 @@ export function createAdminNavigation({account=false}={}) {
   const tabs=document.createElement('nav');tabs.className='admin-tabs';tabs.setAttribute('aria-label','Undersidor');tabs.hidden=true;
   const rows=new Map();
   if(!account)for(const section of NAVIGATION_SECTIONS){
-    if(!section.tabs.length)continue;
+    if(!section.tabs.length||!section.hash)continue;
     const row=document.createElement('div');row.className='admin-tab-row';row.hidden=true;row.dataset.section=section.hash;
     for(const tab of section.tabs){
       const a=document.createElement('a');a.textContent=tab.label;

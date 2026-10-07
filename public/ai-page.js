@@ -1,5 +1,5 @@
 // Inställningar → Den här datorn → AI-tjänst: vilken Claude-modell chatten och AI-genomgången i
-// Objekt och regler använder, och nyckeln hos Anthropic. Nyckeln går till TKL-servern en gång och
+// Studio använder, och nyckeln hos Anthropic. Nyckeln går till TKL-servern en gång och
 // sparas där (ai.json, bara servern läser den); sidan ser sedan bara de fyra sista tecknen.
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const when=t=>t?new Date(t).toLocaleString('sv-SE',{dateStyle:'short',timeStyle:'short'}):'';
@@ -11,10 +11,10 @@ export function createAiPage({root,api,message}){
   const render=()=>{
     if(!view)return;
     const model=view.models.find(m=>m.id===view.model)||{label:view.model,note:''};
-    const state=!view.configured?[pill('off','Inte ansluten'),'Chatten och AI-genomgången i Objekt och regler fungerar inte förrän en nyckel finns.']
+    const state=!view.configured?[pill('off','Inte ansluten'),'Chatten och AI-genomgången i Studio fungerar inte förrän en nyckel finns.']
       :view.lastTest?.ok?[pill('ok','Ansluten'),`Provet gick igenom ${when(view.lastTest.at)} med ${view.lastTest.model||view.model}.`]
       :view.lastTest?[pill('warn','Provet misslyckades'),`${when(view.lastTest.at)}: ${view.lastTest.error||'okänt fel'}`]
-      :[pill('warn','Nyckel finns, inte provad'),'Prova anslutningen så att fel i nyckeln eller nätvägen syns här och inte först i Objekt och regler.'];
+      :[pill('warn','Nyckel finns, inte provad'),'Prova anslutningen så att fel i nyckeln eller nätvägen syns här och inte först i Studio.'];
     const keyRow=view.configured?[['Nyckel',esc(view.keyHint),view.source==='env'?'Ur miljöfilen app.env på servern. En nyckel som sparas här går före den.':'Sparad på TKL-servern '+when(view.updatedAt)+'. Visas aldrig igen i sin helhet.']]:[['Nyckel','saknas','Skapas i Anthropic Console under API keys och klistras in nedan.']];
     const html=`<section class="card"><h2>Anslutningen</h2>${rows([['Status',state[0],state[1]],['Modell',esc(model.label),model.note],...keyRow])}
       <div class="settings-actions"><button type="button" data-ai-test${view.configured&&!busy?'':' disabled'}>${busy?'Provar …':'Prova anslutningen'}</button><p>Ett litet riktigt anrop till AI-tjänsten med den sparade nyckeln och modellen. Kostar en bråkdel av ett öre.</p></div></section>

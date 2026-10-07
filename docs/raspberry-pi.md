@@ -5,6 +5,11 @@ anläggningssimulatorn startar av sig själva, ställverket visas i helskärm p�
 Stream Deck kopplas upp utan att någon behöver klicka. Själva installationen är en rad i
 terminalen; resten sker automatiskt.
 
+**Publicerad: 0.71.1** (cda-tkl main `96461c9`, `beahead-ab/cda-tkl-install` main `018de42`, 7 oktober). En Pi som
+redan är installerad tar den med Inställningar → Uppdatering eller genom att köra installationsraden igen
+(avsnitt 9). Sedan 0.71.1 är användarnamnet e-postadressen när ägaren skapas och när någon bjuds in; lösenordet
+har 6–128 tecken. Sedan 0.71.0 ligger allt om anläggningen i Studio (Inställningar → Anläggningen → Studio).
+
 **Innehåll**
 
 1. [Det här behövs](#1-det-här-behövs)
@@ -207,7 +212,7 @@ på anläggningens nät.
    `sudo systemctl restart cda-tkl`. `LAN_HOSTS` är namnet (eller adressen, kommaseparerat)
    som stationen använder för Pi:n. Allt som kommer från en annan dator måste logga in, även
    i lokalt läge; Pi:ns egen skärm gör det inte.
-2. **Bjud in rangeraren** under Inställningar → Användare med rollen **Rangerare**.
+2. **Bjud in rangeraren** med sin e-postadress under Inställningar → Användare med rollen **Rangerare**.
 3. **På stationens Pi:** installera med stationens adress, starta om och logga in en gång:
 
    ```sh

@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.71.1",
+    "date": "2026-10-07",
+    "notes": [
+      "Användarnamnet är e-postadressen: Skapa ägaren och inbjudan tar en e-postadress, inloggningen frågar efter e-post",
+      "Konton med ett vanligt namn från tidigare versioner loggar in som förut"
+    ]
+  },
+  {
     "version": "0.71.0",
     "date": "2026-10-07",
     "notes": [

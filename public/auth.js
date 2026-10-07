@@ -30,7 +30,7 @@ function render() {
   if (authenticated && !state.mustChange) mountAccountNavigation().catch(showError);
   $('intro').textContent = authenticated ? (state.mustChange ? 'Byt det tillfälliga lösenordet innan du fortsätter.' : `Inloggad som ${state.user?.username || ''} (${state.user?.role === 'owner' ? 'ägare' : 'administratör'}). Här byter du lösenord.`)
     : view === 'setup' ? 'Ingen ägare finns än. Ägaren är den som lägger till och tar bort användare; en administratör sköter hela TKL men inte vilka som har tillgång.'
-    : view === 'redeem' ? 'Ägaren har gett dig ett användarnamn och en engångskod. Välj ditt lösenord här.'
+    : view === 'redeem' ? 'Ägaren har lagt till din e-postadress och gett dig en engångskod. Välj ditt lösenord här.'
     : state.mode === 'external' ? 'Inloggning krävs överallt i webbdriften.' : 'Inställningar och Studio kräver inloggning. Operatören behöver inte logga in på den här datorn.';
   if (!authenticated) (view === 'setup' ? $('setup-username') : view === 'redeem' ? $('redeem-username') : $('username')).focus();
   if (authenticated && !account && !state.mustChange) location.replace(next);

@@ -20,21 +20,22 @@ skapa ägaren; i webbdriften skapas ägaren på servern.
 ## Ägare, administratörer och inbjudan
 
 - **Ägaren** skapas en gång: lokalt i Kom igång eller på inloggningssidan ("Skapa ägaren"); i webbdriften med
-  `printf '%s\n' "$PASSWORD" | node scripts/create-owner.mjs <namn>` som användaren `charlottendal`.
-- **Inbjudan.** Under Inställningar → Den här datorn → Användare skriver ägaren ett användarnamn och väljer roll.
+  `printf '%s\n' "$PASSWORD" | node scripts/create-owner.mjs <e-post>` som användaren `charlottendal`.
+- **Inbjudan.** Under Inställningar → Den här datorn → Användare skriver ägaren användarens e-postadress och väljer roll.
   TKL visar en engångskod `XXXX-XXXX` (utan 0, O, 1 och I) som gäller sju dagar. Den nya användaren öppnar
-  inloggningssidan, väljer "Jag har en inbjudningskod" och anger namn, kod och ett eget lösenord. Koden lagras
+  inloggningssidan, väljer "Jag har en inbjudningskod" och anger e-post, kod och ett eget lösenord. Koden lagras
   bara som hash och fungerar en gång.
 - **Ny kod** nollställer användarens lösenord och avslutar dess inloggningar. **Ta bort** loggar ut användaren
   och tar bort kontot. Den sista ägaren kan inte tas bort, och ingen tar bort sig själv.
 - **Rangerare:** rollen för rangerbangårdens panel (docs/rangerlage.md). Loggar in som
   alla andra men når bara rangerarens vy (`/#ranger`) och dess API; Inställningar och
   TKL:s manövrer är stängda.
-- **Utelåst ägare:** `node scripts/recover-user.mjs <namn>` på datorn skriver en ny kod.
+- **Utelåst ägare:** `node scripts/recover-user.mjs <e-post>` på datorn skriver en ny kod.
 - **Eget lösenord** byts på `/account` (Byt lösenord i sidomenyn). Bytet avslutar användarens andra sessioner.
 
-Användarnamn har 3–64 tecken (bokstäver, siffror, punkt, bindestreck, understreck) och jämförs utan hänsyn till
-versaler. Lösenord har 6–128 tecken.
+Användarnamnet är e-postadressen (sedan 0.71.1). Den sparas med små bokstäver och jämförs utan hänsyn till
+versaler. Ingen e-post skickas: koden lämnas av ägaren som förut. Konton som skapades med ett vanligt namn före
+0.71.1, och `admin` ur den gamla lösenordsfilen, loggar in som förut. Lösenord har 6–128 tecken.
 
 ## Lagring och säkerhet
 

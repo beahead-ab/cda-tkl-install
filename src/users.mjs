@@ -10,11 +10,13 @@ import { promisify } from 'node:util';
 
 const derive = promisify(scrypt), digest = value => createHash('sha256').update(value).digest('hex');
 export const ROLES = ['owner', 'admin', 'ranger'], CODE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ', INVITATION_DAYS = 7, SESSION_HOURS = 12;
-const USERNAME = /^[a-z0-9][a-z0-9._-]{2,63}$/i, CODE = /^[A-Z0-9]{4}-?[A-Z0-9]{4}$/;
+// Användarnamnet är e-postadressen, lagrad med små bokstäver. Konton med ett äldre namn (t.ex. admin ur
+// den gamla lösenordsfilen) loggar in som förut; regeln gäller bara när ett konto skapas.
+const EMAIL = /^[^\s@]{1,64}@[^\s@.][^\s@]*\.[^\s@.]{2,}$/, CODE = /^[A-Z0-9]{4}-?[A-Z0-9]{4}$/;
 const fail = (message, status = 400) => Object.assign(Error(message), { status });
 export function checkUsername(value) {
-  const name = String(value ?? '').trim();
-  if (!USERNAME.test(name)) throw fail('Användarnamnet har 3–64 tecken: bokstäver, siffror, punkt, bindestreck eller understreck.');
+  const name = String(value ?? '').trim().toLowerCase();
+  if (name.length > 254 || !EMAIL.test(name)) throw fail('Användarnamnet är en e-postadress, t.ex. namn@exempel.se.');
   return name;
 }
 export function checkPassword(value) {
@@ -22,7 +24,7 @@ export function checkPassword(value) {
   return value;
 }
 async function hash(password, salt) {
-  if (typeof password !== 'string' || password.length < 1 || password.length > 128) throw fail('Fel användarnamn eller lösenord', 401);
+  if (typeof password !== 'string' || password.length < 1 || password.length > 128) throw fail('Fel e-post eller lösenord', 401);
   return derive(password, Buffer.from(salt, 'hex'), 64, { N: 131072, r: 8, p: 1, maxmem: 256 * 1024 * 1024 });
 }
 const makeCode = () => { let s = ''; for (let i = 0; i < 8; i++) s += CODE_ALPHABET[randomInt(CODE_ALPHABET.length)]; return s.slice(0, 4) + '-' + s.slice(4); };
@@ -90,7 +92,7 @@ export class UserStore {
   invite({ username, role = 'admin' }) {
     const record = this.read(), name = checkUsername(username);
     if (!ROLES.includes(role)) throw fail('Rollen är ägare, administratör eller rangerare.');
-    if (this.find(record, name)) throw fail('Användarnamnet finns redan.', 409);
+    if (this.find(record, name)) throw fail('E-postadressen finns redan.', 409);
     const code = makeCode(), now = this.now();
     const user = { id: randomBytes(8).toString('hex'), username: name, role, salt: null, hash: null, mustChange: false, createdAt: now, updatedAt: now, invitation: { codeHash: digest(normalizeCode(code)), expires: now + INVITATION_DAYS * 86400000 } };
     record.users.push(user); this.write(record);
@@ -113,7 +115,7 @@ export class UserStore {
   async redeem({ username, code, password }) {
     const record = this.read(); this.throttle(record);
     const user = this.find(record, username), clean = normalizeCode(code);
-    if (!user || !user.invitation || !CODE.test(clean.slice(0, 4) + '-' + clean.slice(4)) || !timingSafeEqual(Buffer.from(user.invitation.codeHash, 'hex'), Buffer.from(digest(clean), 'hex'))) throw fail('Fel användarnamn eller kod', 401);
+    if (!user || !user.invitation || !CODE.test(clean.slice(0, 4) + '-' + clean.slice(4)) || !timingSafeEqual(Buffer.from(user.invitation.codeHash, 'hex'), Buffer.from(digest(clean), 'hex'))) throw fail('Fel e-post eller kod', 401);
     if (user.invitation.expires <= this.now()) throw fail('Koden har gått ut. Be ägaren om en ny.', 410);
     checkPassword(password);
     const salt = randomBytes(16).toString('hex'); user.salt = salt; user.hash = (await hash(password, salt)).toString('hex'); user.invitation = null; user.mustChange = false; user.updatedAt = this.now();
@@ -122,7 +124,7 @@ export class UserStore {
   async login({ username, password }) {
     const record = this.read(); this.throttle(record);
     const user = this.find(record, username);
-    if (!user || !user.hash || !timingSafeEqual(await hash(password, user.salt), Buffer.from(user.hash, 'hex'))) throw fail('Fel användarnamn eller lösenord', 401);
+    if (!user || !user.hash || !timingSafeEqual(await hash(password, user.salt), Buffer.from(user.hash, 'hex'))) throw fail('Fel e-post eller lösenord', 401);
     record.attempts = []; this.write(record); return publicUser(user, this.now());
   }
   async changePassword(id, { currentPassword, newPassword }) {

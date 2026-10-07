@@ -15,21 +15,21 @@ export function createUsersPage({root,api,message,session}){
     const rows=view.users.map(u=>`<tr data-user="${esc(u.id)}"><td>${esc(u.username)}${u.id===view.me?.id?' <span class="muted">(du)</span>':''}</td><td>${ROLE[u.role]||esc(u.role)}</td><td>${status(u)}</td><td class="users-actions">${owner?`${u.status!=='active'||u.id!==view.me?.id?`<button type="button" data-reissue="${esc(u.id)}">Ny kod</button>`:''}${u.id!==view.me?.id?`<button type="button" data-remove="${esc(u.id)}" data-name="${esc(u.username)}">Ta bort</button>`:''}`:''}</td></tr>`).join('');
     const mode=view.mode==='external'?'Webbdriften: inloggning krävs överallt, också för operatören.':'Den här datorn: operatören behöver inte logga in. Inställningar och Studio kräver en inloggad ägare eller administratör.';
     const html=`<section class="card"><h2>Vem som har tillgång</h2><p class="settings-consequence">${esc(mode)} Ägaren lägger till och tar bort användare; en administratör sköter hela TKL men inte vilka som har tillgång.</p>
-      <table class="users-table"><thead><tr><th>Användarnamn</th><th>Roll</th><th>Status</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="4" class="muted">Inga användare.</td></tr>'}</tbody></table>
+      <table class="users-table"><thead><tr><th>E-post</th><th>Roll</th><th>Status</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="4" class="muted">Inga användare.</td></tr>'}</tbody></table>
       ${owner?`<div class="settings-actions"><button type="button" class="primary" data-invite>Bjud in användare</button><p>Du får en engångskod som gäller sju dagar. Den nya användaren väljer sitt lösenord på inloggningssidan under "Jag har en inbjudningskod".</p></div>`:`<p class="settings-footnote">Bara ägaren bjuder in och tar bort användare. Ditt eget lösenord byter du under <a href="/account">Byt lösenord</a>.</p>`}
       ${owner?`<p class="settings-footnote">"Ny kod" nollställer användarens lösenord och avslutar dess inloggningar: för den som glömt sitt lösenord eller aldrig löste in sin kod. Har ägaren själv låst sig ute körs <code>node scripts/recover-user.mjs &lt;namn&gt;</code> på datorn. Ditt eget lösenord byter du under <a href="/account">Byt lösenord</a>.</p>`:''}</section>`;
     if(html!==last){last=html;root.innerHTML=html;}
   };
   const showCode=(result,title)=>{
     const body=document.createElement('div');
-    body.innerHTML=`<p>Lämna användarnamnet och koden till <b>${esc(result.user.username)}</b> (${ROLE[result.user.role]}). Koden visas bara nu och gäller till ${esc(when(result.expires))}.</p><p class="users-code"><code>${esc(result.code)}</code> <button type="button" data-copy-code>Kopiera</button></p><p class="settings-consequence">Den nya användaren öppnar inloggningssidan, väljer "Jag har en inbjudningskod" och anger namn, kod och ett eget lösenord.</p>`;
+    body.innerHTML=`<p>Lämna e-postadressen och koden till <b>${esc(result.user.username)}</b> (${ROLE[result.user.role]}). Koden visas bara nu och gäller till ${esc(when(result.expires))}.</p><p class="users-code"><code>${esc(result.code)}</code> <button type="button" data-copy-code>Kopiera</button></p><p class="settings-consequence">Den nya användaren öppnar inloggningssidan, väljer "Jag har en inbjudningskod" och anger namn, kod och ett eget lösenord.</p>`;
     body.querySelector('[data-copy-code]').onclick=async e=>{try{await navigator.clipboard.writeText(result.code);e.target.textContent='Kopierad';}catch{e.target.textContent='Markera koden och kopiera';}};
     const close=document.createElement('button');close.type='button';close.textContent='Klart';
     const modal=createAdminDialog({title,body,saveButton:close});modal.footer.querySelector('[data-cancel]')?.remove();close.onclick=()=>modal.close();modal.open();
   };
   const invite=()=>{
     const form=document.createElement('form');form.className='admin-form';
-    form.innerHTML=`<label>Användarnamn <input name="username" required maxlength="64" autocomplete="off" autocapitalize="off" spellcheck="false" pattern="[A-Za-z0-9][A-Za-z0-9._\\-]{2,63}"></label><p class="settings-consequence">3–64 tecken: bokstäver, siffror, punkt, bindestreck eller understreck.</p>
+    form.innerHTML=`<label>E-post <input name="username" type="email" required maxlength="254" autocomplete="off" autocapitalize="off" spellcheck="false"></label><p class="settings-consequence">E-postadressen är användarnamnet. Ingen e-post skickas; du lämnar koden själv.</p>
       <label>Roll <select name="role"><option value="admin">Administratör · sköter hela TKL</option><option value="owner">Ägare · även vem som har tillgång</option><option value="ranger">Rangerare · bara rangerarens vy</option></select></label>`;
     const save=document.createElement('button');save.type='button';save.textContent='Skapa inbjudningskod';
     const modal=createAdminDialog({title:'Bjud in användare',body:form,saveButton:save});

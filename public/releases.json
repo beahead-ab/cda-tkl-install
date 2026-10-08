@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.72.2",
+    "date": "2026-10-08",
+    "notes": [
+      "S100a läser LS60: regeln i XML:en går via den interna sensorn slS100, och 44 tågvägar väntar inte längre på en rapport som aldrig kommer",
+      "Genomgången har AI-analysen av XML:en: förslag för spårledningarna utan regel, de växelberoende delarna, kryssväxlarna och ändarna av spår 11–13, med mätningarna som avgör"
+    ]
+  },
+  {
     "version": "0.72.1",
     "date": "2026-10-08",
     "notes": [

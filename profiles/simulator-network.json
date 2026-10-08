@@ -1025,10 +1025,13 @@
       "provenance": "LS-nummer ur Cda60.xml som adress, polaritet antagen (aktiv = belagd). Ej uppmätt."
     },
     "S100a": {
-      "address": 3030,
+      "address": 60,
       "activeMeansOccupied": true,
       "sourceSensor": "slS100c",
-      "provenance": "Bänkadress: ingen ingång i Cda60.xml (växelberoende del utan egen ingång). Ej uppmätt."
+      "sourceInputs": [
+        "LS60"
+      ],
+      "provenance": "LS-nummer ur Cda60.xml som adress, polaritet antagen (aktiv = belagd). Ej uppmätt. Växelberoende del i JMRI, förenklad till ingången."
     },
     "S100": {
       "address": 60,
@@ -7251,7 +7254,7 @@
         },
         {
           "signal": "1/7",
-          "index": 7
+          "index": 6
         }
       ],
       "turnouts": {
@@ -7299,7 +7302,7 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         }
       ],
       "turnouts": {
@@ -7348,7 +7351,7 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         }
       ],
       "turnouts": {
@@ -7396,7 +7399,7 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         }
       ],
       "turnouts": {
@@ -7580,11 +7583,11 @@
         },
         {
           "signal": "1/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "1/9",
-          "index": 10
+          "index": 9
         }
       ],
       "turnouts": {
@@ -7640,11 +7643,11 @@
         },
         {
           "signal": "1/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "1/9",
-          "index": 10
+          "index": 9
         }
       ],
       "turnouts": {
@@ -7711,19 +7714,19 @@
         },
         {
           "signal": "1/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "1/9",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "1/11",
-          "index": 13
+          "index": 12
         },
         {
           "signal": "U1",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -7795,19 +7798,19 @@
         },
         {
           "signal": "1/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "1/9",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "1/11",
-          "index": 13
+          "index": 12
         },
         {
           "signal": "N1",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -8856,7 +8859,7 @@
         },
         {
           "signal": "1/7",
-          "index": 6
+          "index": 5
         }
       ],
       "turnouts": {
@@ -8903,7 +8906,7 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         }
       ],
       "turnouts": {
@@ -8951,7 +8954,7 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         }
       ],
       "turnouts": {
@@ -8998,7 +9001,7 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         }
       ],
       "turnouts": {
@@ -9179,11 +9182,11 @@
         },
         {
           "signal": "1/7",
-          "index": 6
+          "index": 5
         },
         {
           "signal": "1/9",
-          "index": 9
+          "index": 8
         }
       ],
       "turnouts": {
@@ -9238,11 +9241,11 @@
         },
         {
           "signal": "1/7",
-          "index": 6
+          "index": 5
         },
         {
           "signal": "1/9",
-          "index": 9
+          "index": 8
         }
       ],
       "turnouts": {
@@ -9308,19 +9311,19 @@
         },
         {
           "signal": "1/7",
-          "index": 6
+          "index": 5
         },
         {
           "signal": "1/9",
-          "index": 9
+          "index": 8
         },
         {
           "signal": "1/11",
-          "index": 12
+          "index": 11
         },
         {
           "signal": "U1",
-          "index": 16
+          "index": 15
         }
       ],
       "turnouts": {
@@ -9391,19 +9394,19 @@
         },
         {
           "signal": "1/7",
-          "index": 6
+          "index": 5
         },
         {
           "signal": "1/9",
-          "index": 9
+          "index": 8
         },
         {
           "signal": "1/11",
-          "index": 12
+          "index": 11
         },
         {
           "signal": "N1",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -11041,11 +11044,11 @@
         },
         {
           "signal": "1/12",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "U2",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -11217,11 +11220,11 @@
         },
         {
           "signal": "1/12",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "U4",
-          "index": 16
+          "index": 15
         }
       ],
       "turnouts": {
@@ -12197,11 +12200,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U2",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -12393,11 +12396,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U4",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -12636,11 +12639,11 @@
         },
         {
           "signal": "1/12",
-          "index": 3
+          "index": 2
         },
         {
           "signal": "U2",
-          "index": 6
+          "index": 5
         }
       ],
       "turnouts": {
@@ -12798,11 +12801,11 @@
         },
         {
           "signal": "1/12",
-          "index": 3
+          "index": 2
         },
         {
           "signal": "U4",
-          "index": 5
+          "index": 4
         }
       ],
       "turnouts": {
@@ -13059,11 +13062,11 @@
         },
         {
           "signal": "1/12",
-          "index": 4
+          "index": 3
         },
         {
           "signal": "U2",
-          "index": 7
+          "index": 6
         }
       ],
       "turnouts": {
@@ -13269,11 +13272,11 @@
         },
         {
           "signal": "1/12",
-          "index": 4
+          "index": 3
         },
         {
           "signal": "U4",
-          "index": 6
+          "index": 5
         }
       ],
       "turnouts": {
@@ -14685,11 +14688,11 @@
         },
         {
           "signal": "1/12",
-          "index": 6
+          "index": 5
         },
         {
           "signal": "U2",
-          "index": 9
+          "index": 8
         }
       ],
       "turnouts": {
@@ -14893,11 +14896,11 @@
         },
         {
           "signal": "1/12",
-          "index": 6
+          "index": 5
         },
         {
           "signal": "U4",
-          "index": 8
+          "index": 7
         }
       ],
       "turnouts": {
@@ -15079,11 +15082,11 @@
         },
         {
           "signal": "1/12",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "U2",
-          "index": 10
+          "index": 9
         }
       ],
       "turnouts": {
@@ -15290,11 +15293,11 @@
         },
         {
           "signal": "1/12",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "U4",
-          "index": 9
+          "index": 8
         }
       ],
       "turnouts": {
@@ -15421,11 +15424,11 @@
         },
         {
           "signal": "1/12",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "U2",
-          "index": 10
+          "index": 9
         }
       ],
       "turnouts": {
@@ -15625,11 +15628,11 @@
         },
         {
           "signal": "1/12",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "U4",
-          "index": 9
+          "index": 8
         }
       ],
       "turnouts": {
@@ -15755,11 +15758,11 @@
         },
         {
           "signal": "1/12",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "U2",
-          "index": 10
+          "index": 9
         }
       ],
       "turnouts": {
@@ -15965,11 +15968,11 @@
         },
         {
           "signal": "1/12",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "U4",
-          "index": 9
+          "index": 8
         }
       ],
       "turnouts": {
@@ -17110,11 +17113,11 @@
         },
         {
           "signal": "1/12",
-          "index": 9
+          "index": 8
         },
         {
           "signal": "U2",
-          "index": 12
+          "index": 11
         }
       ],
       "turnouts": {
@@ -17340,11 +17343,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U4",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -17608,11 +17611,11 @@
         },
         {
           "signal": "1/12",
-          "index": 9
+          "index": 8
         },
         {
           "signal": "U2",
-          "index": 12
+          "index": 11
         }
       ],
       "turnouts": {
@@ -17819,11 +17822,11 @@
         },
         {
           "signal": "1/12",
-          "index": 9
+          "index": 8
         },
         {
           "signal": "U4",
-          "index": 11
+          "index": 10
         }
       ],
       "turnouts": {
@@ -21979,7 +21982,7 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         }
       ],
       "turnouts": {
@@ -22516,11 +22519,11 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "1/9",
-          "index": 12
+          "index": 11
         }
       ],
       "turnouts": {
@@ -22580,11 +22583,11 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "2/9",
-          "index": 11
+          "index": 10
         }
       ],
       "turnouts": {
@@ -22777,11 +22780,11 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "2/9",
-          "index": 11
+          "index": 10
         }
       ],
       "turnouts": {
@@ -22842,11 +22845,11 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "1/9",
-          "index": 12
+          "index": 11
         }
       ],
       "turnouts": {
@@ -23051,19 +23054,19 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "1/9",
-          "index": 12
+          "index": 11
         },
         {
           "signal": "1/11",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U1",
-          "index": 19
+          "index": 18
         }
       ],
       "turnouts": {
@@ -23137,19 +23140,19 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "2/9",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "1/11",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "U1",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -23223,19 +23226,19 @@
         },
         {
           "signal": "1/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "1/9",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "2/11",
-          "index": 13
+          "index": 12
         },
         {
           "signal": "U1",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -23488,19 +23491,19 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "2/9",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "2/11",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "U1",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -23576,19 +23579,19 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "4/9",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "3/11",
-          "index": 12
+          "index": 11
         },
         {
           "signal": "U1",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -23661,19 +23664,19 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "3/9",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "3/11",
-          "index": 12
+          "index": 11
         },
         {
           "signal": "U1",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -23749,19 +23752,19 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "1/9",
-          "index": 12
+          "index": 11
         },
         {
           "signal": "2/11",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U1",
-          "index": 19
+          "index": 18
         }
       ],
       "turnouts": {
@@ -24847,19 +24850,19 @@
         },
         {
           "signal": "1/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "1/9",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "2/11",
-          "index": 13
+          "index": 12
         },
         {
           "signal": "N1",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -24937,19 +24940,19 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "2/9",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "2/11",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "N1",
-          "index": 19
+          "index": 18
         }
       ],
       "turnouts": {
@@ -25027,19 +25030,19 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "4/9",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "3/11",
-          "index": 12
+          "index": 11
         },
         {
           "signal": "N1",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -25114,19 +25117,19 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "3/9",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "3/11",
-          "index": 12
+          "index": 11
         },
         {
           "signal": "N1",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -25204,19 +25207,19 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "1/9",
-          "index": 12
+          "index": 11
         },
         {
           "signal": "2/11",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "N1",
-          "index": 20
+          "index": 19
         }
       ],
       "turnouts": {
@@ -25297,19 +25300,19 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "2/9",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "1/11",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "N1",
-          "index": 19
+          "index": 18
         }
       ],
       "turnouts": {
@@ -25390,19 +25393,19 @@
         },
         {
           "signal": "2/7",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "1/9",
-          "index": 12
+          "index": 11
         },
         {
           "signal": "1/11",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "N1",
-          "index": 20
+          "index": 19
         }
       ],
       "turnouts": {
@@ -29280,7 +29283,7 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         }
       ],
       "turnouts": {
@@ -29808,11 +29811,11 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "1/9",
-          "index": 11
+          "index": 10
         }
       ],
       "turnouts": {
@@ -29871,11 +29874,11 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "2/9",
-          "index": 10
+          "index": 9
         }
       ],
       "turnouts": {
@@ -30065,11 +30068,11 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "2/9",
-          "index": 10
+          "index": 9
         }
       ],
       "turnouts": {
@@ -30129,11 +30132,11 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "1/9",
-          "index": 11
+          "index": 10
         }
       ],
       "turnouts": {
@@ -30335,19 +30338,19 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "1/9",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "1/11",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "U1",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -30420,19 +30423,19 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "2/9",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "1/11",
-          "index": 13
+          "index": 12
         },
         {
           "signal": "U1",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -30505,19 +30508,19 @@
         },
         {
           "signal": "1/7",
-          "index": 6
+          "index": 5
         },
         {
           "signal": "1/9",
-          "index": 9
+          "index": 8
         },
         {
           "signal": "2/11",
-          "index": 12
+          "index": 11
         },
         {
           "signal": "U1",
-          "index": 16
+          "index": 15
         }
       ],
       "turnouts": {
@@ -30592,19 +30595,19 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "2/9",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "2/11",
-          "index": 13
+          "index": 12
         },
         {
           "signal": "U1",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -30854,19 +30857,19 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "4/9",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "3/11",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "U1",
-          "index": 16
+          "index": 15
         }
       ],
       "turnouts": {
@@ -30938,19 +30941,19 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "3/9",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "3/11",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "U1",
-          "index": 16
+          "index": 15
         }
       ],
       "turnouts": {
@@ -31025,19 +31028,19 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "1/9",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "2/11",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "U1",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -32112,19 +32115,19 @@
         },
         {
           "signal": "1/7",
-          "index": 6
+          "index": 5
         },
         {
           "signal": "1/9",
-          "index": 9
+          "index": 8
         },
         {
           "signal": "2/11",
-          "index": 12
+          "index": 11
         },
         {
           "signal": "N1",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -32201,19 +32204,19 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "2/9",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "2/11",
-          "index": 13
+          "index": 12
         },
         {
           "signal": "N1",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -32290,19 +32293,19 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "4/9",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "3/11",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "N1",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -32376,19 +32379,19 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "3/9",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "3/11",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "N1",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -32465,19 +32468,19 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "1/9",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "2/11",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "N1",
-          "index": 19
+          "index": 18
         }
       ],
       "turnouts": {
@@ -32557,19 +32560,19 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "2/9",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "1/11",
-          "index": 13
+          "index": 12
         },
         {
           "signal": "N1",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -32649,19 +32652,19 @@
         },
         {
           "signal": "2/7",
-          "index": 7
+          "index": 6
         },
         {
           "signal": "1/9",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "1/11",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "N1",
-          "index": 19
+          "index": 18
         }
       ],
       "turnouts": {
@@ -37300,11 +37303,11 @@
         },
         {
           "signal": "1/12",
-          "index": 16
+          "index": 15
         },
         {
           "signal": "U2",
-          "index": 19
+          "index": 18
         }
       ],
       "turnouts": {
@@ -37391,11 +37394,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U2",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -37482,11 +37485,11 @@
         },
         {
           "signal": "1/12",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "U2",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -37762,11 +37765,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U2",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -37855,11 +37858,11 @@
         },
         {
           "signal": "1/12",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "U2",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -37945,11 +37948,11 @@
         },
         {
           "signal": "1/12",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "U2",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -38038,11 +38041,11 @@
         },
         {
           "signal": "1/12",
-          "index": 16
+          "index": 15
         },
         {
           "signal": "U2",
-          "index": 19
+          "index": 18
         }
       ],
       "turnouts": {
@@ -40320,11 +40323,11 @@
         },
         {
           "signal": "1/12",
-          "index": 16
+          "index": 15
         },
         {
           "signal": "U4",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -40410,11 +40413,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U4",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -40500,11 +40503,11 @@
         },
         {
           "signal": "1/12",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "U4",
-          "index": 16
+          "index": 15
         }
       ],
       "turnouts": {
@@ -40592,11 +40595,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U4",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -40869,11 +40872,11 @@
         },
         {
           "signal": "1/12",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "U4",
-          "index": 16
+          "index": 15
         }
       ],
       "turnouts": {
@@ -40958,11 +40961,11 @@
         },
         {
           "signal": "1/12",
-          "index": 14
+          "index": 13
         },
         {
           "signal": "U4",
-          "index": 16
+          "index": 15
         }
       ],
       "turnouts": {
@@ -41050,11 +41053,11 @@
         },
         {
           "signal": "1/12",
-          "index": 16
+          "index": 15
         },
         {
           "signal": "U4",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -44108,11 +44111,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U2",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -44202,11 +44205,11 @@
         },
         {
           "signal": "1/12",
-          "index": 16
+          "index": 15
         },
         {
           "signal": "U2",
-          "index": 19
+          "index": 18
         }
       ],
       "turnouts": {
@@ -44297,11 +44300,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U2",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -44389,11 +44392,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U2",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -44484,11 +44487,11 @@
         },
         {
           "signal": "1/12",
-          "index": 17
+          "index": 16
         },
         {
           "signal": "U2",
-          "index": 20
+          "index": 19
         }
       ],
       "turnouts": {
@@ -44582,11 +44585,11 @@
         },
         {
           "signal": "1/12",
-          "index": 16
+          "index": 15
         },
         {
           "signal": "U2",
-          "index": 19
+          "index": 18
         }
       ],
       "turnouts": {
@@ -44680,11 +44683,11 @@
         },
         {
           "signal": "1/12",
-          "index": 17
+          "index": 16
         },
         {
           "signal": "U2",
-          "index": 20
+          "index": 19
         }
       ],
       "turnouts": {
@@ -47200,11 +47203,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U4",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -47294,11 +47297,11 @@
         },
         {
           "signal": "1/12",
-          "index": 16
+          "index": 15
         },
         {
           "signal": "U4",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -47388,11 +47391,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U4",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -47479,11 +47482,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U4",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -47573,11 +47576,11 @@
         },
         {
           "signal": "1/12",
-          "index": 17
+          "index": 16
         },
         {
           "signal": "U4",
-          "index": 19
+          "index": 18
         }
       ],
       "turnouts": {
@@ -47670,11 +47673,11 @@
         },
         {
           "signal": "1/12",
-          "index": 16
+          "index": 15
         },
         {
           "signal": "U4",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -47767,11 +47770,11 @@
         },
         {
           "signal": "1/12",
-          "index": 17
+          "index": 16
         },
         {
           "signal": "U4",
-          "index": 19
+          "index": 18
         }
       ],
       "turnouts": {
@@ -51734,11 +51737,11 @@
         },
         {
           "signal": "1/12",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "U2",
-          "index": 11
+          "index": 10
         }
       ],
       "turnouts": {
@@ -51957,11 +51960,11 @@
         },
         {
           "signal": "1/12",
-          "index": 8
+          "index": 7
         },
         {
           "signal": "U4",
-          "index": 10
+          "index": 9
         }
       ],
       "turnouts": {
@@ -53666,11 +53669,11 @@
         },
         {
           "signal": "1/12",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "U2",
-          "index": 14
+          "index": 13
         }
       ],
       "turnouts": {
@@ -53735,11 +53738,11 @@
         },
         {
           "signal": "1/12",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "U2",
-          "index": 13
+          "index": 12
         }
       ],
       "turnouts": {
@@ -54037,11 +54040,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U4",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -54131,11 +54134,11 @@
         },
         {
           "signal": "1/12",
-          "index": 16
+          "index": 15
         },
         {
           "signal": "U4",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -54225,11 +54228,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U4",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -54316,11 +54319,11 @@
         },
         {
           "signal": "1/12",
-          "index": 15
+          "index": 14
         },
         {
           "signal": "U4",
-          "index": 17
+          "index": 16
         }
       ],
       "turnouts": {
@@ -54410,11 +54413,11 @@
         },
         {
           "signal": "1/12",
-          "index": 17
+          "index": 16
         },
         {
           "signal": "U4",
-          "index": 19
+          "index": 18
         }
       ],
       "turnouts": {
@@ -54507,11 +54510,11 @@
         },
         {
           "signal": "1/12",
-          "index": 16
+          "index": 15
         },
         {
           "signal": "U4",
-          "index": 18
+          "index": 17
         }
       ],
       "turnouts": {
@@ -54604,11 +54607,11 @@
         },
         {
           "signal": "1/12",
-          "index": 17
+          "index": 16
         },
         {
           "signal": "U4",
-          "index": 19
+          "index": 18
         }
       ],
       "turnouts": {
@@ -56057,11 +56060,11 @@
         },
         {
           "signal": "1/12",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "U2",
-          "index": 13
+          "index": 12
         }
       ],
       "turnouts": {
@@ -56127,11 +56130,11 @@
         },
         {
           "signal": "1/12",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "U2",
-          "index": 14
+          "index": 13
         }
       ],
       "turnouts": {
@@ -56410,11 +56413,11 @@
         },
         {
           "signal": "1/12",
-          "index": 10
+          "index": 9
         },
         {
           "signal": "U4",
-          "index": 12
+          "index": 11
         }
       ],
       "turnouts": {
@@ -56479,11 +56482,11 @@
         },
         {
           "signal": "1/12",
-          "index": 11
+          "index": 10
         },
         {
           "signal": "U4",
-          "index": 13
+          "index": 12
         }
       ],
       "turnouts": {

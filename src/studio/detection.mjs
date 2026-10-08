@@ -14,7 +14,9 @@ export function detectionInventory({ profile, xml }) {
   }
   const physical = name => name.startsWith('LS') ? name : (byUser[name]?.startsWith('LS') ? byUser[name] : null);
   const isButton = v => v.name.startsWith('ss');                      // Spärra spår-knapparna i JMRI
-  const inputsOf = src => { const out = []; for (const r of rules[src] || []) for (const v of r.variables) if ((v.type === 1 || v.type === 2) && !isButton(v)) { const p = physical(v.name); if (p && !out.includes(p)) out.push(p); } return out; };
+  // En regel kan läsa en annan intern sensor i stället för ingången: S100a läser slS100, som regeln S100 sätter från LS60
+  // (C77 och C24). Då följs kedjan till de fysiska ingångarna.
+  const inputsOf = (src, seen = new Set()) => { const out = []; seen.add(src); for (const r of rules[src] || []) for (const v of r.variables) if ((v.type === 1 || v.type === 2) && !isButton(v)) { const p = physical(v.name); const found = p ? [p] : rules[v.name] && !seen.has(v.name) ? inputsOf(v.name, seen) : []; for (const f of found) if (!out.includes(f)) out.push(f); } return out; };
   const shapeOf = src => {
     const rs = rules[src]; if (!rs) return 'noRule';
     const r = rs.find(x => !x.variables.some(isButton)) || rs[0];

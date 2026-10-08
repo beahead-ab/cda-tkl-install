@@ -18,8 +18,8 @@ export class TrainInformation {
     if(this.data.schema===1)this.data={...this.data,schema:2,follows:[]};
     const d=this.data;
     if(d.schema!==2||d.sourceHash!==this.sourceHash||!Number.isSafeInteger(d.revision)||d.revision<0||!record(d.entries)||!Array.isArray(d.history)||d.history.length>200) throw Error('Sparad tåginformation är ogiltig eller hör till annat källunderlag. Kontrollera före start.');
-    for(const [key,e] of Object.entries(d.entries)) if(!this.objects.has(key)||!record(e)||!validValue(e.value)||!e.value.trim()||!['manual','follow'].includes(e.source)||(e.review!==undefined&&typeof e.review!=='boolean')||!Number.isFinite(e.updatedAt)||typeof e.sessionId!=='string'||!Number.isSafeInteger(e.epoch)||e.epoch<0) throw Error('Sparad tågidentitet är ogiltig: '+key);
-    for(const e of d.history) if(!record(e)||!['assign','confirm','clear','move','follow-start','follow-move','follow-pause','follow-stop','follow-complete'].includes(e.kind)||!Number.isFinite(e.at)||!Number.isSafeInteger(e.revision)||e.revision<1||e.revision>d.revision||!['manual','follow'].includes(e.source)||!validValue(e.before)||!validValue(e.after)||(['move','follow-move'].includes(e.kind)?[e.from,e.to]:[e.key]).some(key=>!this.objects.has(key))) throw Error('Sparad tågnummershistorik är ogiltig.');
+    for(const [key,e] of Object.entries(d.entries)) if(!this.objects.has(key)||!record(e)||!validValue(e.value)||!e.value.trim()||!['manual','follow','simulation'].includes(e.source)||(e.review!==undefined&&typeof e.review!=='boolean')||!Number.isFinite(e.updatedAt)||typeof e.sessionId!=='string'||!Number.isSafeInteger(e.epoch)||e.epoch<0) throw Error('Sparad tågidentitet är ogiltig: '+key);
+    for(const e of d.history) if(!record(e)||!['assign','confirm','clear','move','follow-start','follow-move','follow-pause','follow-stop','follow-complete'].includes(e.kind)||!Number.isFinite(e.at)||!Number.isSafeInteger(e.revision)||e.revision<1||e.revision>d.revision||!['manual','follow','simulation'].includes(e.source)||!validValue(e.before)||!validValue(e.after)||(['move','follow-move'].includes(e.kind)?[e.from,e.to]:[e.key]).some(key=>!this.objects.has(key))) throw Error('Sparad tågnummershistorik är ogiltig.');
     this.validateFollows();
   }
   catalog(){return {sourceHash:this.sourceHash,fields:copy(this.fields),anchors:copy(this.anchors)};}
@@ -59,6 +59,15 @@ export class TrainInformation {
     this.detach(next,[key]);
     if(value) next.entries[key]=this.entry(value,key);else delete next.entries[key];
     return this.commit(next,{kind:before===value?'confirm':value?'assign':'clear',key,before,after:value});
+  }
+  // Simulerade tåg (0.74.0): den simulerade grannstationen anmäler ett tåg i linjens inkommande fält, och tömmer
+  // fältet när tåget har kommit in. Ingen session- eller beläggningskontroll: det är ingen operatör som redigerar.
+  announce(key,value) {
+    if(this.fault||this.objects.get(key)?.kind!=='incoming'||!validValue(value))return null;
+    const before=this.data.entries[key]?.value||'';if(before===value)return null;
+    const next=copy(this.data);this.detach(next,[key]);
+    if(value)next.entries[key]={...this.entry(value,key),source:'simulation'};else delete next.entries[key];
+    try{return this.commit(next,{kind:value?'assign':'clear',key,before,after:value,source:'simulation'});}catch(error){this.fault='Tåginformationen kunde inte sparas: '+error.message;return null;}
   }
   move({revision,sessionId,from,to,epochs,...extra}) {
     if(Object.keys(extra).length||from===to) fail('Välj två olika informationsfält.');

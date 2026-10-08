@@ -18,6 +18,7 @@ export class LocoNetClient extends EventEmitter {
     socket.on('error', e => this.emit('fault', e.code || e.message));
     socket.on('close', () => {
       clearInterval(this.watch); this.online = false; this.queue = []; this.pending = 0;
+      for (const w of this.simulations?.splice(0) || []) { clearTimeout(w.timer); w.reject(Error('Förbindelsen till simulatorn bröts.')); }
       this.emit('connection', false);
       if (!this.stopped) this.retry = setTimeout(() => this.start(), 1000);
     });
@@ -32,7 +33,22 @@ export class LocoNetClient extends EventEmitter {
       if (!this.pending) { this.emit('fault', 'Oväntad transportkvittens'); return; }
       if (!line.startsWith('SENT OK')) { this.emit('fault', line); this.socket.destroy(); return; }
       this.pending = 0; this.flush();
+    } else if (line.startsWith('SIM ')) {
+      const waiting = this.simulations?.shift(); if (!waiting) return;
+      clearTimeout(waiting.timer);
+      if (line.startsWith('SIM OK')) { try { waiting.resolve(JSON.parse(line.slice(7) || '{}')); } catch { waiting.resolve({}); } }
+      else waiting.reject(Error(line.slice(10) || 'Simulatorn avböjde.'));
     } else if (line.startsWith('ERROR') || line.startsWith('BREAK')) this.emit('fault', line);
+  }
+  // Bara mot simulatorn (src/simulator.mjs): ett simuleringskommando på samma förbindelse, utan LocoNet-telegram.
+  simulate(command) {
+    if (!this.online) return Promise.reject(Error('Ingen kontakt med simulatorn.'));
+    return new Promise((resolve, reject) => {
+      const waiting = { resolve, reject };
+      waiting.timer = setTimeout(() => { const i = this.simulations.indexOf(waiting); if (i >= 0) this.simulations.splice(i, 1); reject(Error('Simulatorn svarade inte.')); }, 3000);
+      (this.simulations ??= []).push(waiting);
+      const line = 'SIM ' + JSON.stringify(command); this.socket.write(line + '\r\n'); this.emit('protocol', { direction: 'out', line });
+    });
   }
   send(data) {
     if (!this.online) return false;

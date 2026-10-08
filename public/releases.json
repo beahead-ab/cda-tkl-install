@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.74.0",
+    "date": "2026-10-08",
+    "notes": [
+      "Simulera tåg under Drift: grannstationerna släpper in tåg med nummer på linjerna, som anmäls i det inkommande fältet och väntar vid infartssignalen",
+      "Tåget kör när tågvägen är lagd, stannar på målspåret och kör vidare på nästa tågväg; ut på en linje lämnar det anläggningen",
+      "Tågvägen löses upp när tåget står helt på målspåret, utan växel under sig; målspåret förblir belagt",
+      "Simulatorn tänder inte längre andra ingångar på en spårledning som bara delar adress med det belagda blocket"
+    ]
+  },
+  {
     "version": "0.73.0",
     "date": "2026-10-08",
     "notes": [

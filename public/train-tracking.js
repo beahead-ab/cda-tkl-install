@@ -20,7 +20,18 @@ export function createTrainTracking({plan,panel,controls,api,message,displayName
   const dialog=document.createElement('dialog');dialog.className='incoming-train-menu tracking-menu';dialog.setAttribute('aria-label','Spårat tåg');
   dialog.innerHTML='<h2></h2><p data-tracking-place></p><label>Tågnummer<input data-tracking-number maxlength="24" autocomplete="off"></label><button data-tracking-save class="primary">Spara och bekräfta</button><button data-tracking-remove>Ta bort ur spårningen</button><p data-tracking-message role="status"></p><button data-tracking-close>Stäng</button>';
   document.body.append(dialog);
-  let view=null,online=false,selected=null,last='';
+  let view=null,online=false,selected=null,last='',simulation=null;
+  // Simulera tåg (0.74.0): bara i simuleringsläge, bland driftknapparna. Grannstationerna släpper då in tåg på linjerna.
+  const simulate=document.createElement('button');simulate.type='button';simulate.id='simulate-trains';simulate.hidden=true;
+  simulate.title='Simulerade grannstationer släpper in tåg med nummer på linjerna. Tåget kör när du lagt en tågväg och signalen visar kör, stannar på målspåret och kör vidare på nästa tågväg.';
+  document.querySelector('.drift-actions')?.append(simulate);
+  simulate.onclick=async()=>{const answer=await api('simulation/trains',{enabled:!simulation?.enabled});if(answer){simulation=answer;paintSimulation();}};
+  function paintSimulation(){
+    simulate.hidden=!simulation?.available;if(simulate.hidden)return;
+    simulate.setAttribute('aria-pressed',String(!!simulation.enabled));
+    const next=simulation.enabled&&simulation.nextAt?Math.max(0,Math.round((simulation.nextAt-Date.now())/1000)):null;
+    simulate.textContent=simulation.enabled?'Simulerade tåg på'+(next!=null?' · nästa om '+next+' s':''):'Simulera tåg';
+  }
   const $d=s=>dialog.querySelector(s);
   const place=t=>t.state==='ghost'?'Senast sedd vid '+displayName('blocks',t.head):'Vid '+displayName('blocks',t.head)+(t.route?' · tågväg '+t.route:'');
   function open(id){
@@ -69,5 +80,5 @@ export function createTrainTracking({plan,panel,controls,api,message,displayName
     list.innerHTML=`<h4>Spårade tåg <small>simulering · ur spåravkänningen</small></h4>${rows||lines?`<ul>${rows}${lines}</ul>`:'<p class="muted">Inga tåg på stationen eller linjerna just nu.</p>'}`;
   }
   list.addEventListener('click',e=>{const b=e.target.closest('[data-tracking-open]');if(b)open(b.dataset.trackingOpen);});
-  return {update(next,isOnline){view=next||null;online=isOnline;draw();}};
+  return {update(next,isOnline,sim){view=next||null;online=isOnline;simulation=sim||null;paintSimulation();draw();}};
 }

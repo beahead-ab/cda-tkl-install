@@ -69,10 +69,10 @@ export class TrainTracker{
     this.input={turnouts:{},routes:[],lines:[],edgeInfo:{},book:{}};
     // Kanterna: knappen för linjen (htvAu …) och blocket vid den, samt första blocket i tågvägarna in från linjen
     // och sista i tågvägarna ut. Det är där tåg kommer och går.
-    const topology=new Topology(panel);this.edgeOf={};this.exitEdge={};
+    const topology=new Topology(panel);this.edgeOf={};this.exitEdge={};this.edgeBlock={};
     for(const edge of Object.keys(EDGES)){
       const button=topology.buttons['htv'+edge],block=button&&topology.segments[button.segment]?.b;
-      if(profile.blocks[block]){this.edgeOf[block]=edge;this.exitEdge[block]=edge;}
+      if(profile.blocks[block]){this.edgeOf[block]=edge;this.exitEdge[block]=edge;this.edgeBlock[edge]=block;}
       for(const r of profile.routes){if(r.from==='htv'+edge&&r.blocks[0])this.edgeOf[r.blocks[0]]??=edge;if(r.to==='htv'+edge&&r.blocks.at(-1))this.exitEdge[r.blocks.at(-1)]??=edge;}
     }
     this.detectors=Object.fromEntries(Object.entries(profile.blocks).map(([n,b])=>[n,(b.inputs||[b]).map(i=>i.address)]));
@@ -200,7 +200,7 @@ export class TrainTracker{
       if(ghost){ghost.state='station';ghost.certain=false;ghost.body=this.order(component);ghost.movedAt=now;for(const b of component)ghost.entered[b]=now;this.log('train-tracking',`Tåg ${ghost.number||ghost.label} syns igen vid ${ghost.head}.`);continue;}
       const edge=component.map(b=>this.edgeOf[b]).find(Boolean),body=this.order(component,edge);
       const named=this.numberFor(component,edge);
-      const t=this.add(body,now,named);
+      const t=this.add(body,now,named);t.edge=edge||'';
       this.log('train-tracking',edge?`Tåg ${t.number||t.label} kom in från ${this.input.edgeInfo[edge]?.name||'linje '+EDGES[edge]} (${edge}).`:`Okänt tåg ${t.label} vid ${t.head}. Ange numret.`);
     }
   }
@@ -230,6 +230,12 @@ export class TrainTracker{
   }
   // Ett nummer som operatören skrivit på ett block där tåget står gäller: det är bekräftelsen.
   applyBook(){
+    // Ett tåg från en kant som fick okänt nummer tar det inkommande fältets nummer om anmälan kom efter tåget.
+    const live=new Set(this.trains.map(t=>t.number).filter(Boolean));
+    for(const t of this.trains.filter(t=>t.state==='station'&&!t.number&&t.edge)){
+      const e=this.input.book[INCOMING_FIELDS[t.edge]];
+      if(e?.value&&e.value!=='-'&&!live.has(e.value)){t.number=e.value;t.label=e.value;t.certain=true;t.source='inkommande fält';live.add(e.value);this.log('train-tracking',`Tåg ${e.value} vid ${t.head}: numret från det inkommande fältet.`);}
+    }
     for(const t of this.trains.filter(t=>t.state==='station'))for(const b of t.body){
       const e=this.input.book['block:'+b];if(!e?.value||this.appliedBook[b]===e.updatedAt)continue;
       this.appliedBook[b]=e.updatedAt;if(t.number!==e.value||!t.certain){t.number=e.value;t.label=e.value;t.certain=true;t.source='operatör';}

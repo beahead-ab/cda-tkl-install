@@ -37,11 +37,15 @@ export class Field extends EventEmitter {
     const physical = value === 'unknown' ? value : b.inverted ? (value === 'C' ? 'T' : 'C') : value;
     this.emit('frame', switchReport(b.address, physical));
   }
+  // En ingång är aktiv när ett block som själv belagts (av ett tåg eller ett klick) har den. Block som bara delar adress
+  // följer med i simulatorns bild men tänder inte sina andra ingångar: S95b belägger LS13, och SLI (LS13 eller LS74)
+  // blir belagd, men LS74 förblir fri (0.74.0).
+  inputActive(address) { return Object.entries(this.direct || {}).some(([n, on]) => on && (this.profile.blocks[n].inputs || [this.profile.blocks[n]]).some(i => i.address === address)); }
   reportBlock(name) {
     if (this.faults.sensor && this.profile.blocks[this.faults.sensor].address === this.profile.blocks[name].address) return;
     const b = this.profile.blocks[name];
     // Flera ingångar rapporterar alla samma beläggning; simulatorn har ingen egen bild av var på spårledningen tåget står.
-    for (const i of b.inputs || [b]) this.emit('frame', sensorReport(i.address, i.activeMeansOccupied ? this.blocks[name] : !this.blocks[name]));
+    for (const i of b.inputs || [b]) { const active = this.inputActive(i.address); this.emit('frame', sensorReport(i.address, i.activeMeansOccupied ? active : !active)); }
   }
   reportSignal(name) {
     const s = this.signals[name], b = this.profile.signals[name]; if (s.virtual) return;
@@ -100,6 +104,7 @@ export class Field extends EventEmitter {
     this.updateBlock(name,occupied); this.tick();
   }
   updateBlock(name,occupied) {
+    (this.direct ??= {})[name]=occupied;
     const address=this.profile.blocks[name].address;
     for(const [alias,binding] of Object.entries(this.profile.blocks)) if(binding.address===address) this.blocks[alias]=occupied;
     this.reportBlock(name);
@@ -124,7 +129,38 @@ export class Field extends EventEmitter {
     this.trains.push({number:'P'+(++this.nextTrain),label:path.label,blocks,signalEntries:path.signalEntries || [{signal:path.signal,index:0}],turnouts:path.turnouts || {},index:-1,nextAt:this.now()+50});
     this.train=this.trains[0] || null;
   }
+  // Simulerade tåg på linjerna (0.74.0). Ett tåg med nummer ställs på linjen utanför infartssignalen, kör när en
+  // tågväg därifrån är lagd och signalerna visar kör, stannar på målspåret och kör vidare på nästa tågväg. Ut på en
+  // linje lämnar det anläggningen. Simulatorn vet inget om TKL:s tågvägar: den läser växlarna och signalerna, och
+  // tåget väljer den färd vars växlar ligger rätt och vars signaler visar kör.
+  routes(){return this.catalogue??=[...this.profile.scenarios,...(this.profile.scenarioAlternatives||[])].map(s=>{const [from,to]=s.id.split('--');return {...s,from,to};});}
+  // Block som följer på varandra i någon färd: där kan ett stående tåg börja nästa.
+  neighbours(){if(!this.adjacent){this.adjacent={};for(const s of this.routes())s.blocks.forEach((b,i)=>{const n=s.blocks[i+1];if(n){(this.adjacent[b]??=new Set()).add(n);(this.adjacent[n]??=new Set()).add(b);}});}return this.adjacent;}
+  spawnTrain({number,at}={}) {
+    if(typeof number!=='string'||!/^[\p{L}\p{N} ._/-]{1,24}$/u.test(number))throw Error('Ogiltigt tågnummer.');
+    if(!/^htv(Au|An|Bu|Bn|Cu|Cn)$/.test(at))throw Error('Okänd linje.');
+    const block=this.routes().find(s=>s.to===at)?.blocks.at(-1);if(!block)throw Error('Linjen saknar block utanför infartssignalen.');
+    const address=this.profile.blocks[block].address;
+    if(this.blocks[block]||this.trains.some(t=>t.blocks.some(n=>this.profile.blocks[n].address===address)))throw Error('Linjen är belagd.');
+    if(this.trains.some(t=>t.number===number))throw Error(`Tåg ${number} finns redan.`);
+    this.updateBlock(block,true);
+    const t={number,label:'På linjen',blocks:[block],index:0,position:at,standing:true,park:true,signalEntries:[],turnouts:{},waiting:'Väntar vid infartssignalen',nextAt:this.now()+500};
+    this.trains.push(t);this.train=this.trains[0]||null;return {number,block};
+  }
+  depart(t) {
+    const here=t.blocks[t.index],address=this.profile.blocks[here].address,near=this.neighbours()[here]||new Set();
+    const busy=new Set(this.trains.filter(o=>o!==t).flatMap(o=>o.blocks.map(n=>this.profile.blocks[n].address)));
+    const path=this.routes().find(s=>(s.from===t.position||near.has(s.blocks[0]))&&!s.blocks.some(b=>this.profile.blocks[b].address===address)
+      &&Object.entries(s.turnouts||{}).every(([n,p])=>this.turnouts[n].position===p)&&(s.signals||[s.signal]).every(n=>this.signals[n].code)
+      &&s.blocks.every(b=>!this.blocks[b]&&!busy.has(this.profile.blocks[b].address)));
+    t.nextAt=this.now()+400;
+    if(!path)return false;
+    const seen=new Set([address]),blocks=path.blocks.filter(n=>{const a=this.profile.blocks[n].address;if(seen.has(a))return false;seen.add(a);return true;});
+    Object.assign(t,{label:path.label,to:path.to,blocks:[here,...blocks],index:0,standing:false,waiting:null,turnouts:path.turnouts||{},signalEntries:(path.signalEntries||[{signal:path.signal,index:0}]).map(e=>({...e,index:e.index+1}))});
+    return true;
+  }
   stepTrain(t) {
+    if (t.standing) { this.depart(t); return; }
     const next = t.index + 1;
     const stop = t.signalEntries.find(e => e.index === next && !this.signals[e.signal].code);
     const moved = Object.entries(t.turnouts).some(([n,p]) => this.turnouts[n].position !== p);
@@ -133,9 +169,18 @@ export class Field extends EventEmitter {
     t.index++; t.nextAt = this.now() + 850;
     if (t.index < t.blocks.length) this.updateBlock(t.blocks[t.index],true);
     if (t.index >= 2) this.updateBlock(t.blocks[t.index-2],false);
+    // Framme på ett spår på stationen: tåget står kvar i sista blocket. Ut på en linje lämnar det anläggningen.
+    if (t.park && t.index === t.blocks.length && !/^htv(Au|An|Bu|Bn|Cu|Cn|D)$/.test(t.to)) {
+      Object.assign(t,{blocks:[t.blocks.at(-1)],index:0,standing:true,position:t.to,waiting:'Står på '+t.label.split(' → ').at(-1),nextAt:this.now()+1500});
+      return;
+    }
     if (t.index >= t.blocks.length + 1) this.trains=this.trains.filter(x=>x!==t);
     this.train=this.trains[0] || null;
     // tick on the next 50 ms cycle recalculates local signal protection.
+  }
+  simulate(command) {
+    if (command?.kind === 'spawn') { const result = this.spawnTrain(command); this.tick(); return result; }
+    throw Error('Okänt simuleringskommando.');
   }
   snapshot() { return { turnouts: this.turnouts, blocks: this.blocks, signals: this.signals, programming:this.programming,faults: this.faults, train: this.train, trains:this.trains, scenarios: this.profile.scenarios }; }
 }

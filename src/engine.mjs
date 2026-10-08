@@ -10,6 +10,8 @@ import { YardControl } from './yard-control.mjs';
 import { signalReportKind, aspectFromSwitch } from './signal-report.mjs';
 
 const FIELD_ROWS = new Set(['report', 'transport']), FIELD_ORDERS = new Set(['order', 'permission']);
+// Upplösning vid ankomst: så länge ska tåget ha stått helt på målspåret innan tågvägen löses upp.
+const ARRIVAL_MS = 3000;
 export class Engine extends EventEmitter {
   constructor(profile, { send = () => {}, storage, now = Date.now } = {}) {
     super(); this.profile = profile; this.send = send; this.storage = storage; this.now = now;
@@ -514,6 +516,14 @@ export class Engine extends EventEmitter {
     for (const name of r.signals) this.permission(name, 'STOP'); this.persist();
     this.log('route-held', `${r.label}: ${reason} Låsen ligger kvar.`);
   }
+  arrived(r) {
+    if(!r.autoRelease||!r.passage?.length)return false;
+    const last=r.passage.at(-1);
+    if(last.state!=='occupied'||r.passage.slice(0,-1).some(p=>p.state!=='clear'))return false;
+    const final=new Set(r.blocks.filter(b=>this.profile.blocks[b].address===last.address));
+    const underTrain=Object.keys(r.turnouts).some(n=>final.has(this.profile.turnouts[n]?.block));
+    return !underTrain&&r.blocks.every(b=>final.has(b)||this.fresh(this.blocks[b])&&this.blocks[b].occupied===false);
+  }
   observePassage(report) {
     for(const r of this.routes) {
       if(!r.autoRelease || r.cancelRequested || ['held','occupied','cancelling'].includes(r.state)) continue;
@@ -557,10 +567,12 @@ export class Engine extends EventEmitter {
       const protectedSignals = this.guardSignals(r).every(n => this.guardConfirmed(r,n));
       if (r.cancelRequested) {
         const stopped = r.signals.every(n => this.fresh(this.signals[n]) && this.signals[n].aspect === 'stop' && this.signals[n].updatedAt >= r.cancelAt && this.signals[n].reportSequence > (r.cancelSequence ?? -1));
-        if (free && known && stopped && protectedSignals && !this.storageFault) {
+        // Ett tåg som står helt på målspåret hindrar inte återtagningen (se arrived).
+        const arrived = !free && this.arrived(r);
+        if ((free || arrived) && known && stopped && protectedSignals && !this.storageFault) {
           const previous = this.routes; this.routes = this.routes.filter(x => x.id !== r.id);
           try { this.persist(); } catch (e) { this.routes = previous; throw e; }
-          this.log('released', `${r.label}: stopp bekräftat, vägen fri, lås frigivna.`);
+          this.log('released', arrived ? `${r.label}: tåget står på målspåret, stopp bekräftat, lås frigivna.` : `${r.label}: stopp bekräftat, vägen fri, lås frigivna.`);
         }
         continue;
       }
@@ -575,6 +587,11 @@ export class Engine extends EventEmitter {
         });
         if(lostSignal) {this.hold(r,'Signalbesked under tågpassagen stämmer inte med medgivandet.');continue;}
         if(free && r.passage.every(p=>p.state==='clear')) this.cancel(r.id);
+        // Upplösning vid ankomst (0.74.0): tåget har lämnat alla avsnitt före målspåret och står helt på det, utan någon
+        // av tågvägens växlar under sig. Efter ARRIVAL_MS begärs återtagning; låsen släpps först efter stoppbesked som
+        // vid all återtagning, och målspåret förblir belagt så att ingen ny tågväg kan läggas in på det.
+        else if(this.arrived(r)) { r.arrivedAt??=now; if(now-r.arrivedAt>=ARRIVAL_MS){ r.arrival=true; this.log('route-arrived',`${r.label}: tåget har kommit fram och står på målspåret. Tågvägen löses upp.`); this.cancel(r.id); } }
+        else delete r.arrivedAt;
         continue;
       }
       if (!protectedSignals && this.connected) { this.hold(r, 'En annan signal till samma provområde saknar bekräftat stopp.'); continue; }

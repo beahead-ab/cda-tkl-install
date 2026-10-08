@@ -16,6 +16,7 @@ import { BindingConfiguration } from './binding-configuration.mjs';
 import { Configuration } from './configuration.mjs';
 import { TrainInformation } from './train-information.mjs';
 import { TrainTracker } from './train-tracking.mjs';
+import { TrainSimulation } from './train-simulation.mjs';
 import { destinationLines } from '../public/destination-data.js';
 import { PanelIndications } from './panel-indications.mjs';
 import { TrainMeet } from './trainmeet.mjs';
@@ -111,6 +112,15 @@ function edgeInfo(){
   }
   return out;
 }
+// Simulerade tåg (src/train-simulation.mjs): bara i simuleringsläge, mot simulatorn över den lokala förbindelsen.
+const trainSimulation=new TrainSimulation({available:process.env.CHARLOTTENDAL_CONNECTION_MODE==='simulator',reason:'Simulerade tåg finns bara i simuleringsläge.',
+  send:command=>client.simulate(command),announce:(key,value)=>{if(trainInformation.announce(key,value))dirty=true;},log:(kind,message)=>engine.log(kind,message)});
+let simulated=0,simulationRevision=0;
+function simulate(){
+  if(!trainSimulation.available||Date.now()-simulated<1000)return;simulated=Date.now();
+  const edges=Object.fromEntries(Object.entries(edgeInfo()).map(([edge,info])=>[edge,{...info,block:tracker.edgeBlock[edge]}]));
+  trainSimulation.tick({edges,blocks:engine.blocks,tracked:tracker.view().trains}).catch(error=>engine.log('error','Simulerade tåg: '+error.message)).finally(()=>{if(trainSimulation.revision!==simulationRevision){simulationRevision=trainSimulation.revision;dirty=true;}});
+}
 let tracked=0,tracking=false;
 // Spårningens journalrader väcker kärnans change-händelse; den läser inte om sig själv under tiden.
 function track(){
@@ -149,7 +159,7 @@ const installKind=process.env.CHARLOTTENDAL_INSTALL_KIND||(fs.existsSync('/usr/l
 const updateCheck=installKind?new UpdateCheck({current:release,kind:installKind,statusFile:path.join(storage.directory,'update.json'),readFile:file=>fs.readFileSync(file,'utf8'),
   writeFile:(file,text)=>{fs.writeFileSync(file+'.tmp',text,{mode:0o640});fs.renameSync(file+'.tmp',file);},hook:process.env.RENDER_DEPLOY_HOOK_URL}):null;
 updateCheck?.start();
-const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot(),trainTracking:tracker.view() };};
+const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot(),trainTracking:tracker.view(),trainSimulation:trainSimulation.view() };};
 const server = http.createServer(async (req, res) => {
   try {
     guard(req, port); const url = new URL(req.url, `http://127.0.0.1:${port}`);
@@ -268,6 +278,7 @@ const server = http.createServer(async (req, res) => {
       return json(res,result);
     }
     // Tågspårningen: operatören rättar eller bekräftar numret, eller tar bort ett tåg som inte finns.
+    if(url.pathname==='/api/simulation/trains'){const result=trainSimulation.set(data.enabled===true);dirty=true;return json(res,result);}
     if(url.pathname==='/api/tracking/name'){const result=tracker.name(data.id,data.number);dirty=true;return json(res,result);}
     if(url.pathname==='/api/tracking/remove'){const result=tracker.remove(data.id);engine.log('train-tracking','Ett tåg togs bort ur spårningen av operatören.');dirty=true;return json(res,result);}
     if(url.pathname.startsWith('/api/train-information/')) {
@@ -311,7 +322,7 @@ let tick, publish;
 // CHARLOTTENDAL_LISTEN=0.0.0.0 lets the rangerare's station reach TKL over the layout's network.
 server.listen(port, process.env.CHARLOTTENDAL_LISTEN || '127.0.0.1', () => {
   console.log(`Charlottendal TKL: http://127.0.0.1:${port}`); client.start();
-  tick = setInterval(() => {protect(() => engine.tick());if(Date.now()-tracked>300)track();recorder.tick();modelClock.checkpoint();trainMeet.tick();if(Date.now()-clockPublished>1000){dirty=true;clockPublished=Date.now();}}, 100);
+  tick = setInterval(() => {protect(() => engine.tick());if(Date.now()-tracked>300)track();simulate();recorder.tick();modelClock.checkpoint();trainMeet.tick();if(Date.now()-clockPublished>1000){dirty=true;clockPublished=Date.now();}}, 100);
   publish = setInterval(() => {
     if (!dirty) return; dirty = false; const text = `data: ${JSON.stringify(snapshot())}\n\n`;
     for (const res of streams) { if (res.writableLength > 1e6) { res.end(); streams.delete(res); } else res.write(text); }

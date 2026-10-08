@@ -18,6 +18,13 @@ const wire = net.createServer(socket => {
   if (!link) return socket.destroy();
   clients.add(socket); socket.setNoDelay(true); socket.write('VERSION Charlottendal field laboratory 0.1\r\n');
   const reader = new LineReader(line => {
+    // TKL i simuleringsläge ställer simulerade tåg på linjerna över samma lokala förbindelse (SIM <json>); en riktig
+    // LocoBuffer får aldrig sådana rader. Svaret är SIM OK <json> eller SIM ERROR <text>.
+    if (line.startsWith('SIM ')) {
+      try { socket.write('SIM OK ' + JSON.stringify(field.simulate(JSON.parse(line.slice(4))) || {}) + '\r\n'); }
+      catch (e) { socket.write('SIM ERROR ' + String(e.message).replace(/[\r\n]+/g, ' ') + '\r\n'); }
+      return;
+    }
     try {
       if (!line.startsWith('SEND ')) throw Error('Expected SEND');
       const bytes = fromHex(line.slice(5)); record('in', bytes);

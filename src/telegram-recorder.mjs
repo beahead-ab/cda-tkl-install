@@ -25,6 +25,7 @@ export function describeProtocol(direction,line) {
   }
   if(/^SENT\b/.test(line))return {kind:'transport-ack',interpretation:'Transportkvittens, ingen bekräftelse på växelläge eller signalbesked.'};
   if(/^(ERROR|BREAK)\b/.test(line))return {kind:'transport-error'};
+  if(/^SIM\b/.test(line))return {kind:'simulation',interpretation:'Simuleringskommando mellan TKL och simulatorn, inget LocoNet-telegram.'};
   return {kind:'transport-line'};
 }
 export class TelegramRecorder extends EventEmitter {

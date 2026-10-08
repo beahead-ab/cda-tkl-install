@@ -507,3 +507,21 @@ body[data-split-dragging] #panel-bottom{border-top-color:#5c656d}
 #track-plan .destination-request .destination-plate{stroke:#ffd83f;stroke-width:2;animation:destination-request 1.4s infinite}
 #track-plan .destination-request .destination-label{fill:#ffd83f}
 @media(prefers-reduced-motion:reduce){.chip-clearance .chip-dot,#track-plan .destination-request .destination-plate{animation:none}}
+
+/* Tågspårningen (0.73.0, simulering): skylten vid tågets front, tåg på linjen vid kanterna. Osäkra skyltar har
+   streckad gul ram och ?, ett tåg som inte syns längre är dämpat. */
+#track-plan .tracking-tag{cursor:pointer}
+#track-plan .tracking-tag rect{fill:#0f2a40;stroke:#9cc9ef;stroke-width:1.8}
+#track-plan .tracking-tag text{fill:#f2f7fb;font:700 15px var(--font-mono,monospace);pointer-events:none}
+#track-plan .tracking-tag:hover rect,#track-plan .tracking-tag:focus-visible rect{stroke:#cfe3f3;stroke-width:2}
+#track-plan .tracking-tag.uncertain rect{fill:#2b240c;stroke:#ffd83f;stroke-dasharray:4 3}
+#track-plan .tracking-tag.uncertain text{fill:#ffe9a3}
+#track-plan .tracking-tag.ghost{opacity:.5}
+#track-plan .tracking-tag.line{cursor:default}
+#track-plan .tracking-tag.line.incoming rect{stroke:#d9b63a}
+#track-plan .tracking-tag.line.outgoing rect{stroke:#4b5862}#track-plan .tracking-tag.line.outgoing text{fill:#aeb6be}
+.tracking-list{margin:0 0 10px}.tracking-list h4{margin:0 0 6px;font:600 11.5px/1.6 "IBM Plex Sans",system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#aeb6be}.tracking-list h4 small{letter-spacing:0;text-transform:none;font-weight:400;color:#7d8791}
+.tracking-list ul{list-style:none;margin:0;padding:0}.tracking-list li{display:grid;grid-template-columns:minmax(60px,auto) minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:4px 0;border-bottom:1px solid #1f2429}
+.tracking-list li button{min-height:0;padding:1px 8px;border:1px solid #8fb7d9;border-radius:3px;background:#13202b;color:#e6eef5;font:600 12px var(--font-mono,monospace);cursor:pointer}
+.tracking-list li.uncertain button{border-color:#ffd83f;border-style:dashed;color:#ffe9a3}.tracking-list li small{color:#7d8791}
+.tracking-menu label{display:flex;flex-direction:column;gap:4px;margin:8px 0;font-size:12px}

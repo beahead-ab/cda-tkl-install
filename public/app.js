@@ -18,6 +18,7 @@ import { createTrainInformation } from './train-information.js';
 import { createTelegramRecorder } from './telegram-recorder.js';
 import { createTrainMeet } from './trainmeet.js';
 import {createClearance} from './clearance.js';
+import {createTrainTracking} from './train-tracking.js';
 import {createStreamDeck} from './stream-deck.js';
 import {createStreamDeckAdmin} from './stream-deck-admin.js';
 import { createModelClock } from './model-clock.js';
@@ -64,7 +65,7 @@ const routeTargets=createRouteTargets({load:async(from,kind)=>{
   if(!response.ok)throw Error('Mål kunde inte kontrolleras.');
   return response.json();
 },onChange:()=>paint()});
-let clearanceAttention=[],clearanceRing=0;
+let clearanceAttention=[],clearanceRing=0,trainTracking=null;
 let currentPage='panel',appMenu,contextDialog,panelConsole,panelEvents,panelHead,signalControls,chosenKind=null,clearanceView,streamDeck,streamDeckAdmin,updatePage;
 let authSession=null;
 // Rangerarens vy (docs/rangerlage.md): #ranger, or always for a user logged in as rangerare. The same
@@ -647,7 +648,7 @@ function renderPanel() {
   $('route-summary').textContent=`${state.routes.length} ${state.routes.length===1?'tågväg':'tågvägar'} · ${state.routes.map(r=>statuses[r.state]).filter((v,i,a)=>a.indexOf(v)===i).join(' / ')}`;
   paintJournal();
   $('wire').textContent = (state.trace || []).slice(0, 40).map(e => `${time(e.at)}  ${e.direction === 'out' ? 'SKICKAT ' : 'MOTTAGET'}  ${e.hex}`).join('\n');
-  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());panelHead?.rangerNotice(rangerMode?rangerOwnView(state.yard):rangerView(state.yard));paintClearance();rangerBar?.update(state,online);
+  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());panelHead?.rangerNotice(rangerMode?rangerOwnView(state.yard):rangerView(state.yard));paintClearance();trainTracking?.update(state.trainTracking,online);rangerBar?.update(state,online);
 }
 function paintInspector() {
   if (!inspected || !state) return;
@@ -716,6 +717,7 @@ async function start() {
   streamDeck=createStreamDeck({pluppar:deckPluppar,choose,clearChoice,api,message,state:()=>state,online:()=>online&&state?.connection==='connected',chosen:()=>chosen,trainMeet:()=>state?.trainMeet,layout:()=>state?.streamDeck,onChange:()=>streamDeckAdmin?.devices(),ranger:()=>rangerMode});
   streamDeckAdmin=createStreamDeckAdmin({pluppar:deckPluppar,lines:()=>state?.trainMeet?.context?.lines||[],context:()=>state?.trainMeet?.context||null,deck:streamDeck});
   trainInformation=createTrainInformation({catalog:config.trainFields,controls:layout.controls,plan:$('track-plan'),displayName,openSource,onOpen:()=>openTools('train-information')});
+  trainTracking=createTrainTracking({plan:$('track-plan'),panel,controls:layout.controls,api,message,displayName});
   $('close-inspector').onclick=()=>closeInspector();
   $('dismiss-message').onclick=()=>message('');
 

@@ -1,5 +1,14 @@
 [
   {
+    "version": "0.73.0",
+    "date": "2026-10-08",
+    "notes": [
+      "Tågspårning i simulering: varje tåg visas med nummer och pil vid sin front och följs genom stationen ur spåravkänningen, växellägena och tågvägarna",
+      "Tåg på linjen vid kanterna: på väg in enligt TrainMeet och på väg ut efter att ha lämnat",
+      "Osäkra tåg har ? och streckad ram; ett klick anger eller bekräftar numret. Listan Spårade tåg under Drift → Tågnummer"
+    ]
+  },
+  {
     "version": "0.72.2",
     "date": "2026-10-08",
     "notes": [

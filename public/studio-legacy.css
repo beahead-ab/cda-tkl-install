@@ -2,9 +2,9 @@
    admin.css ger dialogernas form; här mappas dess variabler till Studios och de vanliga elementen stylas inom .st-legacy. */
 html{scrollbar-gutter:auto!important}
 .st-legacy,.admin-dialog{--text:var(--kr-ink);--muted:var(--kr-mute);--border:var(--kr-line-2);--card:var(--kr-panel);--surface:var(--kr-panel);--page:var(--kr-bg);--accent:var(--kr-blue)}
-.st-legacy{display:flex;flex-direction:column;gap:14px;color:var(--kr-ink);font-size:13px;line-height:1.5}
-.st-legacy .admin-workspace{display:flex;flex-direction:column;gap:14px}
-.st-legacy .card,.st-legacy .source-detail{background:var(--kr-panel);border:1px solid var(--kr-line);border-radius:14px;padding:14px 16px;margin:0;min-width:0}
+.st-legacy{display:flex;flex-direction:column;gap:10px;color:var(--kr-ink);font-size:13px;line-height:1.45}
+.st-legacy .admin-workspace{display:flex;flex-direction:column;gap:10px}
+.st-legacy .card,.st-legacy .source-detail{background:var(--kr-panel);border:1px solid var(--kr-line);border-radius:14px;padding:12px 14px;margin:0;min-width:0}
 .st-legacy .card h2,.st-legacy .source-detail h2{margin:0 0 6px;font-size:14px;font-weight:700}.st-legacy h3{margin:12px 0 6px;font-size:13px;font-weight:700}
 .st-legacy .card>p,.st-legacy p{margin:0 0 8px}.st-legacy .muted,.st-legacy small{color:var(--kr-mute)}
 .st-legacy .card-heading,.st-legacy .toolbar,.st-legacy .configuration-toolbar,.st-legacy .actions,.st-legacy .admin-actions,.st-legacy .source-pagination,.st-legacy .source-filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
@@ -38,3 +38,34 @@ html{scrollbar-gutter:auto!important}
 .admin-dialog{background:var(--kr-panel);color:var(--kr-ink);border-color:var(--kr-line-2)}.admin-dialog label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:600;color:var(--kr-ink-2)}
 @media(max-width:900px){.st-legacy .configuration-grid{grid-template-columns:1fr}.st-legacy .source-field dt{flex-basis:120px}}
 .st-legacy button{width:auto;max-width:100%}.st-legacy .source-detail>button,.st-legacy #source-note-edit{align-self:flex-start;display:inline-flex;align-items:center;margin:4px 0}
+
+/* Kompakt som Studios egna vyer (0.72.0). Rubriken och texten överst i Studio säger redan vad sidan gör, så modulernas egen
+   inledning och omfångsrad döljs. */
+.st-legacy .admin-scope,.st-legacy details.configuration>p:first-of-type,.st-legacy .source-migration>p:first-of-type{display:none}
+.st-legacy :is(input,select,textarea){min-height:30px;padding:4px 9px}.st-legacy button{min-height:30px}
+/* Visning och Driftbindningar: listan till vänster fyller höjden, valt objekt, granskning och historik till höger. */
+.st-legacy .configuration-grid.st-legacy-split{grid-template-columns:minmax(220px,300px) minmax(0,1fr);gap:0 18px}
+.st-legacy .st-legacy-list{display:flex;flex-direction:column;gap:8px;position:sticky;top:0}
+.st-legacy .st-legacy-list select[size]{height:max(220px,calc(100vh - 336px));min-height:0}
+.st-legacy .st-legacy-detail{display:flex;flex-direction:column;gap:8px;min-width:0}.st-legacy .st-legacy-detail>:is(h3,p,div,section,details){margin:0}
+.st-legacy .st-legacy-detail .admin-selected-object{padding-bottom:10px;border-bottom:1px solid var(--kr-line)}
+.st-legacy .st-legacy-detail .configuration-review{margin:0;padding-top:0;border-top:0}.st-legacy .st-legacy-detail .configuration-history{margin:0;padding-top:8px}
+.st-legacy .st-legacy-detail details>summary{cursor:pointer;font-weight:600}
+.st-legacy .configuration-toolbar,.st-legacy details.configuration>.actions{margin-bottom:10px}
+/* Källa: källfilens kort hopfällda överst, registret direkt under och tabellen så hög som fönstret medger. */
+.st-legacy-about{background:var(--kr-panel);border:1px solid var(--kr-line);border-radius:14px}
+.st-legacy-about>summary{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;min-height:38px;padding:8px 14px;cursor:pointer;font-weight:700}
+.st-legacy-about>summary span{font-weight:400;font-size:12.5px;color:var(--kr-mute)}
+.st-legacy-about[open]>summary{border-bottom:1px solid var(--kr-line)}
+.st-legacy-about #advanced-xml-content{display:flex;flex-direction:column}.st-legacy-about #advanced-xml-content .card{border:0;border-radius:0;border-bottom:1px solid var(--kr-line)}.st-legacy-about #advanced-xml-content .card:last-child{border-bottom:0}
+.st-legacy #source-sections{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}.st-legacy .source-section{min-height:26px;padding:0 9px;font-size:12px}
+.st-legacy [data-legacy=register] .table-wrap{max-height:max(260px,calc(100vh - 345px))}
+.st-legacy .table-wrap:empty{display:none}
+.st-legacy .source-filters{margin:0}
+/* Införandestatus: en rad per regelgrupp – namn, status, beskrivning. */
+.st-legacy .migration-row{display:grid;grid-template-columns:minmax(150px,200px) minmax(140px,190px) minmax(0,1fr);gap:2px 14px;align-items:baseline;padding:6px 0;font-size:12.5px}
+.st-legacy .migration-row span{margin:0;font-size:12px}.st-legacy .migration-row p{grid-column:auto;margin:0;font-size:12.5px;line-height:1.45}
+/* Orter och telefon: tätare rader. */
+.st-legacy td button{min-height:26px;padding:0 10px}
+@media(max-width:1000px){.st-legacy .configuration-grid.st-legacy-split{grid-template-columns:1fr}.st-legacy .st-legacy-list{position:static}.st-legacy .st-legacy-list select[size]{height:220px}
+  .st-legacy .migration-row{grid-template-columns:1fr}}

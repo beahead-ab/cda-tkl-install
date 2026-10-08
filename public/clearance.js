@@ -6,7 +6,7 @@
 // applies an action locally.
 import {createAdminDialog,escapeHTML as esc} from './admin-ui.js';
 import {ACTION_TEXT,TRACK_TEXT,NEIGHBOR_TEXT,lineStatus,needsAttention,movementStatus,movementActions,movementDone} from './clearance-text.js';
-export function createClearance({api,message,onRequest}) {
+export function createClearance({api,message,onRequest,onAttention}) {
   const root=document.getElementById('clearance-tools');if(!root)return null;
   root.innerHTML=`<p class="muted">Klarering begärs och besvaras mot grannstationerna genom TrainMeet, som en TMBox. Ett godkännande är varken tågväg eller körsignal; de läggs som vanligt i ställverket.</p>
 <p id="cl-status" class="muted" role="status"></p>
@@ -28,11 +28,14 @@ export function createClearance({api,message,onRequest}) {
   function notify(c){
     const incoming=new Map(c.lines.filter(needsAttention).map(l=>[l.id+':'+l.trainNumber,l]));
     let fresh=false;
-    for(const [key,l] of incoming)if(!seen.has(key)){fresh=true;message(`Klareringsförfrågan från ${l.neighborName}: tåg ${l.trainNumber||'?'}`,{error:false,duration:10000});}
+    // The status bar's own chip says it (app.js), so no passing message beside it.
+    for(const key of incoming.keys())if(!seen.has(key))fresh=true;
     seen=new Set(incoming.keys());
     // The count stands on the bottom row's Drift tab; a new request brings the tab forward.
     const count=document.getElementById('drift-tab-count');if(count)count.textContent=incoming.size?' '+incoming.size:'';
     if(fresh)onRequest?.();
+    // The status bar and the plan's edge show the same requests with Godkänn and Neka (app.js).
+    onAttention?.([...incoming.values()].map(l=>({id:l.id,neighborId:l.neighborId,neighborName:l.neighborName,trainNumber:l.trainNumber})));
   }
   // Replace markup only when it changed, and keep whatever the operator has typed.
   function swap(container,html,previous,inputAttr){
@@ -47,11 +50,12 @@ export function createClearance({api,message,onRequest}) {
     $('status').innerHTML=!tm.paired?'Parkoppla med TrainMeet under <a href="#trainmeet">Inställningar → TrainMeet</a> innan stationen kan klarera tåg.':!c?'Väntar på TrainMeets stationskontext…':`${esc(c.station.name)} · ${esc(c.meet)} · ${esc(c.day)} · TrainMeet-klocka ${esc(c.clock.time.slice(0,5))}${stale?' · <strong>kontakt saknas, gamla uppgifter</strong>':''}`;
     $('lines').hidden=!c;root.querySelector('.cl-trains').hidden=!c;
     if(!c){lastLines=lastRows='';$('lines').innerHTML='';$('trains').querySelector('tbody').innerHTML='';controls();return;}
-    const lines=c.lines.map(line=>{
+    // A request from a neighbour waits for an answer: its card comes first, so it is never scrolled away.
+    const lines=[...c.lines].sort((a,b)=>needsAttention(b)-needsAttention(a)).map(line=>{
       const actions=line.actions.map(a=>a==='request'
         ?`<form data-line="${esc(line.id)}"><input data-request-for="${esc(line.id)}" list="cl-train-numbers" inputmode="numeric" pattern="[0-9]{1,10}" maxlength="10" placeholder="Tågnummer" aria-label="Tågnummer mot ${esc(line.neighborName)}" required autocomplete="off"><button type="submit" class="primary">${ACTION_TEXT.request}</button></form>`
         :`<button type="button" data-line="${esc(line.id)}" data-action="${a}" class="${['accept','depart','arrive'].includes(a)?'primary':''}">${ACTION_TEXT[a]}</button>`).join('');
-      return `<section class="card cl-line${needsAttention(line)?' attention':''}" data-state="${esc(line.state)}"><h3>${esc(line.neighborName)} <small>${esc([TRACK_TEXT[line.trackType]||line.trackType||'',NEIGHBOR_TEXT[line.neighborMode]||''].filter(Boolean).join(' · '))}</small></h3><p class="cl-state">${esc(lineStatus(line))}</p><div class="admin-actions">${actions||'<span class="muted">Inget att göra här nu.</span>'}</div></section>`;
+      return `<section class="card cl-line${needsAttention(line)?' attention':''}" data-state="${esc(line.state)}" data-line-card="${esc(line.id)}"><h3>${esc(line.neighborName)} <small>${esc([TRACK_TEXT[line.trackType]||line.trackType||'',NEIGHBOR_TEXT[line.neighborMode]||''].filter(Boolean).join(' · '))}</small></h3><p class="cl-state">${esc(lineStatus(line))}</p><div class="admin-actions">${actions||'<span class="muted">Inget att göra här nu.</span>'}</div></section>`;
     }).join('')||'<p class="muted">TrainMeet har inga sträckor registrerade för stationen.</p>';
     lastLines=swap($('lines'),lines,lastLines,'data-request-for');
     const states=new Map(c.movements.map(m=>[m.id,m])),trackLabel=new Map(c.tracks.map(t=>[t.id,t.label]));
@@ -72,5 +76,10 @@ export function createClearance({api,message,onRequest}) {
     const tracks=c.tracks.map(t=>`<option value="${esc(t.label)}"></option>`).join('');if($('tracks').innerHTML!==tracks)$('tracks').innerHTML=tracks;
     controls();notify(c);
   }
-  return {update(next,connected){tm=next;online=connected;if(!tm)return;render();}};
+  return {update(next,connected){tm=next;online=connected;if(!tm){onAttention?.([]);return;}render();},
+    // Answer from the status bar: the same TrainMeet command as the card's button.
+    act(lineId,action){if(!['accept','reject'].includes(action))return;const line=tm?.context?.lines.find(l=>l.id===lineId);if(!line||!line.actions.includes(action))return;return run(()=>call('clearance',{connectionId:lineId,action,trainNumber:''}));},
+    ready:()=>!!tm&&online&&!busy&&tm.paired&&!tm.stale,
+    // Bring the line's card into view in Drift and mark it for a moment.
+    reveal(lineId){const card=root.querySelector(`[data-line-card="${CSS.escape(lineId)}"]`);if(!card)return;card.scrollIntoView({block:'nearest',behavior:'smooth'});card.classList.remove('flash');void card.offsetWidth;card.classList.add('flash');}};
 }

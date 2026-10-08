@@ -11,9 +11,16 @@ export function openUpdateNotice(view,{api,message}){
   const title='Charlottendal TKL '+view.latest+' finns';
   if(view.canStart){
     confirmAdmin({title,button:'Uppdatera nu',
-      message:(view.kind==='web'?'Webbdriften kör ':'Den här Pi:n kör ')+view.current+'. Uppdateringen hämtar '+view.latest+' från cda-tkl-install, tar en säkerhetskopia, installerar och startar om TKL, vilket tar ett par minuter. Panelen är borta en kort stund för alla som är inne. Lagda tågvägar behåller sina lås men måste läggas om för att signalerna ska gå till kör. Inställningar och driftdata ligger kvar, och om den nya versionen inte startar återställs den gamla.',
+      message:view.kind==='render'
+        ?'Webbdriften kör '+view.current+'. Render bygger '+view.latest+' ur cda-tkl och startar om webbdriften när bygget är klart, vanligen inom tio minuter. Panelen är borta en kort stund för alla som är inne. Lagda tågvägar behåller sina lås men måste läggas om för att signalerna ska gå till kör. Inställningar och driftdata ligger kvar på disken; misslyckas bygget fortsätter '+view.current+' att köra.'
+        :(view.kind==='web'?'Webbdriften kör ':'Den här Pi:n kör ')+view.current+'. Uppdateringen hämtar '+view.latest+' från cda-tkl-install, tar en säkerhetskopia, installerar och startar om TKL, vilket tar ett par minuter. Panelen är borta en kort stund för alla som är inne. Lagda tågvägar behåller sina lås men måste läggas om för att signalerna ska gå till kör. Inställningar och driftdata ligger kvar, och om den nya versionen inte startar återställs den gamla.',
       action:async()=>{const answer=await api('update/start',{});if(!answer)return false;message('Uppdateringen har startat. Ställverket visar "Ny version · ladda om" när den är klar.',{error:false,duration:8000});}});
     return;
+  }
+  if(view.kind==='render'){
+    const body=document.createElement('div');body.innerHTML='<p></p>';
+    body.querySelector('p').textContent='Webbdriften kör '+view.current+'. Render bygger om den när main i cda-tkl ändras, om automatisk driftsättning är på. Med tjänstens Deploy Hook i miljövariabeln RENDER_DEPLOY_HOOK_URL kan uppdateringen startas härifrån.';
+    const modal=createAdminDialog({title,body});modal.element.addEventListener('close',()=>modal.element.remove(),{once:true});modal.open();return;
   }
   const how=UPDATE_LINES[view.kind]||UPDATE_LINES.mac;
   const body=document.createElement('div');

@@ -1,5 +1,14 @@
 [
   {
+    "version": "0.72.0",
+    "date": "2026-10-08",
+    "notes": [
+      "Klareringsförfrågan i statusraden: grannstationens förfrågan står bredvid CHARLOTTENDAL med Godkänn och Neka, skylten vid linjens kant blinkar och det ringer med Ljud på tills den är besvarad",
+      "Webbdriften på Render: Uppdatering visar version och senaste version, och med Renders Deploy Hook startar Uppdatera nu ett nytt bygge",
+      "Studio: Visning och Driftbindningar har listan till vänster och det valda objektet till höger, Källa visar registret direkt och Införandestatus en rad per regelgrupp"
+    ]
+  },
+  {
     "version": "0.71.1",
     "date": "2026-10-07",
     "notes": [

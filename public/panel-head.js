@@ -3,15 +3,16 @@
 // buttons (Återställ) that app.js moves in. Presentation only; app.js hands it
 // the texts, it sends nothing.
 const esc=v=>String(v??'');
-export function createPanelHead({shell,onUpdate,onRanger}){
+export function createPanelHead({shell,onUpdate,onRanger,onClearance}){
   if(!shell)return null;
   const left=document.createElement('div');left.id='plan-head';
-  left.innerHTML='<span class="plan-head-title">Charlottendal</span><span class="chip chip-status" id="plan-head-status" role="status" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></span><span class="chip chip-ranger" id="plan-head-ranger" role="status" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></span>';
+  left.innerHTML='<span class="plan-head-title">Charlottendal</span><span class="chip chip-status" id="plan-head-status" role="status" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></span><span class="chip chip-ranger" id="plan-head-ranger" role="status" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></span><span class="chip chip-clearance" id="plan-head-clearance" role="alert" data-tone="warn" hidden><i class="chip-dot" aria-hidden="true"></i><button type="button" class="chip-clearance-text" data-clearance="show"></button><button type="button" class="chip-clearance-accept" data-clearance="accept">Godkänn</button><button type="button" data-clearance="reject">Neka</button><button type="button" class="chip-clearance-more" data-clearance="show" hidden></button></span>';
   const right=document.createElement('div');right.id='plan-head-right';
   right.innerHTML='<button type="button" class="chip chip-start" id="plan-head-start" data-tone="warn" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></button><button type="button" class="chip chip-update" id="plan-head-update" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></button><button type="button" class="chip chip-release" id="plan-head-release" data-tone="warn" hidden><i class="chip-dot" aria-hidden="true"></i><span>Ny version · ladda om</span></button>';
   shell.append(left,right);
-  const status=left.querySelector('#plan-head-status'),ranger=left.querySelector('#plan-head-ranger'),release=right.querySelector('#plan-head-release'),updateChip=right.querySelector('#plan-head-update');
-  let rangerShown='';
+  const status=left.querySelector('#plan-head-status'),ranger=left.querySelector('#plan-head-ranger'),clearance=left.querySelector('#plan-head-clearance'),release=right.querySelector('#plan-head-release'),updateChip=right.querySelector('#plan-head-update');
+  let rangerShown='',clearanceLine='';
+  clearance.addEventListener('click',e=>{const b=e.target.closest('[data-clearance]');if(b&&clearanceLine)onClearance?.({action:b.dataset.clearance,line:clearanceLine});});
   // Reloading is the operator's choice: never in the middle of a route choice or an acknowledgement.
   release.onclick=()=>location.reload();
   let updateView=null;updateChip.onclick=()=>onUpdate?.(updateView);
@@ -38,6 +39,15 @@ export function createPanelHead({shell,onUpdate,onRanger}){
       ranger.querySelectorAll('button').forEach(b=>b.remove());if(!key)return;
       ranger.dataset.tone=view.tone;ranger.querySelector('span').textContent=esc(view.text);ranger.title=esc(view.text);
       for(const action of view.actions){const b=document.createElement('button');b.type='button';b.textContent=action.label;b.onclick=()=>onRanger?.(action);ranger.append(b);}
+    },
+    // A neighbour's clearance request (TrainMeet) beside the notice, answered right here like a TMBox:
+    // the oldest one with Godkänn and Neka, "+n" for the rest, the text opens the line in Drift.
+    clearanceNotice(view){
+      clearance.hidden=!view;if(!view){clearanceLine='';return;}
+      clearanceLine=view.line;const text=clearance.querySelector('.chip-clearance-text'),more=clearance.querySelector('.chip-clearance-more');
+      if(text.textContent!==view.text){text.textContent=view.text;text.title=view.text+'. Visa i Drift.';}
+      more.hidden=!view.more;more.textContent='+'+view.more;more.title=view.more+' förfrågningar till i Drift';
+      for(const b of clearance.querySelectorAll('[data-clearance=accept],[data-clearance=reject]'))b.disabled=!view.ready;
     },
     startNotice(view){const show=!!view&&!view.done;startChip.hidden=!show;if(show){startChip.querySelector('span').textContent='Kom igång · '+view.remaining+' steg kvar';startChip.title='Det här ställverket är inte färdigt att användas. Öppna Kom igång under Inställningar.';}},
     // A newer release in the public install repository than this installed copy runs.

@@ -121,10 +121,12 @@ const streamDeckLayouts=new StreamDeckLayouts(storage,{pluppIds:()=>Object.keys(
 // version it was loaded from and offers a reload after a release.
 const release=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8')).version;
 // Installed copies look for a newer release in the public install repository.
-// The web deployment sets no install kind; its own updater (installed by publish-release)
-// makes it one, so Inställningar → Uppdatering can update it from cda-tkl-install.
+// The web deployment on its own server sets no install kind; its own updater (installed by publish-release)
+// makes it one, so Inställningar → Uppdatering can update it from cda-tkl-install. On Render, deploy/render
+// sets the kind and RENDER_DEPLOY_HOOK_URL (a secret set in Render) lets the panel start a new build.
 const installKind=process.env.CHARLOTTENDAL_INSTALL_KIND||(fs.existsSync('/usr/local/sbin/charlottendal-update')?'web':'');
-const updateCheck=installKind?new UpdateCheck({current:release,kind:installKind,statusFile:path.join(storage.directory,'update.json'),readFile:file=>fs.readFileSync(file,'utf8')}):null;
+const updateCheck=installKind?new UpdateCheck({current:release,kind:installKind,statusFile:path.join(storage.directory,'update.json'),readFile:file=>fs.readFileSync(file,'utf8'),
+  writeFile:(file,text)=>{fs.writeFileSync(file+'.tmp',text,{mode:0o640});fs.renameSync(file+'.tmp',file);},hook:process.env.RENDER_DEPLOY_HOOK_URL}):null;
 updateCheck?.start();
 const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot() };};
 const server = http.createServer(async (req, res) => {
@@ -221,7 +223,12 @@ const server = http.createServer(async (req, res) => {
       const view=await updateCheck.check();dirty=true;return json(res,view);
     }
     if(url.pathname==='/api/update/start'){
-      if(!updateCheck?.view().canStart)return json(res,{error:'Uppdateringen startas från Terminal eller PowerShell på den här datorn.'},409);
+      if(!updateCheck?.view().canStart)return json(res,{error:updateCheck?.kind==='render'?'Webbdriften byggs av Render när main ändras. Lägg in en Deploy Hook för att starta det härifrån.':'Uppdateringen startas från Terminal eller PowerShell på den här datorn.'},409);
+      if(updateCheck.kind==='render'){
+        try{await updateCheck.startRender();}catch(e){return json(res,{error:'Render kunde inte starta bygget: '+(e?.message||e)},409);}
+        engine.log('update','Render bygger '+(updateCheck.view().latest||'senaste versionen')+'. Webbdriften startar om när bygget är klart.');dirty=true;
+        return json(res,{started:true});
+      }
       const unit=UPDATE_UNITS[updateCheck.kind];
       const run=spawn('systemctl',['start','--no-block',unit],{stdio:'ignore'});
       const code=await new Promise(r=>{run.on('error',()=>r(-1));run.on('exit',r);});

@@ -64,6 +64,7 @@ const routeTargets=createRouteTargets({load:async(from,kind)=>{
   if(!response.ok)throw Error('Mål kunde inte kontrolleras.');
   return response.json();
 },onChange:()=>paint()});
+let clearanceAttention=[],clearanceRing=0;
 let currentPage='panel',appMenu,contextDialog,panelConsole,panelEvents,panelHead,signalControls,chosenKind=null,clearanceView,streamDeck,streamDeckAdmin,updatePage;
 let authSession=null;
 // Rangerarens vy (docs/rangerlage.md): #ranger, or always for a user logged in as rangerare. The same
@@ -438,6 +439,17 @@ function showInspector(kind,name,event) {
   $('inspector-host').append($('inspector-card'));
   contextDialog.open(event);
 }
+// A neighbour's clearance request is never only in Drift, which may be closed or scrolled: the status bar
+// answers it (Godkänn, Neka), the plate at that line's edge blinks, the browser tab says so and, with
+// Ljud på, it rings again every 30 seconds until it is answered.
+function paintClearance(){
+  const list=clearanceAttention,first=list[0];
+  panelHead?.clearanceNotice(first?{line:first.id,text:`${first.neighborName} begär klarering · tåg ${first.trainNumber||'?'}`,more:list.length-1,ready:!!clearanceView?.ready()}:null);
+  const asking=new Set(list.map(l=>l.neighborId));
+  for(const n of destinationNodes){const entry=state?.destinations?.entries?.find(d=>d.id===n.id);n.group.classList.toggle('destination-request',entry?.source==='trainmeet'&&asking.has(entry.stationId));}
+  const title=(first?'● Klarering · ':'')+document.title.replace(/^● Klarering · /,'');if(document.title!==title)document.title=title;
+  if(first&&!clearanceRing)clearanceRing=setInterval(()=>feedback?.ring(),30000);else if(!first&&clearanceRing){clearInterval(clearanceRing);clearanceRing=0;}
+}
 function closeInspector(restoreFocus=true) {
   contextDialog?.close(restoreFocus);
 }
@@ -635,7 +647,7 @@ function renderPanel() {
   $('route-summary').textContent=`${state.routes.length} ${state.routes.length===1?'tågväg':'tågvägar'} · ${state.routes.map(r=>statuses[r.state]).filter((v,i,a)=>a.indexOf(v)===i).join(' / ')}`;
   paintJournal();
   $('wire').textContent = (state.trace || []).slice(0, 40).map(e => `${time(e.at)}  ${e.direction === 'out' ? 'SKICKAT ' : 'MOTTAGET'}  ${e.hex}`).join('\n');
-  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());panelHead?.rangerNotice(rangerMode?rangerOwnView(state.yard):rangerView(state.yard));rangerBar?.update(state,online);
+  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());panelHead?.rangerNotice(rangerMode?rangerOwnView(state.yard):rangerView(state.yard));paintClearance();rangerBar?.update(state,online);
 }
 function paintInspector() {
   if (!inspected || !state) return;
@@ -684,7 +696,7 @@ async function start() {
   const fullscreen = createFullscreen({button: $('toggle-fullscreen'), onError: message});
   telegramRecorder=createTelegramRecorder();
   operatingControls=createOperatingControls({api,openSource});
-  modelClock=createModelClock({api});trainMeet=createTrainMeet({api,onTimetable:()=>openTools('trainmeet-timetable'),stationHint:()=>config?.profile?.title||'Charlottendal'});feedback=createFeedback();clearanceView=createClearance({api,message,onRequest:()=>panelEvents?.showDrift({auto:true})});
+  modelClock=createModelClock({api});trainMeet=createTrainMeet({api,onTimetable:()=>openTools('trainmeet-timetable'),stationHint:()=>config?.profile?.title||'Charlottendal'});feedback=createFeedback();clearanceView=createClearance({api,message,onRequest:()=>{panelEvents?.showDrift({auto:true});feedback?.ring();},onAttention:list=>{clearanceAttention=list;paintClearance();}});
   panelEvents=createPanelEvents();panelConsole=createPanelConsole({onOpen:()=>{appMenu?.close();},onResetComplete:text=>message(text,{error:false,duration:4000}),showDrift:()=>panelEvents?.showDrift()});
   authSession=await fetch('/api/auth/session').then(r=>r.ok?r.json():null).catch(()=>null);
   if(authSession?.user?.role==='ranger'||location.hash==='#ranger')rangerMode=true;
@@ -744,7 +756,8 @@ async function start() {
   // Original is the only active panel. Retired skin preferences must not restore it differently.
   try{localStorage.removeItem('charlottendal-skin');}catch{}
   createPanelFit({plan:$('track-plan'),viewport:document.querySelector('.panel-scroll'),stage:$('plan-stage'),controls:$('panel-console')});
-  panelHead=createPanelHead({shell:document.querySelector('#panel-view .panel-shell'),onUpdate:view=>openUpdateNotice(view,{api,message}),onRanger:a=>api('ranger/'+a.command,a.command==='answer'?{id:a.id,approved:a.approved}:{id:a.id})});
+  panelHead=createPanelHead({shell:document.querySelector('#panel-view .panel-shell'),onUpdate:view=>openUpdateNotice(view,{api,message}),onRanger:a=>api('ranger/'+a.command,a.command==='answer'?{id:a.id,approved:a.approved}:{id:a.id}),
+    onClearance:({action,line})=>{if(action==='show'){panelEvents?.showDrift();clearanceView?.reveal(line);}else clearanceView?.act(line,action);}});
   if(rangerMode){document.querySelector('.plan-head-title').textContent='Charlottendal · Rangeraren';rangerBar=createRangerBar({root:$('panel-events'),api});}
   createPanelSplit({bottom:$('panel-bottom'),viewport:document.querySelector('.panel-scroll')});
   // Nothing administrative in the signal box's frame: the update chips join the Drift tab's buttons.

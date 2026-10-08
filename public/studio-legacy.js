@@ -14,7 +14,16 @@ export {isLegacyView} from './studio-legacy-views.js';
 embedAdminWorkspaces();
 const get=u=>fetch(u).then(r=>{if([401,428].includes(r.status)){location.assign('/login?next='+encodeURIComponent(location.pathname+location.hash));throw Error('Inloggning krävs.');}if(!r.ok)throw Error(u+': '+r.status);return r.json();});
 // Översiktskorten med "Öppna …" och modulernas egna rubriker behövs inte när sidan redan är öppen i Studio.
-function embed(root){for(const child of [...root.children])if(!child.classList.contains('admin-workspace'))child.remove();root.querySelectorAll('.admin-workspace-heading').forEach(n=>n.remove());return root;}
+function embed(root){for(const child of [...root.children])if(!child.classList.contains('admin-workspace'))child.remove();root.querySelectorAll('.admin-workspace-heading').forEach(n=>n.remove());split(root);return root;}
+// Visning och Driftbindningar som Studios övriga vyer: objektlistan i en kolumn till vänster som fyller höjden, det valda
+// objektet med granskning, aktivering och historik till höger. Bara noderna flyttas; modulerna hittar dem med id som förut.
+function split(root){
+  const card=root.querySelector('details.configuration'),grid=card?.querySelector('.configuration-grid');if(!grid||grid.classList.contains('st-legacy-split'))return;
+  const side=document.createElement('div');side.className='st-legacy-detail';
+  const after=[];for(let n=grid.nextSibling;n;n=n.nextSibling)after.push(n);
+  if(grid.children[1])side.append(grid.children[1]);side.append(...after);
+  grid.children[0]?.classList.add('st-legacy-list');grid.classList.add('st-legacy-split');grid.append(side);card.open=true;
+}
 export function createLegacyHost(){
   const parts={},updaters=[];let config=null,panel=null,register=null,registerRoot=null,timer=null,lastState=null,online=false;
   const configOnce=()=>config?Promise.resolve(config):get('/api/config').then(c=>config=c);
@@ -36,7 +45,9 @@ export function createLegacyHost(){
   async function source(slot){
     if(register){slot.replaceChildren(registerRoot);return register;}
     registerRoot=document.createElement('div');registerRoot.className='st-legacy';
-    registerRoot.innerHTML='<div id="advanced-xml-content" data-legacy="xml"></div><div id="admin-view" data-legacy="register"></div><div id="advanced-migration-content" data-legacy="migration"></div>';
+    // Källfilens kort (importkontroll, avsnitt, sök i hela XML-filen, profilens antal) ligger hopfällda överst, så att
+    // registret syns direkt.
+    registerRoot.innerHTML='<details class="st-legacy-about" data-legacy="xml"><summary>Källfilen Cda60.xml <span>importkontroll, avsnitt och sök i hela XML-filen</span></summary><div id="advanced-xml-content"></div></details><div id="admin-view" data-legacy="register"></div><div id="advanced-migration-content" data-legacy="migration"></div>';
     slot.replaceChildren(registerRoot);
     const [c,p]=await Promise.all([configOnce(),panelOnce()]);
     register=createSourceRegister({config:c,panel:p,editors:false,onActive:()=>{},saveNote:async(key,note)=>{try{const r=await fetch('/api/note',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key,note})});return r.ok;}catch{return false;}}});
@@ -52,6 +63,7 @@ export function createLegacyHost(){
       if(key==='data/kalla'||key==='genomgang/inforande'){
         await source(slot);await register.open();
         registerRoot.querySelector('#admin-view .toolbar')?.remove();registerRoot.querySelector('#admin-view a[href="#register/station"]')?.closest('section')?.remove();
+        const profile=registerRoot.querySelector('#admin-view #profile-summary')?.closest('section');if(profile)registerRoot.querySelector('#advanced-xml-content').append(profile);
         for(const n of registerRoot.querySelectorAll('[data-legacy]'))n.hidden=key==='data/kalla'?n.dataset.legacy==='migration':n.dataset.legacy!=='migration';
         const params=new URLSearchParams(location.hash.split('?')[1]||'');
         if(key==='data/kalla'&&params.get('post'))await register.openKey(params.get('post'));

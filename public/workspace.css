@@ -207,3 +207,7 @@ body[data-skin=traffic] .panel-key{font-family:Menlo,Consolas,monospace}body[dat
 /* In the admin dialog the editor is narrower than the window: the properties go under the deck, and on a phone everything stacks. */
 @container (max-width:1120px){.sda .sda-editor{grid-template-columns:210px minmax(0,1fr);grid-template-rows:auto 1fr;grid-template-areas:'palette main' 'palette props'}.sda .sda-props>:not(.sda-field):not(.sda-check){grid-column:1/-1}.sda .sda-props{border-left:0;border-top:1px solid #1f2429;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));align-items:start;align-content:start}.sda .sda-props>.sda-props-head,.sda .sda-props>.sda-notes,.sda .sda-props>.sda-field:has(.sda-icons){grid-column:1/-1}.sda .sda-main{padding:14px}}
 @container (max-width:680px){.sda .sda-editor{grid-template-columns:minmax(0,1fr);grid-template-areas:'main' 'props' 'palette'}.sda .sda-palette{max-height:none;border-right:0;border-top:1px solid #1f2429}.sda .sda-main{padding:12px}.sda .sda-stage{padding:10px}.sda .sda-grid{gap:6px}.sda .sda-head-actions{margin-left:0}.sda .sda-meta{margin-left:0;width:100%}}
+/* Kortet som statusradens förfrågan pekar på blinkar till när det rullas fram. */
+@keyframes cl-flash{0%,60%{background:color-mix(in srgb,var(--amber) 22%,transparent)}100%{background:transparent}}
+.cl-line.flash{animation:cl-flash 1.6s ease-out}
+@media(prefers-reduced-motion:reduce){.cl-line.flash{animation:none}}

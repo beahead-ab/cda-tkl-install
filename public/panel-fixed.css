@@ -487,3 +487,16 @@ body[data-split-dragging] #panel-bottom{border-top-color:#5c656d}
 .drift-section[open]>summary{margin-bottom:6px;color:#e6e9ec}
 .drift-section.card{border-left:0;border-right:0;border-bottom:0;border-radius:0;background:transparent;padding-left:0;padding-right:0}
 .drift-mode>div{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline}
+
+/* Klareringsförfrågan från en grannstation (TrainMeet): i statusraden med Godkänn och Neka, och skylten vid linjens kant
+   blinkar gult tills den är besvarad. Samma gula som rangerarens begäran. */
+.chip-clearance{padding:2px 4px 2px 9px;font-size:11.5px;color:var(--yellow-text);border-color:var(--yellow);gap:6px}
+.chip-clearance .chip-dot{animation:hblink 1s infinite}
+.chip-clearance button{min-height:0;padding:2px 8px;border:1px solid var(--chip-border);border-radius:3px;background:var(--chip-bg);color:var(--fg);font:500 11px/1.3 var(--font-sans);cursor:pointer}
+.chip-clearance button:hover:not(:disabled){background:#262c32}.chip-clearance button:disabled{opacity:.45;cursor:default}
+.chip-clearance .chip-clearance-text{border:0;background:transparent;padding:0 2px;color:inherit;font-size:11.5px;max-width:44ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip-clearance .chip-clearance-accept{border-color:var(--yellow)}
+@keyframes destination-request{0%,35%,100%{stroke:#ffd83f}50%,85%{stroke:#6b5f2a}}
+#track-plan .destination-request .destination-plate{stroke:#ffd83f;stroke-width:2;animation:destination-request 1.4s infinite}
+#track-plan .destination-request .destination-label{fill:#ffd83f}
+@media(prefers-reduced-motion:reduce){.chip-clearance .chip-dot,#track-plan .destination-request .destination-plate{animation:none}}

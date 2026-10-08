@@ -1,4 +1,4 @@
-// Simulerade tåg (0.74.0, bara i simuleringsläge): med knappen Simulera tåg under Drift släpper TKL in tåg på
+// Simulerad trafik (0.74.0, namnet sedan 0.75.0; bara i simuleringsläge): med knappen Simulerad trafik under Drift släpper TKL in tåg på
 // linjerna, som simulerade grannstationer. Varje tåg anmäls med nummer i linjens inkommande fält (som en grannstation
 // gör) och ställs i simulatorn på linjen utanför infartssignalen (SIM-kommandot över den lokala förbindelsen).
 // Sedan sköter operatören tågvägarna: tåget kör när signalen visar kör, stannar på målspåret och kör vidare på nästa
@@ -18,7 +18,7 @@ export class TrainSimulation{
   set(enabled){
     if(!this.available)fail(this.reason||'Simulerade tåg finns bara i simuleringsläge.');
     this.enabled=!!enabled;this.nextAt=this.enabled?this.now()+3000:0;this.error='';this.revision++;
-    this.log('train-simulation',this.enabled?'Simulerade tåg på: grannstationerna släpper in tåg på linjerna.':'Simulerade tåg av: inga nya tåg släpps in.');
+    this.log('train-simulation',this.enabled?'Simulerad trafik på: grannstationerna släpper in tåg på linjerna.':'Simulerad trafik av: inga nya tåg släpps in.');
     return this.view();
   }
   // edges: {Au:{name,incoming,block}} ur Orter och telefon; blocks: kärnans beläggning; tracked: spårningens tåg.

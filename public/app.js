@@ -279,6 +279,8 @@ function headNotice(){
   const waiting=(state?.routes||[]).find(r=>HEAD_WAIT.has(r.state));
   if(waiting)return {text:displayName('routes',waiting.definitionId,waiting.label)+' · '+(statuses[waiting.state]||waiting.state)+(waiting.reason?' · '+waiting.reason:''),tone:waiting.state==='held'?'alarm':'warn'};
   if(state?.controls?.mode==='remote')return {text:'Fjärrläge · lokal manövrering spärrad',tone:'warn'};
+  // Automaten är tågklarerare: det ska synas, var man än tittar.
+  if(state?.automation?.enabled)return {text:'Automat · datorn lägger tågvägarna'+(state.automation.last?' · '+state.automation.last.replace(/^Automaten /,''):''),tone:'warn'};
   return null;
 }
 function buildPlan() {
@@ -648,7 +650,7 @@ function renderPanel() {
   $('route-summary').textContent=`${state.routes.length} ${state.routes.length===1?'tågväg':'tågvägar'} · ${state.routes.map(r=>statuses[r.state]).filter((v,i,a)=>a.indexOf(v)===i).join(' / ')}`;
   paintJournal();
   $('wire').textContent = (state.trace || []).slice(0, 40).map(e => `${time(e.at)}  ${e.direction === 'out' ? 'SKICKAT ' : 'MOTTAGET'}  ${e.hex}`).join('\n');
-  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());panelHead?.rangerNotice(rangerMode?rangerOwnView(state.yard):rangerView(state.yard));paintClearance();trainTracking?.update(state.trainTracking,online,state.trainSimulation);rangerBar?.update(state,online);
+  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());panelHead?.rangerNotice(rangerMode?rangerOwnView(state.yard):rangerView(state.yard));paintClearance();trainTracking?.update(state.trainTracking,online,state.trainSimulation,state.automation);rangerBar?.update(state,online);
 }
 function paintInspector() {
   if (!inspected || !state) return;
@@ -733,7 +735,8 @@ async function start() {
   $('account-link').hidden = !config.accountUrl;
   adminNavigation.setAccount(!!config.accountUrl);
   adminNavigation.setSession?.(authSession);
-  $('field-link').href = config.fieldUrl || 'http://127.0.0.1:8911/'; $('field-link').hidden = false;
+  // Simulatorns egen sida nås från Studio → Driftsättning (0.75.0); Inställningar har ingen länk dit längre.
+  const fieldLink=$('field-link');if(fieldLink){fieldLink.href = config.fieldUrl || 'http://127.0.0.1:8911/'; fieldLink.hidden = false;}
   $('route-catalog').innerHTML=`<label>Från<select id="catalog-from"></select></label><label>Till<select id="catalog-to"></select></label><button id="catalog-request" class="primary" disabled>Lägg / återta tågväg</button><p id="catalog-hint" class="muted" hidden></p>`;
   function catalogHint(){const ids=[$('catalog-from').value,$('catalog-to').value].filter(id=>config.buttons[id]?.presentation==='catalog');$('catalog-hint').hidden=!ids.length;$('catalog-hint').textContent=ids.map(label).join(', ')+' väljs i listan. Använd Lägg / återta tågväg även för återtagning.';}
   function catalogOrder(ids){return $('route-mode').value==='shunt'?ids.sort((a,b)=>label(a).localeCompare(label(b),'sv',{numeric:true})):ids;}

@@ -20,17 +20,24 @@ export function createTrainTracking({plan,panel,controls,api,message,displayName
   const dialog=document.createElement('dialog');dialog.className='incoming-train-menu tracking-menu';dialog.setAttribute('aria-label','Spårat tåg');
   dialog.innerHTML='<h2></h2><p data-tracking-place></p><label>Tågnummer<input data-tracking-number maxlength="24" autocomplete="off"></label><button data-tracking-save class="primary">Spara och bekräfta</button><button data-tracking-remove>Ta bort ur spårningen</button><p data-tracking-message role="status"></p><button data-tracking-close>Stäng</button>';
   document.body.append(dialog);
-  let view=null,online=false,selected=null,last='',simulation=null;
-  // Simulera tåg (0.74.0): bara i simuleringsläge, bland driftknapparna. Grannstationerna släpper då in tåg på linjerna.
+  let view=null,online=false,selected=null,last='',simulation=null,automation=null;
+  // Två roller bland driftknapparna, bara i simuleringsläge (0.75.0): Simulerad trafik är grannstationerna som släpper
+  // in tåg på linjerna; Automat är datorn som tågklarerare. Banan själv är simulatorn och syns inte här.
   const simulate=document.createElement('button');simulate.type='button';simulate.id='simulate-trains';simulate.hidden=true;
-  simulate.title='Simulerade grannstationer släpper in tåg med nummer på linjerna. Tåget kör när du lagt en tågväg och signalen visar kör, stannar på målspåret och kör vidare på nästa tågväg.';
-  document.querySelector('.drift-actions')?.append(simulate);
+  simulate.title='Trafiken: simulerade grannstationer släpper in tåg med nummer på linjerna. Med TrainMeet kommer trafiken därifrån i stället.';
+  const automate=document.createElement('button');automate.type='button';automate.id='automation-toggle';automate.hidden=true;
+  automate.title='Tågklareraren: datorn lägger tågvägarna med samma förregling som du. Tåg från väster går mot Vagnsta, tåg från Vagnsta mot Kungsfors och Lekby. Du kan ta över när som helst.';
+  document.querySelector('.drift-actions')?.append(simulate,automate);
   simulate.onclick=async()=>{const answer=await api('simulation/trains',{enabled:!simulation?.enabled});if(answer){simulation=answer;paintSimulation();}};
+  automate.onclick=async()=>{const answer=await api('automation',{enabled:!automation?.enabled});if(answer){automation=answer;paintSimulation();}};
   function paintSimulation(){
-    simulate.hidden=!simulation?.available;if(simulate.hidden)return;
-    simulate.setAttribute('aria-pressed',String(!!simulation.enabled));
-    const next=simulation.enabled&&simulation.nextAt?Math.max(0,Math.round((simulation.nextAt-Date.now())/1000)):null;
-    simulate.textContent=simulation.enabled?'Simulerade tåg på'+(next!=null?' · nästa om '+next+' s':''):'Simulera tåg';
+    simulate.hidden=!simulation?.available;automate.hidden=!automation?.available;
+    if(!simulate.hidden){
+      simulate.setAttribute('aria-pressed',String(!!simulation.enabled));
+      const next=simulation.enabled&&simulation.nextAt?Math.max(0,Math.round((simulation.nextAt-Date.now())/1000)):null;
+      simulate.textContent=simulation.enabled?'Simulerad trafik på'+(next!=null?' · nästa om '+next+' s':''):'Simulerad trafik';
+    }
+    if(!automate.hidden){automate.setAttribute('aria-pressed',String(!!automation.enabled));automate.textContent=automation.enabled?'Automat på':'Automat';automate.title=automation.last||automate.title;}
   }
   const $d=s=>dialog.querySelector(s);
   const place=t=>t.state==='ghost'?'Senast sedd vid '+displayName('blocks',t.head):'Vid '+displayName('blocks',t.head)+(t.route?' · tågväg '+t.route:'');
@@ -47,7 +54,7 @@ export function createTrainTracking({plan,panel,controls,api,message,displayName
   dialog.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('[data-tracking-number]')){e.preventDefault();$d('[data-tracking-save]').click();}});
   layer.addEventListener('click',e=>{const g=e.target.closest('[data-tracking-train]');if(g)open(g.dataset.trackingTrain);});
   layer.addEventListener('keydown',e=>{const g=e.target.closest('[data-tracking-train]');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();open(g.dataset.trackingTrain);}});
-  // En skylt: nummer och pil i en ruta, ovanför spåret.
+  // En skylt: nummer och pil i en ruta, mitt på spåret där tågets front står, så att den aldrig hamnar mellan två spår.
   function tag(parent,{x,y,text,cls,id,title,anchor='middle'}){
     const g=node('g',{class:'tracking-tag '+cls,transform:`translate(${Math.round(x)} ${Math.round(y)})`,...(id?{'data-tracking-train':id,role:'button',tabindex:'0'}:{})},parent);
     const width=Math.max(34,text.length*9.6+16),left=anchor==='end'?-width:anchor==='start'?0:-width/2;
@@ -56,7 +63,7 @@ export function createTrainTracking({plan,panel,controls,api,message,displayName
   }
   function draw(){
     const key=JSON.stringify([view,online]);if(key===last)return;last=key;
-    layer.replaceChildren();
+    layer.replaceChildren();plan.append(layer);
     const enabled=!!view?.enabled;layer.style.display=enabled?'':'none';list.hidden=!enabled;
     if(!enabled){list.innerHTML='';return;}
     for(const t of view.trains){
@@ -65,7 +72,8 @@ export function createTrainTracking({plan,panel,controls,api,message,displayName
       const arrow=t.state==='ghost'?'':dx>4?' →':dx<-4?'← ':'';
       const label=(t.number||t.label)+(t.certain||String(t.label).startsWith('?')?'':'?');
       const text=arrow.startsWith('←')?arrow+label:label+arrow;
-      tag(layer,{x:head.x,y:head.y-30,text,cls:(t.certain?'':'uncertain ')+(t.state==='ghost'?'ghost':''),id:t.id,title:(t.number?'Tåg '+t.number:'Okänt tåg')+'. '+place(t)+(t.certain?'':'. Osäkert, klicka för att ange numret.')});
+      // På spåret, förskjuten i färdriktningen så att spårknappen mitt på spåret går att klicka på.
+      tag(layer,{x:head.x+(dx<-4?-40:40),y:head.y,text,cls:(t.certain?'':'uncertain ')+(t.state==='ghost'?'ghost':''),id:t.id,title:(t.number?'Tåg '+t.number:'Okänt tåg')+'. '+place(t)+(t.certain?'':'. Osäkert, klicka för att ange numret.')});
     }
     // Linjerna: på väg in vid infartsspåret, på väg ut vid spåret tåget lämnade på. Flera tåg staplas.
     const stack={};
@@ -80,5 +88,5 @@ export function createTrainTracking({plan,panel,controls,api,message,displayName
     list.innerHTML=`<h4>Spårade tåg <small>simulering · ur spåravkänningen</small></h4>${rows||lines?`<ul>${rows}${lines}</ul>`:'<p class="muted">Inga tåg på stationen eller linjerna just nu.</p>'}`;
   }
   list.addEventListener('click',e=>{const b=e.target.closest('[data-tracking-open]');if(b)open(b.dataset.trackingOpen);});
-  return {update(next,isOnline,sim){view=next||null;online=isOnline;simulation=sim||null;paintSimulation();draw();}};
+  return {update(next,isOnline,sim,auto){view=next||null;online=isOnline;simulation=sim||null;automation=auto||null;paintSimulation();draw();}};
 }

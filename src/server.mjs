@@ -17,6 +17,7 @@ import { Configuration } from './configuration.mjs';
 import { TrainInformation } from './train-information.mjs';
 import { TrainTracker } from './train-tracking.mjs';
 import { TrainSimulation } from './train-simulation.mjs';
+import { TrainAutomation } from './train-automation.mjs';
 import { destinationLines } from '../public/destination-data.js';
 import { PanelIndications } from './panel-indications.mjs';
 import { TrainMeet } from './trainmeet.mjs';
@@ -40,7 +41,7 @@ const baseProfile=loadProfile();
 const port = Number(process.env.CHARLOTTENDAL_PORT || 8910), root = fileURLToPath(new URL('../public', import.meta.url));
 const storage = new Storage(process.env.CHARLOTTENDAL_STATE_DIR || fileURLToPath(new URL('../var', import.meta.url)));
 const auth = createAuth(root, true, process.env, { stateDir: storage.directory });
-let profile,client,engine,configuration,trainInformation,panelIndications,recorder,tracker;
+let profile,client,engine,configuration,trainInformation,panelIndications,recorder,tracker,automation;
 // Panelens geometri, för tågspårningens spårgraf (src/train-tracking.mjs).
 const panelGeometry=JSON.parse(fs.readFileSync(new URL('../public/data/panel.json',import.meta.url),'utf8'));
 const bindingReports=new Map();
@@ -66,6 +67,7 @@ function createRuntime(p){
   const target=connectionInfo(p);
   const c=new LocoNetClient({host:target.host,port:target.port,silenceMs:p.staleMs});
   const e=new Engine(p,{storage,send:bytes=>c.send(bytes)});if(e.storageFault)throw Error(e.storageFault);
+  const t=new TrainTracker({profile:p,panel:panelGeometry,enabled:target.mode==='simulator',reason:'Tågspårningen provas i simulering först. Mot riktig bana är den avstängd.',log:(kind,message)=>e.log(kind,message)});
   return {profile:p,client:c,engine:e,
     configuration:new Configuration(p,{storage,canActivate:()=>!e.routes.length&&!e.controls.programming.reserved&&!e.yard.requests.length&&!e.storageFault}),
     trainInformation:new TrainInformation(JSON.parse(fs.readFileSync(new URL('../public/data/train-fields.json',import.meta.url))),p,{storage}),
@@ -73,7 +75,9 @@ function createRuntime(p){
     panelIndications:new PanelIndications(p.indications||JSON.parse(fs.readFileSync(new URL('../public/data/indications.json',import.meta.url))),p),
     recorder:new TelegramRecorder(storage.directory,p,{connectionInfo:target}),
     // Tågspårningen provas i simulering först; mot riktig bana är den avstängd (docs/tagsparning.md).
-    tracker:new TrainTracker({profile:p,panel:panelGeometry,enabled:target.mode==='simulator',reason:'Tågspårningen provas i simulering först. Mot riktig bana är den avstängd.',log:(kind,message)=>e.log(kind,message)})};
+    tracker:t,
+    // Automaten (src/train-automation.mjs): datorn som tågklarerare, bara i simuleringsläge till att börja med.
+    automation:new TrainAutomation({profile:p,available:target.mode==='simulator',reason:'Automaten finns bara i simuleringsläge.',request:(from,to)=>e.request(from,to,'build'),edgeBlock:t.edgeBlock,log:(kind,message)=>e.log(kind,message)})};
 }
 // Studio's rules describe the network profile; another profile (the legacy commissioning
 // one) runs as it is.
@@ -121,6 +125,13 @@ function simulate(){
   const edges=Object.fromEntries(Object.entries(edgeInfo()).map(([edge,info])=>[edge,{...info,block:tracker.edgeBlock[edge]}]));
   trainSimulation.tick({edges,blocks:engine.blocks,tracked:tracker.view().trains}).catch(error=>engine.log('error','Simulerade tåg: '+error.message)).finally(()=>{if(trainSimulation.revision!==simulationRevision){simulationRevision=trainSimulation.revision;dirty=true;}});
 }
+let automated=0,automationRevision=0;
+function automate(){
+  if(!automation?.enabled||Date.now()-automated<250)return;automated=Date.now();
+  try{automation.tick({state:{routes:engine.routes,blocks:engine.blocks,controls:engine.controls,connected:engine.connected},trains:tracker.view().trains,outgoing:destinations.view().outgoing});}
+  catch(error){engine.log('error','Automaten: '+error.message);automation.handOver('ett fel i automaten.');}
+  if(automation.revision!==automationRevision){automationRevision=automation.revision;dirty=true;}
+}
 let tracked=0,tracking=false;
 // Spårningens journalrader väcker kärnans change-händelse; den läser inte om sig själv under tiden.
 function track(){
@@ -130,7 +141,7 @@ function track(){
 function protect(action) { try { return action(); } catch (e) { engine.log('error', e.message); } }
 function installRuntime(next,start=true){
   if(client){client.removeAllListeners();client.stop();engine.removeAllListeners();recorder.removeAllListeners();}
-  ({profile,client,engine,configuration,trainInformation,panelIndications,recorder,tracker}=next);trace.length=0;protocolTrace.length=0;
+  ({profile,client,engine,configuration,trainInformation,panelIndications,recorder,tracker,automation}=next);trace.length=0;protocolTrace.length=0;
   const {client:c,engine:e,trainInformation:book,recorder:recording}=next;
   let recordedRevision=e.revision;
   e.on('change',()=>{
@@ -159,7 +170,7 @@ const installKind=process.env.CHARLOTTENDAL_INSTALL_KIND||(fs.existsSync('/usr/l
 const updateCheck=installKind?new UpdateCheck({current:release,kind:installKind,statusFile:path.join(storage.directory,'update.json'),readFile:file=>fs.readFileSync(file,'utf8'),
   writeFile:(file,text)=>{fs.writeFileSync(file+'.tmp',text,{mode:0o640});fs.renameSync(file+'.tmp',file);},hook:process.env.RENDER_DEPLOY_HOOK_URL}):null;
 updateCheck?.start();
-const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot(),trainTracking:tracker.view(),trainSimulation:trainSimulation.view() };};
+const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot(),trainTracking:tracker.view(),trainSimulation:trainSimulation.view(),automation:automation.view() };};
 const server = http.createServer(async (req, res) => {
   try {
     guard(req, port); const url = new URL(req.url, `http://127.0.0.1:${port}`);
@@ -278,6 +289,7 @@ const server = http.createServer(async (req, res) => {
       return json(res,result);
     }
     // Tågspårningen: operatören rättar eller bekräftar numret, eller tar bort ett tåg som inte finns.
+    if(url.pathname==='/api/automation'){const result=automation.set(data.enabled===true);dirty=true;return json(res,result);}
     if(url.pathname==='/api/simulation/trains'){const result=trainSimulation.set(data.enabled===true);dirty=true;return json(res,result);}
     if(url.pathname==='/api/tracking/name'){const result=tracker.name(data.id,data.number);dirty=true;return json(res,result);}
     if(url.pathname==='/api/tracking/remove'){const result=tracker.remove(data.id);engine.log('train-tracking','Ett tåg togs bort ur spårningen av operatören.');dirty=true;return json(res,result);}
@@ -322,7 +334,7 @@ let tick, publish;
 // CHARLOTTENDAL_LISTEN=0.0.0.0 lets the rangerare's station reach TKL over the layout's network.
 server.listen(port, process.env.CHARLOTTENDAL_LISTEN || '127.0.0.1', () => {
   console.log(`Charlottendal TKL: http://127.0.0.1:${port}`); client.start();
-  tick = setInterval(() => {protect(() => engine.tick());if(Date.now()-tracked>300)track();simulate();recorder.tick();modelClock.checkpoint();trainMeet.tick();if(Date.now()-clockPublished>1000){dirty=true;clockPublished=Date.now();}}, 100);
+  tick = setInterval(() => {protect(() => engine.tick());if(Date.now()-tracked>300)track();simulate();automate();recorder.tick();modelClock.checkpoint();trainMeet.tick();if(Date.now()-clockPublished>1000){dirty=true;clockPublished=Date.now();}}, 100);
   publish = setInterval(() => {
     if (!dirty) return; dirty = false; const text = `data: ${JSON.stringify(snapshot())}\n\n`;
     for (const res of streams) { if (res.writableLength > 1e6) { res.end(); streams.delete(res); } else res.write(text); }

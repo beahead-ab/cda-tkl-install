@@ -8,11 +8,13 @@ import {createHelp} from './studio-help.js';
 import {createLegacyHost,isLegacyView} from './studio-legacy.js';
 import {studioTarget} from './admin-navigation-model.js';
 const legacy=createLegacyHost();
+// Simulatorns egen sida (banan i simuleringsläge) för felsökning: klicka i block, lägg in fel. Bara härifrån (0.75.0).
+let fieldUrl='';
 const NAV=()=>({
   konfigurera:[['Stationsplan','#konfigurera'],['Signaler','#data?set=signaler','66'],['Växlar','#data?set=vaxlar','49'],['Spårledningar','#data?set=sparledningar','197'],['Regler och chatten','#konfigurera/regler',String(model.rules.filter(r=>r.status!=='proposal').length)],['Visning','#konfigurera/visning'],['Orter och telefon','#konfigurera/orter'],['Övriga delar','#konfigurera/ovriga'],['Prova i simulatorn','#driftsattning/andringar']],
   data:[['Alla mängder','#data'],['Tågvägar','#data?set=tagvagar','340'],['Källa (XML)','#data/kalla']],
   genomgang:[['Genomgång och avvikelser','#genomgang',model.review?.last?String(model.review.last.cards.length)+' kort':''],['Införandestatus','#genomgang/inforande']],
-  driftsattning:[['Ändringar och aktivering','#driftsattning/andringar'],['Driftbindningar','#driftsattning/bindningar'],['Mät objekt','#driftsattning/mat',measuredLabel()],['Lyssna','#driftsattning/lyssna'],['Kort och MGP','#driftsattning/kort',model.cards?.cards.length?String(model.cards.cards.length)+' kort':'']],
+  driftsattning:[['Ändringar och aktivering','#driftsattning/andringar'],['Driftbindningar','#driftsattning/bindningar'],['Mät objekt','#driftsattning/mat',measuredLabel()],['Lyssna','#driftsattning/lyssna'],['Kort och MGP','#driftsattning/kort',model.cards?.cards.length?String(model.cards.cards.length)+' kort':''],...(fieldUrl?[['Simulatorn ↗',fieldUrl]]:[])],
   anslutning:[['TrainMeet','/#trainmeet','i dag'],['Stream Deck','/#tools/streamdeck','i dag']]});
 const measuredLabel=()=>{const c=model.counts.measured,t=model.counts.turnouts+model.counts.signals+model.counts.blocks;return c.field?`${c.field}/${t}`:c.bench?`${c.bench} bänk`:'0/'+t;};
 const state={tab:'konfigurera',view:'',sets:new Set(['vaxlar','signaler','sparledningar','tagvagar']),object:null,layers:new Set(['numbers','signalNames','labels','dev']),width:null,panel:true,search:{}};
@@ -22,7 +24,7 @@ const session={load(){try{return JSON.parse(sessionStorage.getItem('studio-state
 async function load(){
   const get=u=>fetch(u).then(r=>{if(!r.ok)throw Error(`${u}: ${r.status}`);return r.json();});
   const [profile,studio,panel]=await Promise.all([get('/api/config'),get('/api/studio'),get('/data/panel.json')]);
-  model=buildStudioModel({profile,panel,studio});order=walkOrder(panel);
+  model=buildStudioModel({profile,panel,studio});order=walkOrder(panel);fieldUrl=profile.fieldUrl||'';
   const undetected=new Set([...studio.detection.undetected.noSensor,...studio.detection.undetected.noRule]);
   geo=planGeometry(panel,undetected);
   $('#st-mode').textContent=profile.commissioned?'DRIFT':'SIMULERING · ingen hårdvara';
@@ -55,7 +57,8 @@ function render(){
   $('#st-nav').innerHTML=`<span class="st-nav-title">${esc(TABS.find(t=>t.id===state.tab).label.toUpperCase())}</span>`+NAV()[state.tab].map(([label,href,count])=>{
     if(!href)return `<span class="st-nav-item" title="Kommer i ett senare steg">${esc(label)}<span class="st-count">${esc(count||'')}</span></span>`;
     const current=href===here||(href==='#'+state.tab&&!state.view&&!(state.tab==='data'&&state.sets.size===1));
-    return `<a href="${href}"${current?' aria-current="page"':''}>${esc(label)}${count?`<span class="st-count">${esc(count)}</span>`:''}</a>`;}).join('')
+    const external=!href.startsWith('#');
+    return `<a href="${href}"${current?' aria-current="page"':''}${external?' target="_blank" rel="noopener" title="Simulatorns egen sida: banan i simuleringsläge, för felsökning (klicka i block, lägg in fel)"':''}>${esc(label)}${count?`<span class="st-count">${esc(count)}</span>`:''}</a>`;}).join('')
     +`<div class="st-nav-foot"><strong>Ett utkast för hela stationen</strong><br>Allt här är läst ur källorna. Ingenting är uppmätt och ingenting ändras härifrån.<br><span class="mono">profil ${esc(model.sourceHash.slice(0,12))}</span></div>`;
   const main=$('#st-main');
   document.body.classList.toggle('st-fill',state.tab==='konfigurera'&&!state.view);

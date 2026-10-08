@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.75.0",
+    "date": "2026-10-08",
+    "notes": [
+      "Automat under Drift: datorn lägger tågvägarna med samma förregling som operatören, genomgående tåg in på spår 1 eller 2 och vidare ut, och lämnar över vid allt oväntat",
+      "Simulera tåg heter Simulerad trafik: trafiken, automaten och banan är tre roller",
+      "Simulatorns egen sida nås från Studio → Driftsättning för felsökning; Inställningar har ingen länk dit och Starta färd är borta",
+      "Tågets nummerskylt står på spåret, i färdriktningen bredvid spårknappen"
+    ]
+  },
+  {
     "version": "0.74.0",
     "date": "2026-10-08",
     "notes": [

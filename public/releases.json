@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.72.1",
+    "date": "2026-10-08",
+    "notes": [
+      "Klarering är en egen flik först i nederraden: Klarering, Spårbeläggning, Drift och Händelser",
+      "Klarering-fliken visar antalet väntande förfrågningar och blinkar gult tills de är besvarade; Händelser ligger sist med antalet larm kvar på fliken"
+    ]
+  },
+  {
     "version": "0.72.0",
     "date": "2026-10-08",
     "notes": [

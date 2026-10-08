@@ -154,7 +154,7 @@ body[data-role=ranger] #track-plan .rail.outside{opacity:.22}
 body[data-role=ranger] #track-plan .signal-target.outside{opacity:.25;pointer-events:none}
 body[data-role=ranger] #track-plan .turnout-geometry .outside{pointer-events:none}
 body[data-role=ranger] #panel-bottom #trainmeet-timetable{display:none!important}
-body[data-role=ranger] #panel-bottom-tabs,body[data-role=ranger] .ev-tabs [data-view=drift],body[data-role=ranger] .ev-tabs [data-view=occupancy],body[data-role=ranger] #panel-reset,body[data-role=ranger] #plan-head-start{display:none}
+body[data-role=ranger] #panel-bottom-tabs,body[data-role=ranger] .ev-tabs [data-view=drift],body[data-role=ranger] .ev-tabs [data-view=clearance],body[data-role=ranger] .ev-tabs [data-view=occupancy],body[data-role=ranger] #panel-reset,body[data-role=ranger] #plan-head-start{display:none}
 body[data-role=ranger] #panel-bottom{grid-template-columns:minmax(0,1fr)}
 body[data-role=ranger] #panel-events{grid-template-rows:auto auto minmax(0,1fr)}
 #ranger-bar{display:flex;flex-direction:column;gap:6px;padding:8px var(--tt-pad,16px);border-bottom:1px solid #1f2429}
@@ -430,7 +430,7 @@ button.chip:disabled{opacity:.45;cursor:default}button.chip:disabled:hover{backg
 .occ-legend i{display:inline-block;width:14px;height:8px;margin-right:6px;vertical-align:-1px;border:1px solid}
 .occ-done{background:#2a3036;border-color:#3a424a}.occ-now{background:rgba(245,197,24,.18);border-color:#f5c518}.occ-next{background:#1b2a3a;border-color:#4a7fb5}
 #panel-bottom:not([data-right=occupancy]) :is(#panel-occupancy,#occ-range,.occ-legend){display:none}
-#panel-bottom:is([data-right=occupancy],[data-right=drift]) :is(#ev-content,.ev-filters){display:none}
+#panel-bottom:is([data-right=occupancy],[data-right=drift],[data-right=clearance]) :is(#ev-content,.ev-filters){display:none}
 #panel-occupancy{display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0;padding:6px var(--tt-pad) 8px;--occ-name:64px;--occ-row:36px}
 .occ-axis{position:relative;height:16px;margin-left:var(--occ-name)}
 .occ-axis span{position:absolute;top:0;transform:translateX(-50%);font:400 10.5px/1 "IBM Plex Mono",monospace;color:#7d8791}
@@ -448,10 +448,10 @@ button.chip:disabled{opacity:.45;cursor:default}button.chip:disabled:hover{backg
 .occ-bar:hover{filter:brightness(1.25)}.occ-bar:focus-visible{outline:2px solid #e6e9ec;outline-offset:1px}
 .occ-empty{margin:9px 0;font-size:12px;color:#7d8791}
 /* The chart needs width: the column grows while it is shown, the timetable keeps its compact columns. */
-@media(min-width:1800px) and (min-height:431px){#panel-bottom:is([data-right=occupancy],[data-right=drift]){grid-template-columns:minmax(0,1fr) 820px}}
-@media(min-width:1440px) and (max-width:1799px) and (min-height:431px){#panel-bottom:is([data-right=occupancy],[data-right=drift]){grid-template-columns:minmax(0,1fr) 640px}}
-@media(min-width:1201px) and (max-width:1439px) and (min-height:431px){#panel-bottom:is([data-right=occupancy],[data-right=drift]){grid-template-columns:minmax(0,1fr) 480px;--tt-cols:60px 40px 84px 84px 52px 52px 64px minmax(0,1fr)}#panel-bottom:is([data-right=occupancy],[data-right=drift]) :is(.tt-lage,.tt-anm){display:none}#panel-bottom:is([data-right=occupancy],[data-right=drift]) .tt-la{display:block}}
-@media(min-width:901px) and (max-width:1200px) and (min-height:431px){#panel-bottom:is([data-right=occupancy],[data-right=drift]){grid-template-columns:minmax(0,1fr) 400px}}
+@media(min-width:1800px) and (min-height:431px){#panel-bottom:is([data-right=occupancy],[data-right=drift],[data-right=clearance]){grid-template-columns:minmax(0,1fr) 820px}}
+@media(min-width:1440px) and (max-width:1799px) and (min-height:431px){#panel-bottom:is([data-right=occupancy],[data-right=drift],[data-right=clearance]){grid-template-columns:minmax(0,1fr) 640px}}
+@media(min-width:1201px) and (max-width:1439px) and (min-height:431px){#panel-bottom:is([data-right=occupancy],[data-right=drift],[data-right=clearance]){grid-template-columns:minmax(0,1fr) 480px;--tt-cols:60px 40px 84px 84px 52px 52px 64px minmax(0,1fr)}#panel-bottom:is([data-right=occupancy],[data-right=drift]) :is(.tt-lage,.tt-anm){display:none}#panel-bottom:is([data-right=occupancy],[data-right=drift]) .tt-la{display:block}}
+@media(min-width:901px) and (max-width:1200px) and (min-height:431px){#panel-bottom:is([data-right=occupancy],[data-right=drift],[data-right=clearance]){grid-template-columns:minmax(0,1fr) 400px}}
 @media(max-width:1439px){.occ-legend{display:none}}
 @media(max-width:1799px){#panel-occupancy{--occ-row:32px}.occ-bar{font-size:11px}.occ-name{font-size:12px}.ev-tabs button{font-size:12px}}
 @media(max-width:1200px){#panel-occupancy{--occ-name:56px}}
@@ -470,6 +470,13 @@ body[data-split-dragging] #panel-bottom{border-top-color:#5c656d}
    nothing operational is left in the administration window (docs/installningar-plan.md). */
 #panel-drift{grid-row:2;min-height:0;overflow:hidden auto;overscroll-behavior:contain;scrollbar-width:thin;padding:8px var(--tt-pad) 14px;font-size:12.5px;color:#aeb6be;outline:none}
 #panel-bottom:not([data-right=drift]) #panel-drift{display:none}
+#panel-clearance{grid-row:2;min-height:0;overflow:hidden auto;overscroll-behavior:contain;scrollbar-width:thin;padding:0 var(--tt-pad) 14px;font-size:12.5px;color:#aeb6be;outline:none}
+#panel-bottom:not([data-right=clearance]) #panel-clearance{display:none}
+#panel-clearance .drift-clearance{margin-top:6px}
+/* Klarering-fliken: antalet väntande förfrågningar i gult, och fliken blinkar så länge någon väntar. */
+.cl-tab-count{color:var(--yellow-text)}
+.ev-tabs button.cl-waiting{color:var(--yellow-text)}.ev-tabs button.cl-waiting:not([aria-selected=true]){animation:hblink 1.2s infinite}
+@media(prefers-reduced-motion:reduce){.ev-tabs button.cl-waiting{animation:none}}
 .drift-actions{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .drift-actions #panel-quick-actions{display:contents}
 .drift-actions>button:not(.chip){display:inline-flex;align-items:center;min-height:0;padding:3px 9px;border:1px solid var(--chip-border,#2a3036);border-radius:3px;background:var(--chip-bg,#15191d);color:#e6e9ec;font:400 11.5px/1.5 "IBM Plex Sans",system-ui,sans-serif;cursor:pointer}

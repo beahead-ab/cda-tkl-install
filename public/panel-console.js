@@ -1,5 +1,5 @@
 // The panel's console and the Drift tab in the bottom row; opening a part sends no orders.
-export function createPanelConsole({onOpen,onResetComplete,showDrift}) {
+export function createPanelConsole({onOpen,onResetComplete,showDrift,showClearance}) {
   const $=id=>document.getElementById(id),root=$('panel-console');
   root.innerHTML='<div id="panel-quick-actions"><button type="button" class="chip" id="panel-reset" aria-label="Återställ panel"><i class="chip-dot" aria-hidden="true"></i><span id="panel-reset-label">Återställ</span></button></div><div class="panel-runtime-info"><span id="panel-reset-status" role="status"></span><span id="panel-mode-status"></span><span id="panel-selection-slot"></span></div>';
   // Drift: the bottom row's third tab holds everything an operator does while trains
@@ -21,10 +21,12 @@ export function createPanelConsole({onOpen,onResetComplete,showDrift}) {
   $('route-mode').hidden=true;
   const routeActions=document.createElement('div');routeActions.className='admin-actions';routeActions.append($('clear-selection'));
   const routes=section('drift-routes','Tågvägar',routeHelp,root.querySelector('.panel-runtime-info'),$('route-activity'),$('route-catalog').closest('.card'),routeActions,$('route-mode'));
-  const clearance=$('clearance-tools');clearance.classList.add('drift-clearance');
+  // Klarering is its own tab beside Drift (0.72.1): the lines toward the neighbours and today's train movements.
+  const clearance=$('clearance-tools');clearance.classList.add('drift-clearance');clearance.hidden=false;
+  const clearancePane=document.createElement('div');clearancePane.id='panel-clearance';clearancePane.tabIndex=-1;clearancePane.append(clearance);$('panel-events')?.append(clearancePane);
   const blocks=$('toggle-block').closest('details');blocks.id='track-block-tools';
   const trains=section('drift-trains','Tågnummer',$('train-information'));
-  for(const part of [clearance,routes,blocks,$('operating-controls'),trains,$('model-clock')]){part.hidden=false;if(part.tagName==='DETAILS'){part.open=false;part.classList.add('drift-section');}drift.append(part);}
+  for(const part of [routes,blocks,$('operating-controls'),trains,$('model-clock')]){part.hidden=false;if(part.tagName==='DETAILS'){part.open=false;part.classList.add('drift-section');}drift.append(part);}
   $('inspector-home').hidden=true;document.body.append($('inspector-home'));
   $('traffic-tools').remove();$('operating-tools').remove();
   let lastReset=null;
@@ -33,8 +35,8 @@ export function createPanelConsole({onOpen,onResetComplete,showDrift}) {
   function close(){return false;}
   function open(id){
     if(id==='trainmeet-timetable'){location.hash='#panel';$('trainmeet-timetable').focus({preventScroll:true});return true;}
-    const part=$(id);if(!part||!drift.contains(part))return false;
-    onOpen();if(location.hash!=='#panel')location.hash='#panel';showDrift?.();
+    const part=$(id);if(!part||!drift.contains(part)&&!clearancePane.contains(part))return false;
+    onOpen();if(location.hash!=='#panel')location.hash='#panel';if(clearancePane.contains(part))showClearance?.();else showDrift?.();
     if(part.tagName==='DETAILS')part.open=true;
     if(id==='drift-trains'&&$('train-editor'))$('train-editor').open=true;
     requestAnimationFrame(()=>part.scrollIntoView({block:'start',behavior:'smooth'}));

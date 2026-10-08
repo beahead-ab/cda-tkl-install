@@ -696,8 +696,8 @@ async function start() {
   const fullscreen = createFullscreen({button: $('toggle-fullscreen'), onError: message});
   telegramRecorder=createTelegramRecorder();
   operatingControls=createOperatingControls({api,openSource});
-  modelClock=createModelClock({api});trainMeet=createTrainMeet({api,onTimetable:()=>openTools('trainmeet-timetable'),stationHint:()=>config?.profile?.title||'Charlottendal'});feedback=createFeedback();clearanceView=createClearance({api,message,onRequest:()=>{panelEvents?.showDrift({auto:true});feedback?.ring();},onAttention:list=>{clearanceAttention=list;paintClearance();}});
-  panelEvents=createPanelEvents();panelConsole=createPanelConsole({onOpen:()=>{appMenu?.close();},onResetComplete:text=>message(text,{error:false,duration:4000}),showDrift:()=>panelEvents?.showDrift()});
+  modelClock=createModelClock({api});trainMeet=createTrainMeet({api,onTimetable:()=>openTools('trainmeet-timetable'),stationHint:()=>config?.profile?.title||'Charlottendal'});feedback=createFeedback();clearanceView=createClearance({api,message,onRequest:()=>{panelEvents?.showClearance({auto:true});feedback?.ring();},onAttention:list=>{clearanceAttention=list;paintClearance();}});
+  panelEvents=createPanelEvents();panelConsole=createPanelConsole({onOpen:()=>{appMenu?.close();},onResetComplete:text=>message(text,{error:false,duration:4000}),showDrift:()=>panelEvents?.showDrift(),showClearance:()=>panelEvents?.showClearance()});
   authSession=await fetch('/api/auth/session').then(r=>r.ok?r.json():null).catch(()=>null);
   if(authSession?.user?.role==='ranger'||location.hash==='#ranger')rangerMode=true;
   [config, panel, registry, signalEndpoints] = await Promise.all(['/api/config', '/data/panel.json', '/data/source/signals.json', '/data/signal-endpoints.json'].map(async url => { const r = await fetch(url); if (r.status === 401 || r.status === 428) { location.assign('/login'); throw Error('Inloggning krävs'); } if (!r.ok) throw Error('Kunde inte läsa underlaget'); return r.json(); }));
@@ -757,7 +757,7 @@ async function start() {
   try{localStorage.removeItem('charlottendal-skin');}catch{}
   createPanelFit({plan:$('track-plan'),viewport:document.querySelector('.panel-scroll'),stage:$('plan-stage'),controls:$('panel-console')});
   panelHead=createPanelHead({shell:document.querySelector('#panel-view .panel-shell'),onUpdate:view=>openUpdateNotice(view,{api,message}),onRanger:a=>api('ranger/'+a.command,a.command==='answer'?{id:a.id,approved:a.approved}:{id:a.id}),
-    onClearance:({action,line})=>{if(action==='show'){panelEvents?.showDrift();clearanceView?.reveal(line);}else clearanceView?.act(line,action);}});
+    onClearance:({action,line})=>{if(action==='show'){panelEvents?.showClearance();clearanceView?.reveal(line);}else clearanceView?.act(line,action);}});
   if(rangerMode){document.querySelector('.plan-head-title').textContent='Charlottendal · Rangeraren';rangerBar=createRangerBar({root:$('panel-events'),api});}
   createPanelSplit({bottom:$('panel-bottom'),viewport:document.querySelector('.panel-scroll')});
   // Nothing administrative in the signal box's frame: the update chips join the Drift tab's buttons.

@@ -31,8 +31,8 @@ export function createClearance({api,message,onRequest,onAttention}) {
     // The status bar's own chip says it (app.js), so no passing message beside it.
     for(const key of incoming.keys())if(!seen.has(key))fresh=true;
     seen=new Set(incoming.keys());
-    // The count stands on the bottom row's Drift tab; a new request brings the tab forward.
-    const count=document.getElementById('drift-tab-count');if(count)count.textContent=incoming.size?' '+incoming.size:'';
+    // The count stands on the bottom row's Klarering tab, which blinks while a request waits; a new request brings it forward.
+    const count=document.getElementById('clearance-tab-count');if(count){count.textContent=incoming.size?' '+incoming.size:'';count.closest('[role=tab]')?.classList.toggle('cl-waiting',incoming.size>0);}
     if(fresh)onRequest?.();
     // The status bar and the plan's edge show the same requests with Godkänn and Neka (app.js).
     onAttention?.([...incoming.values()].map(l=>({id:l.id,neighborId:l.neighborId,neighborName:l.neighborName,trainNumber:l.trainNumber})));

@@ -6,6 +6,8 @@ export const SV_CMD = { write: 0x01, read: 0x02, maskedWrite: 0x03, write4: 0x05
 export const SV_NAME = { 0x01: 'SV skriv', 0x02: 'SV läs', 0x03: 'SV maskad skrivning', 0x05: 'SV skriv 4', 0x06: 'SV läs 4', 0x07: 'Discover', 0x08: 'Identify', 0x09: 'Adressbyte', 0x0f: 'Omstart',
   0x41: 'Svar SV skriv', 0x42: 'Svar SV läs', 0x43: 'Svar maskad skrivning', 0x45: 'Svar SV skriv 4', 0x46: 'Svar SV läs 4', 0x47: 'Svar Discover', 0x48: 'Svar Identify', 0x49: 'Svar adressbyte', 0x4f: 'Svar omstart' };
 export const STANDARD_SV = { 1: 'EEPROM-storlek', 2: 'Programversion', 3: 'Serienummer låg byte', 4: 'Serienummer hög byte' };
+// MGP-kortens egna SV ur Bennys monitorering 9 oktober 2026 (docs/genomgang-mgp-2026-10-06.md): adressen och ingångarnas polaritet.
+export const MGP_SV = { 21: 'Adress (servo 1; servo 2 får adressen +1, osv.)', 178: 'Ingångarnas belagd-nivå (0 = belagd vid låg, 1 = belagd vid hög)' };
 export const eepromBytes = v => [256, 512, 1024, 2048, 4096][v] ?? null;
 const check = (n, max, what) => { if (!Number.isInteger(n) || n < 0 || n > max) throw Error(`${what} utanför intervallet 0–${max}`); return n; };
 const hi = n => (n >> 7) & 1, low = n => n & 0x7f;

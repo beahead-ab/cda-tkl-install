@@ -7015,6 +7015,9 @@
     ],
     "provenance": "Source LT134 and LS940. Independent B1/B2 feedback is a conservative replacement; physical module behavior not commissioned."
   },
+  "signalReport": {
+    "kind": "switch"
+  },
   "scenarios": [
     {
       "id": "htvAu--htvSpIA",

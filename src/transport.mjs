@@ -1,8 +1,12 @@
 import net from 'node:net';
 import { EventEmitter } from 'node:events';
-import { LineReader, fromHex, hex } from './protocol.mjs';
+import { LineReader, fromHex, hex, decode, switchOrder } from './protocol.mjs';
+// En växelorder är en puls: ON följt av OFF efter PULSE_MS, som JMRI sänder den och som Bennys monitorering visade
+// (B0 … 10 → B1-rapport → B0 … 00). Avsändaren skickar bara ON; OFF läggs till här, så att varje väg ut (kärnan,
+// Mät objekt) pulsar lika. Simulatorn bortser från OFF.
+export const PULSE_MS = 200;
 export class LocoNetClient extends EventEmitter {
-  constructor({ host, port, silenceMs = 7000 }) { super(); this.host = host; this.port = port; this.silenceMs = silenceMs; this.queue = []; this.stopped = false; }
+  constructor({ host, port, silenceMs = 7000, pulseMs = PULSE_MS }) { super(); this.host = host; this.port = port; this.silenceMs = silenceMs; this.pulseMs = pulseMs; this.queue = []; this.stopped = false; this.pulses = new Set(); }
   start() {
     if (this.stopped) return;
     const socket = this.socket = net.createConnection({ host: this.host, port: this.port });
@@ -18,6 +22,7 @@ export class LocoNetClient extends EventEmitter {
     socket.on('error', e => this.emit('fault', e.code || e.message));
     socket.on('close', () => {
       clearInterval(this.watch); this.online = false; this.queue = []; this.pending = 0;
+      for (const t of this.pulses) clearTimeout(t); this.pulses.clear();
       for (const w of this.simulations?.splice(0) || []) { clearTimeout(w.timer); w.reject(Error('Förbindelsen till simulatorn bröts.')); }
       this.emit('connection', false);
       if (!this.stopped) this.retry = setTimeout(() => this.start(), 1000);
@@ -53,12 +58,18 @@ export class LocoNetClient extends EventEmitter {
   send(data) {
     if (!this.online) return false;
     if (this.queue.length >= 200) { this.socket.destroy(); return false; }
-    this.queue.push(data); this.flush(); return true;
+    this.queue.push(data); this.flush();
+    let order = null; try { order = decode(data); } catch {}
+    if (order?.kind === 'order' && order.on) {
+      const t = setTimeout(() => { this.pulses.delete(t); if (this.online) { this.queue.push(switchOrder(order.address, order.position, false)); this.flush(); } }, this.pulseMs);
+      this.pulses.add(t);
+    }
+    return true;
   }
   flush() {
     if (this.pending || !this.online || !this.queue.length) return;
     const bytes = this.queue.shift(); this.pending = Date.now();
     const line='SEND ' + hex(bytes);this.socket.write(line + '\r\n');this.emit('protocol',{direction:'out',line});this.emit('wire', { direction: 'out', hex: hex(bytes) });
   }
-  stop() { this.stopped = true; clearTimeout(this.retry); clearInterval(this.watch); this.socket?.destroy(); }
+  stop() { this.stopped = true; clearTimeout(this.retry); clearInterval(this.watch); for (const t of this.pulses) clearTimeout(t); this.pulses.clear(); this.socket?.destroy(); }
 }

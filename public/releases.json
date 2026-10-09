@@ -1,5 +1,14 @@
 [
   {
+    "version": "0.76.0",
+    "date": "2026-10-09",
+    "notes": [
+      "Bennys LocoNet-monitorering: MGP-korten rapporterar växlar och signaler med B1 i ingångsformatet, som TKL inte läste; avkodaren rättad och simulatorn sänder samma format",
+      "Signalerna rapporterar som växlar: B1 på signalens adress är nu standard i profilen (SE kvar som val per signal)",
+      "Växelorder pulsar ON och OFF som JMRI; SV21 (adress) och SV178 (ingångarnas belagd-nivå) namngivna"
+    ]
+  },
+  {
     "version": "0.75.0",
     "date": "2026-10-08",
     "notes": [

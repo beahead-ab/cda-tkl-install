@@ -1,12 +1,13 @@
 // Kortinventering över SV2: Discover samlar alla kort under ett fönster, Identify och läsning av SV1–4 riktar sig till ett.
 // Vilket kort som driver vilken modul M00–M11 är ett beslut som operatören tar här tills Benny bekräftat identiteterna.
 // MGP-sammanställningen per modul är exporten som senare jämförs mot det korten rapporterar. Inget skrivs till korten.
-import { decodeSv, discover, identify, readSv4, SV_CMD, eepromBytes } from '../sv2.mjs';
+import { decodeSv, discover, identify, readSv4, SV_CMD, eepromBytes, MGP_IDENTITY, MGP_PRODUCTS } from '../sv2.mjs';
 import { moduleOf } from './sources.mjs';
 const fail = (message, status = 400) => { throw Object.assign(Error(message), { status }); };
 const identityKey = i => `${i.manufacturer}/${i.developer}/${i.product}/${i.serial}`;
-// Kortets adress i svaret: DST när kortet skriver sin adress där, annars de sju bitarna i SRC. Bänkprovet avgör.
+// Kortets adress i svaret står i DST; SRC är frågarens agentnummer (Bennys trace 10 oktober 2026). SRC läses bara om DST saknas.
 const addressOf = sv => sv.dst > 1 ? sv.dst : sv.src;
+const decoderName = card => card.manufacturer === MGP_IDENTITY.manufacturer && card.developer === MGP_IDENTITY.developer && MGP_PRODUCTS[card.product] ? 'MGP ' + MGP_PRODUCTS[card.product] : 'produkt ' + card.product;
 
 export class CardInventory {
   constructor({ storage, send, now = Date.now, windowMs = 1500, replyMs = 800, setTimer = setTimeout, clearTimer = clearTimeout }) {
@@ -92,7 +93,7 @@ export function mgpSummary({ profile, xml }, registry, cards, { sections = [], m
         xmlAddress: number(t.system, /^L2?T/), measured: object ? measured[kind + ':' + object] || null : null };
     });
     const inputs = xml.sensors.filter(s => moduleOf(s.comment)?.name === m.id).map(s => ({ system: s.system, comment: s.comment, xmlAddress: number(s.system, /^LS/), blocks: blocksByInput[s.system] || [] }));
-    return { id: m.id, card, decoder: card ? (card.product === 10 ? 'Signal10 (antaget)' : card.product === 5 ? 'Servo5 (antaget)' : 'produkt ' + card.product) : null, status: card ? 'kort kopplat, ej verifierat' : m.status,
+    return { id: m.id, card, decoder: card ? decoderName(card) : null, status: card ? 'kort kopplat, ej verifierat' : m.status,
       outputs, inputs, counts: { outputs: outputs.length, inputs: inputs.length, turnouts: outputs.filter(o => o.kind === 'turnout').length, signals: outputs.filter(o => o.kind === 'signal').length, measured: outputs.filter(o => o.measured).length } };
   });
 }

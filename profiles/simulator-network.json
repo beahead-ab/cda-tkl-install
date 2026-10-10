@@ -56760,9 +56760,9 @@
     {
       "name": "M00",
       "address": 16,
-      "manufacturer": 13,
+      "manufacturer": 126,
       "developer": 1,
-      "product": 5,
+      "product": 9,
       "serial": 1000,
       "sv": {
         "1": 2,
@@ -56777,9 +56777,9 @@
     {
       "name": "M01",
       "address": 17,
-      "manufacturer": 13,
+      "manufacturer": 126,
       "developer": 1,
-      "product": 10,
+      "product": 6,
       "serial": 1001,
       "sv": {
         "1": 2,
@@ -56794,9 +56794,9 @@
     {
       "name": "M02",
       "address": 18,
-      "manufacturer": 13,
+      "manufacturer": 126,
       "developer": 1,
-      "product": 10,
+      "product": 6,
       "serial": 1002,
       "sv": {
         "1": 2,
@@ -56811,9 +56811,9 @@
     {
       "name": "M03",
       "address": 19,
-      "manufacturer": 13,
+      "manufacturer": 126,
       "developer": 1,
-      "product": 10,
+      "product": 6,
       "serial": 1003,
       "sv": {
         "1": 2,
@@ -56828,9 +56828,9 @@
     {
       "name": "M04",
       "address": 20,
-      "manufacturer": 13,
+      "manufacturer": 126,
       "developer": 1,
-      "product": 10,
+      "product": 6,
       "serial": 1004,
       "sv": {
         "1": 2,
@@ -56845,9 +56845,9 @@
     {
       "name": "M05",
       "address": 21,
-      "manufacturer": 13,
+      "manufacturer": 126,
       "developer": 1,
-      "product": 10,
+      "product": 6,
       "serial": 1005,
       "sv": {
         "1": 2,
@@ -56862,9 +56862,9 @@
     {
       "name": "M06",
       "address": 22,
-      "manufacturer": 13,
+      "manufacturer": 126,
       "developer": 1,
-      "product": 10,
+      "product": 6,
       "serial": 1006,
       "sv": {
         "1": 2,
@@ -56879,9 +56879,9 @@
     {
       "name": "M07",
       "address": 23,
-      "manufacturer": 13,
+      "manufacturer": 126,
       "developer": 1,
-      "product": 10,
+      "product": 6,
       "serial": 1007,
       "sv": {
         "1": 2,
@@ -56896,9 +56896,9 @@
     {
       "name": "M08",
       "address": 24,
-      "manufacturer": 13,
+      "manufacturer": 126,
       "developer": 1,
-      "product": 10,
+      "product": 6,
       "serial": 1008,
       "sv": {
         "1": 2,
@@ -56913,9 +56913,9 @@
     {
       "name": "M09",
       "address": 25,
-      "manufacturer": 13,
+      "manufacturer": 126,
       "developer": 1,
-      "product": 10,
+      "product": 6,
       "serial": 1009,
       "sv": {
         "1": 2,
@@ -56930,9 +56930,9 @@
     {
       "name": "M10",
       "address": 26,
-      "manufacturer": 13,
+      "manufacturer": 126,
       "developer": 1,
-      "product": 10,
+      "product": 6,
       "serial": 1010,
       "sv": {
         "1": 2,
@@ -56947,9 +56947,9 @@
     {
       "name": "M11",
       "address": 27,
-      "manufacturer": 13,
+      "manufacturer": 126,
       "developer": 1,
-      "product": 10,
+      "product": 6,
       "serial": 1011,
       "sv": {
         "1": 2,

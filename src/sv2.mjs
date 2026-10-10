@@ -37,11 +37,15 @@ export const discover = (src = 1) => svMessage({ src, cmd: SV_CMD.discover });
 export const identify = (dst, src = 1) => svMessage({ src, cmd: SV_CMD.identify, dst });
 export const readSv = (dst, sv, src = 1) => svMessage({ src, cmd: SV_CMD.read, dst, sv });
 export const readSv4 = (dst, sv, src = 1) => svMessage({ src, cmd: SV_CMD.read4, dst, sv });
-// Svaret på en begäran: samma kommando med bit 6 satt. Kortets adress står i DST och dess låga sju bitar i SRC;
-// vad riktiga kort sätter där avgörs av bänkprovet (fråga till Benny), så inventeringen läser båda.
-export const svReply = (request, { dst, sv = request.sv, data = [] } = {}) => svMessage({ src: dst & 0x7f, cmd: request.cmd | 0x40, dst, sv, data });
+// Svaret på en begäran: samma kommando med bit 6 satt. Kortets adress står i DST och SRC är frågarens (agentens) nummer,
+// som MGP-korten svarar enligt Bennys trace 10 oktober 2026 (JMRI agent 1, MGP-appen agent 0). Inventeringen läser DST.
+export const svReply = (request, { dst, sv = request.sv, data = [] } = {}) => svMessage({ src: request.src, cmd: request.cmd | 0x40, dst, sv, data });
 export const identityReply = (request, address, { manufacturer, developer, product, serial }) =>
-  svMessage({ src: address & 0x7f, cmd: request.cmd | 0x40, dst: address, sv: (manufacturer & 0xff) | ((developer & 0xff) << 8), data: [product & 0xff, product >> 8, serial & 0xff, serial >> 8] });
+  svMessage({ src: request.src, cmd: request.cmd | 0x40, dst: address, sv: (manufacturer & 0xff) | ((developer & 0xff) << 8), data: [product & 0xff, product >> 8, serial & 0xff, serial >> 8] });
+// MGP-kortens identitet i Discover-svaret (Bennys trace): tillverkare 126, utvecklare 1. Signal10 SE är produkt 6; servokortet
+// med adressen i SV21 och ingångar (Bennys kort 6) är produkt 9. Produkt 5 (Bennys kort 18) är inte identifierad.
+export const MGP_IDENTITY = { manufacturer: 126, developer: 1 };
+export const MGP_PRODUCTS = { 6: 'Signal10 SE', 9: 'servokort med ingångar' };
 // Det som inte tolkas men ändå ska kännas igen i Lyssna, enligt LocoNet PE 1.0.
 export function classifyFrame(bytes) {
   const op = bytes[0];

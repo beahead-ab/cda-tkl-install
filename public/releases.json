@@ -1,5 +1,14 @@
 [
   {
+    "version": "0.76.1",
+    "date": "2026-10-10",
+    "notes": [
+      "Bennys andra LocoNet-trace: JMRI:s avfrågning vid uppstart visas som avfrågning, inte som en order till adress 1017–1020, och TKL kan bygga samma åtta ramar",
+      "Studio känner MGP-korten på deras riktiga identitet (Signal10 SE = produkt 6), och simulatorns kort svarar som de riktiga",
+      "Rättat i genomgången: utgångarna utan rapport satt i en sektion som inte var ansluten, och Bennys omvända signalpolaritet är bänkkortets standardvärden"
+    ]
+  },
+  {
     "version": "0.76.0",
     "date": "2026-10-09",
     "notes": [

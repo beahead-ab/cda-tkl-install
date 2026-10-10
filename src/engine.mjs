@@ -106,8 +106,8 @@ export class Engine extends EventEmitter {
   }
   receive(bytes) {
     let d; try { d = decode(bytes); } catch (e) { this.log('bad-frame', e.message, { frame: hex(bytes) }); return; }
-    // B0 echo and SENT OK are not field feedback.
-    if (d.kind === 'order' || d.kind === 'unsupported') return;
+    // B0 echo, interrogation and SENT OK are not field feedback.
+    if (d.kind === 'order' || d.kind === 'interrogate' || d.kind === 'unsupported') return;
     const now = this.now(); const sequence=++this.reportSequence; let changed = false;
     this.operating.receive(d,sequence);
     if (d.kind === 'turnout') for (const [name, binding] of Object.entries(this.profile.turnouts)) {

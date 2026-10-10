@@ -18,6 +18,7 @@ export function describeProtocol(direction,line) {
         if(sv)return {kind:sv.reply?'sv-reply':'sv-request',valid:true,hex:hex(bytes),decoded:sv,interpretation:sv.identity?`${sv.name} från kort ${sv.dst}: tillverkare ${sv.identity.manufacturer}, utvecklare ${sv.identity.developer}, produkt ${sv.identity.product}, serienummer ${sv.identity.serial}.`:`${sv.name}${sv.reply?' från':' till'} kort ${sv.dst}, SV ${sv.sv}, data ${sv.data.join(' ')}.`};
         const c=classifyFrame(bytes);return {kind:'unsupported',frame:c.kind,valid:true,hex:hex(bytes),decoded,interpretation:c.note};
       }
+      if(decoded.kind==='interrogate')return {kind:'interrogate',valid:true,hex:hex(bytes),decoded,interpretation:`Avfrågning, grupp ${decoded.group>>2}/${(decoded.group>>1)&1}/${decoded.group&1} (a/c/b): ingångskorten i gruppen svarar med sina ingångar. Växel- och signalkort svarar inte.`};
       return {kind:decoded.kind==='order'?(direction==='out'?'order':'received-order'):decoded.kind==='unsupported'?'unsupported':'report',valid:true,hex:hex(bytes),decoded,
         ...(decoded.kind==='signal'?{interpretation:'Preliminär Signal10-CZ-form. Svenskt MGP-besked ej verifierat.'}:{}),
         ...(decoded.kind==='order'&&direction==='in'?{interpretation:'Mottagen order kan vara eko eller en annan avsändare. Ingen utförd manöver kvitteras.'}:{})};

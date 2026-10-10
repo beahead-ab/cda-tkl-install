@@ -44,9 +44,17 @@ export function signalReport(addr, code) {
   if (!Number.isInteger(code) || code < 0 || code > 127) throw Error('Ogiltig beskedskod');
   return frame([0xe4, 9, n >> 7, n & 127, 0, 1, code, 0]);
 }
+// Avfrågning (LocoNet PE: växelorder OFF till adresserna 1017–1020): JMRI sänder alla åtta grupperna vid uppstart, och
+// MGP:s ingångskort svarar med B2 för varje ingång (Bennys trace 10 oktober 2026). Gruppen a/c/b väljer vilka kort som
+// svarar; i tracen började svaret 0,5 s efter grupp 0/1/0 (adresserna 17–24, där kort 18 ligger). Växel- och signalkorten
+// svarar inte. Ordningen är JMRI:s: 1/0/0, 1/0/1, 1/1/0, 1/1/1, 0/0/0, 0/0/1, 0/1/0, 0/1/1.
+export function interrogation() {
+  return [4, 5, 6, 7, 0, 1, 2, 3].map(group => frame([0xb0, 0x78 | (group & 3), (group & 4 ? 0x20 : 0) | 0x07]));
+}
 export function decode(bytes) {
   validate(bytes);
   const [op, a, b] = bytes;
+  if (op === 0xb0 && (a & 0xfc) === 0x78 && (b & 0xdf) === 0x07) return { kind: 'interrogate', group: ((b & 0x20) >> 3) | (a & 3) };
   if (op === 0xb0) return { kind: 'order', address: 1 + a + ((b & 15) << 7), position: b & 0x20 ? 'C' : 'T', on: !!(b & 0x10) };
   if (op === 0xb1) {
     const addr = 1 + a + ((b & 15) << 7);

@@ -3,7 +3,7 @@
 // uttryckligen om de inte ska användas. "Markera som klar" tar bort "N steg kvar" ur panelen.
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const when=t=>t?new Date(t).toLocaleString('sv-SE',{dateStyle:'short',timeStyle:'short'}):'';
-const CONNECTION={simulator:'simulatorn',hardware:'LocoBuffer',unspecified:'banan'};
+const CONNECTION={simulator:'den simulerade banan (offline)',hardware:'banan över LocoNet (live)',unspecified:'banan'};
 export function createStartPage({root,api,message,session,onChange}){
   if(!root)return null;
   let view=null,last='',skipped=new Set();
@@ -13,7 +13,7 @@ export function createStartPage({root,api,message,session,onChange}){
     switch(s.id){
       case 'owner':return s.done?['Ägaren finns.'+(user?' Du är inloggad som '+user.username+'.':''),'']:s.how==='script'?['Webbdriften: ägaren skapas på servern som användaren charlottendal. Lösenordet läses från standard input.','']:['Ägaren är den som lägger till och tar bort användare; en administratör sköter hela TKL men inte vilka som har tillgång. Operatören behöver inte logga in på den här datorn.',''];
       case 'ai':return s.done?[`Ansluten med ${s.model}.`+(s.tested?' Provet gick igenom.':' Prova anslutningen under AI-tjänst så att fel syns där och inte först i Studio.'),'']:['Chatten och AI-genomgången i Studio använder Claude via en nyckel från Anthropic. Utan nyckel fungerar de inte; allt annat i TKL fungerar.','Hoppa över om AI-tjänsten inte ska användas på den här installationen.'];
-      case 'connection':return s.done?[`Kontakt med ${CONNECTION[s.mode]||s.mode}.`,'']:[`Ingen kontakt med ${CONNECTION[s.mode]||'banan'}. Läget (simulator eller LocoBuffer) ställs i app.env vid installationen; status och porten syns under Banan (LocoNet).`,''];
+      case 'connection':return s.done?[`Kontakt med ${CONNECTION[s.mode]||s.mode}.`,'']:[`Ingen kontakt med ${CONNECTION[s.mode]||'banan'}. Live eller offline väljs med lägesknappen i statusraden eller under Banan (LocoNet), där också LocoBuffern ställs in.`,''];
       case 'trainmeet':return s.done?['TrainMeet är anslutet'+(s.origin?' till '+s.origin:'')+'.','']:['TrainMeet ger tåg till och från grannstationerna. Anslut med adress och parningskod under Träffen → TrainMeet.','Hoppa över om stationen körs fristående.'];
     }return ['',''];
   };

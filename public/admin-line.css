@@ -330,3 +330,13 @@ body[data-admin-nav-open] #admin-shell .admin-shell-drawer-shade{display:block;p
 .releases ul{margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.55;color:var(--muted)}
 .releases [data-more-releases]{margin-top:10px}
 .releases>.settings-scope{margin:4px 0 8px}
+/* Live eller offline (0.78.0): två lägeskort, bytet och LocoBufferns inställning. */
+.connection-modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:0 0 12px}
+.connection-mode-card{border:1px solid var(--border);border-radius:6px;padding:10px 12px}
+.connection-mode-card h3{margin:0 0 6px;font-size:13px}.connection-mode-card h3 small{font-weight:500;font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-left:6px;color:var(--muted)}
+.connection-mode-card p{margin:0 0 6px;font-size:12px;line-height:1.5}
+.connection-mode-card[data-current=true][data-mode=live]{border-color:#46d36b}.connection-mode-card[data-current=true][data-mode=offline]{border-color:#f5c518}
+.connection-settings h4{margin:18px 0 4px;font-size:13px}
+.connection-settings-form{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end}.connection-settings-form label{display:grid;gap:4px;font-size:12px}
+.connection-settings-form [data-device]{width:min(420px,80vw)}.connection-settings-form p{flex-basis:100%;margin:4px 0 0}
+.connection-settings-gateway{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:12px;margin:12px 0 0}.connection-settings-gateway dt{color:var(--muted)}.connection-settings-gateway dd{margin:0}

@@ -50,5 +50,7 @@ export class TrainSimulation{
     finally{this.busy=false;this.revision++;}
     const [low,high]=this.intervalMs;this.nextAt=this.now()+low+Math.floor(this.random()*(high-low));
   }
+  // Byte till live: anmälda tåg som väntar på linjerna finns inte på riktigt; fälten töms.
+  clear(){for(const w of this.waiting)this.announce(INCOMING_FIELDS[w.edge],'');if(this.waiting.length){this.waiting=[];this.revision++;}}
   view(){return {available:this.available,reason:this.available?'':this.reason,enabled:this.enabled,nextAt:this.nextAt,waiting:this.waiting.map(w=>({...w})),error:this.error};}
 }

@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.78.0",
+    "date": "2026-10-11",
+    "notes": [
+      "Live och offline: live styr banan över LocoNet med en LocoBuffer på USB, offline kör stationen mot den simulerade banan utan LocoNet",
+      "Lägesknappen i statusraden visar alltid läget (LIVE eller OFFLINE) och byter det; bytet kräver att inga tågvägar eller andra lås ligger",
+      "LocoBuffern ställs in under Inställningar → Banan (LocoNet); TKL startar gatewayen själv och startar om den om LocoBuffern försvinner",
+      "Simulerad trafik och Automat finns bara offline; webbdriften kör alltid offline"
+    ]
+  },
+  {
     "version": "0.77.0",
     "date": "2026-10-11",
     "notes": [

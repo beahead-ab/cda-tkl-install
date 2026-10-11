@@ -1,4 +1,5 @@
-import {connectionInfo,commandExpectations,protocolObjects} from './communication-diagnostics.mjs';
+import {commandExpectations,protocolObjects} from './communication-diagnostics.mjs';
+import {ConnectionMode,MODE_LABEL} from './connection-mode.mjs';
 import http from 'node:http';
 import {Destinations} from './destinations.mjs';
 import {StreamDeckLayouts} from './stream-deck-layout.mjs';
@@ -41,6 +42,9 @@ const baseProfile=loadProfile();
 const port = Number(process.env.CHARLOTTENDAL_PORT || 8910), root = fileURLToPath(new URL('../public', import.meta.url));
 const storage = new Storage(process.env.CHARLOTTENDAL_STATE_DIR || fileURLToPath(new URL('../var', import.meta.url)));
 const auth = createAuth(root, true, process.env, { stateDir: storage.directory });
+// Live eller offline (src/connection-mode.mjs): var kärnans LocoNet-klient ansluter, och LocoBufferns gateway i live.
+const connection=new ConnectionMode({storage,root:fileURLToPath(new URL('..',import.meta.url))});
+const connectionInfo=p=>connection.target(p);
 let profile,client,engine,configuration,trainInformation,panelIndications,recorder,tracker,automation;
 // Panelens geometri, för tågspårningens spårgraf (src/train-tracking.mjs).
 const panelGeometry=JSON.parse(fs.readFileSync(new URL('../public/data/panel.json',import.meta.url),'utf8'));
@@ -67,11 +71,34 @@ function activationStatus(proposed){
   }
   return {allowed:true,reason:'AIS aktiv och inga lås. Föreslagna adresser måste ha färska fria lägen och stoppbesked vid aktivering.'};
 }
+// Byte mellan live och offline: kärnan ansluter på nytt mot den andra förbindelsen. Inga lås får ligga, eftersom de
+// gäller den bana som lämnas; inspelningen hör till förbindelsen.
+function connectionModeStatus(mode){
+  const deny=reason=>({allowed:false,reason});
+  if(connection.locked)return deny('TKL är startad mot en fristående gateway och kör alltid live.');
+  if(mode===connection.mode)return deny(`TKL kör redan ${MODE_LABEL[mode].toLowerCase()}.`);
+  if(mode==='live'&&connection.liveReason())return deny(connection.liveReason());
+  if(!engine||engine.storageFault)return deny('Fungerande lagring krävs.');
+  if(engine.routes.length)return deny('Återta alla tågvägar först.');
+  if(engine.controls.programming.reserved)return deny('Återgå till normaldrift på programmeringsspåret först.');
+  if(engine.yard.requests.length)return deny('Rangerarens begäran måste vara besvarad och tillbakalagd först.');
+  if(recorder.active||recorder.pending)return deny('Avsluta och spara telegraminspelningen först.');
+  return {allowed:true,reason:mode==='live'?'TKL ansluter till banan över LocoNet.':'TKL ansluter till den simulerade banan; inget går ut på LocoNet.'};
+}
+function connectionView(options){const v=connection.view(options);return {...v,label:connectionInfo(profile).label,switch:{live:connectionModeStatus('live'),offline:connectionModeStatus('offline')}};}
+function switchConnection(mode){
+  const check=connectionModeStatus(mode);if(!check.allowed)throw Object.assign(Error(check.reason),{status:409});
+  const from=connection.mode;connection.switch(mode);
+  // Simulerad trafik hör till offline: den stängs av, och anmälda tåg som väntar tas bort ur de inkommande fälten.
+  if(trainSimulation.enabled)trainSimulation.set(false);trainSimulation.clear();trainSimulation.available=connection.mode==='offline';
+  installRuntime(createRuntime(withRules(bindings.profile())));
+  engine.log('connection-mode',mode==='live'?'Live: TKL styr banan över LocoNet (LocoBuffer). Signalerna går till stopp och spårledningarna frågas av; växlarna är okända tills de får en order.':`Offline: TKL kör stationen mot den simulerade banan. Inget går ut på LocoNet.${from==='live'?' Banan lämnas som den står.':''}`);
+}
 function createRuntime(p){
   const target=connectionInfo(p);
   const c=new LocoNetClient({host:target.host,port:target.port,silenceMs:p.staleMs});
   const e=new Engine(p,{storage,send:bytes=>c.send(bytes)});if(e.storageFault)throw Error(e.storageFault);
-  const t=new TrainTracker({profile:p,panel:panelGeometry,enabled:target.mode==='simulator',reason:'Tågspårningen provas i simulering först. Mot riktig bana är den avstängd.',log:(kind,message)=>e.log(kind,message)});
+  const t=new TrainTracker({profile:p,panel:panelGeometry,enabled:target.mode==='simulator',reason:'Tågspårningen provas offline först. Live är den avstängd.',log:(kind,message)=>e.log(kind,message)});
   return {profile:p,client:c,engine:e,
     configuration:new Configuration(p,{storage,canActivate:()=>!e.routes.length&&!e.controls.programming.reserved&&!e.yard.requests.length&&!e.storageFault}),
     trainInformation:new TrainInformation(JSON.parse(fs.readFileSync(new URL('../public/data/train-fields.json',import.meta.url))),p,{storage}),
@@ -81,7 +108,7 @@ function createRuntime(p){
     // Tågspårningen provas i simulering först; mot riktig bana är den avstängd (docs/tagsparning.md).
     tracker:t,
     // Automaten (src/train-automation.mjs): datorn som tågklarerare, bara i simuleringsläge till att börja med.
-    automation:new TrainAutomation({profile:p,available:target.mode==='simulator',reason:'Automaten finns bara i simuleringsläge.',request:(from,to)=>e.request(from,to,'build'),edgeBlock:t.edgeBlock,log:(kind,message)=>e.log(kind,message)})};
+    automation:new TrainAutomation({profile:p,available:target.mode==='simulator',reason:'Automaten finns bara offline.',request:(from,to)=>e.request(from,to,'build'),edgeBlock:t.edgeBlock,log:(kind,message)=>e.log(kind,message)})};
 }
 // Studio's rules describe the network profile; another profile (the legacy commissioning
 // one) runs as it is.
@@ -121,7 +148,7 @@ function edgeInfo(){
   return out;
 }
 // Simulerade tåg (src/train-simulation.mjs): bara i simuleringsläge, mot simulatorn över den lokala förbindelsen.
-const trainSimulation=new TrainSimulation({available:process.env.CHARLOTTENDAL_CONNECTION_MODE==='simulator',reason:'Simulerade tåg finns bara i simuleringsläge.',
+const trainSimulation=new TrainSimulation({available:connection.mode==='offline',reason:'Simulerad trafik finns bara offline.',
   send:command=>client.simulate(command),announce:(key,value)=>{if(trainInformation.announce(key,value))dirty=true;},log:(kind,message)=>engine.log(kind,message)});
 let simulated=0,simulationRevision=0;
 function simulate(){
@@ -159,6 +186,7 @@ function installRuntime(next,start=true){
   c.on('wire',event=>{trace.unshift({...event,at:Date.now()});trace.length=Math.min(trace.length,100);dirty=true;});
   if(start)c.start();dirty=true;
 }
+connection.on('change',()=>{dirty=true;});
 trainMeet.on('change',()=>{dirty=true;});trainMeet.on('journal',text=>{engine.log('trainmeet',text);dirty=true;});
 installRuntime(createRuntime(withRules(bindings.profile())),false);
 // Layouts are checked against the live profile's pluppar, so the store is created once the runtime exists.
@@ -174,7 +202,7 @@ const installKind=process.env.CHARLOTTENDAL_INSTALL_KIND||(fs.existsSync('/usr/l
 const updateCheck=installKind?new UpdateCheck({current:release,kind:installKind,statusFile:path.join(storage.directory,'update.json'),readFile:file=>fs.readFileSync(file,'utf8'),
   writeFile:(file,text)=>{fs.writeFileSync(file+'.tmp',text,{mode:0o640});fs.renameSync(file+'.tmp',file);},hook:process.env.RENDER_DEPLOY_HOOK_URL}):null;
 updateCheck?.start();
-const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot(),trainTracking:tracker.view(),trainSimulation:trainSimulation.view(),automation:automation.view() };};
+const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),connectionMode:connectionView(),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot(),trainTracking:tracker.view(),trainSimulation:trainSimulation.view(),automation:automation.view() };};
 const server = http.createServer(async (req, res) => {
   try {
     guard(req, port); const url = new URL(req.url, `http://127.0.0.1:${port}`);
@@ -182,6 +210,7 @@ const server = http.createServer(async (req, res) => {
     const expires = await auth.authenticate(req, url);
     if (req.method === 'GET' || req.method === 'HEAD') {
       if (url.pathname === '/api/state') return json(res, snapshot());
+      if(url.pathname==='/api/connection')return json(res,connectionView({devices:true}));
       if(url.pathname==='/api/communication')return json(res,{connection:connectionInfo(profile),connectionState:engine.connected?'connected':'disconnected',expectations:commandExpectations(profile,engine.snapshot()),trace:protocolTrace});
       if(url.pathname==='/api/studio'){const measured=studioMeasure.measured(profile);return json(res,{...studioData(studioSources,studioDrafts.activeRules(),measured),drafts:studioDrafts.view(bindings.profile()),review:studioReview.view(),
         measure:studioMeasure.view(profile),cards:studioCards.view(),mgp:mgpSummary({profile,xml:studioSources.xml},buildRegistry(studioSources,measured),studioCards.view().cards,{sections:detectionInventory(studioSources).sections,measured})});}
@@ -258,6 +287,9 @@ const server = http.createServer(async (req, res) => {
       if(command==='remove')engine.log('streamdeck',name+' är glömt.');
       return json(res,result);
     }
+    // Live eller offline: vem som helst vid panelen byter läge (samma villkor för alla); LocoBuffern ställer ägaren eller en administratör in.
+    if(url.pathname==='/api/connection/mode'){switchConnection(data?.mode);dirty=true;return json(res,{connection:connectionView(),state:snapshot()});}
+    if(url.pathname==='/api/connection/locobuffer'){connection.setLocobuffer(data);engine.log('connection-mode',`LocoBuffer inställd: ${data.device||'ingen'} · ${data.baud} baud · ${data.flow==='rtscts'?'RTS/CTS':'ingen flödeskontroll'}.`);dirty=true;return json(res,connectionView({devices:true}));}
     if(url.pathname==='/api/destinations'){const result=destinations.save(data,trainMeet.context?.stations||[]);dirty=true;return json(res,result);}
     if(url.pathname.startsWith('/api/trainmeet/')){const command={configure:'configure',pair:'pair',refresh:'refresh',disconnect:'disconnect',stations:'stations',clearance:'clearance',movement:'movement'}[url.pathname.slice('/api/trainmeet/'.length)];if(!command)return json(res,{error:'Okänd TrainMeet-åtgärd'},404);return json(res,await trainMeet[command](data));}
     // On a Raspberry Pi the panel can start cda-tkl-update.service (allowed for the cda-tkl
@@ -337,7 +369,7 @@ const server = http.createServer(async (req, res) => {
 let tick, publish;
 // CHARLOTTENDAL_LISTEN=0.0.0.0 lets the rangerare's station reach TKL over the layout's network.
 server.listen(port, process.env.CHARLOTTENDAL_LISTEN || '127.0.0.1', () => {
-  console.log(`Charlottendal TKL: http://127.0.0.1:${port}`); client.start();
+  console.log(`Charlottendal TKL: http://127.0.0.1:${port}`); connection.start(); client.start();
   tick = setInterval(() => {protect(() => engine.tick());if(Date.now()-tracked>300)track();simulate();automate();recorder.tick();modelClock.checkpoint();trainMeet.tick();if(Date.now()-clockPublished>1000){dirty=true;clockPublished=Date.now();}}, 100);
   publish = setInterval(() => {
     if (!dirty) return; dirty = false; const text = `data: ${JSON.stringify(snapshot())}\n\n`;
@@ -352,6 +384,6 @@ async function close() {
   for (const n of Object.keys(engine.signals)) protect(() => engine.permission(n, 'STOP'));
   modelClock.checkpoint(true);
   await recorder.finish('server-shutdown');
-  setTimeout(() => { client.stop(); for (const s of streams) s.end(); server.close(() => process.exit(0)); }, 250);
+  setTimeout(() => { client.stop(); connection.stop(); for (const s of streams) s.end(); server.close(() => process.exit(0)); }, 250);
 }
 process.on('SIGINT', close); process.on('SIGTERM', close);

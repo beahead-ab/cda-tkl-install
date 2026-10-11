@@ -412,6 +412,11 @@ button.chip{cursor:pointer;color:var(--fg)}button.chip:hover{background:#262c32;
 .chip-release{border-color:var(--yellow);color:var(--yellow-text)}
 .chip-update{border-color:#4a7fb5;color:#9cc3ea}.chip-update .chip-dot{background:#4a7fb5}button.chip-update:hover{border-color:#6a9fd5}
 .update-line{margin:8px 0;padding:10px 12px;border:1px solid #2a3036;border-radius:3px;background:#0a0c0e;white-space:pre-wrap;word-break:break-all;font:400 12.5px/1.5 var(--font-mono,monospace);color:#e6e9ec}button.chip-release:hover{border-color:var(--yellow)}
+/* Live eller offline (0.78.0): LIVE grönt när LocoNet är ansluten, rött utan; OFFLINE gult, så att ingen tar simuleringen för banan. */
+.chip-mode{font-weight:600;letter-spacing:.06em;font-size:11px}
+.chip-mode[data-tone=live]{border-color:var(--green);color:#9fe8b4}.chip-mode[data-tone=live] .chip-dot{background:var(--green)}
+.chip-mode[data-tone=offline]{border-color:var(--yellow);color:var(--yellow-text)}.chip-mode[data-tone=offline] .chip-dot{background:var(--yellow)}
+.chip-mode[data-tone=alarm]{border-color:var(--red);color:var(--red-text)}
 .chip.chip-off>span{text-decoration:line-through;text-decoration-thickness:1px;color:var(--fg-label)}
 .chip[hidden]{display:none}
 /* Återställ panel · Lämna över rangerbangården: chips in the status bar, beside the zoom chip. */

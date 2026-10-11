@@ -34,6 +34,7 @@ import {rangerOwnView,createRangerBar} from './ranger-page.js';
 import {rangerScope} from './ranger-scope.js';
 import {createPanelSplit} from './panel-split.js';
 import {openUpdateNotice} from './update-notice.js';
+import {modeChip,openConnectionMode,createConnectionSettings} from './connection-mode.js';
 import {createUpdatePage} from './update-page.js';
 import {createAiPage} from './ai-page.js';
 import {createUsersPage} from './users-page.js';
@@ -58,7 +59,7 @@ try{setCrossingDisplay(localStorage.getItem('charlottendal-crossing-display'),{s
 $('crossing-display').onchange=()=>{setCrossingDisplay($('crossing-display').value);paint();};
 
 let state, config, panel, registry, chosen = null, inspected = null, online = false, lastEvent = 0, pending = 0;
-let manualFeedback, sourceRegister, trainInformation, telegramRecorder, operatingControls, modelClock, trainMeet, feedback, layout;
+let manualFeedback, sourceRegister, trainInformation, telegramRecorder, connectionSettings, operatingControls, modelClock, trainMeet, feedback, layout;
 let routeConfirmation,signalEndpoints;
 const routeTargets=createRouteTargets({load:async(from,kind)=>{
   const response=await fetch('/api/route-targets?'+new URLSearchParams({from,kind,...(rangerMode?{operator:'ranger'}:{})}),{cache:'no-store'});
@@ -610,6 +611,7 @@ function renderPanel() {
   sourceRegister?.updateState(state,online);
   trainInformation?.update(state,online);
   telegramRecorder?.update(state,online);
+  connectionSettings?.update(state);
   operatingControls?.update(state,online);
   if(state.clock)modelClock?.update(state.clock,online);
   trainMeet?.update(state.trainMeet,online,{routes:state.routes||[]});
@@ -618,7 +620,7 @@ function renderPanel() {
   if(state.streamDeck)streamDeckAdmin?.update(state.streamDeck);
   updatePage?.update(state.update,state.release);
   if(chosen && (!usable() || state.controls?.mode==='remote')) clearChoice(false);
-  const c = $('connection'); setText(c,!online ? 'Kontakt med kärnan saknas' : state.storageFault ? 'Lagringsfel · spärrad' : state.connection === 'connected' ? (state.connectionInfo?.mode==='simulator'?'Simulator ansluten':'LocoNet ansluten') : (state.connectionInfo?.mode==='simulator'?'Simulator frånkopplad':'LocoNet frånkopplad'));
+  const c = $('connection'); setText(c,!online ? 'Kontakt med kärnan saknas' : state.storageFault ? 'Lagringsfel · spärrad' : state.connection === 'connected' ? (state.connectionInfo?.mode==='simulator'?'Offline · simulerad bana':'Live · LocoNet ansluten') : (state.connectionInfo?.mode==='simulator'?'Offline · simulatorn frånkopplad':'Live · LocoNet frånkopplad'));
   c.className = 'connection ' + (usable() ? 'online' : 'offline');
   setText($('panel-connection'),c.textContent);attribute($('panel-connection'),'class',c.className);
   if(currentPage==='panel')paintPlan();
@@ -650,7 +652,7 @@ function renderPanel() {
   $('route-summary').textContent=`${state.routes.length} ${state.routes.length===1?'tågväg':'tågvägar'} · ${state.routes.map(r=>statuses[r.state]).filter((v,i,a)=>a.indexOf(v)===i).join(' / ')}`;
   paintJournal();
   $('wire').textContent = (state.trace || []).slice(0, 40).map(e => `${time(e.at)}  ${e.direction === 'out' ? 'SKICKAT ' : 'MOTTAGET'}  ${e.hex}`).join('\n');
-  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());panelHead?.rangerNotice(rangerMode?rangerOwnView(state.yard):rangerView(state.yard));paintClearance();trainTracking?.update(state.trainTracking,online,state.trainSimulation,state.automation);rangerBar?.update(state,online);
+  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());panelHead?.modeNotice(modeChip(state.connectionMode,state,online));panelHead?.rangerNotice(rangerMode?rangerOwnView(state.yard):rangerView(state.yard));paintClearance();trainTracking?.update(state.trainTracking,online,state.trainSimulation,state.automation);rangerBar?.update(state,online);
 }
 function paintInspector() {
   if (!inspected || !state) return;
@@ -698,6 +700,7 @@ async function start() {
   contextDialog=createContextDialog({dialog:$('inspector-host'),onClose:()=>{$('inspector-home').append($('inspector-card'));manualFeedback?.clear();}});
   const fullscreen = createFullscreen({button: $('toggle-fullscreen'), onError: message});
   telegramRecorder=createTelegramRecorder();
+  connectionSettings=createConnectionSettings($('connection-mode-settings'),{api});
   operatingControls=createOperatingControls({api,openSource});
   modelClock=createModelClock({api});trainMeet=createTrainMeet({api,onTimetable:()=>openTools('trainmeet-timetable'),stationHint:()=>config?.profile?.title||'Charlottendal'});feedback=createFeedback();clearanceView=createClearance({api,message,onRequest:()=>{panelEvents?.showClearance({auto:true});feedback?.ring();},onAttention:list=>{clearanceAttention=list;paintClearance();}});
   panelEvents=createPanelEvents();panelConsole=createPanelConsole({onOpen:()=>{appMenu?.close();},onResetComplete:text=>message(text,{error:false,duration:4000}),showDrift:()=>panelEvents?.showDrift(),showClearance:()=>panelEvents?.showClearance()});
@@ -762,7 +765,9 @@ async function start() {
   try{localStorage.removeItem('charlottendal-skin');}catch{}
   createPanelFit({plan:$('track-plan'),viewport:document.querySelector('.panel-scroll'),stage:$('plan-stage'),controls:$('panel-console')});
   panelHead=createPanelHead({shell:document.querySelector('#panel-view .panel-shell'),onUpdate:view=>openUpdateNotice(view,{api,message}),onRanger:a=>api('ranger/'+a.command,a.command==='answer'?{id:a.id,approved:a.approved}:{id:a.id}),
-    onClearance:({action,line})=>{if(action==='show'){panelEvents?.showClearance();clearanceView?.reveal(line);}else clearanceView?.act(line,action);}});
+    onClearance:({action,line})=>{if(action==='show'){panelEvents?.showClearance();clearanceView?.reveal(line);}else clearanceView?.act(line,action);},
+    // Rangerarens station ser läget men byter det inte.
+    onMode:rangerMode?null:()=>openConnectionMode(state?.connectionMode,{api,message})});
   if(rangerMode){document.querySelector('.plan-head-title').textContent='Charlottendal · Rangeraren';rangerBar=createRangerBar({root:$('panel-events'),api});}
   createPanelSplit({bottom:$('panel-bottom'),viewport:document.querySelector('.panel-scroll')});
   // Nothing administrative in the signal box's frame: the update chips join the Drift tab's buttons.

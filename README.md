@@ -172,8 +172,9 @@ Den sista raden tar även bort driftdata och inställningar.
 
 ## Gemensamt
 
-- **Simulator.** Alla installationer kör mot den inbyggda anläggningssimulatorn. Riktig anläggning via
-  LocoBuffer kopplas in i driftsättningssteget.
+- **Live och offline.** En ny installation kör offline, mot den inbyggda anläggningssimulatorn. Live, banan över
+  LocoNet med en LocoBuffer på USB, väljs med lägesknappen i statusraden sedan 0.78.0, på Raspberry Pi och Mac men
+  inte på Windows än. Se [live och offline](docs/live-och-offline.md).
 - **Inloggning.** TKL svarar bara på datorn själv. Operatören behöver ingen inloggning; Inställningar och
   Objekt och regler kräver en inloggad ägare eller administratör så snart ägaren är skapad (se
   `docs/anvandare.md`). Ägaren skapas i Kom igång vid första starten.

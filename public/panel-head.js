@@ -3,15 +3,17 @@
 // buttons (Återställ) that app.js moves in. Presentation only; app.js hands it
 // the texts, it sends nothing.
 const esc=v=>String(v??'');
-export function createPanelHead({shell,onUpdate,onRanger,onClearance}){
+export function createPanelHead({shell,onUpdate,onRanger,onClearance,onMode}){
   if(!shell)return null;
   const left=document.createElement('div');left.id='plan-head';
-  left.innerHTML='<span class="plan-head-title">Charlottendal</span><span class="chip chip-status" id="plan-head-status" role="status" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></span><span class="chip chip-ranger" id="plan-head-ranger" role="status" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></span><span class="chip chip-clearance" id="plan-head-clearance" role="alert" data-tone="warn" hidden><i class="chip-dot" aria-hidden="true"></i><button type="button" class="chip-clearance-text" data-clearance="show"></button><button type="button" class="chip-clearance-accept" data-clearance="accept">Godkänn</button><button type="button" data-clearance="reject">Neka</button><button type="button" class="chip-clearance-more" data-clearance="show" hidden></button></span>';
+  left.innerHTML='<span class="plan-head-title">Charlottendal</span><button type="button" class="chip chip-mode" id="plan-head-mode" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></button><span class="chip chip-status" id="plan-head-status" role="status" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></span><span class="chip chip-ranger" id="plan-head-ranger" role="status" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></span><span class="chip chip-clearance" id="plan-head-clearance" role="alert" data-tone="warn" hidden><i class="chip-dot" aria-hidden="true"></i><button type="button" class="chip-clearance-text" data-clearance="show"></button><button type="button" class="chip-clearance-accept" data-clearance="accept">Godkänn</button><button type="button" data-clearance="reject">Neka</button><button type="button" class="chip-clearance-more" data-clearance="show" hidden></button></span>';
   const right=document.createElement('div');right.id='plan-head-right';
   right.innerHTML='<button type="button" class="chip chip-start" id="plan-head-start" data-tone="warn" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></button><button type="button" class="chip chip-update" id="plan-head-update" hidden><i class="chip-dot" aria-hidden="true"></i><span></span></button><button type="button" class="chip chip-release" id="plan-head-release" data-tone="warn" hidden><i class="chip-dot" aria-hidden="true"></i><span>Ny version · ladda om</span></button>';
   shell.append(left,right);
   const status=left.querySelector('#plan-head-status'),ranger=left.querySelector('#plan-head-ranger'),clearance=left.querySelector('#plan-head-clearance'),release=right.querySelector('#plan-head-release'),updateChip=right.querySelector('#plan-head-update');
   let rangerShown='',clearanceLine='';
+  // Live eller offline (0.78.0): alltid synligt om TKL styr den riktiga banan; ett klick öppnar rutan där läget byts.
+  const modeChip=left.querySelector('#plan-head-mode');modeChip.onclick=()=>onMode?.();
   clearance.addEventListener('click',e=>{const b=e.target.closest('[data-clearance]');if(b&&clearanceLine)onClearance?.({action:b.dataset.clearance,line:clearanceLine});});
   // Reloading is the operator's choice: never in the middle of a route choice or an acknowledgement.
   release.onclick=()=>location.reload();
@@ -49,6 +51,7 @@ export function createPanelHead({shell,onUpdate,onRanger,onClearance}){
       more.hidden=!view.more;more.textContent='+'+view.more;more.title=view.more+' förfrågningar till i Drift';
       for(const b of clearance.querySelectorAll('[data-clearance=accept],[data-clearance=reject]'))b.disabled=!view.ready;
     },
+    modeNotice(view){modeChip.hidden=!view;if(!view)return;modeChip.dataset.mode=view.mode;modeChip.dataset.tone=view.tone;modeChip.querySelector('span').textContent=view.text;modeChip.title=view.title;modeChip.setAttribute('aria-label',view.text+'. '+view.title);},
     startNotice(view){const show=!!view&&!view.done;startChip.hidden=!show;if(show){startChip.querySelector('span').textContent='Kom igång · '+view.remaining+' steg kvar';startChip.title='Det här ställverket är inte färdigt att användas. Öppna Kom igång under Inställningar.';}},
     // A newer release in the public install repository than this installed copy runs.
     updateNotice(view){updateView=view||null;const show=!!view?.available;updateChip.hidden=!show;if(show){updateChip.querySelector('span').textContent='Uppdatering '+view.latest;const text='Charlottendal TKL '+view.latest+' finns att installera. Den här datorn kör '+view.current+'.';updateChip.title=text;updateChip.setAttribute('aria-label',text);}},

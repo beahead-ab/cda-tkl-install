@@ -151,6 +151,9 @@ installationen har sagt åt Chromium att ställverket får använda Elgatos enhe
 - **Uppdatering.** `● Uppdatering X` i statusraden betyder att en ny version finns att installera, se
   avsnitt 9. `● Ny version · ladda om` betyder att den redan är installerad och att fönstret ska
   laddas om.
+- **Live eller offline.** Lägesknappen bredvid CHARLOTTENDAL i statusraden visar om TKL styr banan över LocoNet
+  (LIVE) eller den simulerade banan (OFFLINE), och byter läge. LocoBuffern ställs in under Inställningar → Banan
+  (LocoNet); sätt i den i en USB-port först. Se [live och offline](live-och-offline.md).
 - **Skärmen släcks aldrig.** Installationen stänger av skärmsläckaren.
 - **Lämna helskärmen tillfälligt** (till exempel för att nå skrivbordet): logga in med ssh och kör
   `pkill -f cda-tkl-browser; pkill chromium`. Vid nästa omstart är helskärmen tillbaka.
@@ -302,12 +305,13 @@ Starta om efter en ändring: `sudo systemctl restart cda-tkl`.
 
 ## 15. Begränsningar
 
-- **Riktig anläggning.** Installationen kör mot anläggningssimulatorn. LocoNet via LocoBuffer på
-  USB (`scripts/locobuffer-gateway.mjs`) kopplas in i driftsättningssteget, när MGP-underlaget finns.
+- **Riktig anläggning.** Installationen startar offline, mot anläggningssimulatorn. Live, LocoNet via en
+  LocoBuffer på USB, väljs i panelen sedan 0.78.0 ([live och offline](live-och-offline.md)); det är provat mot en
+  virtuell LocoBuffer, inte mot Charlottendals riktiga LocoNet än.
 - **Åtkomst från iPad eller annan dator** utan ssh-tunnel: med `CHARLOTTENDAL_LISTEN` och
   `CHARLOTTENDAL_LAN_HOSTS` (avsnitt 10) och inloggning. Rangerarens station är provad i
   simulering, inte på två riktiga Pi.
-- **TrainMeet Server på samma Pi** går bra; de använder olika portar (8787 och 1883 mot 8910–8912).
+- **TrainMeet Server på samma Pi** går bra; de använder olika portar (8787 och 1883 mot 8910–8913).
   Båda installationerna öppnar då var sitt helskärmsfönster.
 - **Provat** i en Debian 12-container på arm64 (samma processorarkitektur som Pi 5) med systemd: ny
   installation, uppdatering ovanpå och återställning efter en trasig version. På en riktig Pi 5 med

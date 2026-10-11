@@ -1,5 +1,5 @@
 import {commandExpectations,protocolObjects} from './communication-diagnostics.mjs';
-import {ConnectionMode,MODE_LABEL} from './connection-mode.mjs';
+import {ConnectionMode} from './connection-mode.mjs';
 import http from 'node:http';
 import {Destinations} from './destinations.mjs';
 import {StreamDeckLayouts} from './stream-deck-layout.mjs';
@@ -17,7 +17,7 @@ import { BindingConfiguration } from './binding-configuration.mjs';
 import { Configuration } from './configuration.mjs';
 import { TrainInformation } from './train-information.mjs';
 import { TrainTracker } from './train-tracking.mjs';
-import { TrainSimulation } from './train-simulation.mjs';
+import { TrafficTrains } from './traffic-trains.mjs';
 import { TrainAutomation } from './train-automation.mjs';
 import { destinationLines } from '../public/destination-data.js';
 import { PanelIndications } from './panel-indications.mjs';
@@ -71,34 +71,35 @@ function activationStatus(proposed){
   }
   return {allowed:true,reason:'AIS aktiv och inga lås. Föreslagna adresser måste ha färska fria lägen och stoppbesked vid aktivering.'};
 }
-// Byte mellan live och offline: kärnan ansluter på nytt mot den andra förbindelsen. Inga lås får ligga, eftersom de
-// gäller den bana som lämnas; inspelningen hör till förbindelsen.
+// Anslut till eller koppla från LocoNet: kärnan ansluter på nytt mot den andra förbindelsen. Inga lås får ligga, eftersom
+// de gäller den bana som lämnas; inspelningen hör till förbindelsen.
 function connectionModeStatus(mode){
   const deny=reason=>({allowed:false,reason});
-  if(connection.locked)return deny('TKL är startad mot en fristående gateway och kör alltid live.');
-  if(mode===connection.mode)return deny(`TKL kör redan ${MODE_LABEL[mode].toLowerCase()}.`);
+  if(connection.locked)return deny('TKL är startad mot en fristående gateway och är alltid ansluten till LocoNet.');
+  if(mode===connection.mode)return deny(mode==='live'?'LocoNet är redan ansluten.':'LocoNet är redan frånkopplad.');
   if(mode==='live'&&connection.liveReason())return deny(connection.liveReason());
   if(!engine||engine.storageFault)return deny('Fungerande lagring krävs.');
   if(engine.routes.length)return deny('Återta alla tågvägar först.');
   if(engine.controls.programming.reserved)return deny('Återgå till normaldrift på programmeringsspåret först.');
   if(engine.yard.requests.length)return deny('Rangerarens begäran måste vara besvarad och tillbakalagd först.');
   if(recorder.active||recorder.pending)return deny('Avsluta och spara telegraminspelningen först.');
-  return {allowed:true,reason:mode==='live'?'TKL ansluter till banan över LocoNet.':'TKL ansluter till den simulerade banan; inget går ut på LocoNet.'};
+  return {allowed:true,reason:mode==='live'?'TKL ansluter till banan över LocoNet.':'TKL kopplar från LocoNet och svarar själv; inget går ut på LocoNet.'};
 }
 function connectionView(options){const v=connection.view(options);return {...v,label:connectionInfo(profile).label,switch:{live:connectionModeStatus('live'),offline:connectionModeStatus('offline')}};}
 function switchConnection(mode){
   const check=connectionModeStatus(mode);if(!check.allowed)throw Object.assign(Error(check.reason),{status:409});
   const from=connection.mode;connection.switch(mode);
   // Simulerad trafik hör till offline: den stängs av, och anmälda tåg som väntar tas bort ur de inkommande fälten.
-  if(trainSimulation.enabled)trainSimulation.set(false);trainSimulation.clear();trainSimulation.available=connection.mode==='offline';
+  // Trafikspelets tåg körs av TKL bara när LocoNet inte är ansluten; med LocoNet syns de på banan.
+  trafficTrains.clear();trafficTrains.available=connection.mode==='offline';
   installRuntime(createRuntime(withRules(bindings.profile())));
-  engine.log('connection-mode',mode==='live'?'Live: TKL styr banan över LocoNet (LocoBuffer). Signalerna går till stopp och spårledningarna frågas av; växlarna är okända tills de får en order.':`Offline: TKL kör stationen mot den simulerade banan. Inget går ut på LocoNet.${from==='live'?' Banan lämnas som den står.':''}`);
+  engine.log('connection-mode',mode==='live'?'LocoNet ansluten: TKL styr banan över LocoNet (LocoBuffer). Signalerna går till stopp och spårledningarna frågas av; växlarna är okända tills de får en order.':`LocoNet frånkopplad: TKL svarar själv och kör trafikspelets tåg. Inget går ut på LocoNet.${from==='live'?' Banan lämnas som den står.':''}`);
 }
 function createRuntime(p){
   const target=connectionInfo(p);
   const c=new LocoNetClient({host:target.host,port:target.port,silenceMs:p.staleMs});
   const e=new Engine(p,{storage,send:bytes=>c.send(bytes)});if(e.storageFault)throw Error(e.storageFault);
-  const t=new TrainTracker({profile:p,panel:panelGeometry,enabled:target.mode==='simulator',reason:'Tågspårningen provas offline först. Live är den avstängd.',log:(kind,message)=>e.log(kind,message)});
+  const t=new TrainTracker({profile:p,panel:panelGeometry,enabled:target.mode==='simulator',reason:'Tågspårningen följer TKL:s egna tåg när LocoNet inte är ansluten; mot banan är den avstängd tills den är provad där.',log:(kind,message)=>e.log(kind,message)});
   return {profile:p,client:c,engine:e,
     configuration:new Configuration(p,{storage,canActivate:()=>!e.routes.length&&!e.controls.programming.reserved&&!e.yard.requests.length&&!e.storageFault}),
     trainInformation:new TrainInformation(JSON.parse(fs.readFileSync(new URL('../public/data/train-fields.json',import.meta.url))),p,{storage}),
@@ -108,7 +109,7 @@ function createRuntime(p){
     // Tågspårningen provas i simulering först; mot riktig bana är den avstängd (docs/tagsparning.md).
     tracker:t,
     // Automaten (src/train-automation.mjs): datorn som tågklarerare, bara i simuleringsläge till att börja med.
-    automation:new TrainAutomation({profile:p,available:target.mode==='simulator',reason:'Automaten finns bara offline.',request:(from,to)=>e.request(from,to,'build'),edgeBlock:t.edgeBlock,log:(kind,message)=>e.log(kind,message)})};
+    automation:new TrainAutomation({profile:p,available:target.mode==='simulator',reason:'Automaten finns bara när LocoNet inte är ansluten.',request:(from,to)=>e.request(from,to,'build'),edgeBlock:t.edgeBlock,log:(kind,message)=>e.log(kind,message)})};
 }
 // Studio's rules describe the network profile; another profile (the legacy commissioning
 // one) runs as it is.
@@ -147,14 +148,20 @@ function edgeInfo(){
   }
   return out;
 }
-// Simulerade tåg (src/train-simulation.mjs): bara i simuleringsläge, mot simulatorn över den lokala förbindelsen.
-const trainSimulation=new TrainSimulation({available:connection.mode==='offline',reason:'Simulerad trafik finns bara offline.',
-  send:command=>client.simulate(command),announce:(key,value)=>{if(trainInformation.announce(key,value))dirty=true;},log:(kind,message)=>engine.log(kind,message)});
-let simulated=0,simulationRevision=0;
-function simulate(){
-  if(!trainSimulation.available||Date.now()-simulated<1000)return;simulated=Date.now();
+// Trafikspelets tåg (src/traffic-trains.mjs): när LocoNet inte är ansluten kör TKL tågen från TrainMeet-servern på sin
+// egen bana, över den lokala förbindelsen. Spåren här namnges som i tidtabellen (Spår 1a → 1a).
+const trafficTrains=new TrafficTrains({available:connection.mode==='offline',send:command=>client.simulate(command),log:(kind,message)=>engine.log(kind,message)});
+function stationTracks(){
+  const out={};
+  for(const [button,b] of Object.entries(profile.buttons||{})){const m=/^Spår\s+(.+)$/.exec(b.label||'');const block=m&&profile.routes.find(r=>r.to===button)?.blocks.at(-1);if(block)out[m[1].trim().toLowerCase()]={button,block};}
+  return out;
+}
+let trafficTicked=0,trafficRevision=0;
+function playTraffic(){
+  if(!trafficTrains.available||Date.now()-trafficTicked<1000)return;trafficTicked=Date.now();
   const edges=Object.fromEntries(Object.entries(edgeInfo()).map(([edge,info])=>[edge,{...info,block:tracker.edgeBlock[edge]}]));
-  trainSimulation.tick({edges,blocks:engine.blocks,tracked:tracker.view().trains}).catch(error=>engine.log('error','Simulerade tåg: '+error.message)).finally(()=>{if(trainSimulation.revision!==simulationRevision){simulationRevision=trainSimulation.revision;dirty=true;}});
+  trafficTrains.tick({context:trainMeet.view().context,edges,tracks:stationTracks(),blocks:engine.blocks,tracked:tracker.view().trains,expect:(block,number)=>tracker.expect(block,number)})
+    .catch(error=>engine.log('error','Trafikspelets tåg: '+error.message)).finally(()=>{if(trafficTrains.revision!==trafficRevision){trafficRevision=trafficTrains.revision;dirty=true;}});
 }
 let automated=0,automationRevision=0;
 function automate(){
@@ -202,7 +209,7 @@ const installKind=process.env.CHARLOTTENDAL_INSTALL_KIND||(fs.existsSync('/usr/l
 const updateCheck=installKind?new UpdateCheck({current:release,kind:installKind,statusFile:path.join(storage.directory,'update.json'),readFile:file=>fs.readFileSync(file,'utf8'),
   writeFile:(file,text)=>{fs.writeFileSync(file+'.tmp',text,{mode:0o640});fs.renameSync(file+'.tmp',file);},hook:process.env.RENDER_DEPLOY_HOOK_URL}):null;
 updateCheck?.start();
-const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),connectionMode:connectionView(),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot(),trainTracking:tracker.view(),trainSimulation:trainSimulation.view(),automation:automation.view() };};
+const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),connectionMode:connectionView(),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot(),trainTracking:tracker.view(),trafficTrains:trafficTrains.view(),automation:automation.view() };};
 const server = http.createServer(async (req, res) => {
   try {
     guard(req, port); const url = new URL(req.url, `http://127.0.0.1:${port}`);
@@ -287,7 +294,7 @@ const server = http.createServer(async (req, res) => {
       if(command==='remove')engine.log('streamdeck',name+' är glömt.');
       return json(res,result);
     }
-    // Live eller offline: vem som helst vid panelen byter läge (samma villkor för alla); LocoBuffern ställer ägaren eller en administratör in.
+    // Anslut till eller koppla från LocoNet: vem som helst vid panelen (samma villkor för alla); LocoBuffern ställer ägaren eller en administratör in.
     if(url.pathname==='/api/connection/mode'){switchConnection(data?.mode);dirty=true;return json(res,{connection:connectionView(),state:snapshot()});}
     if(url.pathname==='/api/connection/locobuffer'){connection.setLocobuffer(data);engine.log('connection-mode',`LocoBuffer inställd: ${data.device||'ingen'} · ${data.baud} baud · ${data.flow==='rtscts'?'RTS/CTS':'ingen flödeskontroll'}.`);dirty=true;return json(res,connectionView({devices:true}));}
     if(url.pathname==='/api/destinations'){const result=destinations.save(data,trainMeet.context?.stations||[]);dirty=true;return json(res,result);}
@@ -326,7 +333,6 @@ const server = http.createServer(async (req, res) => {
     }
     // Tågspårningen: operatören rättar eller bekräftar numret, eller tar bort ett tåg som inte finns.
     if(url.pathname==='/api/automation'){const result=automation.set(data.enabled===true);dirty=true;return json(res,result);}
-    if(url.pathname==='/api/simulation/trains'){const result=trainSimulation.set(data.enabled===true);dirty=true;return json(res,result);}
     if(url.pathname==='/api/tracking/name'){const result=tracker.name(data.id,data.number);dirty=true;return json(res,result);}
     if(url.pathname==='/api/tracking/remove'){const result=tracker.remove(data.id);engine.log('train-tracking','Ett tåg togs bort ur spårningen av operatören.');dirty=true;return json(res,result);}
     if(url.pathname.startsWith('/api/train-information/')) {
@@ -370,7 +376,7 @@ let tick, publish;
 // CHARLOTTENDAL_LISTEN=0.0.0.0 lets the rangerare's station reach TKL over the layout's network.
 server.listen(port, process.env.CHARLOTTENDAL_LISTEN || '127.0.0.1', () => {
   console.log(`Charlottendal TKL: http://127.0.0.1:${port}`); connection.start(); client.start();
-  tick = setInterval(() => {protect(() => engine.tick());if(Date.now()-tracked>300)track();simulate();automate();recorder.tick();modelClock.checkpoint();trainMeet.tick();if(Date.now()-clockPublished>1000){dirty=true;clockPublished=Date.now();}}, 100);
+  tick = setInterval(() => {protect(() => engine.tick());if(Date.now()-tracked>300)track();playTraffic();automate();recorder.tick();modelClock.checkpoint();trainMeet.tick();if(Date.now()-clockPublished>1000){dirty=true;clockPublished=Date.now();}}, 100);
   publish = setInterval(() => {
     if (!dirty) return; dirty = false; const text = `data: ${JSON.stringify(snapshot())}\n\n`;
     for (const res of streams) { if (res.writableLength > 1e6) { res.end(); streams.delete(res); } else res.write(text); }

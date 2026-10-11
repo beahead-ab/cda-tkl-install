@@ -1,7 +1,8 @@
-// Live och offline (0.78.0). Live: TKL styr banan över LocoNet, med en LocoBuffer på USB som TKL själv startar
-// gatewayen för (scripts/locobuffer-gateway.mjs). Offline: TKL kör stationen mot den simulerade banan
-// (src/simulator.mjs), utan LocoNet. Valet sparas i connection.json i tillståndskatalogen och gäller tills det ändras.
-// Kärnan är densamma i båda lägena; bara förbindelsen byts. Villkoren för bytet (inga lås) avgör servern.
+// LocoNet ansluten eller ej ansluten (0.78.0, språket sedan 0.79.0). Ansluten ('live'): TKL styr banan över LocoNet, med
+// en LocoBuffer på USB som TKL själv startar gatewayen för (scripts/locobuffer-gateway.mjs), och återrapporterna kommer
+// från banan. Ej ansluten ('offline'): TKL svarar själv på sina order och kör trafikspelets tåg (src/field.mjs i den
+// lokala processen src/simulator.mjs). Valet sparas i connection.json och gäller efter omstart: var LocoNet ansluten
+// ansluter TKL igen. Kärnan är densamma; bara förbindelsen byts. Villkoren för bytet (inga lås) avgör servern.
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn as nodeSpawn } from 'node:child_process';
@@ -9,7 +10,7 @@ import { EventEmitter } from 'node:events';
 
 const BAUDS = ['9600', '19200', '38400', '57600', '115200'], FLOWS = ['none', 'rtscts'];
 const fail = (message, status = 400) => { throw Object.assign(Error(message), { status }); };
-export const MODE_LABEL = { live: 'Live', offline: 'Offline' };
+export const MODE_LABEL = { live: 'LocoNet ansluten', offline: 'LocoNet ej ansluten' };
 
 // USB-serieportar som en LocoBuffer kan sitta på: stabila namn under /dev/serial/by-id först (Linux), annars
 // ttyACM/ttyUSB, och cu.usb* på Mac.
@@ -39,17 +40,17 @@ export class ConnectionMode extends EventEmitter {
   get port() { return Number(this.env.CHARLOTTENDAL_LOCOBUFFER_PORT || 8913); }
   liveReason() {
     if (this.external) return '';
-    if (this.env.CHARLOTTENDAL_INSTALL_KIND === 'render') return 'Webbdriften har ingen LocoNet; den kör alltid offline.';
-    if (this.platform === 'win32') return 'Live med LocoBuffer finns på Raspberry Pi och Mac, inte på Windows än.';
+    if (this.env.CHARLOTTENDAL_INSTALL_KIND === 'render') return 'Webbdriften har ingen LocoNet; TKL svarar alltid själv.';
+    if (this.platform === 'win32') return 'LocoNet via LocoBuffer finns på Raspberry Pi och Mac, inte på Windows än.';
     if (!this.data.locobuffer.device) return 'Ingen LocoBuffer inställd. Ange den under Inställningar → Banan (LocoNet).';
     return '';
   }
   // Var kärnans LocoNet-klient ansluter: simulatorns ledning offline, gatewayen live.
   target(profile) {
     const wire = { host: this.env.CHARLOTTENDAL_WIRE_HOST || profile.transport.host, port: Number(this.env.CHARLOTTENDAL_WIRE_PORT || profile.transport.port) };
-    if (this.external) return { mode: 'hardware', ...wire, label: `Live · LocoNet via gateway ${wire.host}:${wire.port}` };
-    if (this.mode === 'live') return { mode: 'hardware', host: '127.0.0.1', port: this.port, label: `Live · LocoNet via LocoBuffer (${this.data.locobuffer.device})` };
-    return { mode: 'simulator', ...wire, label: 'Offline · simulerad bana, ingen LocoNet' };
+    if (this.external) return { mode: 'hardware', ...wire, label: `LocoNet ansluten via gateway ${wire.host}:${wire.port}` };
+    if (this.mode === 'live') return { mode: 'hardware', host: '127.0.0.1', port: this.port, label: `LocoNet ansluten via LocoBuffer (${this.data.locobuffer.device})` };
+    return { mode: 'simulator', ...wire, label: 'LocoNet ej ansluten · TKL svarar själv och kör trafikspelets tåg' };
   }
   // Enhetslistan läses bara när den efterfrågas (Inställningar), inte i varje lägesutskick.
   view({ devices = false } = {}) {
@@ -62,7 +63,7 @@ export class ConnectionMode extends EventEmitter {
     if (typeof device !== 'string' || (device && (!/^\/dev\/[^\s\u0000-\u001f]+$/.test(device) || device.length > 255 || device.includes('..')))) fail('Ange LocoBufferns enhet under /dev, till exempel /dev/serial/by-id/…');
     if (!BAUDS.includes(String(baud))) fail('Ogiltig hastighet.');
     if (!FLOWS.includes(flow)) fail('Ogiltig flödeskontroll.');
-    if (!device && this.data.mode === 'live') fail('Byt till offline innan LocoBuffern tas bort.', 409);
+    if (!device && this.data.mode === 'live') fail('Koppla från LocoNet innan LocoBuffern tas bort.', 409);
     const before = JSON.stringify(this.data.locobuffer);
     this.save({ ...this.data, locobuffer: { device, baud: String(baud), flow } });
     // En ändrad LocoBuffer i live: gatewayen startas om på samma port; kärnans klient ansluter igen av sig själv.
@@ -71,8 +72,8 @@ export class ConnectionMode extends EventEmitter {
   }
   // Byter det sparade läget och startar eller stoppar gatewayen. Kärnans förbindelse byter servern efteråt.
   switch(mode) {
-    if (!['live', 'offline'].includes(mode)) fail('Okänt läge. Välj live eller offline.');
-    if (this.locked) fail('TKL är startad mot en fristående gateway och kör alltid live.', 409);
+    if (!['live', 'offline'].includes(mode)) fail('Okänt läge. Välj ansluten eller ej ansluten.');
+    if (this.locked) fail('TKL är startad mot en fristående gateway och är alltid ansluten till LocoNet.', 409);
     if (mode === 'live' && this.liveReason()) fail(this.liveReason(), 409);
     this.save({ ...this.data, mode });
     if (mode === 'live') this.startGateway(); else this.stopGateway();

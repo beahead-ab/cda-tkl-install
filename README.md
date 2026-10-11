@@ -172,9 +172,9 @@ Den sista raden tar även bort driftdata och inställningar.
 
 ## Gemensamt
 
-- **Live och offline.** En ny installation kör offline, mot den inbyggda anläggningssimulatorn. Live, banan över
-  LocoNet med en LocoBuffer på USB, väljs med lägesknappen i statusraden sedan 0.78.0, på Raspberry Pi och Mac men
-  inte på Windows än. Se [live och offline](docs/live-och-offline.md).
+- **LocoNet.** En ny installation har LocoNet ej ansluten: TKL svarar själv och kör trafikspelets tåg från
+  TrainMeet-servern. *Anslut till LocoNet*, med en LocoBuffer på USB, görs med lägesknappen i statusraden, på
+  Raspberry Pi och Mac men inte på Windows än. Se [LocoNet ansluten eller ej ansluten](docs/loconet-anslutning.md).
 - **Inloggning.** TKL svarar bara på datorn själv. Operatören behöver ingen inloggning; Inställningar och
   Objekt och regler kräver en inloggad ägare eller administratör så snart ägaren är skapad (se
   `docs/anvandare.md`). Ägaren skapas i Kom igång vid första starten.

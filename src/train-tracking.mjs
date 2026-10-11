@@ -212,8 +212,12 @@ export class TrainTracker{
     while(rest.size){const next=[...rest].find(b=>this.adjacent(out.at(-1),b))||[...rest][0];out.push(next);rest.delete(next);}
     return out;
   }
+  // Ett tåg som TKL själv ställt på ett spår (trafikspelets uppställda tåg, LocoNet ej ansluten) får sitt nummer när
+  // beläggningen syns, inom en halv minut.
+  expect(block,number,now=this.now()){(this.expected??={})[block]={number,until:now+30000};}
   numberFor(component,edge){
     const live=new Set([...this.trains.map(t=>t.number),...this.lineTrains.map(t=>t.number)].filter(Boolean));
+    for(const b of component){const x=this.expected?.[b];if(x&&x.until>=this.now()&&!live.has(x.number)){delete this.expected[b];return {number:x.number,certain:true,source:'trafikspelet'};}}
     for(const b of component){const e=this.input.book['block:'+b];if(e?.value&&!live.has(e.value))return {number:e.value,certain:true,source:'operatör'};}
     if(edge){
       const info=this.input.edgeInfo[edge]||{};

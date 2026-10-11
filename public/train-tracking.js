@@ -1,4 +1,4 @@
-// Tågspårningen på ställverket (0.73.0, bara i simulering): varje spårat tåg som en skylt vid sin front med pil
+// Tågspårningen på ställverket (0.73.0; sedan 0.79.0 när LocoNet inte är ansluten): varje spårat tåg som en skylt vid sin front med pil
 // åt det håll det kör, tåg på linjen vid kanterna (på väg in enligt TrainMeet, eller på väg ut) och en rad per tåg
 // under Drift → Tågnummer. En skylt med ? är osäker; ett klick rättar eller bekräftar numret. Bara presentation.
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -20,23 +20,15 @@ export function createTrainTracking({plan,panel,controls,api,message,displayName
   const dialog=document.createElement('dialog');dialog.className='incoming-train-menu tracking-menu';dialog.setAttribute('aria-label','Spårat tåg');
   dialog.innerHTML='<h2></h2><p data-tracking-place></p><label>Tågnummer<input data-tracking-number maxlength="24" autocomplete="off"></label><button data-tracking-save class="primary">Spara och bekräfta</button><button data-tracking-remove>Ta bort ur spårningen</button><p data-tracking-message role="status"></p><button data-tracking-close>Stäng</button>';
   document.body.append(dialog);
-  let view=null,online=false,selected=null,last='',simulation=null,automation=null;
-  // Två roller bland driftknapparna, bara i simuleringsläge (0.75.0): Simulerad trafik är grannstationerna som släpper
-  // in tåg på linjerna; Automat är datorn som tågklarerare. Banan själv är simulatorn och syns inte här.
-  const simulate=document.createElement('button');simulate.type='button';simulate.id='simulate-trains';simulate.hidden=true;
-  simulate.title='Trafiken: simulerade grannstationer släpper in tåg med nummer på linjerna. Med TrainMeet kommer trafiken därifrån i stället.';
+  let view=null,online=false,selected=null,last='',automation=null;
+  // Automaten bland driftknapparna (0.75.0): datorn som tågklarerare, bara när LocoNet inte är ansluten. Trafiken kommer
+  // från trafikspelet på TrainMeet-servern (0.79.0); TKL har ingen egen simulerad trafik längre.
   const automate=document.createElement('button');automate.type='button';automate.id='automation-toggle';automate.hidden=true;
   automate.title='Tågklareraren: datorn lägger tågvägarna med samma förregling som du. Tåg från väster går mot Vagnsta, tåg från Vagnsta mot Kungsfors och Lekby. Du kan ta över när som helst.';
-  document.querySelector('.drift-actions')?.append(simulate,automate);
-  simulate.onclick=async()=>{const answer=await api('simulation/trains',{enabled:!simulation?.enabled});if(answer){simulation=answer;paintSimulation();}};
-  automate.onclick=async()=>{const answer=await api('automation',{enabled:!automation?.enabled});if(answer){automation=answer;paintSimulation();}};
-  function paintSimulation(){
-    simulate.hidden=!simulation?.available;automate.hidden=!automation?.available;
-    if(!simulate.hidden){
-      simulate.setAttribute('aria-pressed',String(!!simulation.enabled));
-      const next=simulation.enabled&&simulation.nextAt?Math.max(0,Math.round((simulation.nextAt-Date.now())/1000)):null;
-      simulate.textContent=simulation.enabled?'Simulerad trafik på'+(next!=null?' · nästa om '+next+' s':''):'Simulerad trafik';
-    }
+  document.querySelector('.drift-actions')?.append(automate);
+  automate.onclick=async()=>{const answer=await api('automation',{enabled:!automation?.enabled});if(answer){automation=answer;paintAutomation();}};
+  function paintAutomation(){
+    automate.hidden=!automation?.available;
     if(!automate.hidden){automate.setAttribute('aria-pressed',String(!!automation.enabled));automate.textContent=automation.enabled?'Automat på':'Automat';automate.title=automation.last||automate.title;}
   }
   const $d=s=>dialog.querySelector(s);
@@ -85,8 +77,8 @@ export function createTrainTracking({plan,panel,controls,api,message,displayName
     }
     const rows=view.trains.map(t=>`<li class="${t.certain?'':'uncertain'}"><button type="button" data-tracking-open="${esc(t.id)}">${esc(t.number||t.label)}${t.certain?'':' ?'}</button><span>${esc(place(t))}</span><small>${esc(t.certain?t.source:'osäkert')}</small></li>`).join('');
     const lines=view.lines.map(l=>`<li class="line"><strong>${esc(l.number||l.label)}</strong><span>${l.direction==='in'?'På väg in från':'På väg ut mot'} ${esc(l.neighbor||'linje '+l.line)}</span><small>${esc(l.edge)}</small></li>`).join('');
-    list.innerHTML=`<h4>Spårade tåg <small>simulering · ur spåravkänningen</small></h4>${rows||lines?`<ul>${rows}${lines}</ul>`:'<p class="muted">Inga tåg på stationen eller linjerna just nu.</p>'}`;
+    list.innerHTML=`<h4>Spårade tåg <small>TKL:s egna tåg · LocoNet ej ansluten</small></h4>${rows||lines?`<ul>${rows}${lines}</ul>`:'<p class="muted">Inga tåg på stationen eller linjerna just nu.</p>'}`;
   }
   list.addEventListener('click',e=>{const b=e.target.closest('[data-tracking-open]');if(b)open(b.dataset.trackingOpen);});
-  return {update(next,isOnline,sim,auto){view=next||null;online=isOnline;simulation=sim||null;automation=auto||null;paintSimulation();draw();}};
+  return {update(next,isOnline,auto){view=next||null;online=isOnline;automation=auto||null;paintAutomation();draw();}};
 }

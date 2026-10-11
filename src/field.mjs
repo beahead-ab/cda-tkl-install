@@ -152,15 +152,18 @@ export class Field extends EventEmitter {
   routes(){return this.catalogue??=[...this.profile.scenarios,...(this.profile.scenarioAlternatives||[])].map(s=>{const [from,to]=s.id.split('--');return {...s,from,to};});}
   // Block som följer på varandra i någon färd: där kan ett stående tåg börja nästa.
   neighbours(){if(!this.adjacent){this.adjacent={};for(const s of this.routes())s.blocks.forEach((b,i)=>{const n=s.blocks[i+1];if(n){(this.adjacent[b]??=new Set()).add(n);(this.adjacent[n]??=new Set()).add(b);}});}return this.adjacent;}
+  // at: en linjes infart (htvAu …) eller, sedan 0.79.0, ett spår på stationen (en knapp som är mål för en färd, htvSpIA …):
+  // trafikspelets uppställda tåg ställs där.
   spawnTrain({number,at}={}) {
     if(typeof number!=='string'||!/^[\p{L}\p{N} ._/-]{1,24}$/u.test(number))throw Error('Ogiltigt tågnummer.');
-    if(!/^htv(Au|An|Bu|Bn|Cu|Cn)$/.test(at))throw Error('Okänd linje.');
-    const block=this.routes().find(s=>s.to===at)?.blocks.at(-1);if(!block)throw Error('Linjen saknar block utanför infartssignalen.');
+    const line=/^htv(Au|An|Bu|Bn|Cu|Cn)$/.test(at);
+    if(!line&&(typeof at!=='string'||/^htv(Au|An|Bu|Bn|Cu|Cn|D)$/.test(at)))throw Error('Okänd linje.');
+    const block=this.routes().find(s=>s.to===at)?.blocks.at(-1);if(!block)throw Error(line?'Linjen saknar block utanför infartssignalen.':'Okänt spår.');
     const address=this.profile.blocks[block].address;
-    if(this.blocks[block]||this.trains.some(t=>t.blocks.some(n=>this.profile.blocks[n].address===address)))throw Error('Linjen är belagd.');
+    if(this.blocks[block]||this.trains.some(t=>t.blocks.some(n=>this.profile.blocks[n].address===address)))throw Error(line?'Linjen är belagd.':'Spåret är belagt.');
     if(this.trains.some(t=>t.number===number))throw Error(`Tåg ${number} finns redan.`);
     this.updateBlock(block,true);
-    const t={number,label:'På linjen',blocks:[block],index:0,position:at,standing:true,park:true,signalEntries:[],turnouts:{},waiting:'Väntar vid infartssignalen',nextAt:this.now()+500};
+    const t={number,label:line?'På linjen':'Uppställt',blocks:[block],index:0,position:at,standing:true,park:true,signalEntries:[],turnouts:{},waiting:line?'Väntar vid infartssignalen':'Uppställt',nextAt:this.now()+500};
     this.trains.push(t);this.train=this.trains[0]||null;return {number,block};
   }
   depart(t) {

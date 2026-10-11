@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.79.0",
+    "date": "2026-10-11",
+    "notes": [
+      "Inget simuleringsläge: trafiken kommer från trafikspelet på en TrainMeet-server, och LocoNet är ansluten eller ej ansluten",
+      "LocoNet ej ansluten: TKL svarar själv och kör trafikspelets tåg längs tågvägarna, både tåg på väg hit på linjen och tåg som anmälts uppställda",
+      "Anslut till LocoNet och Koppla från LocoNet i lägesknappen och under Banan (LocoNet); valet gäller efter omstart",
+      "Simulerad trafik är borta; Automat finns kvar när LocoNet inte är ansluten"
+    ]
+  },
+  {
     "version": "0.78.0",
     "date": "2026-10-11",
     "notes": [

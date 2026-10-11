@@ -151,9 +151,10 @@ installationen har sagt åt Chromium att ställverket får använda Elgatos enhe
 - **Uppdatering.** `● Uppdatering X` i statusraden betyder att en ny version finns att installera, se
   avsnitt 9. `● Ny version · ladda om` betyder att den redan är installerad och att fönstret ska
   laddas om.
-- **Live eller offline.** Lägesknappen bredvid CHARLOTTENDAL i statusraden visar om TKL styr banan över LocoNet
-  (LIVE) eller den simulerade banan (OFFLINE), och byter läge. LocoBuffern ställs in under Inställningar → Banan
-  (LocoNet); sätt i den i en USB-port först. Se [live och offline](live-och-offline.md).
+- **LocoNet.** Lägesknappen bredvid CHARLOTTENDAL i statusraden visar om LocoNet är ansluten eller om TKL svarar
+  själv, och har *Anslut till LocoNet* och *Koppla från LocoNet*. LocoBuffern ställs in under Inställningar → Banan
+  (LocoNet); sätt i den i en USB-port först. Valet gäller efter omstart. Se
+  [LocoNet ansluten eller ej ansluten](loconet-anslutning.md).
 - **Skärmen släcks aldrig.** Installationen stänger av skärmsläckaren.
 - **Lämna helskärmen tillfälligt** (till exempel för att nå skrivbordet): logga in med ssh och kör
   `pkill -f cda-tkl-browser; pkill chromium`. Vid nästa omstart är helskärmen tillbaka.
@@ -305,9 +306,9 @@ Starta om efter en ändring: `sudo systemctl restart cda-tkl`.
 
 ## 15. Begränsningar
 
-- **Riktig anläggning.** Installationen startar offline, mot anläggningssimulatorn. Live, LocoNet via en
-  LocoBuffer på USB, väljs i panelen sedan 0.78.0 ([live och offline](live-och-offline.md)); det är provat mot en
-  virtuell LocoBuffer, inte mot Charlottendals riktiga LocoNet än.
+- **Riktig anläggning.** Installationen startar med LocoNet ej ansluten. *Anslut till LocoNet*, via en LocoBuffer
+  på USB, görs i panelen ([LocoNet ansluten eller ej ansluten](loconet-anslutning.md)); det är provat mot en virtuell
+  LocoBuffer, inte mot Charlottendals riktiga LocoNet än.
 - **Åtkomst från iPad eller annan dator** utan ssh-tunnel: med `CHARLOTTENDAL_LISTEN` och
   `CHARLOTTENDAL_LAN_HOSTS` (avsnitt 10) och inloggning. Rangerarens station är provad i
   simulering, inte på två riktiga Pi.

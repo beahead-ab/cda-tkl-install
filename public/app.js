@@ -620,7 +620,7 @@ function renderPanel() {
   if(state.streamDeck)streamDeckAdmin?.update(state.streamDeck);
   updatePage?.update(state.update,state.release);
   if(chosen && (!usable() || state.controls?.mode==='remote')) clearChoice(false);
-  const c = $('connection'); setText(c,!online ? 'Kontakt med kärnan saknas' : state.storageFault ? 'Lagringsfel · spärrad' : state.connection === 'connected' ? (state.connectionInfo?.mode==='simulator'?'Offline · simulerad bana':'Live · LocoNet ansluten') : (state.connectionInfo?.mode==='simulator'?'Offline · simulatorn frånkopplad':'Live · LocoNet frånkopplad'));
+  const c = $('connection'); setText(c,!online ? 'Kontakt med kärnan saknas' : state.storageFault ? 'Lagringsfel · spärrad' : state.connection === 'connected' ? (state.connectionInfo?.mode==='simulator'?'LocoNet ej ansluten · TKL svarar själv':'LocoNet ansluten') : (state.connectionInfo?.mode==='simulator'?'TKL:s egen återrapport svarar inte':'LocoNet svarar inte'));
   c.className = 'connection ' + (usable() ? 'online' : 'offline');
   setText($('panel-connection'),c.textContent);attribute($('panel-connection'),'class',c.className);
   if(currentPage==='panel')paintPlan();
@@ -652,7 +652,7 @@ function renderPanel() {
   $('route-summary').textContent=`${state.routes.length} ${state.routes.length===1?'tågväg':'tågvägar'} · ${state.routes.map(r=>statuses[r.state]).filter((v,i,a)=>a.indexOf(v)===i).join(' / ')}`;
   paintJournal();
   $('wire').textContent = (state.trace || []).slice(0, 40).map(e => `${time(e.at)}  ${e.direction === 'out' ? 'SKICKAT ' : 'MOTTAGET'}  ${e.hex}`).join('\n');
-  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());panelHead?.modeNotice(modeChip(state.connectionMode,state,online));panelHead?.rangerNotice(rangerMode?rangerOwnView(state.yard):rangerView(state.yard));paintClearance();trainTracking?.update(state.trainTracking,online,state.trainSimulation,state.automation);rangerBar?.update(state,online);
+  panelConsole?.update(state,online);panelEvents?.update(state,online);panelHead?.notice(headNotice());panelHead?.modeNotice(modeChip(state.connectionMode,state,online));panelHead?.rangerNotice(rangerMode?rangerOwnView(state.yard):rangerView(state.yard));paintClearance();trainTracking?.update(state.trainTracking,online,state.automation);rangerBar?.update(state,online);
 }
 function paintInspector() {
   if (!inspected || !state) return;

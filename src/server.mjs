@@ -54,8 +54,12 @@ function activationStatus(proposed){
   if(proposed){
     // I fysisk drift får en profil bara aktiveras när varje bindning är uppmätt i fält på den adress profilen har.
     if(connectionInfo(proposed).mode==='hardware'){const missing=studioMeasure.missing(proposed);if(missing.length)return deny(`${missing.length} bindningar är inte uppmätta i fält (${missing.slice(0,4).join(', ')}${missing.length>4?' …':''}). Mät dem under Driftsättning först.`);}
-    const report=(kind,address)=>{const r=bindingReports.get(kind+':'+address);return r&&Date.now()-r.at<=proposed.staleMs?r.data:null;};
-    for(const [n,b] of Object.entries(proposed.turnouts)){const r=report('turnout',b.address);if(!r||!['C','T'].includes(r.position))return deny(n+': den föreslagna adressen saknar aktuellt känt växelläge.');}
+    // Rapporterna töms vid varje anslutning; en ingångs rapport gäller staleMs (avfrågningen förnyar den), växlar och signaler hela förbindelsen.
+    const report=(kind,address)=>{const r=bindingReports.get(kind+':'+address);return r&&(kind!=='sensor'||Date.now()-r.at<=proposed.staleMs)?r.data:null;};
+    // En växel rapporterar bara när den får en order (0.77.0): en växel vars bindning ändras ska ha rapporterat sedan anslutningen;
+    // de andra behåller den bindning som redan är i drift.
+    const changed=(n,b)=>{const a=engine.profile.turnouts[n];return !a||a.address!==b.address||!!a.inverted!==!!b.inverted;};
+    for(const [n,b] of Object.entries(proposed.turnouts)){if(!changed(n,b))continue;const r=report('turnout',b.address);if(!r||!['C','T'].includes(r.position))return deny(n+': den föreslagna adressen saknar aktuellt känt växelläge.');}
     // Varje ingång till en spårledning ska ha rapporterat fritt; en virtuell signal har ingen utgång och ingen rapport att kräva.
     for(const [n,b] of Object.entries(proposed.blocks))for(const i of b.inputs||[b]){const r=report('sensor',i.address);if(!r||(i.activeMeansOccupied?r.active:!r.active))return deny(n+': den föreslagna bindningen saknar färsk frirapport.');}
     for(const [n,b] of Object.entries(proposed.signals)){if(b.virtual)continue;const stopped=signalReportKind(proposed,b)==='switch'?report('turnout',b.reportAddress)?.position==='T':b.stopCodes.includes(report('signal',b.reportAddress)?.code);if(!stopped)return deny(n+': den föreslagna bindningen saknar färskt stoppbesked.');}

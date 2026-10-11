@@ -7,7 +7,9 @@
     "host": "127.0.0.1",
     "port": 8912
   },
-  "staleMs": 7000,
+  "staleMs": 40000,
+  "interrogateMs": 15000,
+  "interrogateStepMs": 1000,
   "commandTimeoutMs": 6000,
   "signalStepMs": 300,
   "turnouts": {

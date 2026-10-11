@@ -6,6 +6,8 @@ export class OperatingControls {
     this.engine=engine;this.catalog=engine.profile.operatingControls||{lines:{},programming:null};
     this.sessionId=randomUUID();this.revision=0;
     this.relay={position:'unknown',updatedAt:0,reportSequence:0};this.feedback={active:null,updatedAt:0,reportSequence:0};
+    // Programmeringsspårets återrapport är en ingång: den åldras och förnyas av avfrågningen. Reläets rapport gäller som en växels.
+    engine.inputStates?.add(this.feedback);
     this.phase=engine.controls.programming.reserved?'held':'normal';this.reason=this.phase==='held'?'Programmeringsspärr återställd. Kontrollera anläggningen och begär normaldrift.':'';
     this.commandSequence=-1;this.commandAt=0;
     this.protectingSignals=[...new Set([...engine.profile.routes,...(engine.profile.routeAlternatives||[])].filter(r=>this.affected(r)).flatMap(r=>[...r.signals,...engine.guardSignals(r)]))];
@@ -56,6 +58,9 @@ export class OperatingControls {
     this.e.send(switchOrder(this.def.relayAddress,enabled?'C':'T'));
     this.e.log('programming',this.reason);
   }
+  // Vid anslutning får reläet normalläget (THROWN), som signalerna får stopp: korten upprepar inget, så utan order blir
+  // reläets läge aldrig känt. En lagd programmeringsspärr rörs inte; den hålls tills operatören begär normaldrift.
+  normalize(){if(this.def&&!this.reservation.reserved)this.e.send(switchOrder(this.def.relayAddress,'T'));}
   connection(){this.revision++;this.relay.position='unknown';this.relay.updatedAt=0;this.feedback.active=null;this.feedback.updatedAt=0;if(this.reservation.reserved){this.phase='held';this.reason='Förbindelsen ändrad. Spärren ligger kvar; begär normaldrift efter kontroll.';}}
   receive(d,sequence) {
     if(!this.def)return;

@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.77.0",
+    "date": "2026-10-11",
+    "notes": [
+      "Återrapporterna följer MGP-korten, som inte upprepar något: växel- och signalrapporter gäller tills förbindelsen bryts, och TKL frågar av spårledningarnas ingångar vid anslutning och var 15:e sekund",
+      "En ingång som inte svarat på 40 sekunder blir okänd, så att ett tyst kort aldrig betyder fritt",
+      "En växel är okänd tills den får en order; en okänd växel som inte rör sig hindrar varken handmanöver eller återtagning",
+      "Simulatorn rapporterar som korten: vid ändring, order och avfrågning"
+    ]
+  },
+  {
     "version": "0.76.1",
     "date": "2026-10-10",
     "notes": [

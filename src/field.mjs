@@ -52,6 +52,20 @@ export class Field extends EventEmitter {
     // Per profil: SE-telegram med beskedskod, eller växelrapport (B1) där CLOSED = kör och THROWN = stopp.
     this.emit('frame', signalReportKind(this.profile, b) === 'switch' ? switchReport(b.reportAddress, s.code ? 'C' : 'T') : signalReport(b.reportAddress, s.code));
   }
+  // Avfrågning (0.77.0): simulatorn svarar som MGP:s ingångskort, med ingångarna och inget annat. Den fördelar ingångarna
+  // på avfrågningens åtta grupper efter adress ((adress − 1) >> 3 & 7), så att varje ingång svarar en gång per varv.
+  // De riktiga korten svarar per kort; vilket kort som svarar på vilken grupp avgör deras adress.
+  interrogate(group) {
+    const sent = new Set(), faulty = this.faults.sensor ? this.profile.blocks[this.faults.sensor].address : null;
+    for (const b of Object.values(this.profile.blocks)) for (const i of b.inputs || [b]) {
+      if (sent.has(i.address) || ((i.address - 1) >> 3 & 7) !== group) continue; sent.add(i.address);
+      if (i.address === faulty) continue;
+      const active = this.inputActive(i.address); this.emit('frame', sensorReport(i.address, i.activeMeansOccupied ? active : !active));
+    }
+    const p = this.programming, a = this.profile.programming?.reportAddress;
+    if (p && !p.fault && a && !sent.has(a) && ((a - 1) >> 3 & 7) === group) this.emit('frame', sensorReport(a, p.active));
+  }
+  // Allt på en gång, som om varje kort rapporterade: bara för proven. Simulatorn sänder det inte (korten upprepar inget).
   allReports() {
     for (const n of Object.keys(this.turnouts)) this.reportTurnout(n);
     // Varje ingång rapporteras en gång; en spårledning med flera ingångar rapporteras när någon av dem ännu inte gått ut.
@@ -64,8 +78,10 @@ export class Field extends EventEmitter {
   setProgrammingFault(enabled){if(!this.programming||typeof enabled!=='boolean')throw Error('Ogiltigt programmeringsfel.');this.programming.fault=enabled;this.tick();this.reportProgramming();}
   accept(bytes) {
     const sv=decodeSv(bytes); if(sv){ if(!sv.reply) this.answerSv(sv); return; }
-    const d = decode(bytes); if (d.kind !== 'order' || !d.on) return;
-    if(this.programming&&d.address===this.profile.programming.relayAddress){this.programming.target=d.position==='C';this.programming.relay='unknown';this.programming.due=this.now()+this.movementMs;this.reportProgramming();}
+    const d = decode(bytes); if (d.kind === 'interrogate') return this.interrogate(d.group);
+    if (d.kind !== 'order' || !d.on) return;
+    // Reläet som redan står i det begärda läget rapporterar direkt, som en växel; annars rör det sig först.
+    if(this.programming&&d.address===this.profile.programming.relayAddress){const p=this.programming,target=d.position==='C';if(target===p.active&&p.relay!=='unknown'&&!p.due)this.reportProgramming();else{p.target=target;p.relay='unknown';p.due=this.now()+this.movementMs;this.reportProgramming();}}
     for (const [name, b] of Object.entries(this.profile.turnouts)) {
       if (b.address !== d.address) continue;
       const logical = b.inverted ? (d.position === 'C' ? 'T' : 'C') : d.position;
@@ -112,7 +128,7 @@ export class Field extends EventEmitter {
   setFault(kind, name) {
     const allowed = { turnout: this.turnouts, signal: this.signals, sensor: this.blocks };
     if (!allowed[kind] || (name && !(name in allowed[kind]))) throw Error('Okänd felpunkt.');
-    this.faults[kind] = name; this.tick(); this.allReports();
+    this.faults[kind] = name; this.tick();
   }
   startTrain(id) {
     const candidates=[...this.profile.scenarios,...(this.profile.scenarioAlternatives||[])].filter(s=>s.id===id);

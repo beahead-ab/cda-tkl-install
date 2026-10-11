@@ -1,6 +1,6 @@
 import { EventEmitter } from 'node:events';
 import { randomUUID, createHash } from 'node:crypto';
-import { decode, hex, switchOrder } from './protocol.mjs';
+import { decode, hex, switchOrder, interrogation } from './protocol.mjs';
 import { RoutePolicy } from './route-policy.mjs';
 import { OperatingControls } from './operating-controls.mjs';
 import { splitRouteAt } from './route-sections.mjs';
@@ -20,6 +20,8 @@ export class Engine extends EventEmitter {
     this.connected = false; this.connectionAt = 0; this.storageFault = null; this.revision = 0; this.events = []; this.journal = []; this.operatingEvents = []; this.reportSequence=0;
     this.turnouts = Object.fromEntries(Object.keys(profile.turnouts).map(n => [n, { position: 'unknown', desired: null, updatedAt: 0 }]));
     this.blocks = Object.fromEntries(Object.keys(profile.blocks).map(n => [n, { occupied: null, updatedAt: 0 }]));
+    // Ingångarnas rapporter åldras (staleMs) och förnyas av avfrågningen; växlar och signaler gäller tills förbindelsen bryts.
+    this.inputStates = new WeakSet(Object.values(this.blocks)); this.interrogation = { queue: [], nextAt: Infinity };
     // En virtuell signal (VirtualSignalMast i källan) har ingen utgång: kärnan bekräftar själv det begärda beskedet, som JMRI gjorde.
     this.signals = Object.fromEntries(Object.entries(profile.signals).map(([n, b]) => [n, { aspect: 'unknown', code: null, desired: 'STOP', updatedAt: 0, commandAt: 0, ...(b.virtual ? { virtual: true } : {}) }]));
     const saved = storage?.load('routes.json', { fingerprint: this.fingerprint, routes: [] });
@@ -70,14 +72,35 @@ export class Engine extends EventEmitter {
     if (!repeated) this.log(connected ? 'connected' : 'disconnected', connected ? 'LocoNet ansluten. Synkroniserar rapporter.' : 'LocoNet frånkopplad. Alla fälttillstånd är okända.');
     else this.emit('change');
     if (connected) for (const name of Object.keys(this.signals)) this.permission(name, 'STOP');
+    if (connected) this.operating.normalize();
+    // Vid anslutning frågar kärnan av ingångarna direkt och sedan med jämna mellanrum (se interrogate).
+    this.interrogation = { queue: [], nextAt: connected ? this.now() : Infinity };
+    if (connected) this.interrogate();
     this.persist();
+  }
+  // MGP-korten upprepar inga rapporter (Bennys trace 10 oktober 2026): ingångarna rapporterar vid ändring och när de blir
+  // avfrågade, växlar och signaler när de får en order. Kärnan sänder JMRI:s åtta avfrågningsramar vid anslutning och sedan
+  // var interrogateMs, med interrogateStepMs mellan ramarna. En ingång som inte svarat inom staleMs blir okänd, så att ett
+  // tyst kort aldrig betyder fritt. Utan interrogateMs i profilen frågar kärnan inte av.
+  interrogate(now = this.now()) {
+    const every = this.profile.interrogateMs, q = this.interrogation;
+    if (!this.connected || !every) return;
+    if (!q.queue.length && now >= q.nextAt) {
+      const step = this.profile.interrogateStepMs || 0;
+      q.queue = interrogation().map((frame, i) => ({ frame, at: now + i * step })); q.nextAt = now + every;
+    }
+    while (q.queue.length && q.queue[0].at <= now) this.send(q.queue.shift().frame);
   }
   invalidate() {
     for (const s of Object.values(this.turnouts)) { s.position = 'unknown'; s.updatedAt = 0; }
     for (const s of Object.values(this.blocks)) { s.occupied = null; s.updatedAt = 0; }
     for (const s of Object.values(this.signals)) { s.aspect = 'unknown'; s.desired = 'STOP'; s.code = null; s.updatedAt = 0; }
   }
-  fresh(s) { return this.connected && s.updatedAt >= this.connectionAt && (s.virtual || this.now() - s.updatedAt <= this.profile.staleMs) && s.updatedAt > 0; }
+  // En rapport gäller från anslutningen; en ingångs rapport bara i staleMs, eftersom avfrågningen förnyar den (0.77.0).
+  fresh(s) { return this.connected && s.updatedAt > 0 && s.updatedAt >= this.connectionAt && (!this.inputStates.has(s) || this.now() - s.updatedAt <= this.profile.staleMs); }
+  // En växel rör sig när den fått en order under den här förbindelsen och inte rapporterat ett läge sedan dess. En växel som
+  // bara saknar rapport sedan anslutningen (korten upprepar inget) rör sig inte; den är okänd tills den får en order.
+  moving(s) { return !!s.desired && s.commandAt >= this.connectionAt && (s.position === 'unknown' || !(s.updatedAt >= s.commandAt)); }
   guardSignals(route) {
     if (route.guardSignals) return route.guardSignals;
     return [...new Set(this.profile.routes.filter(r => r.blocks.some(b => route.blocks.includes(b))).flatMap(r => r.signals))].filter(n => !route.signals.includes(n));
@@ -386,7 +409,7 @@ export class Engine extends EventEmitter {
         if(!this.fresh(this.blocks[n])||this.blocks[n].occupied!==false) return refuse(`${n} är belagt eller saknar aktuell återrapport.`);
       }
       for(const n of policy.signals) if(!this.fresh(this.signals[n])||this.signals[n].aspect!=='stop'||this.signals[n].desired!=='STOP') return refuse(`Skyddande signal ${n} är inte bekräftat i stopp.`);
-      for(const n of policy.guardTurnouts||names) if(!this.fresh(this.turnouts[n])||this.turnouts[n].position==='unknown') return refuse(`${n} saknar aktuellt växelläge eller håller på att läggas om.`);
+      for(const n of policy.guardTurnouts||names) if(this.moving(this.turnouts[n])) return refuse(`${n} håller på att läggas om.`);
       return {allowed:true,names,rule:policy.rule,reason:'Lokala spårledningar fria, skyddande signaler i stopp och inga berörda tågvägslås.'};
     }
     // The small legacy test profile retains its conservative commissioning rule.
@@ -500,8 +523,8 @@ export class Engine extends EventEmitter {
     if(this.storageFault||!this.connected) return {allowed:false,reason:'Lägesbyte kräver fungerande anslutning och lagring.'};
     if(this.routes.length) return {allowed:false,reason:'Återta alla tågvägslås före byte mellan lokal- och fjärrläge.'};
     if(Object.values(this.signals).some(s=>!this.fresh(s)||s.aspect!=='stop'||s.desired!=='STOP'||s.reportSequence<=(s.commandSequence??-1))) return {allowed:false,reason:'Alla signaler måste ha aktuella stoppbesked före lägesbyte.'};
-    if(Object.values(this.turnouts).some(s=>!this.fresh(s)||s.position==='unknown'||(s.desired&&s.position!==s.desired))) return {allowed:false,reason:'Invänta aktuella växellägen och pågående omläggningar före lägesbyte.'};
-    return {allowed:true,reason:'Inga tågvägslås finns och anläggningen har aktuella stopp- och växelbesked.'};
+    if(Object.values(this.turnouts).some(s=>this.moving(s)||(this.fresh(s)&&s.desired&&s.position!==s.desired))) return {allowed:false,reason:'Invänta pågående omläggningar före lägesbyte.'};
+    return {allowed:true,reason:'Inga tågvägslås finns, alla signaler har aktuella stoppbesked och ingen växel läggs om.'};
   }
   setMode(mode) {
     if(!['local','remote'].includes(mode)) throw Error('Okänt manöverläge.');
@@ -554,6 +577,7 @@ export class Engine extends EventEmitter {
   }
   tick() {
     const now = this.now();
+    this.interrogate(now);
     this.operating.tick();
     for (const s of Object.values(this.turnouts)) if (!this.fresh(s)) s.position = 'unknown';
     for (const s of Object.values(this.blocks)) if (!this.fresh(s)) s.occupied = null;
@@ -569,7 +593,9 @@ export class Engine extends EventEmitter {
         const stopped = r.signals.every(n => this.fresh(this.signals[n]) && this.signals[n].aspect === 'stop' && this.signals[n].updatedAt >= r.cancelAt && this.signals[n].reportSequence > (r.cancelSequence ?? -1));
         // Ett tåg som står helt på målspåret hindrar inte återtagningen (se arrived).
         const arrived = !free && this.arrived(r);
-        if ((free || arrived) && known && stopped && protectedSignals && !this.storageFault) {
+        // Växlarna får inte röra sig; en växel utan rapport sedan återanslutningen hindrar inte (0.77.0, korten upprepar inget).
+        const settled = Object.keys(r.turnouts).every(n => !this.moving(this.turnouts[n]));
+        if ((free || arrived) && settled && stopped && protectedSignals && !this.storageFault) {
           const previous = this.routes; this.routes = this.routes.filter(x => x.id !== r.id);
           try { this.persist(); } catch (e) { this.routes = previous; throw e; }
           this.log('released', arrived ? `${r.label}: tåget står på målspåret, stopp bekräftat, lås frigivna.` : `${r.label}: stopp bekräftat, vägen fri, lås frigivna.`);
@@ -629,7 +655,7 @@ export class Engine extends EventEmitter {
     this.emit('change');
   }
   snapshot() {
-    return { serverTime: this.now(), revision: this.revision, connection: this.connected ? 'connected' : 'disconnected', storageFault: this.storageFault,
+    return { serverTime: this.now(), revision: this.revision, connection: this.connected ? 'connected' : 'disconnected', connectionAt: this.connectionAt, storageFault: this.storageFault,
       profile: { id: this.profile.id, title: this.profile.title, commissioned: this.profile.commissioned, description: this.profile.description },
       turnouts: this.turnouts, blocks: this.blocks, signals: this.signals, routes: this.routes, controls:this.controls, events: this.journal, operatingEvents: this.operatingEvents,
       operating:this.operating.snapshot(),yard:this.yard.snapshot(),

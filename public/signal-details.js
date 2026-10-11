@@ -9,7 +9,8 @@ export async function preloadSignalReferences(catalog) {
 }
 export function signalLiveView(name,config,state,online) {
   const binding=config.signals[name],signal=state?.signals?.[name];
-  const fresh=!!(online&&state?.connection==='connected'&&signal?.updatedAt>0&&state.serverTime-signal.updatedAt<=config.staleMs);
+  // Signalens rapport gäller tills förbindelsen bryts (0.77.0: MGP-korten upprepar den inte).
+  const fresh=!!(online&&state?.connection==='connected'&&signal?.updatedAt>0&&signal.updatedAt>=(state.connectionAt||0));
   return {report:fresh?({go:'Kör återrapporterat',stop:'Stopp återrapporterat'}[signal.aspect]||'Okänt besked'):'Okänt besked',
     permission:fresh?({GO:'Kör begärt',STOP:'Stopp begärt'}[signal.desired]||'—'):'—',
     raw:fresh&&signal.aspect!=='unknown'&&signal.code!=null?String(signal.code):'—',address:binding?.virtual?'Virtuell, bara i panelen':binding?String(binding.reportAddress??binding.address)+((binding.reportKind||config.signalReport?.kind)==='switch'?' (B1)':' (E4)'):'Ej inkopplad'};

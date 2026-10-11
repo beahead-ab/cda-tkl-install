@@ -35,14 +35,15 @@ export function createManualFeedback({config, plan, scroll, panelView, stateOf, 
     const pending=selected===name&&requested,orderFailure=selected===name&&failure;
     const canMove=connected&&!state.storageFault&&policy?.allowed===true;
     const reason=!connected?'Panelen saknar aktuell kontakt med anläggningen.':state.storageFault?'Lagringsfel · manövrering spärrad.':policy?.reason||'Ingen verifierad manöverregel är ansluten.';
-    const moving=connected&&pending&&reason.includes('växelläge')&&names.some(n=>{const s=state.turnouts[n];return s?.desired===pending&&s.position==='unknown'&&state.serverTime-s.commandAt<=config.commandTimeoutMs;});
+    const moving=connected&&pending&&(reason.includes('växelläge')||reason.includes('läggas om'))&&names.some(n=>{const s=state.turnouts[n];return s?.desired===pending&&s.position==='unknown'&&state.serverTime-s.commandAt<=config.commandTimeoutMs;});
     box.dataset.status=orderFailure?'blocked':moving?'moving':canMove?'ready':'blocked';
     const unknownPeer=companions.find(n=>state.blocks[config.turnouts[n]?.block]?.occupied==null);
     const unknownReason=unknownPeer&&reason.includes('saknar aktuell återrapport')?`Kan inte bekräfta att kompisväxelns spår är fritt (${config.turnouts[unknownPeer].block}).`:reason;
     const status=orderFailure?'Manövern kunde inte bekräftas · '+orderFailure:moving?'Omläggning pågår · inväntar återrapporter.':canMove?'Manöver möjlig · skyddsvillkoren är uppfyllda.':'Manöver spärrad · '+unknownReason;
     const rows=names.map(n=>{
       const t=config.turnouts[n],s=state.turnouts[n],block=t?.block,occupied=connected?state.blocks[block]?.occupied:null;
-      const position=connected?({C:'Rakt',T:'Avvikande'}[s?.position]||'Okänt / omläggning'):'Okänt läge';
+      // Korten upprepar inget (0.77.0): en växel som inte fått en order sedan anslutningen är okänd, inte under omläggning.
+      const position=connected?({C:'Rakt',T:'Avvikande'}[s?.position]||(s?.desired&&s.commandAt>=(state.connectionAt||0)?'Omläggning':'Okänt läge · ingen order sedan anslutningen')):'Okänt läge';
       const locked=state.routes.some(r=>r.turnouts[n]);
       const programming=n==='Vx133'&&state.operating?.programming?.reserved;
       const blocked=block&&isBlocked(block),outside=!visible(n);

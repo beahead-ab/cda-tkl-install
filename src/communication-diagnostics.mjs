@@ -15,7 +15,8 @@ export function commandExpectations(profile,state){
     const s=state[kind][name];if(!s?.commandAt||!s.desired||b.virtual)continue;
     const isTurnout=kind==='turnouts',physical=isTurnout?(b.inverted?(s.desired==='C'?'T':'C'):s.desired):(s.desired==='GO'?'C':'T');
     const match=isTurnout?s.position===s.desired:s.aspect===s.desired.toLowerCase();
-    const fresh=s.updatedAt>0&&state.serverTime>=s.updatedAt&&state.serverTime-s.updatedAt<=profile.staleMs;
+    // Växel- och signalrapporter gäller tills förbindelsen bryts (MGP-korten upprepar dem inte).
+    const fresh=s.updatedAt>0&&state.serverTime>=s.updatedAt&&s.updatedAt>=(state.connectionAt||0);
     const after=s.reportSequence>s.commandSequence&&s.updatedAt>=s.commandAt;
     const connected=state.connection==='connected',confirmed=connected&&fresh&&after&&match;
     const age=state.serverTime-s.commandAt;

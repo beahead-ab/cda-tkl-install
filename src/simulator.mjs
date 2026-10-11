@@ -33,7 +33,8 @@ const wire = net.createServer(socket => {
     } catch (e) { socket.write('SENT ERROR Invalid frame\r\n'); }
   }, () => socket.destroy());
   socket.on('data', c => reader.push(c)); socket.on('error', () => {}); socket.on('close', () => clients.delete(socket));
-  setTimeout(() => { if (!socket.destroyed) field.allReports(); }, 80);
+  // Som MGP-korten (Bennys trace 10 oktober 2026) rapporterar simulatorn bara vid ändring, order och avfrågning: inget
+  // när TKL ansluter och inget med jämna mellanrum. TKL frågar av ingångarna själv.
 });
 wire.listen(wirePort, '127.0.0.1');
 const root = fileURLToPath(new URL('../public', import.meta.url));
@@ -60,7 +61,7 @@ const server = http.createServer(async (req, res) => {
   } catch (e) { json(res, { error: e.message }, e.status || 400); }
 });
 server.listen(port, '127.0.0.1', () => console.log(`Charlottendal anläggning: http://127.0.0.1:${port} · LocoNet ${wirePort}`));
-const step = setInterval(() => field.tick(), 50), reports = setInterval(() => field.allReports(), 2000);
-function close() { clearInterval(step); clearInterval(reports); for (const s of clients) s.destroy(); wire.close(); server.close(() => process.exit(0)); }
+const step = setInterval(() => field.tick(), 50);
+function close() { clearInterval(step); for (const s of clients) s.destroy(); wire.close(); server.close(() => process.exit(0)); }
 process.on('SIGINT', close); process.on('SIGTERM', close);
 for (const s of [wire, server]) s.on('error', e => { console.error(e.message); process.exit(1); });

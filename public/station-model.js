@@ -38,7 +38,8 @@ export function buildStationModel({index,panel,config}) {
 export function relatedStationObjects(model,id){return new Set([id,...model.edges.filter(e=>e.from===id||e.to===id).map(e=>e.from===id?e.to:e.from)]);}
 export function stationLiveValue(object,state,online,staleMs) {
   if(!state||!online||state.connection!=='connected')return {text:'Ingen aktuell kontakt',tone:'unknown'};
-  const fresh=r=>r&&Number.isFinite(r.updatedAt)&&r.updatedAt>0&&Number.isFinite(state.serverTime)&&state.serverTime>=r.updatedAt&&state.serverTime-r.updatedAt<=staleMs;
+  // Ingångarnas rapporter åldras (staleMs, avfrågningen förnyar dem); växlar och signaler gäller tills förbindelsen bryts.
+  const fresh=(r,input=true)=>r&&Number.isFinite(r.updatedAt)&&r.updatedAt>0&&Number.isFinite(state.serverTime)&&state.serverTime>=r.updatedAt&&r.updatedAt>=(state.connectionAt||0)&&(!input||state.serverTime-r.updatedAt<=staleMs);
   if(object.kind==='sensors'){
     const values=object.bindings.map(b=>({b,r:state.blocks?.[b.block]}));
     if(!values.length)return {text:'Ingen aktiv återrapportbindning',tone:'unknown'};
@@ -48,7 +49,7 @@ export function stationLiveValue(object,state,online,staleMs) {
     return {text:active[0]?'Rapporterad aktiv':'Rapporterad inaktiv',tone:active[0]?'active':'neutral',at:Math.min(...values.map(({r})=>r.updatedAt))};
   }
   const r=state[object.kind]?.[object.name];
-  if(!fresh(r))return {text:object.bindings.length?'Okänd / inaktuell återrapport':'Ingen aktiv driftbindning',tone:'unknown'};
+  if(!fresh(r,object.kind==='blocks'))return {text:object.bindings.length?'Okänd / inaktuell återrapport':'Ingen aktiv driftbindning',tone:'unknown'};
   if(object.kind==='turnouts')return {text:['C','T'].includes(r.position)?'Rapporterat läge '+r.position:'Okänt växelläge',tone:['C','T'].includes(r.position)?'neutral':'unknown',at:r.updatedAt};
   if(object.kind==='blocks')return {text:r.occupied===true?'Rapporterat belagt':r.occupied===false?'Rapporterat fritt':'Okänd beläggning',tone:r.occupied===true?'occupied':r.occupied===false?'neutral':'unknown',at:r.updatedAt};
   if(object.kind==='signals')return {text:r.aspect==='go'?'Rapporterat kör':r.aspect==='stop'?'Rapporterat stopp':'Okänt signalbesked',tone:r.aspect==='go'?'active':r.aspect==='stop'?'neutral':'unknown',at:r.updatedAt};

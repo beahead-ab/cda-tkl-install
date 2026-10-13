@@ -614,7 +614,7 @@ function renderPanel() {
   connectionSettings?.update(state);
   operatingControls?.update(state,online);
   if(state.clock)modelClock?.update(state.clock,online);
-  trainMeet?.update(state.trainMeet,online,{routes:state.routes||[]});
+  trainMeet?.update(state.trainMeet,online,{routes:state.routes||[],destinations:state.destinations});
   clearanceView?.update(state.trainMeet,online);
   streamDeck?.update();
   if(state.streamDeck)streamDeckAdmin?.update(state.streamDeck);

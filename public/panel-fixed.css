@@ -215,6 +215,45 @@ body.panel-app #trainmeet-timetable{display:grid;grid-template-rows:auto auto mi
 .tt-now-line span{font:500 10px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;color:#f5c518}
 .tt-now-line i{flex:1;height:1px;background:#f5c518;opacity:.55}
 .tt-frtill,.tt-la{display:none}
+/* Tidtabellens stil (0.80.0, public/timetable-style.js): the track framed while the train stands
+   on it, the signs of Symboler and the line picture of Linjebild, which takes Från and Till. */
+.tt-track-frame{display:inline-block;padding:0 4px;border:1px solid #f5c518;border-radius:4px;color:#f5c518;font-weight:600;line-height:15px}
+:is([data-tt-style=line],[data-tt-style=lineSymbols]) .tt-fr{grid-column:span 2}
+:is([data-tt-style=line],[data-tt-style=lineSymbols]) .tt-till{display:none}
+.tt-g{display:inline-block;flex:none;vertical-align:-2px;overflow:visible}
+.tt-labels .tt-g{vertical-align:-1px}
+.tt-marks,.tt-route,.tt-route-pic,.tt-sym,.tt-countdown{display:inline-flex;align-items:center;vertical-align:middle;max-width:100%}
+.tt-marks{gap:6px}.tt-route{gap:4px;min-width:0}.tt-sym{gap:4px}.tt-countdown{gap:3px;color:#7d8791;font-weight:500}
+.tt-words{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.tt-arrow{font-weight:800}
+.tt-sym-approaching{color:#6ea8fe}.tt-sym-waiting{color:#f5c518}.tt-sym-cleared{color:#4cd787}
+.tt-request{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#f5c518;color:#000;font:800 10.5px/1 "IBM Plex Sans",system-ui,sans-serif}
+.tt-late{display:inline-block;padding:0 5px;border-radius:8px;background:#d9342b38;color:#ff8a7f;font-weight:700;font-size:11px;line-height:15px}
+.tt-route-pic{gap:3px}
+.tt-route-pic b{flex:none;width:28px;overflow:hidden;font:600 10.5px/1 "IBM Plex Mono",monospace;white-space:nowrap}
+.tt-route-pic b:first-child{text-align:right}
+.tt-line-pic{display:block;flex:none;overflow:visible}
+.tt-node{fill:#000}
+.tt-done .tt-sym-approaching,.tt-done .tt-sym-waiting,.tt-done .tt-sym-cleared{color:inherit}
+/* The comparison under Inställningar → Utseende och ljud: the same trains in each style, laid
+   out as the phone shows them, track and läge on a second line. */
+.tt-style-choice{display:grid;gap:8px;margin:0;padding:0;border:0}
+.tt-style-choice legend{margin-bottom:4px;font-size:12px;color:var(--muted)}
+.tt-style-choice .tt-style-option{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 10px;align-items:start;padding:8px 10px;border:1px solid #2a3036;border-radius:4px;font-size:13px;font-weight:400;cursor:pointer}
+.tt-style-option:has(input:checked){border-color:#f5c518}
+.tt-style-option input{margin:3px 0 0}
+.tt-style-option b{font-weight:600}.tt-style-option small{display:block;color:var(--muted);font-size:11.5px}
+.tt-preview{grid-column:1/-1;justify-self:stretch;display:grid;padding:4px 8px;border-radius:3px;background:#000;color:#dfe4e8;font:400 12.5px/1.3 "IBM Plex Sans",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.tt-preview .tt-entry{grid-template-columns:38px minmax(0,1fr) 40px 40px 34px;grid-template-rows:auto auto;gap:0 8px;height:auto;min-height:0;padding:3px 0;margin:0;width:100%;align-items:center;cursor:inherit;border:0}
+.tt-preview .tt-entry>span{grid-row:1}
+.tt-preview .tt-slag,.tt-preview .tt-fr,.tt-preview .tt-till,.tt-preview .tt-lage,.tt-preview .tt-anm{display:none}
+.tt-preview .tt-frtill{display:block}.tt-preview .tt-spar{text-align:right}
+.tt-preview .tt-entry>.tt-la{display:block;grid-row:2;grid-column:2/-1;padding:0;font-size:11px;color:#8a939c}
+.tt-preview .tt-now{height:auto;margin:0;width:100%;padding:3px 0}.tt-preview .tt-now .tt-la{color:#f5c518}
+.tt-legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin:6px 0;font-size:11px;color:#a8aea2}
+.tt-legend-item{display:inline-flex;align-items:center;gap:8px}
+.tt-legend-mark{display:inline-flex;justify-content:center;min-width:44px;color:#dfe4e8}
+#timetable-legend h4{margin:12px 0 4px;font-size:11px;font-weight:600;color:var(--muted)}
 .tt-empty{margin:9px 0;font-size:12px;color:#7d8791;opacity:1}
 .timetable-stale #tt-content,.timetable-stale #tt-clock{opacity:.55}
 #tt-mini{display:none}

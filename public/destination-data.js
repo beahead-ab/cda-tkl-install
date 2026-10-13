@@ -9,11 +9,13 @@ export const destinationDefaults=[
 ];
 // Normal outbound tracks for left-hand running. This is label placement,
 // independent of temporary routes, line blocks and TrainMeet station names.
+// The side is where the line leaves the panel; the timetable's line picture
+// draws the neighbours on the same side (public/timetable-style.js).
 export const destinationLines=[
-  {id:'C',name:'Linje C · vänster',tracks:['Cu','Cn'],outgoing:'Cn'},
-  {id:'A',name:'Linje A · vänster',tracks:['Au','An'],outgoing:'An'},
-  {id:'B',name:'Linje B · höger',tracks:['Bu','Bn'],outgoing:'Bu'},
-  {id:'D',name:'Linje D · höger',tracks:['D'],outgoing:'D'}
+  {id:'C',name:'Linje C · vänster',side:'left',tracks:['Cu','Cn'],outgoing:'Cn'},
+  {id:'A',name:'Linje A · vänster',side:'left',tracks:['Au','An'],outgoing:'An'},
+  {id:'B',name:'Linje B · höger',side:'right',tracks:['Bu','Bn'],outgoing:'Bu'},
+  {id:'D',name:'Linje D · höger',side:'right',tracks:['D'],outgoing:'D'}
 ];
 export const defaultOutgoing=()=>Object.fromEntries(destinationLines.map(l=>[l.id,l.outgoing]));
 export function isOutgoingDestination(id,outgoing){

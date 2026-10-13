@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.80.0",
+    "date": "2026-10-13",
+    "notes": [
+      "Tidtabellens stil väljs under Inställningar → Utseende och ljud, som i TrainMeet-appen för iPhone: Ord, Symboler, Linjebild eller Linjebild + symboler",
+      "Varje stil har en förhandsvisning med samma tåg; valet gäller den här webbläsaren och byter tåglistan direkt",
+      "Linjebilden visar stationen i mitten och grannarna på sin sida av panelen, med linjen in och ut som planerad, begärd, klar, med tåget på linjen eller avklarad",
+      "Spåret står bara i Spår-kolumnen, i en ram när tåget står inne; tecknen förklaras under Teckenförklaring"
+    ]
+  },
+  {
     "version": "0.79.0",
     "date": "2026-10-11",
     "notes": [

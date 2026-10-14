@@ -14,6 +14,10 @@ parkopplas under Inställningar → TrainMeet. Utan server är TKL offline för 
 Kärnan, låsningen och reglerna är desamma i båda lägena; bara förbindelsen byts. Internt heter lägena `live` och
 `offline` (i `connection.json` och API:t).
 
+**Publicerad: 0.80.0** (13 oktober; cda-tkl main `a503d09`, #60; `beahead-ab/cda-tkl-install` main `5133be9`). Läget
+och LocoBuffern är oförändrade sedan 0.79.0. Nytt i 0.80.0 är tidtabellens stil, som fungerar likadant i båda lägena
+(se nedan).
+
 ## Trafikspelets tåg utan LocoNet
 
 `src/traffic-trains.mjs` läser TrainMeet-kontexten varje sekund och ställer ut det som trafikspelet säger finns:
@@ -31,6 +35,22 @@ påhittade nummer) finns inte längre.
 
 Tåget körs av TKL:s egen återrapport (`src/field.mjs` i den lokala processen `src/simulator.mjs`). Dess sida, med
 spårledningar att klicka i och fel att lägga in, nås för felsökning från Studio → Driftsättning → *Egen återrapport ↗*.
+
+## Tidtabellen i båda lägena (0.80.0)
+
+Tidtabellen läser bara TrainMeet, aldrig LocoNet, och ser likadan ut vare sig LocoNet är ansluten eller inte. Under
+Inställningar → Utseende och ljud väljs hur den visar tågen: Ord, Symboler, Linjebild eller Linjebild + symboler.
+Linjebilden ritar linjen in och linjen ut som TrainMeet säger: begärd, klar, belagd med tåget ute på linjen, eller
+avklarad. Ett tåg som är anmält inne (ankommet, uppställt eller förare på plats) får en ram runt spåret.
+
+Grannarnas sidor i linjebilden kommer från samma Orter och telefon som infartsspåren för trafikspelets tåg: en ort
+kopplad till en TrainMeet-station ger stationen sin linjes sida (C och A vänster, B och D höger). En granne utan
+koppling får inget infartsspår, så TKL ställer inte ut dess tåg, och i linjebilden ritas den mittemot tågets andra ände
+(eller till vänster om ingen sida är känd).
+
+Med LocoNet ej ansluten följer tidtabellen och planen varandra, eftersom TKL ställer ut och kör trafikspelets tåg efter
+samma uppgifter. Med LocoNet ansluten är tågen de riktiga: ramen runt spåret betyder att tåget är anmält inne i
+TrainMeet, inte att banan har rapporterat det där.
 
 ## Var läget syns och byts
 

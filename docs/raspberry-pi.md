@@ -1,14 +1,17 @@
 # Installera Charlottendal TKL på en Raspberry Pi 5
 
 Den här anvisningen tar dig från en tom Raspberry Pi 5 till ett fristående ställverk: TKL och
-anläggningssimulatorn startar av sig själva, ställverket visas i helskärm på Pi:ns skärm och en
+dess egen återrapport (för körning utan LocoNet) startar av sig själva, ställverket visas i helskärm på Pi:ns skärm och en
 Stream Deck kopplas upp utan att någon behöver klicka. Själva installationen är en rad i
 terminalen; resten sker automatiskt.
 
-**Publicerad: 0.71.1** (cda-tkl main `96461c9`, `beahead-ab/cda-tkl-install` main `018de42`, 7 oktober). En Pi som
-redan är installerad tar den med Inställningar → Uppdatering eller genom att köra installationsraden igen
-(avsnitt 9). Sedan 0.71.1 är användarnamnet e-postadressen när ägaren skapas och när någon bjuds in; lösenordet
-har 6–128 tecken. Sedan 0.71.0 ligger allt om anläggningen i Studio (Inställningar → Anläggningen → Studio).
+**Publicerad: 0.80.0** (cda-tkl main `a503d09`, #60; `beahead-ab/cda-tkl-install` main `5133be9`, 13 oktober). En
+Pi som redan är installerad tar den med Inställningar → Uppdatering eller genom att köra installationsraden igen
+(avsnitt 9). Sedan 0.80.0 väljs tidtabellens stil under Inställningar → Utseende och ljud (avsnitt 8). Sedan 0.79.0
+är LocoNet ansluten eller ej ansluten och trafiken kommer från trafikspelet på TrainMeet-servern; sedan 0.78.0 ansluts
+LocoNet med en LocoBuffer på USB, och tjänsten ingår i gruppen `dialout` efter uppdateringen. Sedan 0.71.1 är
+användarnamnet e-postadressen när ägaren skapas och när någon bjuds in; lösenordet har 6–128 tecken. Sedan 0.71.0
+ligger allt om anläggningen i Studio (Inställningar → Anläggningen → Studio).
 
 **Innehåll**
 
@@ -100,7 +103,8 @@ sudo reboot
 ```
 
 Efter omstarten loggar Pi:n in på skrivbordet av sig själv och Chromium öppnar ställverket i
-helskärm, med CHARLOTTENDAL överst till vänster. TKL kör mot den inbyggda anläggningssimulatorn.
+helskärm, med CHARLOTTENDAL överst till vänster. LocoNet är ej ansluten från början: TKL svarar själv genom
+sin egen återrapport (tjänsten `cda-tkl-simulator`) och kör trafikspelets tåg när Pi:n är kopplad till TrainMeet.
 Tappar ställverket kontakten med anläggningen står det "Ingen kontakt med anläggningen" bredvid namnet.
 
 Kontrollera vid behov i terminalen:
@@ -155,6 +159,12 @@ installationen har sagt åt Chromium att ställverket får använda Elgatos enhe
   själv, och har *Anslut till LocoNet* och *Koppla från LocoNet*. LocoBuffern ställs in under Inställningar → Banan
   (LocoNet); sätt i den i en USB-port först. Valet gäller efter omstart. Se
   [LocoNet ansluten eller ej ansluten](loconet-anslutning.md).
+- **Tidtabellens stil** (sedan 0.80.0). Under Inställningar → Utseende och ljud väljs hur tåglistan i nederraden
+  visar tågen: **Ord** (som tidigare), **Symboler**, **Linjebild** (stationen i mitten, grannarna på sin sida och
+  linjen in och ut som planerad, begärd, klar, med tåget på linjen eller avklarad) eller **Linjebild + symboler**.
+  Varje val har en förhandsvisning, och tecknen förklaras under Teckenförklaring. Valet gäller webbläsaren, så
+  Pi:ns helskärm behåller sitt eget val och en iPad eller annan dator mot samma Pi väljer för sig. Spåret står i
+  en ram när tåget står inne. Grannarnas sidor kommer från Studio → Orter och telefon.
 - **Skärmen släcks aldrig.** Installationen stänger av skärmsläckaren.
 - **Lämna helskärmen tillfälligt** (till exempel för att nå skrivbordet): logga in med ssh och kör
   `pkill -f cda-tkl-browser; pkill chromium`. Vid nästa omstart är helskärmen tillbaka.

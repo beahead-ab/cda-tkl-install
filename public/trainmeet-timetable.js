@@ -1,6 +1,7 @@
 import {createContextDialog} from './context-dialog.js';
 import {clockAt,groupRows,lineStates,routeSides,stationSides,trainClass} from './timetable-rows.js';
 import {STYLE_KEY,labelsHTML,readStyle,rowHTML as styledRow,validStyle} from './timetable-style.js';
+import {CLOCK_SECONDS_KEY,clockHint,clockSecondsShown,clockText,toggleClockSeconds} from './clock-seconds.js';
 import {createTrackOccupancy} from './track-occupancy.js';
 import {occupancyModel} from './track-occupancy-model.js';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -148,13 +149,27 @@ export function createTrainMeetTimetable() {
     for(const key of [...announced.keys()])if(grouped.done.some(r=>r.number===key))announced.delete(key);
     render(true);
   }
+  // Träffklockan i rubriken, telefonraden och miniraden; ett tryck på någon av dem visar eller döljer sekunderna (0.81.0).
+  let seconds=clockSecondsShown();
+  function paintClock(now){
+    const text=clockText(now,seconds),hint=clockHint(seconds);
+    for(const el of [$('clock-time'),document.getElementById('panel-phone-clock'),$('mini').querySelector('.tt-mini-clock')]){
+      if(!el)continue;if(el.textContent!==text)el.textContent=text;if(el.title!==hint)el.title=hint;
+    }
+  }
+  const repaintClock=()=>{if(clockBase)paintClock(clockAt(clockBase,performance.now()-clockStart));};
+  const toggleSeconds=()=>{seconds=toggleClockSeconds();repaintClock();};
+  const clockButton=$('clock-time');clockButton.setAttribute('role','button');clockButton.tabIndex=0;
+  clockButton.addEventListener('click',toggleSeconds);
+  clockButton.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleSeconds();}});
+  document.getElementById('panel-phone-clock')?.addEventListener('click',toggleSeconds);
+  $('mini').addEventListener('click',e=>{if(e.target.closest('.tt-mini-clock'))toggleSeconds();});
+  window.addEventListener('storage',e=>{if(e.key===CLOCK_SECONDS_KEY){seconds=clockSecondsShown();repaintClock();}});
   function tick(){
     if(userMoved&&Date.now()>=userActiveUntil){userMoved=false;anchor(false,true);}
     if(!clockBase||document.hidden)return;
     const now=clockAt(clockBase,performance.now()-clockStart);
-    $('clock-time').textContent=now.text;clockShort=now.short;
-    const phone=document.getElementById('panel-phone-clock');if(phone)phone.textContent=now.text;
-    const mini=$('mini').querySelector('.tt-mini-clock');if(mini)mini.textContent=now.text;
+    clockShort=now.short;paintClock(now);
     if(now.minutes!==shownMinute){shownMinute=now.minutes;regroup();}
   }
   // Four times a second, so a fast clock (4×) shows every meet second instead of every fourth.
@@ -195,7 +210,7 @@ export function createTrainMeetTimetable() {
       const seen=clockBase?clockAt(clockBase,performance.now()-clockStart).short:'';
       for(const line of c.lines||[])if(['requested','reserved'].includes(line.state)&&line.direction==='in'&&line.trainNumber&&!announced.has(line.trainNumber))announced.set(line.trainNumber,seen);
     }
-    if(clockBase){const now=clockAt(clockBase,performance.now()-clockStart);clockShort=now.short;shownMinute=now.minutes;$('clock-time').textContent=now.text;}
+    if(clockBase){const now=clockAt(clockBase,performance.now()-clockStart);clockShort=now.short;shownMinute=now.minutes;paintClock(now);}
     regroup();schedule();
   }};
 }

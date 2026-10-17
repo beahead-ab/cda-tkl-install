@@ -193,6 +193,9 @@ body.panel-app #trainmeet-timetable{display:grid;grid-template-rows:auto auto mi
 #tt-clock{display:flex;flex:none;align-items:baseline;gap:9px;min-width:0;overflow:visible;font-variant-numeric:tabular-nums}
 #tt-clock:empty{display:none}
 #tt-clock-time{font:500 20px/1.2 "IBM Plex Mono",monospace;color:#e6e9ec}
+/* Ett tryck på träffklockan visar eller döljer sekunderna (public/clock-seconds.js). */
+#tt-clock-time,#panel-phone-clock,.tt-mini-clock{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+#tt-clock-time:focus-visible{outline:1px solid #7d8791;outline-offset:2px}
 #tt-clock-label{font-size:11px;color:#7d8791}
 #tt-collapse{display:none}
 #tt-status{position:absolute;z-index:2;top:42px;left:0;right:0;margin:0;padding:5px var(--tt-pad);font-size:11px;line-height:16px;background:#000;color:#f5d76e;border-block:1px solid #2a3036}

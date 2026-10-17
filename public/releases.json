@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.81.0",
+    "date": "2026-10-17",
+    "notes": [
+      "Ett tryck på träffklockan visar eller döljer sekunderna, som i TrainMeet Server och iPhone-appen",
+      "Gäller klockan i tidtabellens rubrik, telefonraden och miniraden i liggande läge; valet sparas i webbläsaren"
+    ]
+  },
+  {
     "version": "0.80.0",
     "date": "2026-10-13",
     "notes": [

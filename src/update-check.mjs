@@ -69,5 +69,9 @@ export class UpdateCheck{
     const to=this.latest||'senaste versionen';
     this.write('restarting','Render bygger '+to+'. Webbdriften startar om när bygget är klart, vanligen inom tio minuter.',this.current,this.latest||'');
   }
-  view(){return {kind:this.kind,current:this.current,latest:this.latest,available:!!this.latest&&newer(this.latest,this.current),newReleases:this.newReleases,checkedAt:this.checkedAt,error:this.error,canStart:this.kind==='render'?!!this.hook:!!UPDATE_UNITS[this.kind],run:this.run()};}
+  // A run between two versions older than the running one says nothing about it, so Uppdatering leaves it out:
+  // Render took over the web server's state directory on 6 October with its last update.json (0.59.1 → 0.68.0,
+  // failed), and a build Render starts by itself writes no file.
+  lastRun(){const run=this.run();return run&&run.from&&newer(this.current,run.from)&&(!run.to||newer(this.current,run.to))?null:run;}
+  view(){return {kind:this.kind,current:this.current,latest:this.latest,available:!!this.latest&&newer(this.latest,this.current),newReleases:this.newReleases,checkedAt:this.checkedAt,error:this.error,canStart:this.kind==='render'?!!this.hook:!!UPDATE_UNITS[this.kind],run:this.lastRun()};}
 }

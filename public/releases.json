@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.81.1",
+    "date": "2026-10-17",
+    "notes": [
+      "Uppdatering visar inte längre ett gammalt försök mellan två äldre versioner som senaste uppdatering",
+      "På Render stod ett misslyckat försök från 6 oktober (0.59.1 → 0.68.0) kvar fast 0.81.0 var installerad"
+    ]
+  },
+  {
     "version": "0.81.0",
     "date": "2026-10-17",
     "notes": [

@@ -820,6 +820,7 @@ async function start() {
     // Rangerarens station ser läget men byter det inte.
     onMode:rangerMode?null:()=>openConnectionMode(state?.connectionMode,{api,message})});
   document.querySelector('.plan-head-title').textContent=stationTitle();document.title=document.title.replace(/Charlottendal/g,stationTitle());
+  $('footer-station').textContent=stationTitle();
   // En annan station: dess namn i stället för CHARLOTTENDAL, och ingen länk till Studio om stationen saknar sin JMRI-fil.
   for(const el of document.querySelectorAll('.brand span,.phone-brand,.admin-shell-bar-title'))el.textContent=stationTitle().toUpperCase();
   if(config.station?.studio===false){const group=$('admin-tab')?.closest('.admin-nav-group'),heading=group?.previousElementSibling;group?.remove();

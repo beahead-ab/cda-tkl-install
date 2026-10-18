@@ -1,5 +1,12 @@
 [
   {
+    "version": "0.82.11",
+    "date": "2026-10-18",
+    "notes": [
+      "Panelens sidfot visar den valda stationens namn, även för Träkvista; Charlottendal behåller sitt namn"
+    ]
+  },
+  {
     "version": "0.82.10",
     "date": "2026-10-18",
     "notes": [

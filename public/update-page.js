@@ -2,7 +2,7 @@
 // PC, the one line to run, always at hand with a copy button. A Raspberry Pi and the web
 // deployment start the update themselves; on Render, Render builds main (and a Deploy Hook lets
 // the panel start that build).
-import {updateLines,openUpdateNotice,canFetchLatest} from './update-notice.js';
+import {updateLines,openUpdateNotice,canFetchLatest,buildRepository} from './update-notice.js';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const KIND_TEXT={'raspberry-pi':'Raspberry Pi',mac:'Mac',windows:'Windows',web:'webbdriften',render:'webbdriften på Render'};
 const isWeb=kind=>kind==='web'||kind==='render';
@@ -47,12 +47,12 @@ export function createUpdatePage({root,api,message}){
       const who=update.kind==='render'?'Render':update.kind==='web'?'Servern':'Pi:n';
       const checked=update.checkedAt?new Date(update.checkedAt).toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'}):'';
       const search=`<div class="settings-actions"><button type="button" data-check-update>Sök efter ny version</button><p>Läser installationsförrådet på GitHub nu. Annars sker det varje timme${checked?'; senast '+checked:''}.</p></div>`;
-      const fetches=update.kind==='render'?'Render bygger den nya versionen ur cda-tkl och startar om webbdriften; driftdata och inloggningar ligger kvar på disken':`${who} hämtar från ${esc(repository.split('/')[1])}, tar en säkerhetskopia, installerar och startar om TKL själv`;
+      const fetches=update.kind==='render'?'Render bygger den nya versionen ur '+buildRepository(update)+' och startar om webbdriften; driftdata och inloggningar ligger kvar på disken':`${who} hämtar från ${esc(repository.split('/')[1])}, tar en säkerhetskopia, installerar och startar om TKL själv`;
       const how=update.canStart
         ?(update.available?`<div class="settings-actions"><button type="button" class="primary" data-start-update>Uppdatera nu</button><p>${fetches}. Panelen är borta en kort stund${isWeb(update.kind)?' för alla som är inne':''}.</p></div>`
           :canFetchLatest(update)?`<div class="settings-actions"><button type="button" data-start-update>Hämta senaste versionen</button><p>Versionen gick inte att läsa, men ${who} kan ändå hämta och installera den senaste. ${fetches}.</p></div>`
           :`<p class="muted">${who} uppdaterar ${update.kind==='render'?'webbdriften':'sig själv'} härifrån när en ny version finns.</p>`)
-        :update.kind==='render'?`<p>Render bygger om webbdriften när main i cda-tkl ändras, om automatisk driftsättning är på för tjänsten. För knappen Uppdatera nu: kopiera tjänstens Deploy Hook (Settings → Deploy Hook i Render) till miljövariabeln <code>RENDER_DEPLOY_HOOK_URL</code> under Environment. Adressen är hemlig och stannar på servern.</p>`
+        :update.kind==='render'?`<p>Render bygger om webbdriften när main i ${esc(buildRepository(update))} ändras, om automatisk driftsättning är på för tjänsten. För knappen Uppdatera nu: kopiera tjänstens Deploy Hook (Settings → Deploy Hook i Render) till miljövariabeln <code>RENDER_DEPLOY_HOOK_URL</code> under Environment. Adressen är hemlig och stannar på servern.</p>`
         :line(update.kind);
       // How the last update on the server went: the updater writes each step.
       const run=update.run,RUN={fetching:['warn','Hämtar'],installing:['warn','Installerar'],backup:['warn','Säkerhetskopierar'],restarting:['warn','Startar om'],done:['ok','Klar'],failed:['off','Misslyckades']}[run?.phase];

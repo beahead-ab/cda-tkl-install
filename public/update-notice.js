@@ -8,6 +8,8 @@ export const updateLines=(repository='beahead-ab/cda-tkl-install')=>({
   windows:{where:'PowerShell',line:`irm https://raw.githubusercontent.com/${repository}/main/install.ps1 | iex`}
 });
 export const UPDATE_LINES=updateLines();
+// Förrådet som Render bygger webbdriften ur: cda-tkl för Charlottendal, stationens eget (Tk-TKL) för en annan station.
+export const buildRepository=view=>view?.repository&&view.repository!=='beahead-ab/cda-tkl-install'?view.repository.split('/')[1]:'cda-tkl';
 // Utan känd senaste version (förrådet gick inte att läsa) kan Pi:n ändå hämta och installera den senaste.
 export const canFetchLatest=view=>!!view?.canStart&&view.kind!=='render'&&!view.latest;
 export function openUpdateNotice(view,{api,message}){
@@ -17,14 +19,14 @@ export function openUpdateNotice(view,{api,message}){
   if(view.canStart){
     confirmAdmin({title,button:'Uppdatera nu',
       message:view.kind==='render'
-        ?'Webbdriften kör '+view.current+'. Render bygger '+view.latest+' ur cda-tkl och startar om webbdriften när bygget är klart, vanligen inom tio minuter. Panelen är borta en kort stund för alla som är inne. Lagda tågvägar behåller sina lås men måste läggas om för att signalerna ska gå till kör. Inställningar och driftdata ligger kvar på disken; misslyckas bygget fortsätter '+view.current+' att köra.'
+        ?'Webbdriften kör '+view.current+'. Render bygger '+view.latest+' ur '+buildRepository(view)+' och startar om webbdriften när bygget är klart, vanligen inom tio minuter. Panelen är borta en kort stund för alla som är inne. Lagda tågvägar behåller sina lås men måste läggas om för att signalerna ska gå till kör. Inställningar och driftdata ligger kvar på disken; misslyckas bygget fortsätter '+view.current+' att köra.'
         :(view.kind==='web'?'Webbdriften kör ':'Den här Pi:n kör ')+view.current+'. Uppdateringen hämtar '+to+' från '+(view.repository||'beahead-ab/cda-tkl-install').split('/')[1]+', tar en säkerhetskopia, installerar och startar om TKL, vilket tar ett par minuter. Panelen är borta en kort stund för alla som är inne. Lagda tågvägar behåller sina lås men måste läggas om för att signalerna ska gå till kör. Inställningar och driftdata ligger kvar, och om den nya versionen inte startar återställs den gamla.',
       action:async()=>{const answer=await api('update/start',{});if(!answer)return false;message('Uppdateringen har startat. Ställverket visar "Ny version · ladda om" när den är klar.',{error:false,duration:8000});}});
     return;
   }
   if(view.kind==='render'){
     const body=document.createElement('div');body.innerHTML='<p></p>';
-    body.querySelector('p').textContent='Webbdriften kör '+view.current+'. Render bygger om den när main i cda-tkl ändras, om automatisk driftsättning är på. Med tjänstens Deploy Hook i miljövariabeln RENDER_DEPLOY_HOOK_URL kan uppdateringen startas härifrån.';
+    body.querySelector('p').textContent='Webbdriften kör '+view.current+'. Render bygger om den när main i '+buildRepository(view)+' ändras, om automatisk driftsättning är på. Med tjänstens Deploy Hook i miljövariabeln RENDER_DEPLOY_HOOK_URL kan uppdateringen startas härifrån.';
     const modal=createAdminDialog({title,body});modal.element.addEventListener('close',()=>modal.element.remove(),{once:true});modal.open();return;
   }
   const lines=updateLines(view.repository),how=lines[view.kind]||lines.mac;

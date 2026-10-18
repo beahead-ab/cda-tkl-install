@@ -214,7 +214,7 @@ export class TrainMeet extends EventEmitter {
     this.check(data);if(!identity(data.stationId)||!text(data.code,128)||!pairingCode(data.code))fail('Ange stations-id och giltig anslutningskod.');
     await this.exclusive(async()=>{
       try {
-        const response=await this.request('/v1/pair',{payload:{pairing_code:pairingCode(data.code),client_id:this.data.clientId,display_name:this.data.clientId,device_kind:'tkl_terminal'},denied:{summary:'TrainMeet godkände inte anslutningskoden.',hint:'Koden finns i TrainMeet Server för den som är inloggad som administratör: Anslut ett ställverk i deltagarvyn eller under Drift, och under Inställningar → Anslutningskod. En ny träff ger en ny kod.'}});
+        const response=await this.request('/v1/pair',{payload:{pairing_code:pairingCode(data.code),client_id:this.data.clientId,display_name:this.data.clientId,device_kind:'tkl_terminal'},denied:{summary:'TrainMeet godkände inte anslutningskoden.',hint:'Koden finns i TrainMeet Server för den som är inloggad som administratör: Drift → Anslut en box, eller Inställningar → Anslutningskod. En ny träff ger en ny kod.'}});
         if(response?.protocol_version!==1||response.client_id!==this.data.clientId||!text(response.access_token,4096)||!response.access_token)fail('TrainMeet lämnade ingen giltig parkopplingsnyckel.',503);
         const context=await this.read(response.access_token,data.stationId,true);
         const next={version:1,clientId:this.data.clientId,stationId:data.stationId,token:response.access_token,origin:this.origin,pairings:{...this.data.pairings,[this.origin]:{stationId:data.stationId,token:response.access_token}}};

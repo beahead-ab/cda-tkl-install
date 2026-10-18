@@ -1,5 +1,12 @@
 [
   {
+    "version": "0.82.1",
+    "date": "2026-10-18",
+    "notes": [
+      "TrainMeet-sidan säger var adressen och koden finns: Drift → Anslut en box i TrainMeet Server"
+    ]
+  },
+  {
     "version": "0.82.0",
     "date": "2026-10-17",
     "notes": [

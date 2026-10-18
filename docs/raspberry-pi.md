@@ -123,8 +123,8 @@ Tidtabellen, träffklockan och tågklareringen kommer från TrainMeet Server. Ko
 2. Skriv **serverns adress**, till exempel `https://server.trainmeet.app` eller adressen till
    träffens egen TrainMeet Server på det lokala nätet.
 3. Skriv **anslutningskoden**, sex siffror, till exempel `123-456`. I TrainMeet Server finns adressen
-   och koden på sidan **Anslut ett ställverk**: knappen i deltagarvyn, inloggad som administratör.
-   De finns också under Drift → Anslut en box och under Inställningar → Anslutningskod.
+   och koden under **Drift → Anslut en box**, inloggad som administratör, och koden också under
+   Inställningar → Anslutningskod.
 4. Tryck **Anslut**. Sedan 0.82.0 är det allt: TKL väljer sin station själv (Charlottendal, i Tk-TKL
    Träkvista). En ny Pi heter `cda-tkl-pi` hos TrainMeet (Tk-TKL: `tk-tkl-pi`), så den kopplar inte
    bort webbdriften.

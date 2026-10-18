@@ -50,9 +50,9 @@ Mac och PC beskrivs nedan.
 - **Stream Deck:** koppla in den, öppna menyn **⋯ → Stream Deck** och tryck **Anslut** en gång.
   Chrome kommer ihåg valet, och därefter kopplas den upp av sig själv varje gång.
 - **TrainMeet:** menyn **⋯ → TrainMeet**. Skriv serverns adress och anslutningskoden och tryck
-  **Anslut**; TKL väljer stationen själv. Koden finns i TrainMeet Server på sidan **Anslut ett
-  ställverk** (knappen i deltagarvyn, inloggad som administratör). Macen heter `cda-tkl-mac` hos
-  TrainMeet, så den kopplar inte bort webbdriften.
+  **Anslut**; TKL väljer stationen själv. Adressen och koden finns i TrainMeet Server under
+  **Drift → Anslut en box**, inloggad som administratör. Macen heter `cda-tkl-mac` hos TrainMeet, så
+  den kopplar inte bort webbdriften.
 
 ### Uppdatera
 

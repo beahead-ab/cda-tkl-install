@@ -31,7 +31,7 @@ export function createTrainMeet({api,stationHint=()=>''}) {
     for(const n of form.querySelectorAll('input,select,button'))n.disabled=disabled;
     $('server').readOnly=state.originLocked;$('disconnect').disabled=disabled;
     $('connect').textContent=busy?'Ansluter…':state.paired?'Anslut med ny kod':'Anslut';
-    $('connect-help').textContent=`TKL väljer stationen ${station()} själv. Adressen och koden finns i TrainMeet Server för inloggad administratör: Anslut ett ställverk i deltagarvyn eller under Drift.`;
+    $('connect-help').textContent=`TKL väljer stationen ${station()} själv. Adressen och koden finns i TrainMeet Server under Drift → Anslut en box, för inloggad administratör.`;
   }
   form.onsubmit=async e=>{
     e.preventDefault();if(busy||!state)return;

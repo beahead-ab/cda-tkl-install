@@ -12,7 +12,7 @@ export function createTrainInformation({catalog,plan,controls,displayName,openSo
   const option=f=>`<option value="${esc(f.key)}">${esc(title(f))}</option>`;
   const incoming=catalog.fields.filter(f=>f.kind==='incoming').sort((a,b)=>a.sourceSystem.localeCompare(b.sourceSystem));
   const blocks=catalog.fields.filter(f=>f.kind==='block').sort((a,b)=>a.name.localeCompare(b.name,'sv',{numeric:true}));
-  $('train-information').innerHTML=`<div class="train-strip"><strong>Inkommande</strong><div id="incoming-trains"></div><button id="open-train-editor">Tågnummer <span id="train-count"></span></button></div>
+  $('train-information').innerHTML=`<div class="train-strip"><strong>${incoming.length?'Inkommande':'Tåg'}</strong><div id="incoming-trains"></div><button id="open-train-editor">Tågnummer <span id="train-count"></span></button></div>
     <details id="train-editor" class="card"><summary>Tåginformation och nummerföljning</summary>
     <p class="muted">Ange tågnummer efter egen kontroll. Du kan sedan koppla numret till en klar tågväg före första beläggningen. Följningen använder rapporterad passage; detektorerna identifierar inte själva tåget.</p>
     <div class="train-editor-grid"><div><label>Plats eller inkommande fält<select id="train-field"></select></label>
@@ -23,11 +23,11 @@ export function createTrainInformation({catalog,plan,controls,displayName,openSo
     <label>Flytta numret till<select id="train-target"></select></label><button id="train-move">Flytta tågnummer</button></div></div>
     <div class="train-follow-controls"><label>Följ längs klar tågväg<select id="train-follow-route" aria-label="Följ längs klar tågväg"></select></label><button id="train-follow">Koppla valt tågnummer</button><p class="muted">Numret ska stå i ett inkommande fält eller vid vägens första detektor. Vid avbrott, återtagning eller oklar passage stannar följningen för kontroll. Den fortsätter aldrig själv efter omstart.</p><div id="train-follow-list"></div></div>
     <details class="train-history"><summary>Senaste ändringar</summary><div id="train-history"></div></details>
-    <details class="train-source-note"><summary>Källavvikelse i originalet</summary><p class="muted">Två visningsplatser pekar på SN2A och markeras med ?; SU2A saknar egen visningsplats. Båda blocken finns i listan.</p></details><p class="muted train-source-note">TrainMeet visas separat. Nummerföljningen ändrar inga klareringar i TrainMeet.</p></details>`;
-  const options=`<optgroup label="Inkommande tåg">${incoming.map(option).join('')}</optgroup><optgroup label="Spårblock">${blocks.map(option).join('')}</optgroup>`;
+    ${catalog.anchors.some(a=>a.duplicate)?'<details class="train-source-note"><summary>Källavvikelse i originalet</summary><p class="muted">Två visningsplatser pekar på SN2A och markeras med ?; SU2A saknar egen visningsplats. Båda blocken finns i listan.</p></details>':''}<p class="muted train-source-note">TrainMeet visas separat. Nummerföljningen ändrar inga klareringar i TrainMeet.</p></details>`;
+  const options=`${incoming.length?'<optgroup label="Inkommande tåg">'+incoming.map(option).join('')+'</optgroup>':''}<optgroup label="Spårblock">${blocks.map(option).join('')}</optgroup>`;
   $('train-field').innerHTML=options;$('train-target').innerHTML='<option value="">Välj mål…</option>'+options;
   let activeKey=$('train-field').value;
-  for(const line of destinationLines) {
+  for(const line of destinationLines.filter(l=>l.tracks.some(t=>fields.has(incomingFields[t])))) {
     const button=document.createElement('button');button.className='incoming-train';button.innerHTML=`<span>${esc(line.name)}</span><strong>—</strong>`;
     button.onclick=()=>open(incomingFields[normalIncoming(line.id,state?.destinations?.outgoing)]);
     $('incoming-trains').append(button);chips.push({line,button});
@@ -91,8 +91,8 @@ export function createTrainInformation({catalog,plan,controls,displayName,openSo
   function paintEditor() {
     const key=$('train-field').value,f=fields.get(key),entry=info?.entries[key],target=$('train-target').value;
     $('train-detail').textContent=entry?`${entry.value} · ${entry.source==='follow'?'flyttat efter passage':'manuellt registrerat'} ${stamp(entry.updatedAt)}${entry.needsReview?' · behöver kontrolleras':''}${entry.duplicate?' · numret finns på flera platser':''}`:'Inget tågnummer registrerat här.';
-    const occupied=online&&state?.connection==='connected'?state?.blocks[f.name]?.occupied:null;
-    $('train-condition').textContent=f.kind==='incoming'?'Planeringsuppgift · ingen beläggningskoppling.':`${occupied===true?'Spårledningen är belagd':occupied===false?'Spårledningen är fri':'Beläggningen är okänd'} · ${f.name}. Ett registrerat nummer är inte en detektorkvittens.`;
+    const occupied=online&&state?.connection==='connected'?state?.blocks[f?.name]?.occupied:null;
+    $('train-condition').textContent=f?.kind==='incoming'?'Planeringsuppgift · ingen beläggningskoppling.':`${occupied===true?'Spårledningen är belagd':occupied===false?'Spårledningen är fri':'Beläggningen är okänd'} · ${f?.name||'Inget spårfält'}. Ett registrerat nummer är inte en detektorkvittens.`;
     if(stale()&&dirty) $('train-message').textContent='Uppgifterna eller beläggningen har ändrats. Din text finns kvar; läs in senaste innan du sparar.';
     const unavailable=!online||busy||!!info?.fault;
     $('train-follow').disabled=unavailable||dirty||stale()||!entry||entry.needsReview||entry.duplicate||!$('train-follow-route').value||info.follows.some(f=>['active','paused'].includes(f.status)&&f.key===key);

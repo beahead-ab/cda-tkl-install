@@ -14,6 +14,7 @@ export const NAVIGATION_SECTIONS=[
   {group:'traffen',hash:'#trainmeet',label:'TrainMeet',id:'trainmeet-tab',title:'TrainMeet',status:'menu-trainmeet-status',tabs:[]},
   {group:'traffen',hash:'#tools/journal',label:'Händelser',id:'journal-tab',title:'Händelser',tabs:[]},
   {group:'datorn',hash:'#advanced/start',label:'Kom igång',id:'start-tab',title:'Kom igång',status:'start-status',tabs:[]},
+  {group:'datorn',hash:'#advanced/station',label:'Station',id:'station-tab',title:'Station',tabs:[]},
   {group:'datorn',hash:'#tools/appearance',label:'Utseende och ljud',id:'tools-tab',title:'Utseende och ljud',tabs:[]},
   {group:'datorn',hash:'#tools/streamdeck',label:'Stream Deck',id:'streamdeck-tab',title:'Elgato Stream Deck',tabs:[
     {hash:'#tools/streamdeck',label:'Anslutning'},

@@ -6,9 +6,9 @@ export function loadProfile(side='tkl',{activated=true}={}) {
   if(!['network','legacy'].includes(selected)) throw Error('Okänd anläggningsprofil.');
   const station=currentStation();
   // En annan station än Charlottendal har en driftprofil och en fältprofil i stations/<id>/profiles; den äldre provprofilen finns bara för Charlottendal.
-  if(!station.builtIn&&selected!=='network') throw Error('Provprofilen finns bara för Charlottendal.');
-  const file=side==='field'?'simulator':'charlottendal';
-  const base=JSON.parse(fs.readFileSync(station.builtIn?new URL(`../profiles/${file}${selected==='network'?'-network':''}.json`,import.meta.url):side==='field'?station.field:station.profile));
+  const file=selected==='legacy'?(side==='field'?station.legacyField:station.legacyProfile):(side==='field'?station.field:station.profile);
+  if(!file) throw Error('Provprofilen finns bara för Charlottendal.');
+  const base=JSON.parse(fs.readFileSync(file));
   if(side!=='field'||!activated)return base;
   // Studio skriver den aktiverade fältprofilen till tillståndskatalogen; simulatorn följer den vid start.
   // I webbdriften kör simulatorn som en annan användare och får inte läsa TKL:s katalog: då gäller grundprofilen,

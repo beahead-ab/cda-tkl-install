@@ -3,13 +3,19 @@
 // under Drift → Tågnummer. En skylt med ? är osäker; ett klick rättar eller bekräftar numret. Bara presentation.
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const SVG='http://www.w3.org/2000/svg';
-const RIGHT=new Set(['Bu','Bn','D']);
+import {lineTrainPlacement,destinationLines} from './destination-data.js';
 // Var ett block ligger i planen: mitten av dess längsta spårbit, annars växelns mittpunkt.
 export function blockPositions(panel){
   const out={},best={};
   for(const s of panel.segs||[]){if(!s.b)continue;const length=Math.hypot(s.x2-s.x1,s.y2-s.y1);if(!(best[s.b]>=length)){best[s.b]=length;out[s.b]={x:(s.x1+s.x2)/2,y:(s.y1+s.y2)/2};}}
   for(const t of Object.values(panel.turnouts||{}))if(t.block&&!out[t.block])out[t.block]={x:t.cx,y:t.cy};
   return out;
+}
+export function trackedTrainPlacement(head,previous,state){
+  const dx=previous?head.x-previous.x:0,dy=previous?head.y-previous.y:0;
+  const vertical=Math.abs(dy)>Math.abs(dx)&&Math.abs(dy)>4;
+  return {x:head.x+(vertical?0:dx<-4?-40:40),y:head.y+(vertical?(dy<0?-28:28):0),
+    arrow:state==='ghost'?'':vertical?(dy<0?'↑':'↓'):dx>4?'→':dx<-4?'←':''};
 }
 export function createTrainTracking({plan,panel,controls,api,message,displayName=(k,n)=>n}){
   if(!plan)return null;
@@ -24,7 +30,9 @@ export function createTrainTracking({plan,panel,controls,api,message,displayName
   // Automaten bland driftknapparna (0.75.0): datorn som tågklarerare, bara när LocoNet inte är ansluten. Trafiken kommer
   // från trafikspelet på TrainMeet-servern (0.79.0); TKL har ingen egen simulerad trafik längre.
   const automate=document.createElement('button');automate.type='button';automate.id='automation-toggle';automate.hidden=true;
-  automate.title='Tågklareraren: datorn lägger tågvägarna med samma förregling som du. Tåg från väster går mot Vagnsta, tåg från Vagnsta mot Kungsfors och Lekby. Du kan ta över när som helst.';
+  automate.title=destinationLines.every(line=>line.tracks.length===1)
+    ?'Tågklareraren: datorn följer tidtabellens spår och grannar på stationens linjer och lägger tågvägarna med samma förregling som du. Du kan ta över när som helst.'
+    :'Tågklareraren: datorn lägger tågvägarna med samma förregling som du. Tåg från väster går mot Vagnsta, tåg från Vagnsta mot Kungsfors och Lekby. Du kan ta över när som helst.';
   document.querySelector('.drift-actions')?.append(automate);
   automate.onclick=async()=>{const answer=await api('automation',{enabled:!automation?.enabled});if(answer){automation=answer;paintAutomation();}};
   function paintAutomation(){
@@ -60,20 +68,20 @@ export function createTrainTracking({plan,panel,controls,api,message,displayName
     if(!enabled){list.innerHTML='';return;}
     for(const t of view.trains){
       const head=positions[t.head];if(!head)continue;
-      const previous=positions[t.blocks.at(-2)]||null,dx=previous?head.x-previous.x:0;
-      const arrow=t.state==='ghost'?'':dx>4?' →':dx<-4?'← ':'';
+      const previous=positions[t.blocks.at(-2)]||null,placement=trackedTrainPlacement(head,previous,t.state);
+      const arrow=placement.arrow;
       const label=(t.number||t.label)+(t.certain||String(t.label).startsWith('?')?'':'?');
-      const text=arrow.startsWith('←')?arrow+label:label+arrow;
+      const text=['←','↑'].includes(arrow)?arrow+' '+label:label+(arrow?' '+arrow:'');
       // På spåret, förskjuten i färdriktningen så att spårknappen mitt på spåret går att klicka på.
-      tag(layer,{x:head.x+(dx<-4?-40:40),y:head.y,text,cls:(t.certain?'':'uncertain ')+(t.state==='ghost'?'ghost':''),id:t.id,title:(t.number?'Tåg '+t.number:'Okänt tåg')+'. '+place(t)+(t.certain?'':'. Osäkert, klicka för att ange numret.')});
+      tag(layer,{...placement,text,cls:(t.certain?'':'uncertain ')+(t.state==='ghost'?'ghost':''),id:t.id,title:(t.number?'Tåg '+t.number:'Okänt tåg')+'. '+place(t)+(t.certain?'':'. Osäkert, klicka för att ange numret.')});
     }
     // Linjerna: på väg in vid infartsspåret, på väg ut vid spåret tåget lämnade på. Flera tåg staplas.
     const stack={};
     for(const l of view.lines){
-      const control=controls.find(c=>c.sensor==='htv'+l.edge);if(!control)continue;
-      const right=RIGHT.has(l.edge),n=stack[l.edge]=(stack[l.edge]||0)+1,inward=l.direction==='in';
-      const name=l.number||l.label,arrow=(right?!inward:inward)?'→':'←',text=arrow==='←'?'← '+name:name+' →';
-      tag(layer,{x:control.centerX+(right?18:-18),y:control.centerY+28*n,anchor:right?'start':'end',text,cls:'line '+(inward?'incoming':'outgoing'),title:`Tåg ${name} ${inward?'på väg in från':'på väg ut mot'} ${l.neighbor||'linje '+l.line}${l.state==='reserved'?' (klarerat, inte avgått)':''}.`});
+      const n=stack[l.edge]=(stack[l.edge]||0)+1,inward=l.direction==='in';
+      const placement=lineTrainPlacement(l.edge,l.direction,controls,n);if(!placement)continue;
+      const name=l.number||l.label,text=['←','↑'].includes(placement.arrow)?placement.arrow+' '+name:name+' '+placement.arrow;
+      tag(layer,{...placement,text,cls:'line '+(inward?'incoming':'outgoing'),title:`Tåg ${name} ${inward?'på väg in från':'på väg ut mot'} ${l.neighbor||'linje '+l.line}${l.state==='reserved'?' (klarerat, inte avgått)':''}.`});
     }
     const rows=view.trains.map(t=>`<li class="${t.certain?'':'uncertain'}"><button type="button" data-tracking-open="${esc(t.id)}">${esc(t.number||t.label)}${t.certain?'':' ?'}</button><span>${esc(place(t))}</span><small>${esc(t.certain?t.source:'osäkert')}</small></li>`).join('');
     const lines=view.lines.map(l=>`<li class="line"><strong>${esc(l.number||l.label)}</strong><span>${l.direction==='in'?'På väg in från':'På väg ut mot'} ${esc(l.neighbor||'linje '+l.line)}</span><small>${esc(l.edge)}</small></li>`).join('');

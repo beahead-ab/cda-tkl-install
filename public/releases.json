@@ -1,5 +1,62 @@
 [
   {
+    "version": "0.82.10",
+    "date": "2026-10-18",
+    "notes": [
+      "Samlad uppdatering för stationsstyrd trafik och lokalt stationsval; Charlottendal behåller sina stationsfiler och Render kör fortsatt en fast station",
+      "Träkvistas automat inväntar normal tågvägsupplösning efter passage även när stoppåterrapporten dröjer"
+    ]
+  },
+  {
+    "version": "0.82.9",
+    "date": "2026-10-18",
+    "notes": [
+      "Inställningar visar installerade stationer och kan byta station med kontrollerad omstart genom npm start; användare och driftdata hålls isär och TrainMeet ansluts uttryckligen efter bytet"
+    ]
+  },
+  {
+    "version": "0.82.8",
+    "date": "2026-10-18",
+    "notes": [
+      "Träkvistas automat följer tidtabellsspår och verkliga grannar samt inväntar enkelspårets klarering i TrainMeet; Charlottendals automat behåller sitt beteende"
+    ]
+  },
+  {
+    "version": "0.82.7",
+    "date": "2026-10-18",
+    "notes": [
+      "Panelen, orterna och trafikspelets tåg använder stationens egna linjer och spår; Träkvista har A, B och C med uttryckliga TrainMeet-kopplingar"
+    ]
+  },
+  {
+    "version": "0.82.6",
+    "date": "2026-10-18",
+    "notes": [
+      "Mac och Windows använder stationens eget installationsnamn, katalog och autostart så att Träkvista inte ersätter Charlottendal"
+    ]
+  },
+  {
+    "version": "0.82.5",
+    "date": "2026-10-18",
+    "notes": [
+      "Verktygen för att skapa och återställa användare väljer samma tillståndskatalog som stationens server"
+    ]
+  },
+  {
+    "version": "0.82.4",
+    "date": "2026-10-18",
+    "notes": [
+      "Stationspaketet behåller den delade XML-importören och kräver att stationens genererade filer stämmer före publicering"
+    ]
+  },
+  {
+    "version": "0.82.3",
+    "date": "2026-10-18",
+    "notes": [
+      "Stationernas profiler, Studio och källfiler läses genom samma beskrivning; Charlottendals filer och driftkatalog ligger kvar"
+    ]
+  },
+  {
     "version": "0.82.2",
     "date": "2026-10-18",
     "notes": [

@@ -1,6 +1,6 @@
-import {destinationLines} from './destination-data.js';
-// Presentation bindings to the seven imported JMRI incoming memory fields.
-export const incomingFields={Cu:'incoming:CuppIn',Cn:'incoming:CnedIn',Au:'incoming:AuppIn',An:'incoming:AnedIn',Bu:'incoming:BuppIn',Bn:'incoming:BnedIn',D:'incoming:DIn'};
+import {destinationLines,incomingFields,trafficAnchor} from './destination-data.js';
+export {incomingFields} from './destination-data.js';
+// Bara stationens faktiska importerade fält får manuella ankomstknappar.
 export function normalIncoming(lineId,outgoing){
   const line=destinationLines.find(l=>l.id===lineId);
   if(!line)return null;
@@ -17,9 +17,8 @@ export function incomingChoice(key,outgoing){
 }
 export function incomingAnchors(controls){
   return Object.entries(incomingFields).flatMap(([track,key])=>{
-    const control=controls.find(c=>c.sensor==='htv'+track);
-    if(!control)return [];
-    const right=['Bu','Bn','D'].includes(track);
+    const anchor=trafficAnchor(track,controls);if(!anchor)return [];
+    const {control,right}=anchor;
     return [{key,track,right,x:control.centerX+(right?45:-45),y:control.centerY-26}];
   });
 }

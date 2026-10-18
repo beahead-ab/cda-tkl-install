@@ -2,6 +2,8 @@
 // genererade filerna (Charlottendal: public/data, en annan station: stations/<id>/data).
 // Allt är läsning. Ingenting här ändrar driften.
 import fs from 'node:fs';
+import path from 'node:path';
+import { currentStation } from '../station.mjs';
 const ROOT = new URL('../../', import.meta.url);
 export function readJson(rel, root = ROOT) { return JSON.parse(fs.readFileSync(new URL(rel, root), 'utf8')); }
 export function readText(rel, root = ROOT) { return fs.readFileSync(new URL(rel, root), 'utf8'); }
@@ -37,35 +39,38 @@ export function parseLayoutXml(text) {
 }
 
 let cache = null;
-// En annan station (stations/<id>, till exempel Träkvista) har samma slags källor i sin egen katalog: driftprofilen,
-// panelen, tågvägstäckningen, indikeringarna och JMRI-filen. Charlottendals regelmigrering (migration.json) och
-// granskade regelfil finns bara för Charlottendal.
+// Stationsbeskrivningen anger samma slags källor för båda stationerna. Charlottendals granskade regler och
+// migreringsunderlag ligger kvar på sina gamla platser. root kan vara en isolerad kopia av källorna vid prov.
 export function loadSources(root = ROOT, station = null) {
-  const key = root.href + '|' + (station?.builtIn === false ? station.id : 'charlottendal');
+  station ||= currentStation({ CHARLOTTENDAL_STATION: 'charlottendal' }, root);
+  const key = JSON.stringify([root.href, station]);
   if (cache && cache.key === key) return cache.sources;
-  const sources = station?.builtIn === false ? stationSources(station) : builtInSources(root);
+  const sources = stationSources(station);
   const { profile } = sources;
   for (const [name, doc] of [['route-coverage', sources.coverage], ['indications', sources.indications], ['migration', sources.migration]])
     if (doc && doc.sourceHash !== profile.sourceHash) throw Error(`${name}.json hör till en annan källversion än driftprofilen.`);
+  if (sources.rules && sources.rules.sourceHash !== profile.sourceHash)
+    throw Error(`${path.basename(station.rules)} hör till en annan källversion än driftprofilen.`);
   cache = { key, sources };
-  return sources;
-}
-function builtInSources(root) {
-  const profile = readJson('profiles/charlottendal-network.json', root);
-  const sources = { profile, panel: readJson('public/data/panel.json', root), coverage: readJson('public/data/route-coverage.json', root),
-    indications: readJson('public/data/indications.json', root), migration: readJson('public/data/migration.json', root),
-    xml: parseLayoutXml(readText('public/data/source/Cda60.xml', root)), station: { id: 'charlottendal', title: 'Charlottendal', sourceName: 'Cda60.xml' } };
-  try { const rules = readJson('profiles/charlottendal-rules.json', root); if (rules.sourceHash !== profile.sourceHash) throw Error('charlottendal-rules.json hör till en annan källversion än driftprofilen.'); sources.rules = rules; }
-  catch (e) { if (e.code !== 'ENOENT') throw e; sources.rules = null; }
   return sources;
 }
 function stationSources(station) {
   if (!station.source) throw Error(`${station.title} saknar sin JMRI-fil; Studio har inget att läsa.`);
-  const file = name => JSON.parse(fs.readFileSync(station.dataDir + '/' + name, 'utf8'));
-  const optional = name => fs.existsSync(station.dataDir + '/' + name) ? file(name) : null;
-  const profile = JSON.parse(fs.readFileSync(station.profile, 'utf8')), empty = { sourceHash: profile.sourceHash };
-  return { profile, panel: file('panel.json'), coverage: optional('route-coverage.json') || { ...empty, nx: [], excluded: [] },
-    indications: optional('indications.json') || { ...empty, indicators: [] }, migration: null, xml: parseLayoutXml(fs.readFileSync(station.source, 'utf8')), rules: null,
+  const read = (file, optional = false) => {
+    if (!file) return null;
+    try {
+      const document = JSON.parse(fs.readFileSync(file, 'utf8'));
+      if (!document || typeof document !== 'object' || Array.isArray(document))
+        throw Error(`${path.basename(file)} måste innehålla ett JSON-objekt.`);
+      return document;
+    }
+    catch (e) { if (optional && e.code === 'ENOENT') return null; throw e; }
+  };
+  const profile = read(station.profile), empty = { sourceHash: profile.sourceHash };
+  return { profile, panel: read(station.dataDir + '/panel.json'),
+    coverage: read(station.dataDir + '/route-coverage.json', station.optionalStudioData) ?? { ...empty, nx: [], excluded: [] },
+    indications: read(station.dataDir + '/indications.json', station.optionalStudioData) ?? { ...empty, indicators: [] },
+    migration: read(station.migration), rules: read(station.rules, true), xml: parseLayoutXml(fs.readFileSync(station.source, 'utf8')),
     station: { id: station.id, title: station.title, sourceName: station.sourceName } };
 }
 export const MODULE_RE = /^(M\d\d)(?:-(\d+)-(\d+))?\b/;

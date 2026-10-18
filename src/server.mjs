@@ -14,13 +14,15 @@ import { createAuth } from './auth.mjs';
 import { json, guard, body, staticFile } from './http.mjs';
 import { loadProfile } from './profile.mjs';
 import { currentStation, stateDirectory, stationData } from './station.mjs';
+import { InstallationStation } from './installation-station.mjs';
 import { BindingConfiguration } from './binding-configuration.mjs';
 import { Configuration } from './configuration.mjs';
 import { TrainInformation } from './train-information.mjs';
 import { TrainTracker } from './train-tracking.mjs';
 import { TrafficTrains } from './traffic-trains.mjs';
 import { TrainAutomation } from './train-automation.mjs';
-import { destinationLines } from '../public/destination-data.js';
+import { automationCommand } from './automation-command.mjs';
+import { stationTraffic, trafficEdgeInfo } from './station-traffic.mjs';
 import { PanelIndications } from './panel-indications.mjs';
 import { TrainMeet } from './trainmeet.mjs';
 import { ModelClock } from './model-clock.mjs';
@@ -43,12 +45,17 @@ const station=currentStation(),baseProfile=loadProfile();
 const port = Number(process.env.CHARLOTTENDAL_PORT || 8910), root = fileURLToPath(new URL('../public', import.meta.url));
 const storage = new Storage(stateDirectory(process.env, station));
 const auth = createAuth(root, true, process.env, { stateDir: storage.directory });
+const installationStation = new InstallationStation({station});
+let activeCommands = 0;
+const stationRuntime = ({changing=false}={}) => ({engine,connection,recorder,automation,trainMeet,activeCommands:activeCommands-(changing?1:0),automating,trafficBusy:trafficTrains.busy});
+const checkStationPending = () => {if(installationStation.pending)throw Object.assign(Error('Stationen byts. Vänta tills programmet har startat om.'),{status:409});};
 // Live eller offline (src/connection-mode.mjs): var kärnans LocoNet-klient ansluter, och LocoBufferns gateway i live.
 const connection=new ConnectionMode({storage,root:fileURLToPath(new URL('..',import.meta.url))});
 const connectionInfo=p=>connection.target(p);
 let profile,client,engine,configuration,trainInformation,panelIndications,recorder,tracker,automation;
 // Panelens geometri, för tågspårningens spårgraf (src/train-tracking.mjs).
 const panelGeometry=stationData('panel.json',station);
+const traffic=stationTraffic(station,baseProfile,panelGeometry);
 const bindingReports=new Map();
 function activationStatus(proposed){
   const deny=reason=>({allowed:false,reason});
@@ -100,7 +107,13 @@ function createRuntime(p){
   const target=connectionInfo(p);
   const c=new LocoNetClient({host:target.host,port:target.port,silenceMs:p.staleMs});
   const e=new Engine(p,{storage,send:bytes=>c.send(bytes)});if(e.storageFault)throw Error(e.storageFault);
-  const t=new TrainTracker({profile:p,panel:panelGeometry,enabled:target.mode==='simulator',reason:'Tågspårningen följer TKL:s egna tåg när LocoNet inte är ansluten; mot banan är den avstängd tills den är provad där.',log:(kind,message)=>e.log(kind,message)});
+  const t=new TrainTracker({profile:p,panel:panelGeometry,traffic,enabled:target.mode==='simulator',reason:'Tågspårningen följer TKL:s egna tåg när LocoNet inte är ansluten; mot banan är den avstängd tills den är provad där.',log:(kind,message)=>e.log(kind,message)});
+  let a;
+  const guarded=data=>()=>automationCommand({automation,engine,connection},a,e,t,data);
+  a=new TrainAutomation({profile:p,available:target.mode==='simulator',reason:'Automaten finns bara när LocoNet inte är ansluten.',
+    policy:traffic.explicitConnections?'trainmeet':'legacy',traffic,
+    request:(from,to)=>e.request(from,to,'build'),edgeBlock:t.edgeBlock,log:(kind,message)=>e.log(kind,message),
+    clearance:data=>trainMeet.clearance(data,{guard:guarded(data)}),movement:data=>trainMeet.movement(data,{guard:guarded(data)})});
   return {profile:p,client:c,engine:e,
     configuration:new Configuration(p,{storage,canActivate:()=>!e.routes.length&&!e.controls.programming.reserved&&!e.yard.requests.length&&!e.storageFault}),
     trainInformation:new TrainInformation(stationData('train-fields.json',station),p,{storage}),
@@ -110,7 +123,7 @@ function createRuntime(p){
     // Tågspårningen provas i simulering först; mot riktig bana är den avstängd (docs/tagsparning.md).
     tracker:t,
     // Automaten (src/train-automation.mjs): datorn som tågklarerare, bara i simuleringsläge till att börja med.
-    automation:new TrainAutomation({profile:p,available:target.mode==='simulator',reason:'Automaten finns bara när LocoNet inte är ansluten.',request:(from,to)=>e.request(from,to,'build'),edgeBlock:t.edgeBlock,log:(kind,message)=>e.log(kind,message)})};
+    automation:a};
 }
 // Studio's rules describe the network profile; another profile (the legacy commissioning
 // one) runs as it is.
@@ -119,7 +132,7 @@ const bindings=new BindingConfiguration(baseProfile,{storage,canActivate:activat
 // Studio: reglerna ovanpå driftbindningarna. Kärnan får alltid den kompilerade profilen, aldrig utkastet.
 // Studio läser stationens egna källor: driftprofilen, panelen och JMRI-filen (Charlottendal: Cda60.xml, Träkvista:
 // Trakvista.xml). En station utan JMRI-fil har inget Studio.
-const hasStudio=station.builtIn||!!station.source;
+const hasStudio=!!station.source;
 // Källregistret (Studio → Källa): JMRI-filen post för post, ur source/index.json i stationens data.
 const hasRegister=fs.existsSync(path.join(station.dataDir,'source','index.json'));
 const studioSources=hasStudio?loadSources(undefined,station):{profile:null,panel:null,coverage:null,indications:null,migration:null,xml:null,rules:null,station:null};
@@ -140,47 +153,37 @@ const studioMeasure=new Measurements({storage,send:b=>!!client?.send(b),guard:()
 // TKL-id hos TrainMeet. TrainMeet släpper in ett TKL per id och station, och sedan 0.82.0 anges inget id vid anslutningen:
 // en ny installation på en Pi, en Mac eller en PC får ett eget (cda-tkl-pi, tk-tkl-mac …), så att den inte kopplar bort
 // webbdriften (cda-tkl). En installation som redan har ett id behåller det. TKL väljer stationen med samma namn.
-const tklName=station.builtIn?'cda-tkl':(station.signature||station.id).toLowerCase().replace(/[^a-z0-9]/g,'')+'-tkl';
+const tklName=station.tklId;
 const clientId=tklName+({'raspberry-pi':'-pi',mac:'-mac',windows:'-pc'}[process.env.CHARLOTTENDAL_INSTALL_KIND]||'');
 const trainMeet=new TrainMeet({storage,origin:process.env.CHARLOTTENDAL_TRAINMEET_ORIGIN||'',station:station.title||'Charlottendal',clientId});
 // Kom igång (src/onboarding.mjs): stegens status ur det som finns; panelen visar "N steg kvar" tills ägaren markerat klart.
 const onboarding=new Onboarding({storage});
 const onboardingContext=()=>({auth,ai:aiSettings.view(),connection:{mode:connectionInfo(profile).mode,state:engine?.connected?'connected':'disconnected'},trainMeet:trainMeet.view()});
-const destinations=new Destinations(storage);
+const destinations=new Destinations(storage,traffic);
 const modelClock=new ModelClock(storage);let clockPublished=0;
 let notes = storage.load('notes.json', {}); const streams = new Set(), trace = [], protocolTrace=[]; let dirty = true;
 auth.on('invalidate', () => { for (const stream of streams) stream.end(); streams.clear(); });
 // Kanterna för tågspårningen: ortsnamnet och TrainMeet-stationen per spår, och vilket spår som är linjens infart.
-function edgeInfo(){
-  const d=destinations.view(),stations=trainMeet.view().context?.stations||[],out={};
-  for(const line of destinationLines){
-    const exit=d.outgoing?.[line.id]??line.outgoing,incoming=line.tracks.find(t=>t!==exit)||exit;
-    for(const track of line.tracks){const e=d.entries.find(x=>x.id===track)||{},station=e.source==='trainmeet'?stations.find(s=>s.id===e.stationId):null;out[track]={name:station?.name||e.name||track,stationId:e.source==='trainmeet'?e.stationId:'',incoming:track===incoming};}
-  }
-  return out;
-}
+function edgeInfo(){return trafficEdgeInfo(traffic,destinations.view(),trainMeet.view().context);}
 // Trafikspelets tåg (src/traffic-trains.mjs): när LocoNet inte är ansluten kör TKL tågen från TrainMeet-servern på sin
 // egen bana, över den lokala förbindelsen. Spåren här namnges som i tidtabellen (Spår 1a → 1a).
 const trafficTrains=new TrafficTrains({available:connection.mode==='offline',send:command=>client.simulate(command),log:(kind,message)=>engine.log(kind,message)});
-function stationTracks(){
-  const out={};
-  for(const [button,b] of Object.entries(profile.buttons||{})){const m=/^Spår\s+(.+)$/.exec(b.label||'');const block=m&&profile.routes.find(r=>r.to===button)?.blocks.at(-1);if(block)out[m[1].trim().toLowerCase()]={button,block};}
-  return out;
-}
+function stationTracks(){return traffic.stationTracks;}
 let trafficTicked=0,trafficRevision=0;
 function playTraffic(){
-  if(!trafficTrains.available||Date.now()-trafficTicked<1000)return;trafficTicked=Date.now();
+  if(installationStation.pending||installationStation.requireTrainMeetConnect||!trafficTrains.available||Date.now()-trafficTicked<1000)return;trafficTicked=Date.now();
   const edges=Object.fromEntries(Object.entries(edgeInfo()).map(([edge,info])=>[edge,{...info,block:tracker.edgeBlock[edge]}]));
   const meet=trainMeet.view();
   trafficTrains.tick({context:meet.context,fresh:!meet.stale,edges,tracks:stationTracks(),blocks:engine.blocks,tracked:tracker.view().trains,expect:(block,number)=>tracker.expect(block,number),forget:number=>tracker.forget(number)})
     .catch(error=>engine.log('error','Trafikspelets tåg: '+error.message)).finally(()=>{if(trafficTrains.revision!==trafficRevision){trafficRevision=trafficTrains.revision;dirty=true;}});
 }
-let automated=0,automationRevision=0;
-function automate(){
-  if(!automation?.enabled||Date.now()-automated<250)return;automated=Date.now();
-  try{automation.tick({state:{routes:engine.routes,blocks:engine.blocks,controls:engine.controls,connected:engine.connected},trains:tracker.view().trains,outgoing:destinations.view().outgoing});}
-  catch(error){engine.log('error','Automaten: '+error.message);automation.handOver('ett fel i automaten.');}
-  if(automation.revision!==automationRevision){automationRevision=automation.revision;dirty=true;}
+let automated=0,automationRevision=0,automating=false;
+async function automate(){
+  if(installationStation.pending||installationStation.requireTrainMeetConnect||automating||!automation?.enabled||Date.now()-automated<250)return;automated=Date.now();automating=true;
+  const current=automation;
+  try{await current.tick({state:{routes:engine.routes,blocks:engine.blocks,controls:engine.controls,connected:engine.connected},trains:tracker.view().trains,outgoing:destinations.view().outgoing,meet:trainMeet.view(),edges:edgeInfo()});}
+  catch(error){engine.log('error','Automaten: '+error.message);current.handOver('ett fel i automaten.');}
+  finally{automating=false;if(automation===current&&current.revision!==automationRevision){automationRevision=current.revision;dirty=true;}}
 }
 let tracked=0,tracking=false;
 // Spårningens journalrader väcker kärnans change-händelse; den läser inte om sig själv under tiden.
@@ -221,18 +224,21 @@ const installKind=process.env.CHARLOTTENDAL_INSTALL_KIND||(fs.existsSync('/usr/l
 const updateCheck=installKind?new UpdateCheck({current:release,kind:installKind,repository:installRepository(),product:station.title+' TKL',token:()=>readToken(),statusFile:path.join(storage.directory,'update.json'),readFile:file=>fs.readFileSync(file,'utf8'),
   writeFile:(file,text)=>{fs.writeFileSync(file+'.tmp',text,{mode:0o640});fs.renameSync(file+'.tmp',file);},hook:process.env.RENDER_DEPLOY_HOOK_URL}):null;
 updateCheck?.start();
-const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),connectionMode:connectionView(),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot(),trainTracking:tracker.view(),trafficTrains:trafficTrains.view(),automation:automation.view() };};
+const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),connectionMode:connectionView(),installationStation:installationStation.view(stationRuntime()),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot(),trainTracking:tracker.view(),trafficTrains:trafficTrains.view(),automation:automation.view() };};
 const server = http.createServer(async (req, res) => {
+  let countedCommand=false;
   try {
     guard(req, port); const url = new URL(req.url, `http://127.0.0.1:${port}`);
     if (await auth.handle(req, res, url)) return;
     const expires = await auth.authenticate(req, url);
+    if(req.method==='POST'){checkStationPending();activeCommands++;countedCommand=true;}
     // Studio läser stationens egna källor (driftprofilen, panelen, JMRI-filen). En station utan JMRI-fil har inget att
     // visa; att visa Charlottendals vore fel, så Studio svarar att det saknas.
     if (!hasStudio && url.pathname.startsWith('/api/studio')) return json(res, { error: `${station.title} saknar sin JMRI-fil; Studio har inget att läsa.` }, 404);
     if (req.method === 'GET' || req.method === 'HEAD') {
       if (url.pathname === '/api/state') return json(res, snapshot());
       if(url.pathname==='/api/connection')return json(res,connectionView({devices:true}));
+      if(url.pathname==='/api/installation/station'){auth.requireRole(req,'admin');return json(res,installationStation.view(stationRuntime()));}
       if(url.pathname==='/api/communication')return json(res,{connection:connectionInfo(profile),connectionState:engine.connected?'connected':'disconnected',expectations:commandExpectations(profile,engine.snapshot()),trace:protocolTrace});
       if(url.pathname==='/api/studio'){const measured=studioMeasure.measured(profile);return json(res,{...studioData(studioSources,studioDrafts.activeRules(),measured),drafts:studioDrafts.view(bindings.profile()),review:studioReview.view(),
         measure:studioMeasure.view(profile),cards:studioCards.view(),mgp:mgpSummary({profile,xml:studioSources.xml},buildRegistry(studioSources,measured),studioCards.view().cards,{sections:detectionInventory(studioSources).sections,measured})});}
@@ -246,7 +252,7 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Disposition':`attachment; filename="${station.id}-mgp.json"`});return res.end(req.method==='HEAD'?undefined:JSON.stringify(doc,null,2)+'\n');}
       // A preview only: the ranger's own targets are a narrower list, never a wider one.
       if(url.pathname==='/api/route-targets')return json(res,{targets:engine.routeTargets(url.searchParams.get('from'),url.searchParams.get('kind')||'main',url.searchParams.get('operator')==='ranger'?'ranger':'tkl')});
-      if (url.pathname === '/api/config') { const {routeAlternatives,...panelProfile}=profile; return json(res, { ...panelProfile,release,station:{id:station.id,title:station.title,signature:station.signature||null,studio:hasStudio,source:station.sourceName||null,register:hasRegister,migration:!!studioSources.migration},bindingVersion:bindings.data.activeVersion, notes, trainFields:trainInformation.catalog(),panelIndications:panelIndications.catalog(), presentation:configuration.presentation(), fieldUrl: process.env.CHARLOTTENDAL_FIELD_URL || `http://127.0.0.1:${Number(process.env.CHARLOTTENDAL_SIM_PORT || 8911)}/`, accountUrl: auth.mode === 'external' ? '/account' : null, authMode: auth.mode, onboarding: (v => ({ done: v.done, remaining: v.remaining, steps: v.steps.map(x => ({ id: x.id, label: x.label, done: x.done, skipped: x.skipped })) }))(onboarding.view(onboardingContext())) }); }
+      if (url.pathname === '/api/config') { const {routeAlternatives,...panelProfile}=profile; return json(res, { ...panelProfile,release,traffic,station:{id:station.id,title:station.title,signature:station.signature||null,studio:hasStudio,source:station.sourceName||null,register:hasRegister,migration:!!studioSources.migration},bindingVersion:bindings.data.activeVersion, notes, trainFields:trainInformation.catalog(),panelIndications:panelIndications.catalog(), presentation:configuration.presentation(), fieldUrl: process.env.CHARLOTTENDAL_FIELD_URL || `http://127.0.0.1:${Number(process.env.CHARLOTTENDAL_SIM_PORT || 8911)}/`, accountUrl: auth.mode === 'external' ? '/account' : null, authMode: auth.mode, onboarding: (v => ({ done: v.done, remaining: v.remaining, steps: v.steps.map(x => ({ id: x.id, label: x.label, done: x.done, skipped: x.skipped })) }))(onboarding.view(onboardingContext())) }); }
       if (url.pathname === '/api/train-information') return json(res, {...trainInformation.snapshot(),...trainInformation.catalog()});
       if(url.pathname==='/api/bindings')return json(res,bindings.view());
       if(url.pathname==='/api/bindings/export'){res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store','Content-Disposition':`attachment; filename=${station.id}-driftprofil.json`});return res.end(req.method==='HEAD'?undefined:JSON.stringify(bindings.export(),null,2));}
@@ -266,13 +272,21 @@ const server = http.createServer(async (req, res) => {
         req.on('close', () => { streams.delete(res); clearTimeout(expiry); }); return;
       }
       if (url.pathname.startsWith('/api/')) return json(res, { error: 'Finns inte' }, 404);
-      // En annan station har sin egen data/ (panel.json, signalregister …). Charlottendals filer lämnas aldrig ut i dess ställe.
+      // Alla stationer läser /data ur sin egen datakatalog (panel.json, signalregister …), utan återfall till en annan station.
       // Originalfilen i Studio → Källa: stationens JMRI-fil ligger i stationens katalog, inte bland de genererade filerna.
-      if (!station.builtIn && station.source && url.pathname === '/data/source/' + encodeURIComponent(station.sourceName)) return staticFile(res, path.dirname(station.source), '/' + station.sourceName);
-      if (!station.builtIn && url.pathname.startsWith('/data/')) return staticFile(res, station.dataDir, decodeURIComponent(url.pathname.slice(5)));
+      if (station.source && url.pathname === '/data/source/' + encodeURIComponent(station.sourceName)) return staticFile(res, path.dirname(station.source), '/' + station.sourceName);
+      if (url.pathname.startsWith('/data/')) return staticFile(res, station.dataDir, decodeURIComponent(url.pathname.slice(5)));
       return staticFile(res, root, decodeURIComponent(url.pathname));
     }
     const data = await body(req,65536);
+    // Även en begäran som börjat läsa sin kropp före stationsbytet måste stanna här.
+    checkStationPending();
+    if(url.pathname==='/api/installation/station'){
+      auth.requireRole(req,'owner');
+      const result=installationStation.prepare(data.stationId,stationRuntime({changing:true}));
+      engine.log('station','Stationsbyte till '+result.title+' begärt. Den nuvarande stationen avslutas före omstart.');dirty=true;
+      res.once('finish',()=>installationStation.restart());return json(res,result);
+    }
     if(url.pathname.startsWith('/api/users/')){
       const command=url.pathname.slice('/api/users/'.length);if(!['invite','reissue','remove'].includes(command))return json(res,{error:'Finns inte'},404);
       const me=auth.requireRole(req,'owner'),ROLE={owner:'ägare',admin:'administratör',ranger:'rangerare'};
@@ -317,7 +331,14 @@ const server = http.createServer(async (req, res) => {
     if(url.pathname==='/api/connection/mode'){switchConnection(data?.mode);dirty=true;return json(res,{connection:connectionView(),state:snapshot()});}
     if(url.pathname==='/api/connection/locobuffer'){connection.setLocobuffer(data);engine.log('connection-mode',`LocoBuffer inställd: ${data.device||'ingen'} · ${data.baud} baud · ${data.flow==='rtscts'?'RTS/CTS':'ingen flödeskontroll'}.`);dirty=true;return json(res,connectionView({devices:true}));}
     if(url.pathname==='/api/destinations'){const result=destinations.save(data,trainMeet.context?.stations||[]);dirty=true;return json(res,result);}
-    if(url.pathname.startsWith('/api/trainmeet/')){const command={connect:'connect',configure:'configure',pair:'pair',refresh:'refresh',disconnect:'disconnect',stations:'stations',clearance:'clearance',movement:'movement'}[url.pathname.slice('/api/trainmeet/'.length)];if(!command)return json(res,{error:'Okänd TrainMeet-åtgärd'},404);return json(res,await trainMeet[command](data));}
+    if(url.pathname.startsWith('/api/trainmeet/')){
+      const command={connect:'connect',configure:'configure',pair:'pair',refresh:'refresh',disconnect:'disconnect',stations:'stations',clearance:'clearance',movement:'movement'}[url.pathname.slice('/api/trainmeet/'.length)];
+      if(!command)return json(res,{error:'Okänd TrainMeet-åtgärd'},404);
+      if(installationStation.requireTrainMeetConnect&&!['connect','pair','configure','disconnect'].includes(command))return json(res,{error:'TrainMeet är pausad efter stationsbytet. Öppna TrainMeet och anslut uttryckligen med serverns adress och anslutningskod.'},409);
+      const result=await trainMeet[command](data);
+      if(['connect','pair'].includes(command)&&result.status==='connected')installationStation.resumeTrainMeet();
+      dirty=true;return json(res,result);
+    }
     // On a Raspberry Pi the panel can start cda-tkl-update.service (allowed for the cda-tkl
     // user by the installer's polkit rule). It reinstalls and restarts TKL; the panel then
     // offers a reload. Elsewhere the update is started from Terminal or PowerShell.
@@ -391,12 +412,13 @@ const server = http.createServer(async (req, res) => {
     } else return json(res, { error: 'Okänd manöver' }, 404);
     json(res, { ok: true, state: snapshot() });
   } catch (e) { json(res, { error: e.message }, e.status || 400); }
+  finally{if(countedCommand)activeCommands--;}
 });
 let tick, publish;
 // CHARLOTTENDAL_LISTEN=0.0.0.0 lets the rangerare's station reach TKL over the layout's network.
 server.listen(port, process.env.CHARLOTTENDAL_LISTEN || '127.0.0.1', () => {
   console.log(`${station.title} TKL: http://127.0.0.1:${port}`); connection.start(); client.start();
-  tick = setInterval(() => {protect(() => engine.tick());if(Date.now()-tracked>300)track();playTraffic();automate();recorder.tick();modelClock.checkpoint();trainMeet.tick();if(Date.now()-clockPublished>1000){dirty=true;clockPublished=Date.now();}}, 100);
+  tick = setInterval(() => {protect(() => engine.tick());if(Date.now()-tracked>300)track();playTraffic();automate();recorder.tick();modelClock.checkpoint();if(!installationStation.pending&&!installationStation.requireTrainMeetConnect)trainMeet.tick();if(Date.now()-clockPublished>1000){dirty=true;clockPublished=Date.now();}}, 100);
   publish = setInterval(() => {
     if (!dirty) return; dirty = false; const text = `data: ${JSON.stringify(snapshot())}\n\n`;
     for (const res of streams) { if (res.writableLength > 1e6) { res.end(); streams.delete(res); } else res.write(text); }

@@ -69,18 +69,20 @@ export function buildTrackGraph(panel,profile){
 const allowed=(conds,turnouts)=>conds.every(c=>{const p=turnouts?.[c.turnout]?.position;return p!=='C'&&p!=='T'||p===c.position;});
 
 export class TrainTracker{
-  constructor({profile,panel,enabled=true,reason='',now=Date.now,log=()=>{}}){
+  constructor({profile,panel,traffic=null,enabled=true,reason='',now=Date.now,log=()=>{}}){
     Object.assign(this,{profile,enabled,reason,now,log});
+    // Utan stationsmodell används Charlottendals äldre bindningar, bland annat i de befintliga modulproven.
+    this.edgeLines={...(traffic?.edgeLines??EDGES)};this.incomingFields={...(traffic?.incomingFields??INCOMING_FIELDS)};
     this.graph=buildTrackGraph(panel,profile);
     this.trains=[];this.lineTrains=[];this.lastOccupied={};this.sequence=0;this.unknown=0;this.revision=0;this.appliedBook={};
     this.input={turnouts:{},routes:[],lines:[],edgeInfo:{},book:{}};
     // Kanterna: knappen för linjen (htvAu …) och blocket vid den, samt första blocket i tågvägarna in från linjen
     // och sista i tågvägarna ut. Det är där tåg kommer och går.
     const topology=new Topology(panel);this.edgeOf={};this.exitEdge={};this.edgeBlock={};
-    for(const edge of Object.keys(EDGES)){
-      const button=topology.buttons['htv'+edge],block=button&&topology.segments[button.segment]?.b;
+    for(const edge of Object.keys(this.edgeLines)){
+      const name=traffic?.anchors?.[edge]?.button||'htv'+edge,button=topology.buttons[name],block=traffic?traffic.edgeBlocks[edge]:button&&topology.segments[button.segment]?.b;
       if(profile.blocks[block]){this.edgeOf[block]=edge;this.exitEdge[block]=edge;this.edgeBlock[edge]=block;}
-      for(const r of profile.routes){if(r.from==='htv'+edge&&r.blocks[0])this.edgeOf[r.blocks[0]]??=edge;if(r.to==='htv'+edge&&r.blocks.at(-1))this.exitEdge[r.blocks.at(-1)]??=edge;}
+      for(const r of profile.routes){if(r.from===name&&r.blocks[0])this.edgeOf[r.blocks[0]]??=edge;if(r.to===name&&r.blocks.at(-1))this.exitEdge[r.blocks.at(-1)]??=edge;}
     }
     this.detectors=Object.fromEntries(Object.entries(profile.blocks).map(([n,b])=>[n,(b.inputs||[b]).map(i=>i.address)]));
   }
@@ -131,8 +133,8 @@ export class TrainTracker{
     const edge=this.exitEdge[t.head]||this.edgeOf[t.head];
     if(edge){
       const info=this.input.edgeInfo[edge]||{};
-      this.lineTrains.push({id:t.id,number:t.number,label:t.label,certain:t.certain,edge,line:EDGES[edge],direction:'out',neighbor:info.name||'',stationId:info.stationId||'',since:now});
-      this.log('train-tracking',`Tåg ${t.number||t.label} lämnade mot ${info.name||'linje '+EDGES[edge]}.`);
+      this.lineTrains.push({id:t.id,number:t.number,label:t.label,certain:t.certain,edge,line:this.edgeLines[edge],direction:'out',neighbor:info.name||'',stationId:info.stationId||'',since:now});
+      this.log('train-tracking',`Tåg ${t.number||t.label} lämnade mot ${info.name||'linje '+this.edgeLines[edge]}.`);
       this.trains=this.trains.filter(x=>x!==t);
     } else {
       // Försvann inne på stationen: troligen på spår utan avkänning (lokstallet, vändskivan). Står kvar som senast sett.
@@ -210,7 +212,7 @@ export class TrainTracker{
       const edge=component.map(b=>this.edgeOf[b]).find(Boolean),body=this.order(component,edge);
       const named=this.numberFor(component,edge);
       const t=this.add(body,now,named);t.edge=edge||'';
-      this.log('train-tracking',edge?`Tåg ${t.number||t.label} kom in från ${this.input.edgeInfo[edge]?.name||'linje '+EDGES[edge]} (${edge}).`:`Okänt tåg ${t.label} vid ${t.head}. Ange numret.`);
+      this.log('train-tracking',edge?`Tåg ${t.number||t.label} kom in från ${this.input.edgeInfo[edge]?.name||'linje '+this.edgeLines[edge]} (${edge}).`:`Okänt tåg ${t.label} vid ${t.head}. Ange numret.`);
     }
   }
   // Ordningen inom ett nytt tåg: från kanten och inåt, annars som blocken hänger ihop.
@@ -232,7 +234,7 @@ export class TrainTracker{
       const info=this.input.edgeInfo[edge]||{};
       const line=this.input.lines.find(l=>l.direction==='in'&&['reserved','occupied'].includes(l.state)&&l.trainNumber&&!live.has(l.trainNumber)&&info.stationId&&l.neighborId===info.stationId);
       if(line)return {number:line.trainNumber,certain:true,source:'TrainMeet'};
-      const e=this.input.book[INCOMING_FIELDS[edge]];if(e?.value&&e.value!=='-'&&!live.has(e.value))return {number:e.value,certain:true,source:'inkommande fält'};
+      const field=this.incomingFields[edge],e=field&&this.input.book[field];if(e?.value&&e.value!=='-'&&!live.has(e.value))return {number:e.value,certain:true,source:'inkommande fält'};
     }
     return {number:'',certain:false,source:'okänt'};
   }
@@ -246,7 +248,7 @@ export class TrainTracker{
     // Ett tåg från en kant som fick okänt nummer tar det inkommande fältets nummer om anmälan kom efter tåget.
     const live=new Set(this.trains.map(t=>t.number).filter(Boolean));
     for(const t of this.trains.filter(t=>t.state==='station'&&!t.number&&t.edge)){
-      const e=this.input.book[INCOMING_FIELDS[t.edge]];
+      const field=this.incomingFields[t.edge],e=field&&this.input.book[field];
       if(e?.value&&e.value!=='-'&&!live.has(e.value)){t.number=e.value;t.label=e.value;t.certain=true;t.source='inkommande fält';live.add(e.value);this.log('train-tracking',`Tåg ${e.value} vid ${t.head}: numret från det inkommande fältet.`);}
     }
     for(const t of this.trains.filter(t=>t.state==='station'))for(const b of t.body){
@@ -290,8 +292,8 @@ export class TrainTracker{
     const live=new Set(this.trains.map(t=>t.number).filter(Boolean)),incoming=[];
     for(const l of this.input.lines){
       if(l.direction!=='in'||!['reserved','occupied'].includes(l.state)||!l.trainNumber||live.has(l.trainNumber))continue;
-      const edge=Object.keys(EDGES).find(e=>this.input.edgeInfo[e]?.stationId===l.neighborId&&this.input.edgeInfo[e]?.incoming);
-      if(edge)incoming.push({id:'in:'+l.id,number:l.trainNumber,label:l.trainNumber,certain:true,edge,line:EDGES[edge],direction:'in',neighbor:l.neighborName||this.input.edgeInfo[edge]?.name||'',state:l.state});
+      const edge=Object.keys(this.edgeLines).find(e=>this.input.edgeInfo[e]?.stationId&&this.input.edgeInfo[e].stationId===l.neighborId&&this.input.edgeInfo[e]?.incoming);
+      if(edge)incoming.push({id:'in:'+l.id,number:l.trainNumber,label:l.trainNumber,certain:true,edge,line:this.edgeLines[edge],direction:'in',neighbor:l.neighborName||this.input.edgeInfo[edge]?.name||'',state:l.state});
     }
     return {enabled:true,trains,lines:[...incoming,...this.lineTrains.map(l=>({...l}))]};
   }

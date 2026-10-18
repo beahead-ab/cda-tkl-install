@@ -49,7 +49,7 @@ export class TrafficTrains {
       if (line.state !== 'occupied' || line.direction !== 'in' || !line.trainNumber) continue;
       const edge = Object.keys(edges).find(e => edges[e]?.incoming && edges[e]?.stationId && edges[e].stationId === line.neighborId);
       if (!edge || !edges[edge].block) continue;
-      out.push({ key: `line:${line.id}:${line.trainNumber}`, number: line.trainNumber, at: 'htv' + edge, block: edges[edge].block, where: `på linjen från ${line.neighborName || edges[edge].name || edge}, utanför infartssignalen` });
+      out.push({ key: `line:${line.id}:${line.trainNumber}`, number: line.trainNumber, at: edges[edge].button || 'htv' + edge, block: edges[edge].block, where: `på linjen från ${line.neighborName || edges[edge].name || edge}, utanför infartssignalen` });
     }
     const labels = new Map((context?.tracks || []).map(t => [t.id, t.label]));
     for (const m of context?.movements || []) {

@@ -9,13 +9,18 @@ set -eu
 if [ "$(id -u)" -eq 0 ]; then echo "Kör installationen utan sudo på Mac."; exit 1; fi
 SOURCE_DIR=$(CDPATH= cd -- "${1:-$(dirname -- "$0")/..}" && pwd)
 [ -f "$SOURCE_DIR/src/server.mjs" ] || { echo "Installationspaketet är ofullständigt."; exit 1; }
-APP="${CDA_TKL_HOME:-$HOME/Library/Application Support/Charlottendal TKL}"
+# Identiteten måste läsas före kataloger, autostart och appnamn, så en annan station inte ersätter Charlottendal.
+TKL_ID=cda-tkl TKL_NAME=Charlottendal TKL_STATION=charlottendal TKL_REPOSITORY=beahead-ab/cda-tkl-install
+[ -f "$SOURCE_DIR/packaging/identity.env" ] && . "$SOURCE_DIR/packaging/identity.env"
+case "$TKL_ID" in *[!a-z0-9-]*|'') echo "Ogiltigt TKL_ID i packaging/identity.env."; exit 1 ;; esac
+APP_NAME="$TKL_NAME TKL"
+APP="${CDA_TKL_HOME:-$HOME/Library/Application Support/$APP_NAME}"
 NODE_DIR="$APP/node"
 NODE_MAJOR=22
-LABEL=se.beahead.cda-tkl
+LABEL="se.beahead.$TKL_ID"
 PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
 VERSION=$(sed -n 's/^ *"version": *"\([^"]*\)".*/\1/p' "$SOURCE_DIR/package.json" | head -n 1)
-echo "Installerar Charlottendal TKL $VERSION …"
+echo "Installerar $APP_NAME $VERSION …"
 mkdir -p "$APP/releases" "$APP/state" "$APP/logs"
 
 case "$(uname -m)" in arm64) NODE_ARCH=arm64 ;; x86_64) NODE_ARCH=x64 ;; *) echo "Processorn $(uname -m) stöds inte."; exit 1 ;; esac
@@ -49,9 +54,7 @@ if [ ! -f "$APP/app.env" ]; then
   sed -e "s|^CHARLOTTENDAL_STATE_DIR=.*|CHARLOTTENDAL_STATE_DIR=\"$APP/state\"|" -e "s|^CHARLOTTENDAL_INSTALL_KIND=.*|CHARLOTTENDAL_INSTALL_KIND=mac|" "$SOURCE_DIR/packaging/raspberry-pi/app.env" > "$APP/app.env"
 fi
 grep -q '^CHARLOTTENDAL_INSTALL_KIND=' "$APP/app.env" || printf '\nCHARLOTTENDAL_INSTALL_KIND=mac\n' >> "$APP/app.env"
-# En annan station än Charlottendal (packaging/identity.env): stationen och förrådet för uppdateringar.
-TKL_STATION=charlottendal TKL_REPOSITORY=beahead-ab/cda-tkl-install
-[ -f "$SOURCE_DIR/packaging/identity.env" ] && . "$SOURCE_DIR/packaging/identity.env"
+# En annan station än Charlottendal: stationen och förrådet för uppdateringar.
 [ "$TKL_STATION" = charlottendal ] || grep -q '^CHARLOTTENDAL_STATION=' "$APP/app.env" || printf 'CHARLOTTENDAL_STATION=%s\n' "$TKL_STATION" >> "$APP/app.env"
 [ "$TKL_REPOSITORY" = beahead-ab/cda-tkl-install ] || grep -q '^CHARLOTTENDAL_INSTALL_REPOSITORY=' "$APP/app.env" || printf 'CHARLOTTENDAL_INSTALL_REPOSITORY=%s\n' "$TKL_REPOSITORY" >> "$APP/app.env"
 # "Application Support" has a space: run.sh sources app.env, so the value must be quoted.
@@ -68,8 +71,8 @@ cp "$SOURCE_DIR/packaging/mac/run.sh" "$APP/run.sh" && chmod +x "$APP/run.sh"
 # otherwise in Program in the home folder. A copy in the other place is removed.
 APPS=/Applications
 [ -w "$APPS" ] || { APPS="$HOME/Applications"; mkdir -p "$APPS"; }
-rm -rf "/Applications/Charlottendal TKL.app" "$HOME/Applications/Charlottendal TKL.app" 2>/dev/null || true
-osacompile -o "$APPS/Charlottendal TKL.app" "$SOURCE_DIR/packaging/mac/open-panel.applescript" >/dev/null
+rm -rf "/Applications/$APP_NAME.app" "$HOME/Applications/$APP_NAME.app" 2>/dev/null || true
+osacompile -o "$APPS/$APP_NAME.app" "$SOURCE_DIR/packaging/mac/open-panel.applescript" >/dev/null
 
 if [ -n "${CDA_TKL_NO_LAUNCHD:-}" ]; then
   echo "Startas inte (CDA_TKL_NO_LAUNCHD). Starta för hand med:  \"$APP/run.sh\""
@@ -101,8 +104,8 @@ if [ "$ok" != true ]; then
   exit 1
 fi
 echo
-echo "Charlottendal TKL $VERSION är installerad och startar när du loggar in."
+echo "$APP_NAME $VERSION är installerad och startar när du loggar in."
 echo "Ställverket:  http://127.0.0.1:8910   Anläggningssimulatorn:  http://127.0.0.1:8911"
-echo "Appen 'Charlottendal TKL' finns i $([ "$APPS" = /Applications ] && echo 'mappen Program' || echo 'mappen Program i din hemkatalog')."
+echo "Appen '$APP_NAME' finns i $([ "$APPS" = /Applications ] && echo 'mappen Program' || echo 'mappen Program i din hemkatalog')."
 echo "Uppdatera senare genom att köra installationsraden igen."
-open "$APPS/Charlottendal TKL.app" 2>/dev/null || true
+open "$APPS/$APP_NAME.app" 2>/dev/null || true

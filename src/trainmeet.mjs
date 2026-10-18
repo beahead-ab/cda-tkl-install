@@ -272,13 +272,29 @@ export class TrainMeet extends EventEmitter {
       return this.view();
     });
   }
-  async clearance(data){
+  // Automatens beslut får inte följa med en poll till en annan trafikdag, ett annat tåg eller en ny klarering.
+  // Kontrollen anropas inne i exclusive, efter väntande läsning. Manuella klienter behåller sitt befintliga kontrakt.
+  checkAutomationContext(data,context){
+    if(!Object.hasOwn(data,'contextRevision'))return false;
+    const expected=data.contextIdentity;
+    if(data.sessionId!==this.sessionId||data.revision!==this.revision||this.view().stale||
+      !Number.isSafeInteger(data.contextRevision)||data.contextRevision!==context.revision||!record(expected)||
+      expected.stationId!==context.station?.id||expected.publicationId!==context.publicationId||expected.day!==context.day)
+      fail('Automatens TrainMeet-underlag har ändrats. Operatören behöver kontrollera trafikläget.',409);
+    return true;
+  }
+  async clearance(data,{guard}={}){
     const action=data?.action,trainNumber=typeof data?.trainNumber==='string'?data.trainNumber.trim():'';
     if(!CLEARANCE_ACTIONS.includes(action))fail('Okänd klareringsåtgärd.');
     if(action==='request'&&!/^\d{1,10}$/.test(trainNumber))fail('Ange tågnumret med siffror.');
     return this.command(data,context=>{
       const line=(context.lines||[]).find(l=>l.id===data.connectionId);
       if(!line)fail('Sträckan hör inte till stationen.',409);
+      if(this.checkAutomationContext(data,context)){
+        if(!line.actions?.includes(action)||action!=='request'&&line.trainNumber!==trainNumber)
+          fail('Automatens klarering gäller inte längre samma tåg eller tillåtna åtgärd.',409);
+        guard?.();
+      }
       const number=action==='request'?trainNumber:line.trainNumber;
       return {path:'/v1/tkl/clearance',payload:{station_id:this.data.stationId,connection_id:line.id,action,train_number:action==='request'?trainNumber:''},journal:`Klarering ${CLEARANCE_JOURNAL[action]}${number?' · tåg '+number:''} · ${line.neighborName}.`};
     });
@@ -286,7 +302,7 @@ export class TrainMeet extends EventEmitter {
   // Movement declarations, the TMBox steps for one train: uppställt, förare på
   // plats, närmar sig, ankommit and an actual track. Unchanged fields are sent
   // with their current values so neither server path resets them.
-  async movement(data){
+  async movement(data,{guard}={}){
     const movementId=typeof data?.movementId==='string'?data.movementId:'';
     const departure=data?.departure==null?'':data.departure,arrival=data?.arrival==null?'':data.arrival,track=data?.actualTrack==null?'':data.actualTrack;
     if(!identity(movementId))fail('Ange vilken tågrörelse som avses.');
@@ -297,6 +313,10 @@ export class TrainMeet extends EventEmitter {
     return this.command(data,context=>{
       const train=(context.trains||[]).find(t=>t.id===movementId);
       if(!train)fail('Tågrörelsen finns inte på stationen i dag.',409);
+      if(this.checkAutomationContext(data,context)){
+        if(train.train_number!==data.trainNumber)fail('Automatens tågrörelse gäller inte längre samma tåg.',409);
+        guard?.();
+      }
       const current=(context.movements||[]).find(m=>m.id===movementId)||{};
       const payload={station_id:this.data.stationId,movement_id:movementId,departure:departure||current.departure||'none',arrival:arrival||current.arrival||'none',event_type:'tkl_'+(departure||arrival||'track_changed')};
       const actualTrack=track.trim()||current.track||train.track_id||'';if(actualTrack)payload.actual_track=actualTrack;

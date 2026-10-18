@@ -16,33 +16,13 @@ $ProgressPreference = 'SilentlyContinue'
 
 $Repository = 'beahead-ab/cda-tkl-install'
 $Branch = if ($env:CDA_TKL_BRANCH) { $env:CDA_TKL_BRANCH } else { 'main' }
-$App = if ($env:CDA_TKL_HOME) { $env:CDA_TKL_HOME } else { Join-Path $env:LOCALAPPDATA 'Charlottendal TKL' }
-$NodeDir = Join-Path $App 'node'
 $NodeMajor = 22
-$Temp = Join-Path ([IO.Path]::GetTempPath()) ('cda-tkl-' + [Guid]::NewGuid())
-New-Item -ItemType Directory -Force -Path $Temp, (Join-Path $App 'releases'), (Join-Path $App 'state'), (Join-Path $App 'logs') | Out-Null
+$Temp = Join-Path ([IO.Path]::GetTempPath()) ('tkl-' + [Guid]::NewGuid())
+New-Item -ItemType Directory -Force -Path $Temp | Out-Null
 
 function Get-File($Url, $Path, $Headers = @{}) { Invoke-WebRequest -UseBasicParsing -Uri $Url -OutFile $Path -Headers $Headers }
 
 try {
-  # Node.js 22 in our own folder; the system's Node (if any) is neither used nor changed.
-  $Arch = if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 'arm64' } else { 'x64' }
-  $Current = if (Test-Path (Join-Path $NodeDir 'node.exe')) { & (Join-Path $NodeDir 'node.exe') -p 'process.versions.node' } else { '' }
-  if (-not $Current.StartsWith("$NodeMajor.")) {
-    Write-Host "Hämtar Node.js $NodeMajor …"
-    $Base = "https://nodejs.org/dist/latest-v$NodeMajor.x"
-    Get-File "$Base/SHASUMS256.txt" (Join-Path $Temp 'SHASUMS256.txt')
-    $Line = Get-Content (Join-Path $Temp 'SHASUMS256.txt') | Where-Object { $_ -match "node-v[\d.]+-win-$Arch\.zip$" } | Select-Object -First 1
-    if (-not $Line) { throw "Hittade ingen Node.js $NodeMajor för win-$Arch." }
-    $Hash, $File = $Line -split '\s+'
-    $Zip = Join-Path $Temp $File
-    Get-File "$Base/$File" $Zip
-    if ((Get-FileHash -Algorithm SHA256 $Zip).Hash -ne $Hash.ToUpper()) { throw 'Node.js-filen stämmer inte med sin kontrollsumma.' }
-    Expand-Archive -Path $Zip -DestinationPath (Join-Path $Temp 'node') -Force
-    if (Test-Path $NodeDir) { Remove-Item -Recurse -Force $NodeDir }
-    Move-Item (Get-ChildItem (Join-Path $Temp 'node') -Directory | Select-Object -First 1).FullName $NodeDir
-  }
-
   # The package from GitHub, or from CDA_TKL_SOURCE (a folder or a .zip) for tests.
   if ($env:CDA_TKL_SOURCE -and (Test-Path $env:CDA_TKL_SOURCE -PathType Container)) {
     $Source = (Resolve-Path $env:CDA_TKL_SOURCE).Path
@@ -61,8 +41,36 @@ try {
     $Source = (Get-ChildItem (Join-Path $Temp 'package') -Directory | Select-Object -First 1).FullName
   }
   if (-not (Test-Path (Join-Path $Source 'src\server.mjs'))) { throw 'Installationspaketet är ofullständigt.' }
+  # Läs identiteten före kataloger och genvägar, så en annan station inte ersätter Charlottendal.
+  $Identity = @{ TKL_ID = 'cda-tkl'; TKL_NAME = 'Charlottendal'; TKL_STATION = 'charlottendal'; TKL_REPOSITORY = 'beahead-ab/cda-tkl-install' }
+  $IdentityFile = Join-Path $Source 'packaging\identity.env'
+  if (Test-Path $IdentityFile) { foreach ($Line in Get-Content $IdentityFile) { if ($Line -match '^(TKL_[A-Z_]+)=(.*)$') { $Identity[$Matches[1]] = $Matches[2].Trim() } } }
+  if ($Identity['TKL_ID'] -notmatch '^[a-z0-9-]+$') { throw 'Ogiltigt TKL_ID i packaging\identity.env.' }
+  $Name = $Identity['TKL_NAME'] + ' TKL'
+  $App = if ($env:CDA_TKL_HOME) { $env:CDA_TKL_HOME } else { Join-Path $env:LOCALAPPDATA $Name }
+  $NodeDir = Join-Path $App 'node'
+  New-Item -ItemType Directory -Force -Path (Join-Path $App 'releases'), (Join-Path $App 'state'), (Join-Path $App 'logs') | Out-Null
+
+  # Node.js 22 in our own folder; the system's Node (if any) is neither used nor changed.
+  $Arch = if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 'arm64' } else { 'x64' }
+  $Current = if (Test-Path (Join-Path $NodeDir 'node.exe')) { & (Join-Path $NodeDir 'node.exe') -p 'process.versions.node' } else { '' }
+  if (-not $Current.StartsWith("$NodeMajor.")) {
+    Write-Host "Hämtar Node.js $NodeMajor …"
+    $Base = "https://nodejs.org/dist/latest-v$NodeMajor.x"
+    Get-File "$Base/SHASUMS256.txt" (Join-Path $Temp 'SHASUMS256.txt')
+    $Line = Get-Content (Join-Path $Temp 'SHASUMS256.txt') | Where-Object { $_ -match "node-v[\d.]+-win-$Arch\.zip$" } | Select-Object -First 1
+    if (-not $Line) { throw "Hittade ingen Node.js $NodeMajor för win-$Arch." }
+    $Hash, $File = $Line -split '\s+'
+    $Zip = Join-Path $Temp $File
+    Get-File "$Base/$File" $Zip
+    if ((Get-FileHash -Algorithm SHA256 $Zip).Hash -ne $Hash.ToUpper()) { throw 'Node.js-filen stämmer inte med sin kontrollsumma.' }
+    Expand-Archive -Path $Zip -DestinationPath (Join-Path $Temp 'node') -Force
+    if (Test-Path $NodeDir) { Remove-Item -Recurse -Force $NodeDir }
+    Move-Item (Get-ChildItem (Join-Path $Temp 'node') -Directory | Select-Object -First 1).FullName $NodeDir
+  }
+
   $Version = (Get-Content (Join-Path $Source 'package.json') -Raw | ConvertFrom-Json).version
-  Write-Host "Installerar Charlottendal TKL $Version …"
+  Write-Host "Installerar $Name $Version …"
 
   # Each installation is a folder of its own; current.txt names the one in use.
   $Release = Join-Path $App ("releases\$Version-" + (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ'))
@@ -90,10 +98,6 @@ try {
       Set-Content -Path $EnvFile -Encoding UTF8
   }
   if (-not (Select-String -Path $EnvFile -Pattern '^CHARLOTTENDAL_INSTALL_KIND=' -Quiet)) { Add-Content -Path $EnvFile -Value 'CHARLOTTENDAL_INSTALL_KIND=windows' -Encoding UTF8 }
-  # En annan station än Charlottendal (packaging\identity.env): stationen och förrådet för uppdateringar.
-  $Identity = @{}
-  $IdentityFile = Join-Path $Source 'packaging\identity.env'
-  if (Test-Path $IdentityFile) { foreach ($Line in Get-Content $IdentityFile) { if ($Line -match '^(TKL_[A-Z_]+)=(.*)$') { $Identity[$Matches[1]] = $Matches[2].Trim() } } }
   if ($Identity['TKL_STATION'] -and $Identity['TKL_STATION'] -ne 'charlottendal' -and -not (Select-String -Path $EnvFile -Pattern '^CHARLOTTENDAL_STATION=' -Quiet)) { Add-Content -Path $EnvFile -Value ('CHARLOTTENDAL_STATION=' + $Identity['TKL_STATION']) -Encoding UTF8 }
   if ($Identity['TKL_REPOSITORY'] -and $Identity['TKL_REPOSITORY'] -ne 'beahead-ab/cda-tkl-install' -and -not (Select-String -Path $EnvFile -Pattern '^CHARLOTTENDAL_INSTALL_REPOSITORY=' -Quiet)) { Add-Content -Path $EnvFile -Value ('CHARLOTTENDAL_INSTALL_REPOSITORY=' + $Identity['TKL_REPOSITORY']) -Encoding UTF8 }
   Copy-Item -Force (Join-Path $Source 'packaging\windows\run.ps1') (Join-Path $App 'run.ps1')
@@ -101,7 +105,7 @@ try {
   # Started hidden at login (Startup folder; no administrator rights needed).
   $Shell = New-Object -ComObject WScript.Shell
   $PowerShell = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
-  $Startup = $Shell.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Startup')) 'Charlottendal TKL.lnk'))
+  $Startup = $Shell.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Startup')) "$Name.lnk"))
   $Startup.TargetPath = $PowerShell
   $Startup.Arguments = "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$(Join-Path $App 'run.ps1')`""
   $Startup.WindowStyle = 7
@@ -111,7 +115,7 @@ try {
   $Browser = @("${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe", "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe",
     "$env:ProgramFiles\Google\Chrome\Application\chrome.exe", "${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe",
     "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe") | Where-Object { $_ -and (Test-Path $_) } | Select-Object -First 1
-  $Panel = $Shell.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Desktop')) 'Charlottendal TKL.lnk'))
+  $Panel = $Shell.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Desktop')) "$Name.lnk"))
   if ($Browser) { $Panel.TargetPath = $Browser; $Panel.Arguments = '--app=http://127.0.0.1:8910/#panel' }
   else { $Panel.TargetPath = 'http://127.0.0.1:8910/#panel' }
   $Panel.Save()
@@ -136,10 +140,10 @@ try {
     throw 'Den nya versionen startade inte.'
   }
   Write-Host ''
-  Write-Host "Charlottendal TKL $Version är installerad och startar när du loggar in."
+  Write-Host "$Name $Version är installerad och startar när du loggar in."
   Write-Host 'Ställverket:  http://127.0.0.1:8910   Anläggningssimulatorn:  http://127.0.0.1:8911'
-  Write-Host "Genvägen 'Charlottendal TKL' finns på skrivbordet. Uppdatera genom att köra installationsraden igen."
-  Start-Process (Join-Path ([Environment]::GetFolderPath('Desktop')) 'Charlottendal TKL.lnk')
+  Write-Host "Genvägen '$Name' finns på skrivbordet. Uppdatera genom att köra installationsraden igen."
+  Start-Process (Join-Path ([Environment]::GetFolderPath('Desktop')) "$Name.lnk")
 }
 catch {
   Write-Host ''

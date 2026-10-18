@@ -14,7 +14,7 @@ import { json, body, staticFile } from './http.mjs';
 const fail = (message, status = 401) => Object.assign(Error(message), { status });
 // Vad som kräver en inloggad administratör i lokalt läge. Allt annat är operatörens: panelen, tågvägarna, klockan, TrainMeet-rörelser.
 const ADMIN_PAGES = new Set(['/studio.html']);
-const ADMIN_API = ['/api/connection/locobuffer', '/api/studio', '/api/ai', '/api/users', '/api/onboarding', '/api/bindings', '/api/recordings', '/api/update/', '/api/configuration/', '/api/destinations', '/api/note', '/api/trainmeet/connect', '/api/trainmeet/configure', '/api/trainmeet/pair', '/api/trainmeet/refresh', '/api/trainmeet/disconnect'];
+const ADMIN_API = ['/api/connection/locobuffer', '/api/installation/station', '/api/studio', '/api/ai', '/api/users', '/api/onboarding', '/api/bindings', '/api/recordings', '/api/update/', '/api/configuration/', '/api/destinations', '/api/note', '/api/trainmeet/connect', '/api/trainmeet/configure', '/api/trainmeet/pair', '/api/trainmeet/refresh', '/api/trainmeet/disconnect'];
 const STREAMDECK_OPERATOR = new Set(['/api/streamdeck/seen']);
 // Rangerarens inloggning ger bara rangerarens vy: sidorna, läsning och /api/ranger/ (docs/rangerlage.md).
 const isRangerRoute = (pathname, method) => ['GET', 'HEAD'].includes(method) ? !isAdminRoute(pathname) : pathname.startsWith('/api/ranger/') || pathname.startsWith('/api/auth/');

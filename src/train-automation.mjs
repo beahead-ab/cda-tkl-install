@@ -6,6 +6,7 @@
 // tåget stått på spåret DWELL_MS läggs utfarten. Vilket tåg som står var vet automaten ur tågspårningen.
 // Spår där tågvägen inte kan lösas upp vid ankomst (målspårets detektor täcker en växel i vägen, spår 6 och 10) väljs
 // inte, eftersom låsen då skulle ligga kvar.
+import { TimetableAutomationPolicy } from './automation-policy.mjs';
 export const DWELL_MS=30000;
 const STAND_MS=2000,STEP_MS=2500;
 const LINE_EDGES={A:['Au','An'],B:['Bu','Bn'],C:['Cu','Cn']};
@@ -20,9 +21,14 @@ export const TRACK_ORDER={
 export function throughLine(origin,turn){return origin==='B'?(turn%2?'C':'A'):'B';}
 
 export class TrainAutomation{
-  constructor({profile,available,reason='',request,edgeBlock,log=()=>{},now=Date.now}){
+  constructor({profile,available,reason='',request,edgeBlock,log=()=>{},now=Date.now,policy='legacy',traffic,clearance,movement}){
     Object.assign(this,{profile,available,reason,request,edgeBlock,log,now});
-    this.enabled=false;this.plans={};this.turn=0;this.lastAt=0;this.revision=0;this.last='';
+    this.enabled=false;this.generation=0;this.plans={};this.turn=0;this.lastAt=0;this.revision=0;this.last='';
+    if(policy==='trainmeet'){
+      this.timetablePolicy=new TimetableAutomationPolicy({automation:this,traffic,clearance,movement});
+      this.trackOf=this.timetablePolicy.trackOf;this.arrivals=this.timetablePolicy.arrivals;this.departures=this.timetablePolicy.departures;
+      return;
+    }
     const main=profile.routes.filter(r=>r.kind==='main'&&!r.adminDisabled);
     // Spårknappen för blocket där en infart slutar (SIA → htvSpIA).
     this.trackOf={};for(const r of main)if(r.to.startsWith('htvSp'))this.trackOf[r.blocks.at(-1)]=r.to;
@@ -32,13 +38,13 @@ export class TrainAutomation{
   }
   set(enabled){
     if(!this.available)fail(this.reason||'Automaten finns bara i simuleringsläge.');
-    this.enabled=!!enabled;this.revision++;
+    this.enabled=!!enabled;this.generation++;this.revision++;
     this.log('automation',this.enabled?'Automaten är på: datorn lägger tågvägarna. Du kan ta över när som helst.':'Automaten är av: du lägger tågvägarna.');
     return this.view();
   }
-  handOver(reason){this.enabled=false;this.revision++;this.last=reason;this.log('automation','Automaten lämnar över: '+reason);}
+  handOver(reason){this.enabled=false;this.generation++;this.revision++;this.last=reason;this.log('automation','Automaten lämnar över: '+reason);}
   // state: kärnans läge (blocks, routes, controls, connected); trains: tågspårningens tåg; outgoing: normal utfart per linje.
-  tick({state,trains=[],outgoing={}}){
+  tick({state,trains=[],outgoing={},meet,edges={}}){
     if(!this.enabled)return;
     const now=this.now();
     if(!state.connected)return this.handOver('ingen kontakt med banan.');
@@ -47,6 +53,7 @@ export class TrainAutomation{
     if(state.controls?.mode!=='local')return this.handOver('fjärrläge.');
     const held=state.routes.find(r=>['held','occupied'].includes(r.state));
     if(held)return this.handOver(`${held.label} hålls: ${held.reason}`);
+    if(this.timetablePolicy)return this.timetablePolicy.tick({state,trains,meet,edges,dwellMs:DWELL_MS,standMs:STAND_MS,stepMs:STEP_MS});
     if(now-this.lastAt<STEP_MS)return;
     const live=state.routes.filter(r=>LIVE.has(r.state)),inRoute=b=>live.some(r=>r.blocks.includes(b)),from=new Set(live.map(r=>r.from));
     const free=b=>state.blocks[b]?.occupied===false,claimed=new Set(trains.flatMap(t=>t.blocks));

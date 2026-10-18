@@ -5,8 +5,13 @@ import { signalReportKind } from './signal-report.mjs';
 
 // Independent field state: no Engine import, route state or TKL HTTP access.
 export class Field extends EventEmitter {
-  constructor(profile, { now = Date.now, movementMs = 650 } = {}) {
+  constructor(profile, { now = Date.now, movementMs = 650, traffic = null } = {}) {
     super(); this.profile = profile; this.now = now; this.movementMs = movementMs;
+    // Stationen anger linjekanter och uppställningsspår uttryckligen. Äldre modulprov behåller Charlottendals knappar.
+    this.traffic=traffic;
+    const edges=Object.keys(traffic?.edgeLines??{Au:'A',An:'A',Bu:'B',Bn:'B',Cu:'C',Cn:'C',D:'D'});
+    this.lineEdges=Object.fromEntries(edges.map(edge=>[traffic?.anchors?.[edge]?.button||'htv'+edge,edge]));
+    this.lineButtons=new Set(Object.keys(this.lineEdges));
     this.turnouts = Object.fromEntries(Object.keys(profile.turnouts).map(n => [n, { position: 'C', target: 'C', due: 0 }]));
     this.blocks = Object.fromEntries(Object.keys(profile.blocks).map(n => [n, false]));
     // En virtuell signal finns inte i anläggningen: ingen dekoder, ingen rapport. Tåget kör på panelens besked, så den räknas som kör här.
@@ -168,9 +173,11 @@ export class Field extends EventEmitter {
   // trafikspelets uppställda tåg ställs där.
   spawnTrain({number,at}={}) {
     if(typeof number!=='string'||!/^[\p{L}\p{N} ._/-]{1,24}$/u.test(number))throw Error('Ogiltigt tågnummer.');
-    const line=/^htv(Au|An|Bu|Bn|Cu|Cn)$/.test(at);
-    if(!line&&(typeof at!=='string'||/^htv(Au|An|Bu|Bn|Cu|Cn|D)$/.test(at)))throw Error('Okänd linje.');
-    const block=this.routes().find(s=>s.to===at)?.blocks.at(-1);if(!block)throw Error(line?'Linjen saknar block utanför infartssignalen.':'Okänt spår.');
+    const line=this.lineButtons.has(at);
+    if(typeof at!=='string'||line&&!this.routes().some(s=>s.from===at))throw Error('Okänd linje.');
+    const track=Object.values(this.traffic?.stationTracks||{}).find(t=>t.button===at);
+    const block=line&&this.traffic?this.traffic.edgeBlocks[this.lineEdges[at]]:track?.block??this.routes().find(s=>s.to===at)?.blocks.at(-1);
+    if(!block||!this.profile.blocks[block])throw Error(line?'Linjen saknar block utanför infartssignalen.':'Okänt spår.');
     const address=this.profile.blocks[block].address;
     if(this.blocks[block]||this.trains.some(t=>t.blocks.some(n=>this.profile.blocks[n].address===address)))throw Error(line?'Linjen är belagd.':'Spåret är belagt.');
     if(this.trains.some(t=>t.number===number))throw Error(`Tåg ${number} finns redan.`);
@@ -212,7 +219,7 @@ export class Field extends EventEmitter {
     if (t.index < t.blocks.length) this.updateBlock(t.blocks[t.index],true);
     if (t.index >= 2) this.updateBlock(t.blocks[t.index-2],false);
     // Framme på ett spår på stationen: tåget står kvar i sista blocket. Ut på en linje lämnar det anläggningen.
-    if (t.park && t.index === t.blocks.length && !/^htv(Au|An|Bu|Bn|Cu|Cn|D)$/.test(t.to)) {
+    if (t.park && t.index === t.blocks.length && !this.lineButtons.has(t.to)) {
       Object.assign(t,{blocks:[t.blocks.at(-1)],index:0,standing:true,position:t.to,waiting:'Står på '+t.label.split(' → ').at(-1),nextAt:this.now()+1500});
       return;
     }

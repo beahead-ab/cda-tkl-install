@@ -109,9 +109,13 @@ export function parseHash(hash){
   return {tab,view,sets:(params.get('set')||'').split(',').filter(s=>SETS.some(x=>x.id===s)),object:params.get('objekt')||null};
 }
 // Geometrin ur panel.json, ritad av Studios egen kod. Ramen och dekorationerna utgår.
-export function planGeometry(panel,undetected=new Set()){
-  const road=new Set(['v1','v2','v3','v4']),skip=new Set(['frame','friline']);
-  const segments=panel.segs.filter(s=>!s.hide&&!skip.has(s.b)&&Math.max(s.y1,s.y2)<=820).map(s=>({id:s.id,block:s.b,x1:s.x1,y1:s.y1,x2:s.x2,y2:s.y2,road:road.has(s.b),undetected:undetected.has(s.b)}));
+// Charlottendals plan visas i en fast ram (andra panelen under y 820 utgår); en annan station får ramen ur sin ritning.
+export const CHARLOTTENDAL_FRAME={viewBox:[20,130,2100,690],maxY:820,labelMaxY:800};
+// Ramen runt alla punkter, med marginal för texter och signaler.
+const fitFrame=points=>{const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]),pad=40;const x=Math.min(...xs)-pad,y=Math.min(...ys)-pad;return [Math.floor(x),Math.floor(y),Math.ceil(Math.max(...xs)-x+pad),Math.ceil(Math.max(...ys)-y+pad)];};
+export function planGeometry(panel,undetected=new Set(),frame=CHARLOTTENDAL_FRAME){
+  const road=new Set(['v1','v2','v3','v4']),skip=new Set(['frame','friline']),maxY=frame?.maxY??Infinity,labelMaxY=frame?.labelMaxY??Infinity;
+  const segments=panel.segs.filter(s=>!s.hide&&!skip.has(s.b)&&Math.max(s.y1,s.y2)<=maxY).map(s=>({id:s.id,block:s.b,x1:s.x1,y1:s.y1,x2:s.x2,y2:s.y2,road:road.has(s.b),undetected:undetected.has(s.b)}));
   const legs=[],turnouts=[];
   for(const t of Object.values(panel.turnouts)){
     turnouts.push({name:t.name,cx:t.cx,cy:t.cy,block:t.block,undetected:undetected.has(t.block)});
@@ -120,6 +124,8 @@ export function planGeometry(panel,undetected=new Set()){
   const blockCentroid={};
   for(const s of segments){if(s.road)continue;const c=blockCentroid[s.block]??={sx:0,sy:0,n:0};c.sx+=s.x1+s.x2;c.sy+=s.y1+s.y2;c.n+=2;}
   const blockLabels=Object.entries(blockCentroid).map(([block,c])=>({block,x:c.sx/c.n,y:c.sy/c.n}));
-  const labels=panel.labels.filter(l=>!l.hidden&&l.y<=800&&l.text.trim()).map(l=>({x:l.x,y:l.y,text:l.text.trim().replace(/</g,'‹').replace(/>/g,'›')}));
-  return {viewBox:[20,130,2100,690],segments,legs,turnouts,signals:panel.micons.map(m=>({mast:m.mast,x:m.x,y:m.y})),labels,blockLabels,turntable:panel.turntable,crossings:Object.entries(panel.xings).map(([id,x])=>({id,cx:x.cx,cy:x.cy}))};
+  const labels=panel.labels.filter(l=>!l.hidden&&l.y<=labelMaxY&&l.text.trim()).map(l=>({x:l.x,y:l.y,text:l.text.trim().replace(/</g,'‹').replace(/>/g,'›')}));
+  const signals=panel.micons.map(m=>({mast:m.mast,x:m.x,y:m.y}));
+  return {viewBox:frame?.viewBox||fitFrame([...segments.flatMap(s=>[[s.x1,s.y1],[s.x2,s.y2]]),...turnouts.map(t=>[t.cx,t.cy]),...signals.map(m=>[m.x,m.y]),...labels.map(l=>[l.x,l.y])]),
+    segments,legs,turnouts,signals,labels,blockLabels,turntable:panel.turntable||null,crossings:Object.entries(panel.xings).map(([id,x])=>({id,cx:x.cx,cy:x.cy}))};
 }

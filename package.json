@@ -1,6 +1,6 @@
 {
   "name": "charlottendal-tkl",
-  "version": "0.81.1",
+  "version": "0.82.0",
   "private": true,
   "type": "module",
   "description": "Charlottendal TKL och en separat LocoNet-anläggningssimulator",
@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "node scripts/start.mjs",
+    "start:trakvista": "node scripts/start.mjs trakvista",
     "backend": "node src/server.mjs",
     "simulator": "node src/simulator.mjs",
     "test": "node --test test/*.test.mjs",
@@ -18,8 +19,11 @@
     "test:integration": "node --test test/integration.mjs test/password-integration.mjs test/serial-integration.mjs test/trainmeet-integration.mjs test/panel-reset-integration.mjs test/yard-integration.mjs test/tracking-integration.mjs test/live-offline-integration.mjs",
     "import:xml": "python3 scripts/import-source.py",
     "verify:xml": "python3 scripts/verify-source.py",
+    "verify:layout": "python3 scripts/import-layout.py public/data/source/Cda60.xml --compare public/data/panel.json",
     "import:operations": "python3 scripts/import-operations.py && node scripts/make-network-profile.mjs && node scripts/make-rules.mjs && node scripts/make-migration.mjs && node scripts/make-train-fields.mjs && python3 scripts/make-signal-catalog.py && node scripts/make-indications.mjs && node scripts/make-signal-endpoints.mjs",
-    "verify:operations": "python3 scripts/import-operations.py --check && node scripts/make-network-profile.mjs --check && node scripts/make-rules.mjs --check && node scripts/make-migration.mjs --check && node scripts/make-train-fields.mjs --check && python3 scripts/make-signal-catalog.py --check && node scripts/make-indications.mjs --check && node scripts/make-signal-endpoints.mjs --check"
+    "verify:operations": "python3 scripts/import-operations.py --check && node scripts/make-network-profile.mjs --check && node scripts/make-rules.mjs --check && node scripts/make-migration.mjs --check && node scripts/make-train-fields.mjs --check && python3 scripts/make-signal-catalog.py --check && node scripts/make-indications.mjs --check && node scripts/make-signal-endpoints.mjs --check",
+    "import:trakvista": "python3 scripts/import-source.py --source stations/trakvista/Trakvista.xml --out stations/trakvista/data/source && python3 scripts/import-layout.py stations/trakvista/Trakvista.xml --panel Träkvista --station stations/trakvista/station.json --out stations/trakvista/data/panel.json && python3 scripts/import-logixng.py stations/trakvista && node scripts/make-station-profile.mjs stations/trakvista",
+    "verify:trakvista": "python3 scripts/import-source.py --source stations/trakvista/Trakvista.xml --out stations/trakvista/data/source --check >/dev/null && python3 scripts/import-layout.py stations/trakvista/Trakvista.xml --panel Träkvista --station stations/trakvista/station.json --out stations/trakvista/data/panel.json --check && python3 scripts/import-logixng.py stations/trakvista --check && node scripts/make-station-profile.mjs stations/trakvista --check"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.131.0",

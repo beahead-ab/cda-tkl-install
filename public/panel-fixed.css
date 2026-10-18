@@ -395,6 +395,8 @@ body.panel-app .panel-shell{--rail:var(--track-side);--rail-unknown:var(--track-
 #track-plan{font-family:var(--font-mono)}
 #track-plan .rail{stroke:var(--track-side);stroke-width:var(--track-w);stroke-linecap:round}
 #track-plan .rail.main{stroke:var(--track-main)}
+/* Lokalt styrt spår (Träkvista): ofyllt, som i Bennys JMRI-panel. Kanten följer spårets tillstånd, mitten är tom. */
+#track-plan .rail-hollow{stroke:#000;stroke-width:calc(var(--track-w) * .5);stroke-linecap:round;pointer-events:none}
 #track-plan .rail.unconfigured{stroke:var(--track-off)}
 #track-plan .rail.occupied{stroke:var(--red)!important;stroke-width:var(--track-w-state);stroke-dasharray:none}
 #track-plan .rail.unknown:not(.turnout-base){stroke:var(--yellow);stroke-width:var(--track-w);stroke-dasharray:var(--track-dash-unknown)}

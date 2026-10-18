@@ -47,7 +47,7 @@ export function createClearance({api,message,onRequest,onAttention}) {
   }
   function render(){
     const c=tm.context,stale=!online||tm.stale;
-    $('status').innerHTML=!tm.paired?'Parkoppla med TrainMeet under <a href="#trainmeet">Inställningar → TrainMeet</a> innan stationen kan klarera tåg.':!c?'Väntar på TrainMeets stationskontext…':`${esc(c.station.name)} · ${esc(c.meet)} · ${esc(c.day)} · TrainMeet-klocka ${esc(c.clock.time.slice(0,5))}${stale?' · <strong>kontakt saknas, gamla uppgifter</strong>':''}`;
+    $('status').innerHTML=!tm.paired?'Anslut till TrainMeet med serverns adress och kod under <a href="#trainmeet">Inställningar → TrainMeet</a> innan stationen kan klarera tåg.':!c?'Väntar på TrainMeets stationskontext…':`${esc(c.station.name)} · ${esc(c.meet)} · ${esc(c.day)} · TrainMeet-klocka ${esc(c.clock.time.slice(0,5))}${stale?' · <strong>kontakt saknas, gamla uppgifter</strong>':''}`;
     $('lines').hidden=!c;root.querySelector('.cl-trains').hidden=!c;
     if(!c){lastLines=lastRows='';$('lines').innerHTML='';$('trains').querySelector('tbody').innerHTML='';controls();return;}
     // A request from a neighbour waits for an answer: its card comes first, so it is never scrolled away.

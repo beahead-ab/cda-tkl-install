@@ -35,7 +35,7 @@ fi
 
 RELEASE="$APP/releases/$VERSION-$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$RELEASE"
-for item in package.json package-lock.json public src scripts profiles; do
+for item in package.json package-lock.json public src scripts profiles stations; do
   [ -e "$SOURCE_DIR/$item" ] && cp -R "$SOURCE_DIR/$item" "$RELEASE/"
 done
 echo "Installerar beroenden …"
@@ -49,6 +49,11 @@ if [ ! -f "$APP/app.env" ]; then
   sed -e "s|^CHARLOTTENDAL_STATE_DIR=.*|CHARLOTTENDAL_STATE_DIR=\"$APP/state\"|" -e "s|^CHARLOTTENDAL_INSTALL_KIND=.*|CHARLOTTENDAL_INSTALL_KIND=mac|" "$SOURCE_DIR/packaging/raspberry-pi/app.env" > "$APP/app.env"
 fi
 grep -q '^CHARLOTTENDAL_INSTALL_KIND=' "$APP/app.env" || printf '\nCHARLOTTENDAL_INSTALL_KIND=mac\n' >> "$APP/app.env"
+# En annan station än Charlottendal (packaging/identity.env): stationen och förrådet för uppdateringar.
+TKL_STATION=charlottendal TKL_REPOSITORY=beahead-ab/cda-tkl-install
+[ -f "$SOURCE_DIR/packaging/identity.env" ] && . "$SOURCE_DIR/packaging/identity.env"
+[ "$TKL_STATION" = charlottendal ] || grep -q '^CHARLOTTENDAL_STATION=' "$APP/app.env" || printf 'CHARLOTTENDAL_STATION=%s\n' "$TKL_STATION" >> "$APP/app.env"
+[ "$TKL_REPOSITORY" = beahead-ab/cda-tkl-install ] || grep -q '^CHARLOTTENDAL_INSTALL_REPOSITORY=' "$APP/app.env" || printf 'CHARLOTTENDAL_INSTALL_REPOSITORY=%s\n' "$TKL_REPOSITORY" >> "$APP/app.env"
 # "Application Support" has a space: run.sh sources app.env, so the value must be quoted.
 # Installations from before 0.50.1 wrote it unquoted, and TKL then kept its data in the
 # release's own var folder. Quote it, and bring that data into state once.

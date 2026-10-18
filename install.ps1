@@ -67,7 +67,7 @@ try {
   # Each installation is a folder of its own; current.txt names the one in use.
   $Release = Join-Path $App ("releases\$Version-" + (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ'))
   New-Item -ItemType Directory -Force -Path $Release | Out-Null
-  foreach ($Item in 'package.json', 'package-lock.json', 'public', 'src', 'scripts', 'profiles') {
+  foreach ($Item in 'package.json', 'package-lock.json', 'public', 'src', 'scripts', 'profiles', 'stations') {
     $Path = Join-Path $Source $Item
     if (Test-Path $Path) { Copy-Item -Recurse -Force $Path $Release }
   }
@@ -90,6 +90,12 @@ try {
       Set-Content -Path $EnvFile -Encoding UTF8
   }
   if (-not (Select-String -Path $EnvFile -Pattern '^CHARLOTTENDAL_INSTALL_KIND=' -Quiet)) { Add-Content -Path $EnvFile -Value 'CHARLOTTENDAL_INSTALL_KIND=windows' -Encoding UTF8 }
+  # En annan station än Charlottendal (packaging\identity.env): stationen och förrådet för uppdateringar.
+  $Identity = @{}
+  $IdentityFile = Join-Path $Source 'packaging\identity.env'
+  if (Test-Path $IdentityFile) { foreach ($Line in Get-Content $IdentityFile) { if ($Line -match '^(TKL_[A-Z_]+)=(.*)$') { $Identity[$Matches[1]] = $Matches[2].Trim() } } }
+  if ($Identity['TKL_STATION'] -and $Identity['TKL_STATION'] -ne 'charlottendal' -and -not (Select-String -Path $EnvFile -Pattern '^CHARLOTTENDAL_STATION=' -Quiet)) { Add-Content -Path $EnvFile -Value ('CHARLOTTENDAL_STATION=' + $Identity['TKL_STATION']) -Encoding UTF8 }
+  if ($Identity['TKL_REPOSITORY'] -and $Identity['TKL_REPOSITORY'] -ne 'beahead-ab/cda-tkl-install' -and -not (Select-String -Path $EnvFile -Pattern '^CHARLOTTENDAL_INSTALL_REPOSITORY=' -Quiet)) { Add-Content -Path $EnvFile -Value ('CHARLOTTENDAL_INSTALL_REPOSITORY=' + $Identity['TKL_REPOSITORY']) -Encoding UTF8 }
   Copy-Item -Force (Join-Path $Source 'packaging\windows\run.ps1') (Join-Path $App 'run.ps1')
 
   # Started hidden at login (Startup folder; no administrator rights needed).

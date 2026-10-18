@@ -1,0 +1,20 @@
+# Proven i en stations eget förråd (till exempel Tk-TKL), på varje pull request och varje ändring av main.
+# deploy/publish-station.sh lägger den här filen i .github/workflows/prov.yml; ändra den i cda-tkl.
+name: Prov
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  prov:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm test
+      # Stationens genererade filer ska stämma med källan (Trakvista.xml, CSV-tabellerna, station.json).
+      - run: npm run --if-present "verify:$(sed -n 's/^TKL_STATION=//p' packaging/identity.env)"

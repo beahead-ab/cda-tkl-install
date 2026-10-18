@@ -40,16 +40,23 @@ export function buildTrackGraph(panel,profile){
     for(const leg of ['A','B','C']){const seg=t['c'+leg.toLowerCase()];if(seg)link('s:'+seg,'t:'+id,leg==='A'?null:{turnout:t.name,position:leg===closed?'C':'T'});}
   }
   for(const [id,x] of Object.entries(panel.xings||{}))for(const [legs,path] of [[['ca','cc'],'AC'],[['cb','cd'],'BD']])for(const leg of legs)if(x[leg])link('s:'+x[leg],'x:'+id+':'+path);
+  // Korsningsväxeln (Träkvistas 22a/23): en nod per tillåten förbindelse, med båda växlarnas lägen som villkor.
+  for(const [id,sl] of Object.entries(panel.slips||{}))for(const [pair,st] of Object.entries(sl.states||{})){
+    const node='l:'+id+':'+pair,conds=[{turnout:sl.name,position:st.turnout===4?'T':'C'},{turnout:sl.name2,position:st.turnoutB===4?'T':'C'}];add(node,sl.block);
+    for(const leg of pair.split('-')){const seg=sl['c'+leg.toLowerCase()];if(seg&&nodes.has('s:'+seg)){nodes.get('s:'+seg).edges.push({to:node,cond:null});nodes.get(node).edges.push({to:'s:'+seg,cond:null});}}
+    // Villkoret ligger på passagen genom noden: båda lägena måste stämma för att tåget ska gå den här förbindelsen.
+    nodes.get(node).conds=conds;
+  }
   // Komprimera till block: från varje nod i ett block, genom noder utan block, till närmaste andra block.
   const edges={};
   for(const [id,n] of nodes){
     if(!n.block)continue;
-    const queue=[[id,[]]],seen=new Set([id]);
+    const queue=[[id,n.conds||[]]],seen=new Set([id]);
     while(queue.length){
       const [current,conds]=queue.shift();
       for(const e of nodes.get(current).edges){
         if(seen.has(e.to))continue;seen.add(e.to);
-        const next=nodes.get(e.to),path=e.cond?[...conds,e.cond]:conds;
+        const next=nodes.get(e.to),path=[...conds,...(e.cond?[e.cond]:[]),...(next.conds||[])];
         if(next.block===n.block)continue;
         if(next.block){const map=(edges[n.block]??=new Map());const list=map.get(next.block)||[];if(!list.some(c=>JSON.stringify(c)===JSON.stringify(path)))list.push(path);map.set(next.block,list);continue;}
         queue.push([e.to,path]);
@@ -195,7 +202,9 @@ export class TrainTracker{
       const component=[start],queue=[start];used.add(start);
       while(queue.length){const b=queue.shift();for(const n of this.neighbours(b))if(fresh.includes(n)&&!used.has(n)&&!component.some(c=>this.shares(c,n))){used.add(n);component.push(n);queue.push(n);}}
       for(const b of fresh)if(!used.has(b)&&component.some(c=>this.shares(c,b)))used.add(b);
-      const ghost=this.trains.find(t=>t.state==='ghost'&&component.some(b=>b===t.lastBlock||this.adjacent(t.lastBlock,b)));
+      // Ett tåg som TKL själv just ställt här (trafikspelet) är inte ett tåg som stod här förut.
+      const placed=component.some(b=>this.expected?.[b]?.until>=now);
+      const ghost=!placed&&this.trains.find(t=>t.state==='ghost'&&component.some(b=>b===t.lastBlock||this.adjacent(t.lastBlock,b)));
       // Samma tåg som stod på spår utan avkänning, troligen; osäkert tills operatören bekräftat.
       if(ghost){ghost.state='station';ghost.certain=false;ghost.body=this.order(component);ghost.movedAt=now;for(const b of component)ghost.entered[b]=now;this.log('train-tracking',`Tåg ${ghost.number||ghost.label} syns igen vid ${ghost.head}.`);continue;}
       const edge=component.map(b=>this.edgeOf[b]).find(Boolean),body=this.order(component,edge);
@@ -262,6 +271,12 @@ export class TrainTracker{
     if(this.trains.some(o=>o!==t&&o.number===value))throw Object.assign(Error(`Tåg ${value} finns redan i spårningen.`),{status:409});
     t.number=value;t.label=value;t.certain=true;t.source='operatör';this.revision++;
     this.log('train-tracking',`Tåg ${value} bekräftat av operatören vid ${t.head}.`);return this.view();
+  }
+  // Ett av trafikspelets tåg som TKL tagit bort från banan (0.82.0): spårningen glömmer det helt.
+  forget(number){
+    const count=this.trains.length+this.lineTrains.length;
+    this.trains=this.trains.filter(t=>t.number!==number);this.lineTrains=this.lineTrains.filter(t=>t.number!==number);
+    if(this.trains.length+this.lineTrains.length!==count)this.revision++;
   }
   remove(id){
     const before=this.trains.length;this.trains=this.trains.filter(t=>t.id!==id);this.lineTrains=this.lineTrains.filter(t=>t.id!==id);

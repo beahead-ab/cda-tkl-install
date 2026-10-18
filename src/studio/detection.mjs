@@ -17,7 +17,11 @@ export function detectionInventory({ profile, xml }) {
   // En regel kan läsa en annan intern sensor i stället för ingången: S100a läser slS100, som regeln S100 sätter från LS60
   // (C77 och C24). Då följs kedjan till de fysiska ingångarna.
   const inputsOf = (src, seen = new Set()) => { const out = []; seen.add(src); for (const r of rules[src] || []) for (const v of r.variables) if ((v.type === 1 || v.type === 2) && !isButton(v)) { const p = physical(v.name); const found = p ? [p] : rules[v.name] && !seen.has(v.name) ? inputsOf(v.name, seen) : []; for (const f of found) if (!out.includes(f)) out.push(f); } return out; };
-  const shapeOf = src => {
+  // LogixNG (Träkvista): filen har inga Logix-villkor, och importören har redan följt reglerna till ingångarna, som står
+  // i profilen (sourceInputs). Charlottendals Logix följs här, som förut.
+  const logixng = !xml.conditionals.length, fromProfile = b => logixng && b.sourceInputs?.length ? b.sourceInputs : null;
+  const shapeOf = (src, b) => {
+    const given = fromProfile(b); if (given) return given.length === 1 ? 'single' : b.logic === 'all' ? 'all' : 'any';
     const rs = rules[src]; if (!rs) return 'noRule';
     const r = rs.find(x => !x.variables.some(isButton)) || rs[0];
     if (r.variables.some(v => v.type === 3 || v.type === 4)) return 'turnoutPart';
@@ -27,16 +31,16 @@ export function detectionInventory({ profile, xml }) {
   };
   const sections = Object.entries(profile.blocks).map(([name, b]) => {
     const src = b.sourceSensor || null;
-    const inputs = src ? inputsOf(src) : [];
+    const inputs = src ? fromProfile(b) || inputsOf(src) : [];
     // bound: profilen använder redan exakt dessa LS-nummer som adresser, så ingen detekteringsregel behöver föreslås.
     const bound = inputs.length > 0 && JSON.stringify((b.inputs || [b]).map(i => i.address)) === JSON.stringify(inputs.map(p => Number(p.slice(2))));
-    return { name, sourceSensor: src, shape: src ? shapeOf(src) : 'noSensor', inputs, inputDetails: inputs.map(p => ({ system: p, user: sensors[p].user, module: moduleOf(sensors[p].comment)?.name || null })),
+    return { name, sourceSensor: src, shape: src ? shapeOf(src, b) : 'noSensor', inputs, inputDetails: inputs.map(p => ({ system: p, user: sensors[p]?.user || null, module: moduleOf(sensors[p]?.comment)?.name || null })),
       address: b.address, activeMeansOccupied: b.activeMeansOccupied, bound,
       blockedByButton: !!(src && (rules[src] || []).some(r => r.variables.some(isButton))), track: !TRACKLESS(name) };
   });
   const bySource = {}; for (const s of sections) if (s.sourceSensor) bySource[s.sourceSensor] = (bySource[s.sourceSensor] || 0) + 1;
   for (const s of sections) s.sharedWith = s.sourceSensor ? bySource[s.sourceSensor] : 0;
-  const used = {}; for (const src of Object.keys(bySource)) for (const p of inputsOf(src)) used[p] = (used[p] || 0) + 1;
+  const used = {}; for (const src of Object.keys(bySource)) for (const p of sections.find(s => s.sourceSensor === src).inputs) used[p] = (used[p] || 0) + 1;
   const all = xml.sensors.filter(s => s.system.startsWith('LS')).map(s => s.system);
   const namedBlock = ls => { const m = /,\s*(\S.*)$/.exec(sensors[ls].comment || ''); return m ? m[1].trim() : null; };
   const unbound = all.filter(s => !used[s]).map(s => ({ system: s, user: sensors[s].user, comment: sensors[s].comment, module: moduleOf(sensors[s].comment)?.name || null, namedBlock: namedBlock(s) }));

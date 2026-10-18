@@ -11,8 +11,13 @@
 # CDA_TKL_SOURCE=/path/to/package.tar.gz or a directory installs from there instead (tests).
 set -eu
 
+# Förrådet och namnet för den här installationen. Charlottendal: cda-tkl-install. En annan station har sitt eget
+# förråd med samma skript (Träkvista: beahead-ab/Tk-TKL); packaging/identity.env i paketet säger resten.
 REPOSITORY="beahead-ab/cda-tkl-install"
+NAME="Charlottendal TKL"
 BRANCH="${CDA_TKL_BRANCH:-main}"
+# Ett privat förråd läses med en token: TKL_TOKEN eller CDA_TKL_TOKEN.
+CDA_TKL_TOKEN="${TKL_TOKEN:-${CDA_TKL_TOKEN:-}}"
 INSTALLER="scripts/install-raspberry-pi.sh"
 TEMP_DIR=$(mktemp -d)
 cleanup() { rm -rf "$TEMP_DIR"; }
@@ -51,7 +56,7 @@ else
   if [ -n "$SOURCE" ]; then
     cp "$SOURCE" "$ARCHIVE"
   else
-    echo "Hämtar Charlottendal TKL …"
+    echo "Hämtar $NAME …"
     if [ -n "${CDA_TKL_TOKEN:-}" ]; then
       URL="https://api.github.com/repos/${REPOSITORY}/tarball/${BRANCH}"
       set -- -H "Authorization: Bearer ${CDA_TKL_TOKEN}" -H "Accept: application/vnd.github+json"
@@ -61,7 +66,7 @@ else
     fi
     if ! curl -fsSL "$@" "$URL" -o "$ARCHIVE"; then
       echo
-      echo "Kunde inte hämta Charlottendal TKL från GitHub."
+      echo "Kunde inte hämta $NAME från GitHub."
       echo "Kontrollera internetanslutningen, och att CDA_TKL_TOKEN är satt om förrådet är privat."
       exit 1
     fi

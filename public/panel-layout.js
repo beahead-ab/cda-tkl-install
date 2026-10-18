@@ -22,7 +22,7 @@ export function panelLayout(panel) {
     }
     return { ...source, index, centerX: x, centerY: y };
   }).filter(c => !c.hidden && c.y < 840);
-  const buttons = controls.filter(c => (c.act || '').includes('S-on') || c.sensor.startsWith('tvv'));
+  const buttons = controls.filter(c => (c.act || '').includes('S-on') || /^(tvv|vtv)/.test(c.sensor));
   for (const b of buttons) {
     let distance = Infinity;
     for (const other of buttons) if (other.index !== b.index) distance = Math.min(distance, Math.hypot(other.centerX - b.centerX, other.centerY - b.centerY));

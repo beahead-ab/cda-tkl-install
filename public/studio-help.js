@@ -2,10 +2,11 @@
 // i sidhuvudet eller tangenten ?, stängs med × eller Escape. Den aktiva fliken är utfälld. Texterna är data (HELP) så att de
 // kan provas utan DOM.
 import {esc} from './studio-ui.js';
+import {forStation} from './studio-station.js';
 export const HELP=[
   {id:'plan',n:1,title:'Konfigurera · Stationsplan',match:({tab,view})=>tab==='konfigurera'&&!view,
    paragraphs:['Hela stationen ritad ur panel.json. <b>Klicka</b> på en växel, signal eller spårledning: panelen till höger visar adress, modul, tågvägar och avvikelser för just det objektet, och leder vidare till Data och Mät objekt.',
-     '<b>Gå igenom</b> stegar från vänster till höger genom alla 115 växlar och signaler med ‹ och ›. Använd den när hela stationen ska gås igenom utan att något missas.',
+     '<b>Gå igenom</b> stegar från vänster till höger genom alla växlar och signaler med ‹ och ›. Använd den när hela stationen ska gås igenom utan att något missas.',
      '<b>Lager</b> tänder och släcker växelnummer, signalnamn, spårledningar, adresser, MGP-modul och avvikelser. Röd punkt är en avvikelse; streckat spår saknar detektering i källan.',
      '<b>Höjd</b> visar hela stationen i fönstret, <b>Bredd</b> fyller bredden, − och + zoomar; dra i planen för att flytta, klicka i minikartan för att hoppa. <b>Panel</b> fäller in objektet och avvikelserna när planen behöver hela bredden.']},
   {id:'data',n:2,title:'Data',match:({tab})=>tab==='data',
@@ -41,7 +42,7 @@ export function createHelp({button,getState}){
   const panel=document.createElement('aside');panel.id='st-help';panel.className='st-help';panel.setAttribute('aria-label','Hjälp');panel.hidden=true;document.body.append(panel);
   let openedFrom=null;
   const isOpen=()=>!panel.hidden;
-  function open(){panel.innerHTML=helpHtml(getState());panel.hidden=false;button.setAttribute('aria-pressed','true');openedFrom=document.activeElement;panel.querySelector('#st-help-close').focus();}
+  function open(){panel.innerHTML=forStation(helpHtml(getState()));panel.hidden=false;button.setAttribute('aria-pressed','true');openedFrom=document.activeElement;panel.querySelector('#st-help-close').focus();}
   function close(){if(!isOpen())return;panel.hidden=true;button.setAttribute('aria-pressed','false');(openedFrom&&openedFrom!==document.body?openedFrom:button).focus?.();}
   button.addEventListener('click',()=>isOpen()?close():open());
   panel.addEventListener('click',e=>{if(e.target.closest('#st-help-close'))close();});

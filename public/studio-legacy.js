@@ -10,6 +10,7 @@ import {createBindingConfiguration} from './binding-configuration.js';
 import {createSourceRegister} from './source-register.js';
 import {esc} from './studio-ui.js';
 import {LEGACY_VIEWS} from './studio-legacy-views.js';
+import {forStation} from './studio-station.js';
 export {isLegacyView} from './studio-legacy-views.js';
 embedAdminWorkspaces();
 const get=u=>fetch(u).then(r=>{if([401,428].includes(r.status)){location.assign('/login?next='+encodeURIComponent(location.pathname+location.hash));throw Error('Inloggning krävs.');}if(!r.ok)throw Error(u+': '+r.status);return r.json();});
@@ -47,7 +48,7 @@ export function createLegacyHost(){
     registerRoot=document.createElement('div');registerRoot.className='st-legacy';
     // Källfilens kort (importkontroll, avsnitt, sök i hela XML-filen, profilens antal) ligger hopfällda överst, så att
     // registret syns direkt.
-    registerRoot.innerHTML='<details class="st-legacy-about" data-legacy="xml"><summary>Källfilen Cda60.xml <span>importkontroll, avsnitt och sök i hela XML-filen</span></summary><div id="advanced-xml-content"></div></details><div id="admin-view" data-legacy="register"></div><div id="advanced-migration-content" data-legacy="migration"></div>';
+    registerRoot.innerHTML='<details class="st-legacy-about" data-legacy="xml"><summary>Källfilen '+esc(forStation('Cda60.xml'))+' <span>importkontroll, avsnitt och sök i hela XML-filen</span></summary><div id="advanced-xml-content"></div></details><div id="admin-view" data-legacy="register"></div><div id="advanced-migration-content" data-legacy="migration"></div>';
     slot.replaceChildren(registerRoot);
     const [c,p]=await Promise.all([configOnce(),panelOnce()]);
     register=createSourceRegister({config:c,panel:p,editors:false,onActive:()=>{},saveNote:async(key,note)=>{try{const r=await fetch('/api/note',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key,note})});return r.ok;}catch{return false;}}});
@@ -57,7 +58,7 @@ export function createLegacyHost(){
   }
   async function render(main,tab,view){
     const key=tab+'/'+view,info=LEGACY_VIEWS[key];
-    main.innerHTML=`<div class="st-title"><div><div class="st-eyebrow">${esc(info.eyebrow)}</div><h1>${esc(info.title)}</h1><p>${esc(info.text)}</p></div></div><div class="st-legacy-slot"><p class="st-loading">Läser…</p></div>`;
+    main.innerHTML=`<div class="st-title"><div><div class="st-eyebrow">${esc(info.eyebrow)}</div><h1>${esc(info.title)}</h1><p>${esc(forStation(info.text))}</p></div></div><div class="st-legacy-slot"><p class="st-loading">Läser…</p></div>`;
     const slot=main.querySelector('.st-legacy-slot');start();
     try{
       if(key==='data/kalla'||key==='genomgang/inforande'){

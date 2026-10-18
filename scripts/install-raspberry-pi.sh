@@ -8,14 +8,20 @@ set -eu
 
 if [ "$(id -u)" -ne 0 ]; then echo "Kör installationen med sudo."; exit 1; fi
 SOURCE_DIR=$(CDPATH= cd -- "${1:-$(dirname -- "$0")/..}" && pwd)
+# Vilken installation paketet blir (packaging/identity.env): Charlottendal (cda-tkl) om inget annat anges.
+TKL_ID=cda-tkl TKL_NAME=Charlottendal TKL_STATION=charlottendal TKL_REPOSITORY=beahead-ab/cda-tkl-install
+[ -f "$SOURCE_DIR/packaging/identity.env" ] && . "$SOURCE_DIR/packaging/identity.env"
+case "$TKL_ID" in *[!a-z0-9-]*|'') echo "Ogiltigt TKL_ID i packaging/identity.env."; exit 1 ;; esac
 if [ ! -f "$SOURCE_DIR/src/server.mjs" ] || [ ! -f "$SOURCE_DIR/packaging/raspberry-pi/cda-tkl.service" ]; then
   echo "Hämtar det fullständiga installationspaketet …"
-  exec sh -c 'curl -fsSL https://raw.githubusercontent.com/beahead-ab/cda-tkl-install/main/install.sh | sh'
+  exec sh -c "curl -fsSL https://raw.githubusercontent.com/$TKL_REPOSITORY/main/install.sh | sh"
 fi
 PACKAGING="$SOURCE_DIR/packaging/raspberry-pi"
-BASE=/opt/cda-tkl
-STATE_DIR=/var/lib/cda-tkl
-CONFIG_DIR=/etc/cda-tkl
+BASE=/opt/$TKL_ID
+STATE_DIR=/var/lib/$TKL_ID
+CONFIG_DIR=/etc/$TKL_ID
+# Paketfilerna är skrivna för Charlottendal (cda-tkl); för en annan station byts namn, sökvägar och förråd vid installationen.
+render() { sed -e "s#beahead-ab/cda-tkl-install#$TKL_REPOSITORY#g" -e "s#cda-tkl#$TKL_ID#g" -e "s#Charlottendal#$TKL_NAME#g" "$1" > "$2"; chmod "$3" "$2"; }
 NODE_DIR="$BASE/node"
 NODE_MAJOR=22
 DESKTOP_USER=${CDA_TKL_DESKTOP_USER:-${SUDO_USER:-}}
@@ -26,7 +32,7 @@ SYSTEMD=true
 [ -d /run/systemd/system ] || SYSTEMD=false
 VERSION=$(sed -n 's/^ *"version": *"\([^"]*\)".*/\1/p' "$SOURCE_DIR/package.json" | head -n 1)
 
-echo "Installerar Charlottendal TKL $VERSION …"
+echo "Installerar $TKL_NAME TKL $VERSION …"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y ca-certificates curl xz-utils
@@ -54,17 +60,17 @@ if [ "${CURRENT_NODE%%.*}" != "$NODE_MAJOR" ]; then
 fi
 NODE="$NODE_DIR/bin/node"
 
-if ! id cda-tkl >/dev/null 2>&1; then
-  useradd --system --home-dir "$STATE_DIR" --no-create-home --shell /usr/sbin/nologin cda-tkl
+if ! id "$TKL_ID" >/dev/null 2>&1; then
+  useradd --system --home-dir "$STATE_DIR" --no-create-home --shell /usr/sbin/nologin "$TKL_ID"
 fi
 install -d -m 0755 "$BASE" "$BASE/releases"
-install -d -o cda-tkl -g cda-tkl -m 0750 "$STATE_DIR"
+install -d -o "$TKL_ID" -g "$TKL_ID" -m 0750 "$STATE_DIR"
 
 # Each installation is a release directory of its own; `current` points at the one in
 # use, and the two before it are kept to go back to.
 RELEASE="$BASE/releases/$VERSION-$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$RELEASE"
-for item in package.json package-lock.json public src scripts profiles; do
+for item in package.json package-lock.json public src scripts profiles stations; do
   [ -e "$SOURCE_DIR/$item" ] && cp -R "$SOURCE_DIR/$item" "$RELEASE/"
 done
 echo "Installerar beroenden …"
@@ -80,7 +86,17 @@ done
 # Settings: written once, never overwritten by an update.
 install -d -m 0755 "$CONFIG_DIR"
 if [ ! -f "$CONFIG_DIR/app.env" ]; then
-  install -m 0644 "$PACKAGING/app.env" "$CONFIG_DIR/app.env"
+  render "$PACKAGING/app.env" "$CONFIG_DIR/app.env" 0644
+fi
+# En annan station än Charlottendal: stationen, förrådet för uppdateringar och Pi:ns uppdateringstjänst.
+if [ "$TKL_STATION" != charlottendal ]; then
+  grep -q '^CHARLOTTENDAL_STATION=' "$CONFIG_DIR/app.env" || printf '\nCHARLOTTENDAL_STATION=%s\n' "$TKL_STATION" >> "$CONFIG_DIR/app.env"
+fi
+if [ "$TKL_REPOSITORY" != beahead-ab/cda-tkl-install ]; then
+  grep -q '^CHARLOTTENDAL_INSTALL_REPOSITORY=' "$CONFIG_DIR/app.env" || printf 'CHARLOTTENDAL_INSTALL_REPOSITORY=%s\n' "$TKL_REPOSITORY" >> "$CONFIG_DIR/app.env"
+fi
+if [ "$TKL_ID" != cda-tkl ]; then
+  grep -q '^CHARLOTTENDAL_UPDATE_UNIT=' "$CONFIG_DIR/app.env" || printf 'CHARLOTTENDAL_UPDATE_UNIT=%s-update.service\n' "$TKL_ID" >> "$CONFIG_DIR/app.env"
 fi
 # Older installations lack the setting that turns on the update notice.
 grep -q '^CHARLOTTENDAL_INSTALL_KIND=' "$CONFIG_DIR/app.env" || printf '\nCHARLOTTENDAL_INSTALL_KIND=raspberry-pi\n' >> "$CONFIG_DIR/app.env"
@@ -92,28 +108,36 @@ KIOSK_ORIGIN=$(printf '%s' "$KIOSK_URL" | sed -E 's#^(https?://[^/]+).*#\1#')
 if [ -n "${CDA_TKL_TOKEN:-}" ]; then
   umask 077 && printf '%s\n' "$CDA_TKL_TOKEN" > "$CONFIG_DIR/github-token" && umask 022
 fi
+# TKL läser token för att se nya versioner i ett privat förråd (Uppdatering i panelen); bara dess grupp får läsa den.
+if [ -f "$CONFIG_DIR/github-token" ]; then
+  chown "root:$TKL_ID" "$CONFIG_DIR/github-token" && chmod 0640 "$CONFIG_DIR/github-token"
+  grep -q '^CHARLOTTENDAL_GITHUB_TOKEN_FILE=' "$CONFIG_DIR/app.env" || printf 'CHARLOTTENDAL_GITHUB_TOKEN_FILE=%s\n' "$CONFIG_DIR/github-token" >> "$CONFIG_DIR/app.env"
+fi
 
-install -m 0644 "$PACKAGING/cda-tkl.service" /etc/systemd/system/cda-tkl.service
-install -m 0644 "$PACKAGING/cda-tkl-simulator.service" /etc/systemd/system/cda-tkl-simulator.service
-install -m 0644 "$PACKAGING/cda-tkl-update.service" /etc/systemd/system/cda-tkl-update.service
-install -m 0755 "$PACKAGING/cda-tkl-update" /usr/local/sbin/cda-tkl-update
-install -m 0755 "$PACKAGING/cda-tkl-browser" /usr/local/bin/cda-tkl-browser
+install -d -m 0755 /etc/systemd/system /usr/local/sbin /usr/local/bin
+render "$PACKAGING/cda-tkl.service" "/etc/systemd/system/$TKL_ID.service" 0644
+render "$PACKAGING/cda-tkl-simulator.service" "/etc/systemd/system/$TKL_ID-simulator.service" 0644
+render "$PACKAGING/cda-tkl-update.service" "/etc/systemd/system/$TKL_ID-update.service" 0644
+render "$PACKAGING/cda-tkl-update" "/usr/local/sbin/$TKL_ID-update" 0755
+render "$PACKAGING/cda-tkl-browser" "/usr/local/bin/$TKL_ID-browser" 0755
 # The panel may start the update service, and only that (polkit).
 if [ -d /etc/polkit-1/rules.d ] || command -v pkcheck >/dev/null 2>&1; then
   install -d -m 0755 /etc/polkit-1/rules.d
-  install -m 0644 "$PACKAGING/50-cda-tkl-update.rules" /etc/polkit-1/rules.d/50-cda-tkl-update.rules
+  render "$PACKAGING/50-cda-tkl-update.rules" "/etc/polkit-1/rules.d/50-$TKL_ID-update.rules" 0644
 fi
 
 # Stream Deck: the logged-in desktop user may open it (udev), and Chromium lets the
 # panel use it without the "choose a device" dialog (policy), so it connects by itself.
-install -m 0644 "$PACKAGING/50-cda-tkl-streamdeck.rules" /etc/udev/rules.d/50-cda-tkl-streamdeck.rules
+# Katalogen finns på Raspberry Pi OS men inte på varje Debian/Ubuntu utan udev.
+install -d -m 0755 /etc/udev/rules.d
+render "$PACKAGING/50-cda-tkl-streamdeck.rules" "/etc/udev/rules.d/50-$TKL_ID-streamdeck.rules" 0644
 if command -v udevadm >/dev/null 2>&1; then udevadm control --reload-rules 2>/dev/null || true; udevadm trigger 2>/dev/null || true; fi
 for POLICY_DIR in /etc/chromium/policies/managed /etc/chromium-browser/policies/managed; do
   install -d -m 0755 "$POLICY_DIR"
   if [ -n "$KIOSK_ORIGIN" ]; then
-    sed "s#\"http://localhost:8910\" ]#\"http://localhost:8910\", \"$KIOSK_ORIGIN\" ]#" "$PACKAGING/chromium-policy.json" > "$POLICY_DIR/cda-tkl.json" && chmod 0644 "$POLICY_DIR/cda-tkl.json"
+    sed "s#\"http://localhost:8910\" ]#\"http://localhost:8910\", \"$KIOSK_ORIGIN\" ]#" "$PACKAGING/chromium-policy.json" > "$POLICY_DIR/$TKL_ID.json" && chmod 0644 "$POLICY_DIR/$TKL_ID.json"
   else
-    install -m 0644 "$PACKAGING/chromium-policy.json" "$POLICY_DIR/cda-tkl.json"
+    install -m 0644 "$PACKAGING/chromium-policy.json" "$POLICY_DIR/$TKL_ID.json"
   fi
 done
 
@@ -129,12 +153,12 @@ if command -v labwc >/dev/null 2>&1 && [ -n "${DESKTOP_USER:-}" ] && id "$DESKTO
   AUTOSTART="$DESKTOP_HOME/.config/labwc/autostart"
   install -d -o "$DESKTOP_USER" -g "$DESKTOP_USER" -m 0755 "$DESKTOP_HOME/.config/labwc"
   touch "$AUTOSTART"
-  grep -q 'cda-tkl-browser' "$AUTOSTART" || printf '\n# Charlottendal TKL\n/usr/local/bin/cda-tkl-browser &\n' >> "$AUTOSTART"
+  grep -q "$TKL_ID-browser" "$AUTOSTART" || printf '\n# %s TKL\n/usr/local/bin/%s-browser &\n' "$TKL_NAME" "$TKL_ID" >> "$AUTOSTART"
   chown "$DESKTOP_USER:$DESKTOP_USER" "$AUTOSTART"
   DESKTOP_DIR=$(runuser -u "$DESKTOP_USER" -- xdg-user-dir DESKTOP 2>/dev/null || true)
   DESKTOP_DIR=${DESKTOP_DIR:-$DESKTOP_HOME/Desktop}
   install -d -o "$DESKTOP_USER" -g "$DESKTOP_USER" -m 0755 "$DESKTOP_DIR"
-  install -o "$DESKTOP_USER" -g "$DESKTOP_USER" -m 0755 "$PACKAGING/cda-tkl.desktop" "$DESKTOP_DIR/Charlottendal-TKL.desktop"
+  render "$PACKAGING/cda-tkl.desktop" "$DESKTOP_DIR/$TKL_NAME-TKL.desktop" 0755 && chown "$DESKTOP_USER:$DESKTOP_USER" "$DESKTOP_DIR/$TKL_NAME-TKL.desktop"
   if command -v raspi-config >/dev/null 2>&1; then
     raspi-config nonint do_wayland W2 || true       # labwc
     raspi-config nonint do_boot_behaviour B4 || true # desktop, logged in automatically
@@ -147,23 +171,23 @@ fi
 if [ "$SYSTEMD" = true ] && [ -n "$KIOSK_URL" ]; then
   # The rangerare's station shows another Pi's TKL; nothing runs here but the browser.
   systemctl daemon-reload
-  systemctl disable --now cda-tkl-simulator.service cda-tkl.service >/dev/null 2>&1 || true
+  systemctl disable --now "$TKL_ID-simulator.service" "$TKL_ID.service" >/dev/null 2>&1 || true
 elif [ "$SYSTEMD" = true ]; then
   systemctl daemon-reload
-  systemctl enable cda-tkl-simulator.service cda-tkl.service >/dev/null
+  systemctl enable "$TKL_ID-simulator.service" "$TKL_ID.service" >/dev/null
   # `enable --now` would leave a running old process in place on an update.
-  systemctl restart cda-tkl-simulator.service cda-tkl.service
+  systemctl restart "$TKL_ID-simulator.service" "$TKL_ID.service"
   ok=false
   for _ in $(seq 1 30); do
     if curl -fsS --max-time 2 -o /dev/null http://127.0.0.1:8910/api/config 2>/dev/null; then ok=true; break; fi
     sleep 1
   done
   if [ "$ok" != true ]; then
-    echo "TKL svarar inte. Visa loggen med:  journalctl -u cda-tkl -n 50"
+    echo "TKL svarar inte. Visa loggen med:  journalctl -u $TKL_ID -n 50"
     if [ -n "$PREVIOUS" ] && [ -d "$PREVIOUS" ]; then
       ln -sfn "$PREVIOUS" "$BASE/current.new" && mv -Tf "$BASE/current.new" "$BASE/current"
       rm -rf "$RELEASE"
-      systemctl restart cda-tkl-simulator.service cda-tkl.service || true
+      systemctl restart "$TKL_ID-simulator.service" "$TKL_ID.service" || true
       for _ in $(seq 1 30); do curl -fsS --max-time 2 -o /dev/null http://127.0.0.1:8910/api/config 2>/dev/null && break; sleep 1; done
       echo "Föregående version är återställd och körs: $PREVIOUS"
     fi
@@ -179,13 +203,13 @@ if [ -n "$KIOSK_URL" ]; then
   echo "Logga in med en användare som har rollen rangerare. Stream Deck kopplas upp av sig själv."
   exit 0
 fi
-echo "Charlottendal TKL $VERSION är installerad och startar automatiskt."
+echo "$TKL_NAME TKL $VERSION är installerad och startar automatiskt."
 echo "Ställverket:  http://127.0.0.1:8910  (på den här datorn)"
 echo "Anläggningssimulatorn:  http://127.0.0.1:8911"
 if [ "$BROWSER_ENABLED" = true ]; then
   echo "Chromium öppnar ställverket i helskärm efter nästa omstart:  sudo reboot"
-  echo "Genvägen 'Charlottendal TKL' finns på skrivbordet. Stream Deck kopplas upp av sig själv."
+  echo "Genvägen '$TKL_NAME TKL' finns på skrivbordet. Stream Deck kopplas upp av sig själv."
 else
   echo "Inget skrivbord hittades; TKL körs utan lokal webbläsare."
 fi
-echo "Uppdatera senare med:  sudo cda-tkl-update"
+echo "Uppdatera senare med:  sudo $TKL_ID-update"

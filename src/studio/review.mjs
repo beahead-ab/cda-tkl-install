@@ -4,7 +4,7 @@
 import { deviations, signalRelationCoverage } from './deviations.mjs';
 import { companionCheck, crossoverProposals } from './graph.mjs';
 import { proposeCrossoverRules, explainRule } from './rules.mjs';
-import { toRules, decorateProposals, RULE_SCHEMA, RULE_LANGUAGE, nameLists, namesOf, nameSets } from './assistant.mjs';
+import { toRules, decorateProposals, RULE_SCHEMA, ruleLanguage, genitive, CHARLOTTENDAL, nameLists, namesOf, nameSets } from './assistant.mjs';
 import { detectionInventory } from './detection.mjs';
 import { proposeDetectionRules } from './rules.mjs';
 
@@ -27,6 +27,7 @@ const objectsIn = (items, known) => [...new Set(items.flatMap(i => String(i).spl
 export function reviewItems(sources, activeRules, profile = sources.profile) {
   const names = nameSets(profile), known = o => names.turnouts.has(o) || names.blocks.has(o) || names.signals.has(o);
   const rows = deviations(sources), dev = Object.fromEntries(rows.map(r => [r.id, r]));
+  const sourceName = sources.station?.sourceName || 'Cda60.xml';
   const companions = companionCheck(sources.xml, profile.coupled), crossings = crossoverProposals(sources.xml);
   const items = [];
   const push = (id, type, title, { text = '', count = 0, objects = [], list: rowsIn = [], rules = [], replaces = [], basis = [], action = 'none', related = [] } = {}) =>
@@ -49,10 +50,10 @@ export function reviewItems(sources, activeRules, profile = sources.profile) {
       text: `Logix ${dev['vx95-vx96'].items.join(' och ')} lägger Vx95 och Vx96 tillsammans, men i profilen är de inte kopplade. Förslag: en följregel. Bekräfta på banan att de ska ligga lika innan aktivering.` }); }
   fromDev('yard-boundaries', 'förslag', 'Gränsväxlar mot rangerbangården: manöverrätten finns, TKL-lägena kontrolleras inte', { action: 'chat', related: activeRules.filter(r => r.type === 'authority').map(r => r.id),
     text: `${dev['yard-boundaries']?.items.join(', ')} har manöverrätt i dag (${activeRules.filter(r => r.type === 'authority').map(explainRule).join(' ')}) Kärnan prövar bara rangerarens lägen. Ska TKL:s lägen begränsas, beskriv det i chatten; den fysiska överlämningen mäts under Mät objekt när rangerpanelen är ansluten.` });
-  fromDev('signal-bench', 'förslag', 'Signaladresser: utgångarna ur XML ersätter bänkadresserna', { action: 'bindings', text: `${dev['signal-bench']?.count} signaler har bänkadresser i simulatorn. Utgången LTn i Cda60.xml blir order- och rapportadress n som utkast till driftbindningar, status ej uppmätt, och mäts under Mät objekt. Rapportadressen för Signal10:s besked är ett antagande tills bänkprovet gjorts.` });
-  const detection = decorateProposals(proposeDetectionRules(detectionInventory(sources).sections, activeRules), { profile, activeRules, names });
+  fromDev('signal-bench', 'förslag', 'Signaladresser: utgångarna ur XML ersätter bänkadresserna', { action: 'bindings', text: `${dev['signal-bench']?.count} signaler har bänkadresser i simulatorn. Utgången LTn i ${sourceName} blir order- och rapportadress n som utkast till driftbindningar, status ej uppmätt, och mäts under Mät objekt. Rapportadressen för Signal10:s besked är ett antagande tills bänkprovet gjorts.` });
+  const detection = decorateProposals(proposeDetectionRules(detectionInventory(sources).sections, activeRules, { sourceName }), { profile, activeRules, names });
   fromDev('block-bench', 'förslag', 'Spårledningar: ingångarna ur XML ersätter bänkadresserna', { action: 'draft', rules: detection.rules, replaces: detection.replaces, objects: detection.rules.map(r => r.object),
-    text: `${dev['block-bench']?.count} spårledningar saknar verklig ingång (${dev['block-bench']?.note}). ${detection.rules.length} detekteringsregler ur Cda60.xml: LS-numret som adress, någon av eller alla ingångar, polaritet antagen. Utkastet provas i simulatorn; aktivering kräver färska rapporter på de nya adresserna, alltså mätning på banan.` });
+    text: `${dev['block-bench']?.count} spårledningar saknar verklig ingång (${dev['block-bench']?.note}). ${detection.rules.length} detekteringsregler ur ${sourceName}: LS-numret som adress, någon av eller alla ingångar, polaritet antagen. Utkastet provas i simulatorn; aktivering kräver färska rapporter på de nya adresserna, alltså mätning på banan.` });
   // Saknas
   fromDev('manual-groups', 'saknas', 'Manuella växelgrupper utan entydig manöverregel', { action: 'chat', objects: activeRules.filter(r => r.type === 'condition' && r.trigger === 'manual' && r.status === 'unresolved').flatMap(r => r.objects),
     related: activeRules.filter(r => r.type === 'condition' && r.trigger === 'manual' && r.status === 'unresolved').map(r => r.id),
@@ -68,8 +69,8 @@ export function reviewItems(sources, activeRules, profile = sources.profile) {
   fromDev('nx-without-route', 'beslut', 'NX-definitioner utan tågväg', { action: 'data' });
   fromDev('shunt-excluded', 'beslut', 'Undantagna växeltågvägar', { action: 'data' });
   fromDev('signal-virtual', 'beslut', 'Virtuella signaler i JMRI: besked bara i panelen', { action: 'data', objects: dev['signal-virtual']?.items || [],
-    text: `${dev['signal-virtual']?.items.join(', ')} är VirtualSignalMast i Cda60.xml utan utgång. Kärnan bekräftar deras besked själv, som JMRI gjorde. Beslut: förblir de panelbesked, eller ska fysiska dvärgar kopplas in (3/1 har utgången D3/1 på M02 i källan)?` });
-  fromDev('xml-only-turnouts', 'beslut', 'Växlar i källan utan plats i planen', { action: 'data', objects: [], text: `${dev['xml-only-turnouts']?.items.join(', ')} finns i Cda60.xml men inte i planen. Beslut: ta in i planen eller lämna utanför.` });
+    text: `${dev['signal-virtual']?.items.join(', ')} är VirtualSignalMast i ${sourceName} utan utgång. Kärnan bekräftar deras besked själv, som JMRI gjorde. Beslut: förblir de panelbesked, eller ska fysiska dvärgar kopplas in (3/1 har utgången D3/1 på M02 i källan)?` });
+  fromDev('xml-only-turnouts', 'beslut', 'Växlar i källan utan plats i planen', { action: 'data', objects: [], text: `${dev['xml-only-turnouts']?.items.join(', ')} finns i ${sourceName} men inte i planen. Beslut: ta in i planen eller lämna utanför.` });
   // Underlag
   fromDev('turnout-unmeasured', 'underlag', 'Växeladresser ur JMRI, ej uppmätta i fält', { action: 'measure', objects: [] });
   fromDev('swedish-aspects', 'underlag', 'Svenska beskedskoder per masttyp', { action: 'none', objects: [], related: activeRules.filter(r => r.type === 'aspect').map(r => r.id), text: `Beskedskoderna saknas för alla ${dev['swedish-aspects']?.count} masttyper (${dev['swedish-aspects']?.items.join(', ')}). Reglerna aspect:<masttyp> håller CZ-provkoderna tills Signal10:s svenska koder finns; då blir regeln regelägd och ersätter bindningarnas koder.` });
@@ -79,11 +80,11 @@ export function reviewItems(sources, activeRules, profile = sources.profile) {
   return items;
 }
 
-const reviewSystem = names => `Du går igenom hela Charlottendals anläggning i Studio, ett ställverk (TKL) för en modelljärnväg. Utgångspunkten är att reglerna ska följa det som är ritat. Du får korten som räknats fram deterministiskt ur källorna (JMRI-ritningen Cda60.xml, driftprofilen och spårgrafen) och en sammanfattning av anläggningen. Du bedömer, ordnar och kompletterar; du avgör ingenting, och ingenting aktiveras av genomgången.
+const reviewSystem = (names, station = CHARLOTTENDAL) => `Du går igenom hela ${genitive(station.title)} anläggning i Studio, ett ställverk (TKL) för en modelljärnväg. Utgångspunkten är att reglerna ska följa det som är ritat. Du får korten som räknats fram deterministiskt ur källorna (JMRI-ritningen ${station.sourceName}, driftprofilen och spårgrafen) och en sammanfattning av anläggningen. Du bedömer, ordnar och kompletterar; du avgör ingenting, och ingenting aktiveras av genomgången.
 Korttyper: förslag (regel eller bindning att granska), saknas (regel som behövs men inte finns), beslut (källan säger emot sig själv; operatören måste välja), underlag (bara MGP-uppgifter eller mätning på banan kan avgöra).
 För varje kort: behåll id, ange priority (1 är det som bör göras först) och skriv assessment på svenska, två till fyra meningar: vad ritningen och källorna säger, vad som bör göras och varför det kommer i den ordningen. Byt type bara när källorna motiverar det. summary är en kort sammanfattning av läget och ordningen.
 extra är kort för sådant som de givna korten inte täcker och som går att belägga i underlaget; lämna listan tom om inget sådant finns. Ett förslag med regler följer regelspråket nedan med exakta objektnamn; TKL validerar dem. Hitta aldrig på objekt, adresser eller mätvärden.
-${RULE_LANGUAGE}
+${ruleLanguage(station)}
 ${nameLists(names)}`;
 
 // AI:ns svar läggs på korten: bedömning, prioritet, eventuellt byte av typ, och extra kort med validerade regler.
@@ -127,7 +128,7 @@ export class StudioReview {
             unresolvedManualGroups: unresolved.map(r => ({ button: r.button, turnouts: r.objects, reason: r.reason })),
             contradictingRouteRules: (profile.sourcePolicy || []).filter(r => r.status === 'unresolved').map(r => ({ rule: r.rule, name: r.name, problems: r.problems })),
             unmatchedSignalRelations: signalRelationCoverage(this.sources).unmatched.map(r => `${r.from} → ${r.to}`), programming: profile.operatingControls?.programming || null } };
-        const { parsed, model, usage } = await this.assistant.ask({ system: reviewSystem(namesOf(profile)), input, schema: REVIEW_SCHEMA });
+        const { parsed, model, usage } = await this.assistant.ask({ system: reviewSystem(namesOf(profile), this.sources.station || CHARLOTTENDAL), input, schema: REVIEW_SCHEMA });
         result = { mode: 'ai', model, usage, ...mergeReview(items, parsed, { profile, activeRules, names }) };
       }
       const counts = Object.fromEntries(CARD_TYPES.map(t => [t, result.cards.filter(c => c.type === t).length]));

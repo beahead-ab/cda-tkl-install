@@ -15,7 +15,9 @@ export function fragmentDiff(a, b) {
   const out = [], j = v => JSON.stringify(v);
   for (const n of Object.keys(b.coupled)) if (j(a.coupled[n]) !== j(b.coupled[n])) out.push({ kind: 'coupled', object: n, before: a.coupled[n], after: b.coupled[n] });
   for (const n of Object.keys(b.manualPolicies.byTurnout)) { const x = a.manualPolicies.byTurnout[n], y = b.manualPolicies.byTurnout[n]; if (x?.status !== y.status || x?.reason !== y.reason || j(x?.names) !== j(y.names)) out.push({ kind: 'manual', object: n, before: x ? `${x.status} ${x.names.join('+')}` : null, after: `${y.status} ${y.names.join('+')}` }); }
-  for (const n of new Set([...Object.keys(a.yardBoundaries), ...Object.keys(b.yardBoundaries)])) if (j(a.yardBoundaries[n]) !== j(b.yardBoundaries[n])) out.push({ kind: 'authority', object: n, before: a.yardBoundaries[n]?.rangerPositions || null, after: b.yardBoundaries[n]?.rangerPositions || null });
+  // Rangerbangårdens gränsväxlar finns bara där det finns en rangerbangård (Charlottendal).
+  const ya = a.yardBoundaries || {}, yb = b.yardBoundaries || {};
+  for (const n of new Set([...Object.keys(ya), ...Object.keys(yb)])) if (j(ya[n]) !== j(yb[n])) out.push({ kind: 'authority', object: n, before: ya[n]?.rangerPositions || null, after: yb[n]?.rangerPositions || null });
   for (const n of new Set([...Object.keys(a.operatingControls.lines), ...Object.keys(b.operatingControls.lines)])) if (j(a.operatingControls.lines[n]) !== j(b.operatingControls.lines[n])) out.push({ kind: 'line', object: n, before: !!a.operatingControls.lines[n], after: !!b.operatingControls.lines[n] });
   if (j(a.operatingControls.programming) !== j(b.operatingControls.programming)) out.push({ kind: 'programming', object: 'Vx133', before: a.operatingControls.programming?.requiredPosition || null, after: b.operatingControls.programming?.requiredPosition || null });
   // Det regelägda: spårledningarnas ingångar, signalernas koder och vägövergångarna.
@@ -26,15 +28,16 @@ export function fragmentDiff(a, b) {
   if (j(a.indications?.indicators || null) !== j(b.indications?.indicators || null)) for (const ind of b.indications?.indicators || []) { const was = (a.indications?.indicators || []).find(x => x.name === ind.name); if (j(was) !== j(ind)) out.push({ kind: 'crossing', object: ind.name, before: was ? was.conditions.length + ' villkor' : null, after: ind.conditions.length + ' villkor' }); }
   return out;
 }
-export function applyRules(profile, rules, field = null) {
+export function applyRules(profile, rules, field = null, { sourceName = 'Cda60.xml' } = {}) {
   const compiled = compileRules(rules, { turnoutNames: Object.keys(profile.turnouts) });
   const blockOf = Object.fromEntries(Object.entries(profile.turnouts).map(([n, t]) => [n, t.block]));
   const next = structuredClone(profile);
-  next.coupled = compiled.coupled; next.manualPolicies = compiled.manualPolicies; next.yardBoundaries = compiled.yardBoundaries;
+  next.coupled = compiled.coupled; next.manualPolicies = compiled.manualPolicies;
+  if (profile.yardBoundaries || Object.keys(compiled.yardBoundaries).length) next.yardBoundaries = compiled.yardBoundaries;
   // Adresserna för programmeringsreläet ägs av driftbindningarna, inte av regeln.
   const pr = profile.operatingControls?.programming;
   next.operatingControls = { lines: compiled.operatingControls.lines, programming: compiled.operatingControls.programming && pr ? { ...compiled.operatingControls.programming, relayAddress: pr.relayAddress, reportAddress: pr.reportAddress } : compiled.operatingControls.programming };
-  for (const [n, b] of Object.entries(compiled.blocks)) next.blocks[n] = { ...next.blocks[n], ...b, provenance: 'Studio detection-regel: adress ur Cda60.xml, ej uppmätt.' };
+  for (const [n, b] of Object.entries(compiled.blocks)) next.blocks[n] = { ...next.blocks[n], ...b, provenance: `Studio detection-regel: adress ur ${sourceName}, ej uppmätt.` };
   for (const [n, c] of Object.entries(compiled.signals)) next.signals[n] = { ...next.signals[n], ...c };
   if (compiled.indications) next.indications = { sourceHash: profile.sourceHash, indicators: compiled.indications };
   next.rules = rules.filter(r => !['proposal', 'rejected'].includes(r.status));

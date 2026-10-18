@@ -1,19 +1,20 @@
 // Studio: Konfigurera (stationsplanen och reglerna med chatten), Data (alla mängder med korsfilter), Genomgång (korten och avvikelserna)
 // och Driftsättning (utkast, prov och aktivering). AI:n nås bara via TKL-servern; ingenting aktiveras härifrån utan utkast.
-import {buildStudioModel,SETS,TABS,relationsFor,rowsFor,columnsFor,cellsFor,walkOrder,parseHash,planGeometry,setOf,SHAPE_LABEL,CARD_TYPES,CARD_LABEL,TYPE_CLASS} from './studio-model.js';
+import {buildStudioModel,SETS,TABS,relationsFor,rowsFor,columnsFor,cellsFor,walkOrder,parseHash,planGeometry,CHARLOTTENDAL_FRAME,setOf,SHAPE_LABEL,CARD_TYPES,CARD_LABEL,TYPE_CLASS} from './studio-model.js';
 import {createPlan} from './studio-plan.js';
 import {esc,$,mono,pill,kv,card,measuredPill} from './studio-ui.js';
 import * as drift from './studio-drift.js';
 import {createHelp} from './studio-help.js';
 import {createLegacyHost,isLegacyView} from './studio-legacy.js';
 import {studioTarget} from './admin-navigation-model.js';
+import {station,setStation} from './studio-station.js';
 const legacy=createLegacyHost();
 // Den egna återrapportens sida (banan när LocoNet inte är ansluten) för felsökning: klicka i block, lägg in fel. Bara härifrån (0.75.0).
 let fieldUrl='';
 const NAV=()=>({
-  konfigurera:[['Stationsplan','#konfigurera'],['Signaler','#data?set=signaler','66'],['Växlar','#data?set=vaxlar','49'],['Spårledningar','#data?set=sparledningar','197'],['Regler och chatten','#konfigurera/regler',String(model.rules.filter(r=>r.status!=='proposal').length)],['Visning','#konfigurera/visning'],['Orter och telefon','#konfigurera/orter'],['Övriga delar','#konfigurera/ovriga'],['Prova i simulatorn','#driftsattning/andringar']],
-  data:[['Alla mängder','#data'],['Tågvägar','#data?set=tagvagar','340'],['Källa (XML)','#data/kalla']],
-  genomgang:[['Genomgång och avvikelser','#genomgang',model.review?.last?String(model.review.last.cards.length)+' kort':''],['Införandestatus','#genomgang/inforande']],
+  konfigurera:[['Stationsplan','#konfigurera'],['Signaler','#data?set=signaler',String(model.counts.signals)],['Växlar','#data?set=vaxlar',String(model.counts.turnouts)],['Spårledningar','#data?set=sparledningar',String(model.counts.blocks)],['Regler och chatten','#konfigurera/regler',String(model.rules.filter(r=>r.status!=='proposal').length)],['Visning','#konfigurera/visning'],['Orter och telefon','#konfigurera/orter'],['Övriga delar','#konfigurera/ovriga'],['Prova i simulatorn','#driftsattning/andringar']],
+  data:[['Alla mängder','#data'],['Tågvägar','#data?set=tagvagar',String(model.counts.routes)],...(station.register?[['Källa (XML)','#data/kalla']]:[])],
+  genomgang:[['Genomgång och avvikelser','#genomgang',model.review?.last?String(model.review.last.cards.length)+' kort':''],...(station.migration?[['Införandestatus','#genomgang/inforande']]:[])],
   driftsattning:[['Ändringar och aktivering','#driftsattning/andringar'],['Driftbindningar','#driftsattning/bindningar'],['Mät objekt','#driftsattning/mat',measuredLabel()],['Lyssna','#driftsattning/lyssna'],['Kort och MGP','#driftsattning/kort',model.cards?.cards.length?String(model.cards.cards.length)+' kort':''],...(fieldUrl?[['Egen återrapport ↗',fieldUrl]]:[])],
   anslutning:[['TrainMeet','/#trainmeet','i dag'],['Stream Deck','/#tools/streamdeck','i dag']]});
 const measuredLabel=()=>{const c=model.counts.measured,t=model.counts.turnouts+model.counts.signals+model.counts.blocks;return c.field?`${c.field}/${t}`:c.bench?`${c.bench} bänk`:'0/'+t;};
@@ -24,9 +25,11 @@ const session={load(){try{return JSON.parse(sessionStorage.getItem('studio-state
 async function load(){
   const get=u=>fetch(u).then(r=>{if(!r.ok)throw Error(`${u}: ${r.status}`);return r.json();});
   const [profile,studio,panel]=await Promise.all([get('/api/config'),get('/api/studio'),get('/data/panel.json')]);
+  setStation(profile);document.title=station.title+' · Studio';
+  {const brand=document.querySelector('.st-brand');if(brand?.firstChild?.nodeType===3)brand.firstChild.textContent=station.title.toUpperCase()+' ';}
   model=buildStudioModel({profile,panel,studio});order=walkOrder(panel);fieldUrl=profile.fieldUrl||'';
   const undetected=new Set([...studio.detection.undetected.noSensor,...studio.detection.undetected.noRule]);
-  geo=planGeometry(panel,undetected);
+  geo=planGeometry(panel,undetected,station.id==='charlottendal'?CHARLOTTENDAL_FRAME:null);
   $('#st-mode').textContent=profile.commissioned?'DRIFT':'EJ DRIFTSATT · inga bindningar uppmätta';
   {const old=studioTarget(location.hash);if(old)history.replaceState(null,'',old.replace('/studio.html',''));}
   const saved=session.load(),link=parseHash(location.hash);
@@ -76,7 +79,7 @@ function stats(){const c=model.counts,d=model.detection;return `<div class="st-s
 function renderKonfigurera(main){
   const layers=[['numbers','Växelnummer'],['signalNames','Signalnamn'],['blockLabels','Spårledningar'],['addresses','Adresser'],['modules','MGP-modul'],['dev','Avvikelser']];
   // En verktygsrad: gå igenom, lager, zoom och panelen. Planen tar höjden som blir över (body.st-fill), objektet och avvikelserna ligger till höger.
-  main.innerHTML=`<div class="st-title"><div><div class="st-eyebrow">KONFIGURERA · STATIONSPLAN</div><h1>Charlottendal</h1></div><p>Hela stationen. Klicka på ett objekt, eller gå igenom från vänster till höger.</p><span class="st-grow"></span>
+  main.innerHTML=`<div class="st-title"><div><div class="st-eyebrow">KONFIGURERA · STATIONSPLAN</div><h1>${esc(station.title)}</h1></div><p>Hela stationen. Klicka på ett objekt, eller gå igenom från vänster till höger.</p><span class="st-grow"></span>
     <a class="st-btn" href="#genomgang">Avvikelser</a><a class="st-btn st-btn-primary" href="#data">Visa i data</a></div>${stats()}
     <section class="st-card st-card-plan"><div class="st-toolbar"><span id="st-walk" style="display:contents"></span><span class="st-sep"></span><span class="st-eyebrow">LAGER</span>${layers.map(([k,l])=>`<button type="button" class="st-btn st-toggle" data-layer="${k}" aria-pressed="${state.layers.has(k)}">${l}</button>`).join('')}
       <span class="st-grow"></span><button type="button" class="st-btn st-toggle" data-zoom="-" aria-label="Zooma ut">−</button><span class="mono" id="st-zoom"></span><button type="button" class="st-btn st-toggle" data-zoom="+" aria-label="Zooma in">+</button><button type="button" class="st-btn st-toggle" data-zoom="fit" aria-label="Fyll bredden">Bredd</button><button type="button" class="st-btn st-toggle" data-zoom="height" aria-label="Fyll höjden">Höjd</button><button type="button" class="st-btn st-toggle" data-panel aria-pressed="${state.panel}">Panel</button></div>
@@ -115,7 +118,7 @@ function renderObjectCard(){
     const mods=[...new Set(o.source.map(s=>s.module?.name).filter(Boolean))];
     title=`${mono(o.id)} · signal`;right=measuredPill(o,'Bänkadress');
     body=kv([['Masttyp',mono(o.mastType)+(o.aspects.length?` · ${o.aspects.length} besked`:'')],['Adress',mono(o.loconet.order)+' · stopp '+mono(o.loconet.stopCodes.join(', '))+', kör '+mono(o.loconet.goCodes.join(', '))+' <span style="color:var(--kr-mute)">CZ-prov, ej svenskt</span>'],
-      ['Utgångar i Cda60.xml',o.source.length?o.source.map(s=>mono(s.system)+' <span style="color:var(--kr-mute)">'+esc(s.comment)+'</span>').join('<br>'):'Ingen'],['Modul',mods.length>1?mods.map(mono).join(' och ')+' '+pill('Två moduler, oklart','amber'):mods.map(mono).join('')||'–'],
+      ['Utgångar i '+station.source,o.source.length?o.source.map(s=>mono(s.system)+' <span style="color:var(--kr-mute)">'+esc(s.comment)+'</span>').join('<br>'):'Ingen'],['Modul',mods.length>1?mods.map(mono).join(' och ')+' '+pill('Två moduler, oklart','amber'):mods.map(mono).join('')||'–'],
       ['Tågvägar','klareras i '+mono(o.routes.length)+', skyddssignal i '+mono(o.guards.length)],['Svenska beskedskoder',pill('Saknas','amber')]]);
   } else if(o.kind==='block'){
     const s=o.section,undet=s&&(s.shape==='noRule'||s.shape==='noSensor')&&s.track;

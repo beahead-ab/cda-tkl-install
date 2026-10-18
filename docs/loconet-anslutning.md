@@ -33,6 +33,13 @@ nästa tågväg; ut på en linje lämnar det stationen. Ett tåg som redan syns 
 väntar. Klarering, avgång och ankomst anmäler operatören i TrainMeet som vanligt. TKL:s egen *Simulerad trafik* (tåg med
 påhittade nummer) finns inte längre.
 
+Sedan 0.82.0 gäller det också åt andra hållet. Ett tåg som står på banan men inte finns i trafikspelet här tas bort
+efter tio sekunder. Trafikspelet har ett tåg här när det är på linjen hit eller härifrån, eller ankommet, på väg in,
+uppställt eller med förare på plats, och inte avgånget. Spåret blir då fritt för det uppställda tåget som ska stå där.
+Förut stod tågen från ett tidigare trafikläge kvar efter en ny anslutning eller en återställd träff: planen kunde visa
+sju tåg när tidtabellen hade två uppställda. Ett tåg som kör tas inte bort, och inte heller en provkörning. Utan kontakt
+med TrainMeet rörs inget.
+
 Tåget körs av TKL:s egen återrapport (`src/field.mjs` i den lokala processen `src/simulator.mjs`). Dess sida, med
 spårledningar att klicka i och fel att lägga in, nås för felsökning från Studio → Driftsättning → *Egen återrapport ↗*.
 
@@ -48,8 +55,8 @@ kopplad till en TrainMeet-station ger stationen sin linjes sida (C och A vänste
 koppling får inget infartsspår, så TKL ställer inte ut dess tåg, och i linjebilden ritas den mittemot tågets andra ände
 (eller till vänster om ingen sida är känd).
 
-Med LocoNet ej ansluten följer tidtabellen och planen varandra, eftersom TKL ställer ut och kör trafikspelets tåg efter
-samma uppgifter. Med LocoNet ansluten är tågen de riktiga: ramen runt spåret betyder att tåget är anmält inne i
+Med LocoNet ej ansluten följer tidtabellen och planen varandra, eftersom TKL ställer ut, kör och tar bort trafikspelets
+tåg efter samma uppgifter. Med LocoNet ansluten är tågen de riktiga: ramen runt spåret betyder att tåget är anmält inne i
 TrainMeet, inte att banan har rapporterat det där.
 
 ## Var läget syns och byts

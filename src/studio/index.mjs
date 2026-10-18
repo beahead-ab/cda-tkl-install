@@ -36,11 +36,11 @@ export function studioRules(sources = loadSources(), activeRules = null) {
   const problems = validateRules(rules, names);
   const compiled = compileRules(rules, { turnoutNames: Object.keys(profile.turnouts) });
   const identical = JSON.stringify(compiledFragments(compiled)) === JSON.stringify(JSON.parse(JSON.stringify(profileFragments(profile))));
-  const baseDiff = applyRules(profile, rules).changes;
+  const baseDiff = applyRules(profile, rules, null, { sourceName: sources.station?.sourceName }).changes;
   const decorate = r => ({ ...r, typeLabel: TYPE_LABEL[r.type], runsInLabel: RUNS_IN[r.type], explain: explainRule(r), routes: ruleRoutes(profile, r), problems: problems.filter(p => p.rule === r.id).map(p => p.problem) });
   const proposal = proposeCrossoverRules(profile, rules, crossoverProposals(sources.xml), companionCheck(sources.xml, profile.coupled));
   // Detekteringsförslagen ur XML: ett per spårledning med ingångar i källan. Visas i genomgången, inte som enskilda kort under Regler.
-  const detection = proposeDetectionRules(detectionInventory(sources).sections, rules);
+  const detection = proposeDetectionRules(detectionInventory(sources).sections, rules, { sourceName: sources.station?.sourceName });
   return { rules: rules.map(decorate), proposals: proposal.proposals.map(decorate), replaces: proposal.replaces, effects: proposal.effects, detectionProposals: detection.map(decorate),
     source: activeRules ? 'aktiv regelversion' : sources.rules ? 'profiles/charlottendal-rules.json' : 'härledda ur driftprofilen', compiledIdentical: identical, baseDiff: { fragments: baseDiff.fragments.length, routes: baseDiff.routes.length }, problems };
 }

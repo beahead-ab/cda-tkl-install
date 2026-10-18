@@ -34,6 +34,10 @@ export class Field extends EventEmitter {
   reportTurnout(name) {
     if (this.faults.turnout === name) return;
     const b = this.profile.turnouts[name], value = this.turnouts[name].position;
+    // En lokalt styrd växel läggs på plats och har inga konfigurerade givare: den rapporterar ingenting till TKL.
+    if (b.local) return;
+    // Växelmotorns lägesgivare (Träkvista): två ingångar i stället för växelrapporten; båda passiva medan växeln går.
+    if (b.feedbackSensors) { this.emit('frame', sensorReport(b.feedbackSensors.thrown, value === 'T')); this.emit('frame', sensorReport(b.feedbackSensors.closed, value === 'C')); return; }
     const physical = value === 'unknown' ? value : b.inverted ? (value === 'C' ? 'T' : 'C') : value;
     this.emit('frame', switchReport(b.address, physical));
   }
@@ -64,6 +68,13 @@ export class Field extends EventEmitter {
     }
     const p = this.programming, a = this.profile.programming?.reportAddress;
     if (p && !p.fault && a && !sent.has(a) && ((a - 1) >> 3 & 7) === group) this.emit('frame', sensorReport(a, p.active));
+    // Växelmotorernas lägesgivare är ingångar på korten och svarar på avfrågningen som de andra.
+    for (const [name, b] of Object.entries(this.profile.turnouts)) {
+      if (!b.feedbackSensors || b.local || this.faults.turnout === name) continue;
+      const value = this.turnouts[name].position;
+      for (const [address, active] of [[b.feedbackSensors.thrown, value === 'T'], [b.feedbackSensors.closed, value === 'C']])
+        if (!sent.has(address) && ((address - 1) >> 3 & 7) === group) { sent.add(address); this.emit('frame', sensorReport(address, active)); }
+    }
   }
   // Allt på en gång, som om varje kort rapporterade: bara för proven. Simulatorn sänder det inte (korten upprepar inget).
   allReports() {
@@ -86,7 +97,8 @@ export class Field extends EventEmitter {
       if (b.address !== d.address) continue;
       const logical = b.inverted ? (d.position === 'C' ? 'T' : 'C') : d.position;
       const s = this.turnouts[name];
-      if (s.position === logical) { this.reportTurnout(name); continue; }
+      // Ett MGP-kort svarar på ordern; en motor som redan ligger rätt ändrar inga givare och rapporterar inget.
+      if (s.position === logical) { if (!b.feedbackSensors) this.reportTurnout(name); continue; }
       s.target = logical; s.position = 'unknown'; s.due = this.now() + this.movementMs;
       this.reportTurnout(name);
     }
@@ -166,6 +178,17 @@ export class Field extends EventEmitter {
     const t={number,label:line?'På linjen':'Uppställt',blocks:[block],index:0,position:at,standing:true,park:true,signalEntries:[],turnouts:{},waiting:line?'Väntar vid infartssignalen':'Uppställt',nextAt:this.now()+500};
     this.trains.push(t);this.train=this.trains[0]||null;return {number,block};
   }
+  // Ett av trafikspelets tåg som trafikspelet inte längre har här tas bort från banan (0.82.0), och bara när det står:
+  // ett tåg som kör lämnar banan själv.
+  removeTrain({number}={}) {
+    const t=this.trains.find(x=>x.number===number);
+    if(!t)throw Error(`Tåg ${number} finns inte på banan.`);
+    if(!t.park)throw Error(`Tåg ${number} är inte ett av trafikspelets tåg.`);
+    if(!t.standing)throw Error(`Tåg ${number} kör.`);
+    this.trains=this.trains.filter(x=>x!==t);this.train=this.trains[0]||null;
+    for(const block of t.blocks)this.updateBlock(block,false);
+    return {number};
+  }
   depart(t) {
     const here=t.blocks[t.index],address=this.profile.blocks[here].address,near=this.neighbours()[here]||new Set();
     const busy=new Set(this.trains.filter(o=>o!==t).flatMap(o=>o.blocks.map(n=>this.profile.blocks[n].address)));
@@ -199,6 +222,7 @@ export class Field extends EventEmitter {
   }
   simulate(command) {
     if (command?.kind === 'spawn') { const result = this.spawnTrain(command); this.tick(); return result; }
+    if (command?.kind === 'remove') { const result = this.removeTrain(command); this.tick(); return result; }
     throw Error('Okänt simuleringskommando.');
   }
   snapshot() { return { turnouts: this.turnouts, blocks: this.blocks, signals: this.signals, programming:this.programming,faults: this.faults, train: this.train, trains:this.trains, scenarios: this.profile.scenarios }; }

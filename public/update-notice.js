@@ -2,18 +2,23 @@
 // release than this installed copy. On a Raspberry Pi and on the web deployment the dialog
 // starts the update; on a Mac or PC it shows the line to run. The page itself sends nothing until asked.
 import {confirmAdmin,createAdminDialog} from './admin-ui.js';
-export const UPDATE_LINES={
-  mac:{where:'Terminal',line:'curl -fsSL https://raw.githubusercontent.com/beahead-ab/cda-tkl-install/main/install.sh | sh'},
-  windows:{where:'PowerShell',line:'irm https://raw.githubusercontent.com/beahead-ab/cda-tkl-install/main/install.ps1 | iex'}
-};
+// Raderna pekar på installationens eget förråd (view.repository); Charlottendals är cda-tkl-install.
+export const updateLines=(repository='beahead-ab/cda-tkl-install')=>({
+  mac:{where:'Terminal',line:`curl -fsSL https://raw.githubusercontent.com/${repository}/main/install.sh | sh`},
+  windows:{where:'PowerShell',line:`irm https://raw.githubusercontent.com/${repository}/main/install.ps1 | iex`}
+});
+export const UPDATE_LINES=updateLines();
+// Utan känd senaste version (förrådet gick inte att läsa) kan Pi:n ändå hämta och installera den senaste.
+export const canFetchLatest=view=>!!view?.canStart&&view.kind!=='render'&&!view.latest;
 export function openUpdateNotice(view,{api,message}){
-  if(!view?.available)return;
-  const title='Charlottendal TKL '+view.latest+' finns';
+  if(!view?.available&&!canFetchLatest(view))return;
+  const product=view.product||'Charlottendal TKL',to=view.latest||'den senaste versionen';
+  const title=view.available?product+' '+view.latest+' finns':'Uppdatera '+product;
   if(view.canStart){
     confirmAdmin({title,button:'Uppdatera nu',
       message:view.kind==='render'
         ?'Webbdriften kör '+view.current+'. Render bygger '+view.latest+' ur cda-tkl och startar om webbdriften när bygget är klart, vanligen inom tio minuter. Panelen är borta en kort stund för alla som är inne. Lagda tågvägar behåller sina lås men måste läggas om för att signalerna ska gå till kör. Inställningar och driftdata ligger kvar på disken; misslyckas bygget fortsätter '+view.current+' att köra.'
-        :(view.kind==='web'?'Webbdriften kör ':'Den här Pi:n kör ')+view.current+'. Uppdateringen hämtar '+view.latest+' från cda-tkl-install, tar en säkerhetskopia, installerar och startar om TKL, vilket tar ett par minuter. Panelen är borta en kort stund för alla som är inne. Lagda tågvägar behåller sina lås men måste läggas om för att signalerna ska gå till kör. Inställningar och driftdata ligger kvar, och om den nya versionen inte startar återställs den gamla.',
+        :(view.kind==='web'?'Webbdriften kör ':'Den här Pi:n kör ')+view.current+'. Uppdateringen hämtar '+to+' från '+(view.repository||'beahead-ab/cda-tkl-install').split('/')[1]+', tar en säkerhetskopia, installerar och startar om TKL, vilket tar ett par minuter. Panelen är borta en kort stund för alla som är inne. Lagda tågvägar behåller sina lås men måste läggas om för att signalerna ska gå till kör. Inställningar och driftdata ligger kvar, och om den nya versionen inte startar återställs den gamla.',
       action:async()=>{const answer=await api('update/start',{});if(!answer)return false;message('Uppdateringen har startat. Ställverket visar "Ny version · ladda om" när den är klar.',{error:false,duration:8000});}});
     return;
   }
@@ -22,7 +27,7 @@ export function openUpdateNotice(view,{api,message}){
     body.querySelector('p').textContent='Webbdriften kör '+view.current+'. Render bygger om den när main i cda-tkl ändras, om automatisk driftsättning är på. Med tjänstens Deploy Hook i miljövariabeln RENDER_DEPLOY_HOOK_URL kan uppdateringen startas härifrån.';
     const modal=createAdminDialog({title,body});modal.element.addEventListener('close',()=>modal.element.remove(),{once:true});modal.open();return;
   }
-  const how=UPDATE_LINES[view.kind]||UPDATE_LINES.mac;
+  const lines=updateLines(view.repository),how=lines[view.kind]||lines.mac;
   const body=document.createElement('div');
   body.innerHTML='<p></p><p></p><pre class="update-line"><code></code></pre><button type="button" class="update-copy">Kopiera raden</button>';
   body.querySelector('p').textContent='Den här datorn kör '+view.current+'. Inställningar och driftdata ligger kvar vid uppdateringen, och om den nya versionen inte startar återställs den gamla.';

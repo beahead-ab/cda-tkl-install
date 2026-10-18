@@ -32,12 +32,20 @@ export const RULE_LANGUAGE = `Regelspråket, de fem typer som kan skapas här:
 Signalbesked (aspect) och vägövergångar (crossing) kan inte skapas här; de väntar på MGP-underlag.
 Lägen: C är rakt spår (normalläge), T är avvikande (omlagt). Fält som inte hör till typen lämnas tomma: tomma listor, tom sträng, bothWays true.`;
 
+// Texterna är skrivna för Charlottendal. En annan station (station i Studios källor, till exempel Träkvista) får sitt
+// namn, sin JMRI-fil och exempel ur sina egna namn; utan rangerbangård skapas inga authority-regler.
+export const CHARLOTTENDAL = { id: 'charlottendal', title: 'Charlottendal', sourceName: 'Cda60.xml' };
+export const genitive = title => /s$/.test(title) ? title : title + 's';
+export const ruleLanguage = (station = CHARLOTTENDAL) => station.id === 'charlottendal' ? RULE_LANGUAGE : RULE_LANGUAGE.replace('Cda60.xml', station.sourceName)
+  .replace('Finns bara för gränsväxlarna mot rangerbangården (Vx112, Vx131, Vx154).', `${station.title} har ingen rangerbangård; skapa inga authority-regler.`);
+const naming = (names, station = CHARLOTTENDAL) => station.id === 'charlottendal' ? NAMING
+  : `Namn: växlar heter Vx följt av nummer och ibland en bokstav (${names.turnouts.slice(0, 3).join(', ')}). Spårledningar heter S följt av nummer eller bokstäver (${names.blocks.slice(0, 3).join(', ')}). Signaler heter som på ställverkets tavla (${names.signals.slice(0, 3).join(', ')}). Använd bara namn ur listorna nedan, exakt skrivna. Diktering hör fel på fackord: "växel ${(names.turnouts[0] || 'Vx1').slice(2)}" och "vx ${(names.turnouts[0] || 'Vx1').slice(2)}" är ${names.turnouts[0] || 'Vx1'}; "Jimmy" är JMRI.`;
 const NAMING = `Namn: växlar heter Vx följt av nummer (Vx100). Spårledningar heter S följt av nummer eller bokstäver (S100, SIA, SN2A). Signaler heter som på ställverkets tavla (1/5, Au, An, Xv). Använd bara namn ur listorna nedan, exakt skrivna. Diktering hör fel på fackord: "växel hundra", "vä x 100" och "vx 100" är Vx100; "ess hundra" är S100; "Jimmy" är JMRI.`;
 export const nameLists = names => `Växlar: ${names.turnouts.join(' ')}\nSignaler: ${names.signals.join(' ')}\nSpårledningar: ${names.blocks.join(' ')}${names.inputs?.length ? '\nIngångar: ' + names.inputs.join(' ') : ''}`;
 
-const proposeSystem = names => `Du är regelassistent i Charlottendal Studio, ett ställverk (TKL) för en modelljärnväg. Operatören skriver eller dikterar vad som ska gälla för växlar, spårledningar och signaler. Du översätter till regelkort enligt schemat. Du är en översättare, aldrig en auktoritet: TKL validerar varje regel deterministiskt, läser tillbaka den på svenska och provar den i simulatorn innan något blir utkast.
-${RULE_LANGUAGE}
-${NAMING}
+const proposeSystem = (names, station = CHARLOTTENDAL) => `Du är regelassistent i ${station.title} Studio, ett ställverk (TKL) för en modelljärnväg. Operatören skriver eller dikterar vad som ska gälla för växlar, spårledningar och signaler. Du översätter till regelkort enligt schemat. Du är en översättare, aldrig en auktoritet: TKL validerar varje regel deterministiskt, läser tillbaka den på svenska och provar den i simulatorn innan något blir utkast.
+${ruleLanguage(station)}
+${naming(names, station)}
 Svaret följer schemat. message är ett kort svar på svenska om vad du förstod och vad som blev regel. objects är de objekt beskrivningen avser. Är något tvetydigt, eller gäller det detektering, signalbesked eller vägövergångar som inte kan uttryckas i de fyra typerna: lämna rules tom och ställ frågan i questions. Hitta aldrig på objekt.
 ${nameLists(names)}`;
 
@@ -96,9 +104,9 @@ const mapError = e => {
 export class StudioAssistant {
   // Nyckel och modell läses vid varje anrop: ur appens inställningar (AiSettings, Inställningar → AI-tjänst) när sådana finns,
   // annars ur miljön. Klienten byggs om när nyckeln byts, så ett sparat byte gäller utan omstart.
-  constructor({ settings = null, key = undefined, model = undefined, fetcher = undefined, timeout = 600000 } = {}) {
+  constructor({ settings = null, key = undefined, model = undefined, fetcher = undefined, timeout = 600000, product = 'Charlottendal TKL' } = {}) {
     this.settings = settings || { key: key ?? (process.env.ANTHROPIC_API_KEY || ''), model: model ?? (process.env.CHARLOTTENDAL_STUDIO_MODEL || 'claude-opus-5-5') };
-    this.fetcher = fetcher; this.timeout = timeout; this.provider = 'Anthropic'; this.cached = null;
+    this.fetcher = fetcher; this.timeout = timeout; this.provider = 'Anthropic'; this.cached = null; this.product = product;
   }
   get key() { return this.settings.key || ''; }
   get model() { return this.settings.model || 'claude-opus-5-5'; }
@@ -112,7 +120,7 @@ export class StudioAssistant {
   // Provanropet från Inställningar: ett litet riktigt anrop med strukturerat svar, så att nyckel, modell och nätväg prövas på riktigt.
   async probe() {
     const schema = { type: 'object', properties: { ok: { type: 'boolean' }, greeting: { type: 'string' } }, required: ['ok', 'greeting'], additionalProperties: false };
-    const { parsed, model, usage } = await this.ask({ system: 'Du är AI-tjänsten i Charlottendal TKL. Svara enligt schemat: ok är true och greeting en kort hälsning på svenska.', input: { test: 'anslutning' }, schema, maxTokens: 2000, effort: 'low' });
+    const { parsed, model, usage } = await this.ask({ system: `Du är AI-tjänsten i ${this.product}. Svara enligt schemat: ok är true och greeting en kort hälsning på svenska.`, input: { test: 'anslutning' }, schema, maxTokens: 2000, effort: 'low' });
     if (parsed.ok !== true) fail('AI-tjänsten svarade, men inte enligt schemat.', 502);
     return { ok: true, model, greeting: String(parsed.greeting || ''), usage };
   }
@@ -134,12 +142,12 @@ export class StudioAssistant {
     return { parsed, model: response.model || this.model, usage: { input: u.input_tokens ?? 0, output: u.output_tokens ?? 0, cached: u.cache_read_input_tokens ?? 0 } };
   }
   // Fritext → regelkort. Svaret innehåller TKL:s egen tillbakaläsning, validering och vilka regler som ersätts.
-  async propose({ text, objects = [] } = {}, { profile, xml, activeRules, names }) {
+  async propose({ text, objects = [] } = {}, { profile, xml, activeRules, names, station = CHARLOTTENDAL }) {
     const t = String(text ?? '').trim();
     if (t.length < 3 || t.length > 2000) fail('Beskriv regeln med 3–2000 tecken.', 400);
     if (/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(t)) fail('Ogiltig text.', 400);
     const ctx = assistantContext({ profile, xml }, activeRules, Array.isArray(objects) ? objects : []);
-    const { parsed, model, usage } = await this.ask({ system: proposeSystem(ctx.names), input: { text: t, selection: ctx.selection, existingRules: ctx.existingRules }, schema: PROPOSE_SCHEMA });
+    const { parsed, model, usage } = await this.ask({ system: proposeSystem(ctx.names, station), input: { text: t, selection: ctx.selection, existingRules: ctx.existingRules }, schema: PROPOSE_SCHEMA });
     const rules = toRules(parsed.rules, { origin: 'chatt', text: t, activeRules });
     const d = decorateProposals(rules, { profile, activeRules, names });
     const known = o => names.turnouts.has(o) || names.blocks.has(o) || names.signals.has(o);

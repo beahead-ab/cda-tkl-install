@@ -20,7 +20,7 @@ button,input,select,textarea{border-radius:3px}button{padding:6px 10px}.app-head
 
 .sim-filter{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0}.sim-filter input[type=search]{padding:8px;flex:1;min-width:120px}.sim-filter label,.sim-ready{font-size:11px;color:var(--muted)}.sim-ready{display:block;margin-top:12px}.sim-main .block-grid{max-height:190px;overflow:auto;padding:2px}.sim-main details{margin-bottom:20px}.sim-main summary{cursor:pointer;font-size:13px}.sim-main summary span{margin-left:8px}.sim-main .catalog>button{align-self:end}.sim-main .field-list{max-height:220px;overflow:auto}
 
-.shunt-control{display:none}body[data-skin=traffic] .shunt-control .dot{display:block}.shunt-control .dot{fill:#ada88e}.shunt-control.in-route .dot{fill:#f0d98a}#route-mode{font-size:10px;padding:4px 7px}.panel-actions{align-items:center}
+.shunt-control{display:none}body[data-shunt-buttons=visible] .shunt-control{display:inline}body[data-skin=traffic] .shunt-control .dot{display:block}.shunt-control .dot{fill:#ada88e}.shunt-control.in-route .dot{fill:#f0d98a}#route-mode{font-size:10px;padding:4px 7px}.panel-actions{align-items:center}
 
 .stop-button{color:#ffabab!important;border-color:#855657!important;background:#402b2b!important}.ais-status{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border:1px solid #845455;color:#ffc1b4;background:#362323;font-size:12px;margin-top:12px}.rail.blocked:not(.occupied){stroke:#b59ce8!important;stroke-dasharray:5 3}.blocked-chip{color:#c9b7ed;border-color:#6a577f}.operating-tools{margin-top:16px}.operating-tools>summary{font-size:13px;cursor:pointer}.operating-tools .catalog>button{align-self:end}.panel-compact .operating-tools{display:none}
 .authority-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;font-size:12px}.authority-bar strong{font-weight:500}.authority-bar .muted{display:block;margin-top:4px;font-size:11px}#remote-notice,#emergency-status{margin:0 0 12px;font-size:12px;line-height:1.6}.panel-actions{flex-wrap:wrap}#emergency-cancel{border-style:dashed}@media(max-width:700px){.authority-bar,.ais-status{flex-wrap:wrap;align-items:flex-start}.authority-bar button{font-size:11px}}
@@ -63,7 +63,7 @@ button,input,select,textarea{border-radius:3px}button{padding:6px 10px}.app-head
 
 
 @media(prefers-reduced-motion:reduce){}
-#tm-pair input.pairing-code{font-family:Menlo,monospace;font-size:18px;letter-spacing:.16em;font-variant-numeric:tabular-nums}#tm-pair input.pairing-code::placeholder{opacity:.4}
+#tm-connect-form input.pairing-code{font-family:Menlo,monospace;font-size:18px;letter-spacing:.16em;font-variant-numeric:tabular-nums}#tm-connect-form input.pairing-code::placeholder{opacity:.4}
 /* Focus ring only for the keyboard (Casper, 2 oktober 2026): no box around fields and
    controls after a click or a touch, a ring after Tab. admin-navigation.js sets
    data-nav-keyboard on Tab and clears it on any pointer press. A text field always shows
@@ -71,3 +71,4 @@ button,input,select,textarea{border-radius:3px}button{padding:6px 10px}.app-head
 body:not([data-nav-keyboard]) :is(button,a,input,select,textarea,summary,[role=button],[role=tab],[tabindex]):is(:focus,:focus-visible){outline:none!important}
 body[data-nav-keyboard] :is(button,a,input,select,textarea,summary,[role=button],[role=tab],[tabindex]):focus-visible{outline:2px solid #aeb6be!important;outline-offset:2px!important}
 :is(input:not([type=range]):not([type=checkbox]):not([type=radio]),select,textarea):focus{border-color:#8a939c!important}
+#tm-connect-form #tm-server{width:min(380px,80vw)}

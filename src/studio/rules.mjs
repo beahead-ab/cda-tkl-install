@@ -26,10 +26,11 @@ export function rulesFromProfile(profile, { indications = null } = {}) {
   for (const r of manual)
     rules.push({ id: 'condition:manual:' + r.button, type: 'condition', trigger: 'manual', objects: r.names, button: r.button,
       requires: { freeSensors: r.freeSensors, blocks: r.blocks, signals: r.signals, inactiveNX: r.inactiveNX }, runsIn: 'tkl',
-      status: r.status === 'ready' ? 'active' : 'unresolved', reason: r.reason, source: { profile: 'manualPolicies.rules', jmri: r.rule } });
-  for (const l of Object.values(profile.operatingControls?.lines || {}))
-    rules.push({ id: 'condition:line:' + l.id, type: 'condition', trigger: 'line', object: l.id, label: l.label, button: l.button, sourceSensor: l.sourceSensor,
-      requires: { blocks: l.blocks }, runsIn: 'tkl', status: 'active', source: { profile: 'operatingControls.lines', jmri: l.rule } });
+      status: r.status === 'ready' ? 'active' : 'unresolved', reason: r.reason, source: { profile: 'manualPolicies.rules', jmri: r.rule, ...(r.provenance ? { provenance: r.provenance } : {}) } });
+  // Linjens egna uppgifter utöver regeln (Träkvista: sida, granne, enkelspår, in- och utfartssignal) följer med oförändrade.
+  for (const { id, label, button, rule, sourceSensor, blocks, ...detail } of Object.values(profile.operatingControls?.lines || {}))
+    rules.push({ id: 'condition:line:' + id, type: 'condition', trigger: 'line', object: id, label, button, sourceSensor,
+      requires: { blocks }, runsIn: 'tkl', status: 'active', source: { profile: 'operatingControls.lines', jmri: rule }, ...(Object.keys(detail).length ? { detail } : {}) });
   const pr = profile.operatingControls?.programming;
   if (pr) rules.push({ id: 'condition:programming', type: 'condition', trigger: 'programming', object: pr.turnout, requiredPosition: pr.requiredPosition,
     requires: { blocks: pr.blocks, clearBlocks: pr.clearBlocks }, relay: { address: pr.relayAddress, reportAddress: pr.reportAddress, sourceRelay: pr.sourceRelay, sourceReport: pr.sourceReport },
@@ -49,13 +50,14 @@ export function rulesFromProfile(profile, { indications = null } = {}) {
   }
   return rules;
 }
-// Detekteringsregler ur Cda60.xml: varje spårledning med ingångar i källan får LS-numret som adress, som förslag.
-// Polariteten antas aktiv = belagd tills mätningen visar annat. Ersätter bänkbindningen först när regeln aktiveras.
-export function proposeDetectionRules(sections, rules) {
+// Detekteringsregler ur stationens JMRI-fil (Charlottendal: Cda60.xml): varje spårledning med ingångar i källan får
+// LS-numret som adress, som förslag. Polariteten antas aktiv = belagd tills mätningen visar annat. Ersätter
+// bänkbindningen först när regeln aktiveras.
+export function proposeDetectionRules(sections, rules, { sourceName = 'Cda60.xml' } = {}) {
   const live = new Set(rules.filter(r => r.type === 'detection' && isLive(r)).map(r => r.object));
   return sections.filter(s => s.track && s.inputs?.length && !s.bound && !live.has(s.name)).map(s => ({ id: 'detection:' + s.name, type: 'detection', object: s.name, logic: s.shape === 'all' ? 'all' : 'any',
     inputs: s.inputDetails.map(d => ({ system: d.system, address: Number(String(d.system).replace(/^LS/, '')) || null, activeMeansOccupied: true, module: d.module || null })), owner: 'rule', runsIn: 'tkl', status: 'proposal',
-    reason: s.shape === 'turnoutPart' ? 'Växelberoende del i JMRI, förenklad till någon av ingångarna.' : '', source: { studio: 'xml-ingångar', jmri: s.sourceSensor, provenance: 'LS-nummer ur Cda60.xml som adress, polaritet antagen. Ej uppmätt.' } }));
+    reason: s.shape === 'turnoutPart' ? 'Växelberoende del i JMRI, förenklad till någon av ingångarna.' : '', source: { studio: 'xml-ingångar', jmri: s.sourceSensor, provenance: `LS-nummer ur ${sourceName} som adress, polaritet antagen. Ej uppmätt.` } }));
 }
 
 const isLive = r => !['proposal', 'rejected', 'unsupported'].includes(r.status);
@@ -66,7 +68,8 @@ export function compileRules(rules, { turnoutNames }) {
   const coupled = Object.fromEntries(turnoutNames.map(n => [n, [n]]));
   for (const r of rules.filter(r => supportedFollow(r) && isLive(r))) { const group = [...r.objects].sort(); for (const n of group) coupled[n] = group; }
   const policies = rules.filter(r => r.type === 'condition' && r.trigger === 'manual' && isLive(r)).map(r => ({ rule: r.source.jmri, button: r.button, names: r.objects,
-    freeSensors: r.requires.freeSensors, blocks: r.requires.blocks, inactiveNX: r.requires.inactiveNX, signals: r.requires.signals, status: r.status === 'active' ? 'ready' : 'unresolved', reason: r.reason || '' }));
+    freeSensors: r.requires.freeSensors, blocks: r.requires.blocks, inactiveNX: r.requires.inactiveNX, signals: r.requires.signals, status: r.status === 'active' ? 'ready' : 'unresolved', reason: r.reason || '',
+    ...(r.source.provenance ? { provenance: r.source.provenance } : {}) }));
   const byTurnout = {};
   for (const p of policies) for (const n of p.names) { if (byTurnout[n]) throw Error('Två manöverregler för samma växel: ' + n); byTurnout[n] = p; }
   for (const n of turnoutNames) if (!byTurnout[n]) byTurnout[n] = { names: coupled[n] || [n], status: 'unresolved', reason: UNRESOLVED_REASON };
@@ -80,7 +83,7 @@ export function compileRules(rules, { turnoutNames }) {
     byTurnout[r.object] = replacement; boundaryOverrides[r.object] = replacement;
   }
   const lines = {};
-  for (const r of rules.filter(r => r.type === 'condition' && r.trigger === 'line' && isLive(r))) lines[r.object] = { id: r.object, label: r.label, button: r.button, rule: r.source.jmri, sourceSensor: r.sourceSensor, blocks: r.requires.blocks };
+  for (const r of rules.filter(r => r.type === 'condition' && r.trigger === 'line' && isLive(r))) lines[r.object] = { id: r.object, label: r.label, button: r.button, rule: r.source.jmri, sourceSensor: r.sourceSensor, blocks: r.requires.blocks, ...(r.detail || {}) };
   const blocks = {};
   for (const r of rules.filter(r => r.type === 'detection' && r.owner === 'rule' && isLive(r))) blocks[r.object] = { address: r.inputs[0].address, activeMeansOccupied: r.inputs[0].activeMeansOccupied !== false, ...(r.inputs.length > 1 ? { inputs: r.inputs.map(i => ({ address: i.address, activeMeansOccupied: i.activeMeansOccupied !== false })), logic: r.logic } : {}) };
   const signals = {};
@@ -93,7 +96,7 @@ export function compileRules(rules, { turnoutNames }) {
     blocks, signals, indicators, indications: crossings.some(r => r.owner === 'rule') ? indicators : null };
 }
 export function profileFragments(profile) {
-  return { coupled: profile.coupled, manualPolicies: profile.manualPolicies, yardBoundaries: profile.yardBoundaries, operatingControls: profile.operatingControls };
+  return { coupled: profile.coupled, manualPolicies: profile.manualPolicies, yardBoundaries: profile.yardBoundaries || {}, operatingControls: profile.operatingControls };
 }
 // De fragment som jämförs mot profilen: kärnans fyra plus det regelägda (tomt i dag).
 export const compiledFragments = c => ({ coupled: c.coupled, manualPolicies: c.manualPolicies, yardBoundaries: c.yardBoundaries, operatingControls: c.operatingControls });

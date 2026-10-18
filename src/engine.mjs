@@ -8,6 +8,8 @@ import { boundaryCommandReason } from './yard-boundaries.mjs';
 import { forbidReason } from './studio/rules.mjs';
 import { YardControl } from './yard-control.mjs';
 import { signalReportKind, aspectFromSwitch } from './signal-report.mjs';
+// Växelmotorns två lägesgivare (feedbackSensors): avvikande aktiv och rakt passiv = T, tvärtom = C, annars okänt.
+export function sensorPosition(s) { return s.thrown === true && s.closed === false ? 'T' : s.closed === true && s.thrown === false ? 'C' : 'unknown'; }
 
 const FIELD_ROWS = new Set(['report', 'transport']), FIELD_ORDERS = new Set(['order', 'permission']);
 // Upplösning vid ankomst: så länge ska tåget ha stått helt på målspåret innan tågvägen löses upp.
@@ -134,10 +136,20 @@ export class Engine extends EventEmitter {
     const now = this.now(); const sequence=++this.reportSequence; let changed = false;
     this.operating.receive(d,sequence);
     if (d.kind === 'turnout') for (const [name, binding] of Object.entries(this.profile.turnouts)) {
-      if (binding.address !== d.address) continue;
+      // En växel med lägesgivare (feedbackSensors, Träkvistas motorer) rapporterar bara genom sina två ingångar.
+      if (binding.address !== d.address || binding.feedbackSensors) continue;
       const pos = d.position === 'unknown' ? 'unknown' : binding.inverted ? (d.position === 'C' ? 'T' : 'C') : d.position;
       const state = this.turnouts[name]; changed ||= state.position !== pos;
       state.position = pos; state.updatedAt = now; state.reportSequence=sequence;
+    }
+    if (d.kind === 'sensor') for (const [name, binding] of Object.entries(this.profile.turnouts)) {
+      // Växelmotorns inbyggda lägesgivare: en ingång för avvikande och en för rakt (JMRI TWOSENSOR). Läget gäller när exakt
+      // en av dem är aktiv; båda passiva betyder att växeln går, båda aktiva att något är fel. Båda ger okänt läge.
+      const f = binding.feedbackSensors; if (!f || (f.thrown !== d.address && f.closed !== d.address)) continue;
+      const state = this.turnouts[name]; state.sensors ||= {}; state.sensors[f.thrown === d.address ? 'thrown' : 'closed'] = d.active; state.sensorsAt = now;
+      const pos = sensorPosition(state.sensors);
+      changed ||= state.position !== pos;
+      state.position = pos; state.updatedAt = now; state.reportSequence = sequence;
     }
     if (d.kind === 'sensor') for (const [name, binding] of Object.entries(this.profile.blocks)) {
       // En spårledning med flera ingångar (detection-regel): belagd när någon av, eller alla, ingångarna säger belagd.
@@ -187,9 +199,13 @@ export class Engine extends EventEmitter {
   }
   turnoutOrder(name, position) {
     const b = this.profile.turnouts[name], s = this.turnouts[name];
+    // Lägesgivarna ändras inte när växeln redan ligger rätt, så ingen ny rapport kommer. Visar båda givarna sedan anslutningen
+    // det begärda läget räknas det som bekräftat direkt; annars väntar kärnan på givarna som för en vanlig växelrapport.
+    const settled = b.feedbackSensors && s.sensorsAt >= this.connectionAt && sensorPosition(s.sensors || {}) === position;
     s.desired = position; s.commandAt = this.now(); s.commandSequence=this.reportSequence;s.position = 'unknown'; s.updatedAt = 0;
     const physical = b.inverted ? (position === 'C' ? 'T' : 'C') : position;
     this.send(switchOrder(b.address, physical));
+    if (settled) { s.position = position; s.updatedAt = this.now(); s.reportSequence = ++this.reportSequence; }
     this.log('order', `${name}: begär ${position === 'C' ? 'rakt' : 'avvikande'}.`, { address: b.address });
   }
   turnoutConfirmed(name, position) {

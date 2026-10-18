@@ -49,9 +49,10 @@ Mac och PC beskrivs nedan.
   mappen Program i hemkatalogen, `~/Applications`.)
 - **Stream Deck:** koppla in den, öppna menyn **⋯ → Stream Deck** och tryck **Anslut** en gång.
   Chrome kommer ihåg valet, och därefter kopplas den upp av sig själv varje gång.
-- **TrainMeet:** menyn **⋯ → Tidtabeller → TrainMeet**. Ge datorn ett eget **TKL-id** under
-  **Redigera anslutning** (till exempel `cda-tkl-mac`) innan du parkopplar; TrainMeet släpper bara in
-  ett TKL per id och station.
+- **TrainMeet:** menyn **⋯ → TrainMeet**. Skriv serverns adress och anslutningskoden och tryck
+  **Anslut**; TKL väljer stationen själv. Koden finns i TrainMeet Server på sidan **Anslut ett
+  ställverk** (knappen i deltagarvyn, inloggad som administratör). Macen heter `cda-tkl-mac` hos
+  TrainMeet, så den kopplar inte bort webbdriften.
 
 ### Uppdatera
 
@@ -127,7 +128,7 @@ Om Windows Defender SmartScreen eller brandväggen frågar: TKL lyssnar bara på
 - **Stream Deck:** koppla in den, öppna menyn **⋯ → Stream Deck** och tryck **Anslut** en gång.
   Webbläsaren kommer ihåg valet, och därefter kopplas den upp av sig själv. Stäng Elgatos egen
   Stream Deck-app om den är installerad; bara ett program åt gången kan styra Stream Deck.
-- **TrainMeet:** som på Mac; ge datorn ett eget TKL-id, till exempel `cda-tkl-pc`.
+- **TrainMeet:** som på Mac: adress och kod, sedan **Anslut**. Datorn heter `cda-tkl-pc` hos TrainMeet.
 
 ### Uppdatera
 

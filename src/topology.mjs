@@ -3,6 +3,10 @@ export class Topology {
     this.panel = panel;
     this.segments = Object.fromEntries(panel.segs.filter(s => s.b !== 'frame' && Math.min(s.y1, s.y2) < 850).map(s => [s.id, s]));
     this.turnouts = Object.fromEntries(Object.values(panel.turnouts).map(t => [t.name, t]));
+    // Dubbel korsningsväxel (JMRI layoutSlip, Träkvistas 22a/23): en nod med fyra ben och två växlar. Varje växel
+    // registreras med korsningsväxelns geometri och block, utan koppling till den andra, eftersom lägena väljs var för sig.
+    this.slips = panel.slips || {};
+    for (const [ident, sl] of Object.entries(this.slips)) for (const name of [sl.name, sl.name2]) if (name) this.turnouts[name] = { ...sl, name, name2: null, slip: ident };
     this.points = {};
     for (const s of Object.values(this.segments)) for (const end of [1, 2]) {
       if (s['t' + end] === 'POS_POINT') (this.points[s['c' + end]] ??= []).push({ id: s.id, end });
@@ -70,7 +74,7 @@ export class Topology {
         let internalLength = 0;
         if (via?.kind === 'turnout') {
           const t = this.turnouts[via.name];
-          const points = { A: [t.ax,t.ay], B: [t.bx,t.by], C: [t.ccx,t.ccy] };
+          const points = { A: [t.ax,t.ay], B: [t.bx,t.by], C: [t.ccx,t.ccy], D: [t.dx,t.dy] };
           for (const leg of [via.from,via.to]) internalLength += Math.hypot(points[leg][0]-t.cx,points[leg][1]-t.cy);
         }
         queue.push({ id, end, settings: expanded, path, blocks: [...n.blocks, ...(vb ? [vb] : []), next.b], crossings: crossing ? [...n.crossings, crossing] : n.crossings, used: [...n.used, id], cost: n.cost + length(next) + internalLength });
@@ -90,6 +94,20 @@ export class Topology {
           push(t['c' + exit.toLowerCase()], 'TURNOUT_' + exit, { ...n.settings, [t.name]: pos }, { kind: 'turnout', name: t.name, from: leg, to: exit });
         }
       }
+      const sm = /^SLIP_([ABCD])$/.exec(type);
+      if (sm) {
+        // Korsningsväxeln: varje tillåten förbindelse (A–C, A–D, B–C, B–D) med båda växlarnas lägen ur JMRI:s states
+        // (2 = CLOSED, 4 = THROWN). Vägen bär den första växelns namn; lägena gäller båda.
+        const sl = this.slips[node]; if (!sl) continue;
+        const leg = sm[1];
+        for (const [pair, st] of Object.entries(sl.states || {})) {
+          const [p, q] = pair.split('-'); if (leg !== p && leg !== q) continue;
+          const exit = leg === p ? q : p;
+          const wanted = { [sl.name]: st.turnout === 4 ? 'T' : 'C', [sl.name2]: st.turnoutB === 4 ? 'T' : 'C' };
+          if (Object.entries(wanted).some(([name, pos]) => n.settings[name] && n.settings[name] !== pos)) continue;
+          push(sl['c' + exit.toLowerCase()], 'SLIP_' + exit, { ...n.settings, ...wanted }, { kind: 'turnout', name: sl.name, slip: node, from: leg, to: exit });
+        }
+      }
       const xm = /^LEVEL_XING_([ABCD])$/.exec(type);
       if (xm && !crossings.has(node)) {
         const x = this.panel.xings[node], exit = { A: 'C', C: 'A', B: 'D', D: 'B' }[xm[1]];
@@ -107,7 +125,7 @@ export class Topology {
         const s = this.segments[p.id], a = [s.x1, s.y1], b = [s.x2, s.y2];
         append(p.id, p.end === 1 ? a : b, p.end === 1 ? b : a, s.b);
       } else {
-        const t = this.turnouts[p.name], points = { A: [t.ax, t.ay], B: [t.bx, t.by], C: [t.ccx, t.ccy] };
+        const t = this.turnouts[p.name], points = { A: [t.ax, t.ay], B: [t.bx, t.by], C: [t.ccx, t.ccy], D: [t.dx, t.dy] };
         append('VX:' + p.name + ':' + p.from, points[p.from], [t.cx, t.cy], t.block);
         append('VX:' + p.name + ':' + p.to, [t.cx, t.cy], points[p.to], t.block);
       }

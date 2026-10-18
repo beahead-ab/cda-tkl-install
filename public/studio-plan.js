@@ -1,11 +1,14 @@
 // Spårplanen i Studio: ritad ur panelgeometrin av modulens egen kod, stor och rullbar i sidled, med lager, urval och minikarta.
 const NS='http://www.w3.org/2000/svg';
 const el=(tag,attrs,parent,text)=>{const n=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))if(v!=null)n.setAttribute(k,v);if(text!=null)n.textContent=text;parent?.append(n);return n;};
+import {forStation} from './studio-station.js';
 export function createPlan(host,geo,{onSelect,info=()=>({})}){
   const [vx,vy,vw,vh]=geo.viewBox;
   host.innerHTML='';host.className='st-plan';
   const scroll=document.createElement('div');scroll.className='st-plan-scroll';scroll.tabIndex=0;scroll.setAttribute('aria-label','Spårplan. Rulla i sidled, klicka på ett objekt för att välja det.');
-  const svg=el('svg',{viewBox:geo.viewBox.join(' '),role:'group','aria-label':'Charlottendals spårplan'},scroll);
+  const svg=el('svg',{viewBox:geo.viewBox.join(' '),role:'group','aria-label':forStation('Charlottendals spårplan')},scroll);
+  // Texterna är satta för Charlottendals ritning, 2100 enheter bred; en mindre ritning får mindre text.
+  svg.style.setProperty('--st-text',String(Math.max(0.45,Math.min(1,vw/2100))));
   const minimap=document.createElement('div');minimap.className='st-minimap';const mini=el('svg',{viewBox:geo.viewBox.join(' '),'aria-hidden':'true'},minimap);
   host.append(scroll,minimap);
   const g={rails:el('g',{class:'st-rails'},svg),legs:el('g',{class:'st-rails'},svg),blockLabels:el('g',{class:'st-layer',hidden:''},svg),labels:el('g',{class:'st-layer'},svg),numbers:el('g',{class:'st-layer'},svg),
@@ -15,7 +18,7 @@ export function createPlan(host,geo,{onSelect,info=()=>({})}){
     if(!s.road)el('line',{x1:s.x1,y1:s.y1,x2:s.x2,y2:s.y2,class:'st-hit st-hit-line','data-id':s.block},g.hits);
   }
   for(const l of geo.legs){el('line',{x1:l.x1,y1:l.y1,x2:l.x2,y2:l.y2,class:l.undetected?'st-rail st-rail-undetected':'st-rail'},g.legs);}
-  el('circle',{cx:geo.turntable.cx,cy:geo.turntable.cy,r:geo.turntable.r,class:'st-turntable'},g.rails);
+  if(geo.turntable)el('circle',{cx:geo.turntable.cx,cy:geo.turntable.cy,r:geo.turntable.r,class:'st-turntable'},g.rails);
   for(const t of geo.turnouts){
     el('circle',{cx:t.cx,cy:t.cy,r:5,class:'st-node'},g.signals);
     el('text',{x:t.cx,y:t.cy-14,class:'st-number','text-anchor':'middle'},g.numbers,t.name.slice(2));

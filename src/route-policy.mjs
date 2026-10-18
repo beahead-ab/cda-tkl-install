@@ -29,7 +29,7 @@ export function attachSourceEndpoints(topology, source) {
     const incoming = [a.connect1name,a.connect2name].map(id=>topology.segments[id]).filter(Boolean).filter(s=>{
       const at = s.c1===a.ident ? 1 : s.c2===a.ident ? 2 : 0;
       if (!at) return false;
-      const dx = deltaFromAnchor(topology, s, at, a);
+      const dx = deltaFromAnchor(topology, s, at, a, source.verticalEastbound);
       return direction==='eastbound' ? dx<0 : dx>0;
     });
     if(incoming.length===1) {
@@ -43,7 +43,7 @@ export function attachSourceEndpoints(topology, source) {
   }
 }
 
-function deltaFromAnchor(topology, segment, at, anchor) {
+function deltaFromAnchor(topology, segment, at, anchor, vertical) {
   const other = at === 1 ? 2 : 1;
   let dx = segment['x'+other] - Number(anchor.x);
   // JMRI may place an anchor exactly on a turnout leg. The zero-length
@@ -52,8 +52,11 @@ function deltaFromAnchor(topology, segment, at, anchor) {
     const turnout = topology.panel.turnouts[segment['c'+other]];
     if (turnout) dx = turnout.cx - Number(anchor.x);
   }
-  return dx;
+  return dx || verticalDelta(segment['y'+other] - Number(anchor.y), vertical);
 }
+// Lodrätt spår: JMRI anger öst och väst även där. Stationen säger vilket håll som är öst (Träkvista: nedåt, se
+// stations/trakvista/station.json). Utan uppgift ger lodrätt spår ingen riktning, som förut.
+export function verticalDelta(dy, vertical) { return !dy || !vertical ? 0 : vertical === 'down' ? dy : -dy; }
 
 export function searchSourceRoute(topology, fromSensor, toSensor) {
   return trimApproach(topology,topology.search(fromSensor,toSensor));
@@ -96,7 +99,7 @@ export function signalPlan(topology, source, route) {
     const anchor = anchors[entry];
     if (!anchor) continue;
     const exit = p.end === 1 ? 2 : 1;
-    const dx = deltaFromAnchor(topology, seg, p.end, anchor);
+    const dx = deltaFromAnchor(topology, seg, p.end, anchor, source.verticalEastbound);
     if (!dx) continue; // no inferred direction for a vertical-only anchor
     const forward = dx > 0 ? 'eastbound' : 'westbound', reverse = dx > 0 ? 'westbound' : 'eastbound';
     add(anchor[forward + 'signalmast'], index, anchor[forward + 'sensor']);
@@ -107,7 +110,7 @@ export function signalPlan(topology, source, route) {
   const last = route.path.at(-1);
   if (last?.kind === 'segment') {
     const seg = topology.segments[last.id], exit = last.end === 1 ? 2 : 1, node = seg['c' + exit];
-    const a = anchors[node], dx = seg['x' + exit] - seg['x' + last.end];
+    const a = anchors[node], dx = (seg['x' + exit] - seg['x' + last.end]) || verticalDelta(seg['y' + exit] - seg['y' + last.end], source.verticalEastbound);
     if (a && dx) for (const direction of ['eastbound', 'westbound']) if (a[direction + 'signalmast']) guards.push(a[direction + 'signalmast']);
     for (const e of ends) if (e.id === node && e.segment === last.id && e.mast) guards.push(e.mast);
   }

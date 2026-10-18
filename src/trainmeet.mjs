@@ -19,6 +19,12 @@ export function localNetwork(hostname){
   if(h.startsWith('['))return /^\[(f[cd][0-9a-f]{2}|fe[89ab][0-9a-f]):/.test(h);
   return false;
 }
+// Ställverkets station i träffen: samma namn, annars den enda station vars namn innehåller ställverkets.
+export function matchStation(stations,name){
+  const hint=String(name||'').trim().toLowerCase(),named=s=>s.name.trim().toLowerCase();if(!hint)return null;
+  const same=stations.find(s=>named(s)===hint);if(same)return same;
+  const near=stations.filter(s=>named(s).includes(hint));return near.length===1?near[0]:null;
+}
 function serverOrigin(value) {
   if(value==='')return '';
   if(!text(value,512))fail('Ange en giltig TrainMeet-adress.');
@@ -88,10 +94,10 @@ function readLines(display,context,station,names,codes){
 // traffic shift is started. It deliberately has no reference to Engine, Field or
 // detector state: a clearance is never a route, a lock or a signal aspect.
 export class TrainMeet extends EventEmitter {
-  constructor({storage,origin='',fetcher=fetch,now=Date.now,changeFeed=true}) {
-    super();this.storage=storage;this.fetcher=fetcher;this.now=now;this.changeFeed=changeFeed;this.feed=null;this.feedRetryAt=0;this.urgent=false;this.sessionId=randomUUID();this.revision=0;this.busy=false;this.current=null;this.lastAttempt=0;this.context=null;this.status='unconfigured';this.error='';this.updatedAt=0;
+  constructor({storage,origin='',fetcher=fetch,now=Date.now,changeFeed=true,station='Charlottendal',clientId='cda-tkl'}) {
+    super();this.station=station;this.storage=storage;this.fetcher=fetcher;this.now=now;this.changeFeed=changeFeed;this.feed=null;this.feedRetryAt=0;this.urgent=false;this.sessionId=randomUUID();this.revision=0;this.busy=false;this.current=null;this.lastAttempt=0;this.context=null;this.status='unconfigured';this.error='';this.updatedAt=0;
     this.origin=serverOrigin(origin);this.originLocked=!!origin;
-    this.data=storage.load('trainmeet.json',{version:1,clientId:'cda-tkl',stationId:'',token:'',origin:this.origin,pairings:{}});
+    this.data=storage.load('trainmeet.json',{version:1,clientId,stationId:'',token:'',origin:this.origin,pairings:{}});
     // One saved pairing per server, each key bound to its own origin. Older files hold only the active one.
     const pairings=this.data.pairings??(this.data.token&&text(this.data.origin,512)?{[this.data.origin]:{stationId:this.data.stationId,token:this.data.token}}:{});
     if(!record(pairings)||Object.entries(pairings).some(([o,p])=>!text(o,512)||!record(p)||!text(p.stationId,128)||!text(p.token,4096)||!p.token))throw Error('Ogiltig sparad TrainMeet-anslutning.');
@@ -184,11 +190,31 @@ export class TrainMeet extends EventEmitter {
     if(display?.protocol_version!==1||!Array.isArray(stations)||stations.length>5000||stations.some(s=>!record(s)||!identity(s.id)||!text(s.name,200)||s.code!=null&&!text(String(s.code),12)))fail('TrainMeet lämnade ingen giltig stationslista.',503);
     return {origin:this.origin,meet:text(display.meet?.name)?display.meet.name:'',stations:stations.map(s=>({id:s.id,name:s.name,code:s.code==null?'':String(s.code)}))};
   }
+  // Anslut (0.82.0): adressen och koden är allt operatören anger. TrainMeet har en kod för hela träffen och TKL väljer
+  // själv sin station ur träffens stationer, med samma namn som ställverket (eller samma början eller kod). Bara när
+  // träffen inte har någon sådan station svarar connect med listan, och operatören väljer.
+  async connect(data) {
+    const origin=serverOrigin(typeof data.origin==='string'?data.origin.trim():'');
+    if(!origin)fail('Ange TrainMeet-serverns adress.');
+    if(!text(data.code,128)||pairingCode(data.code).length<6)fail('Ange anslutningskoden från TrainMeet, sex tecken.');
+    // En pågående läsning (TKL försöker återansluta) väntas ut i stället för att neka.
+    const idle=async()=>{while(this.busy&&this.current)await this.current.catch(()=>{});};
+    await idle();
+    if(origin!==this.origin)this.configure({...this.view(),origin});
+    let stationId=identity(data.stationId)?data.stationId:'';
+    if(!stationId){
+      const list=await this.stations(),pick=matchStation(list.stations,this.station);
+      if(!pick)return {...this.view(),choose:{meet:list.meet,stations:list.stations,reason:`Träffen${list.meet?' '+list.meet:''} har ingen station som heter ${this.station}. Välj stationen.`}};
+      stationId=pick.id;
+    }
+    await idle();
+    return this.pair({...this.view(),stationId,code:data.code});
+  }
   async pair(data) {
     this.check(data);if(!identity(data.stationId)||!text(data.code,128)||!pairingCode(data.code))fail('Ange stations-id och giltig anslutningskod.');
     await this.exclusive(async()=>{
       try {
-        const response=await this.request('/v1/pair',{payload:{pairing_code:pairingCode(data.code),client_id:this.data.clientId,display_name:this.data.clientId,device_kind:'tkl_terminal'},denied:{summary:'TrainMeet godkände inte anslutningskoden.',hint:'Hämta en aktuell kod under Skärmar → Visa anslutningsuppgifter i TrainMeet.'}});
+        const response=await this.request('/v1/pair',{payload:{pairing_code:pairingCode(data.code),client_id:this.data.clientId,display_name:this.data.clientId,device_kind:'tkl_terminal'},denied:{summary:'TrainMeet godkände inte anslutningskoden.',hint:'Koden finns i TrainMeet Server för den som är inloggad som administratör: Anslut ett ställverk i deltagarvyn eller under Drift, och under Inställningar → Anslutningskod. En ny träff ger en ny kod.'}});
         if(response?.protocol_version!==1||response.client_id!==this.data.clientId||!text(response.access_token,4096)||!response.access_token)fail('TrainMeet lämnade ingen giltig parkopplingsnyckel.',503);
         const context=await this.read(response.access_token,data.stationId,true);
         const next={version:1,clientId:this.data.clientId,stationId:data.stationId,token:response.access_token,origin:this.origin,pairings:{...this.data.pairings,[this.origin]:{stationId:data.stationId,token:response.access_token}}};

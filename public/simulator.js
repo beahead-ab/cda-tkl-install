@@ -45,5 +45,7 @@ $('blocks').onclick = e => { const name = e.target.closest('button')?.dataset.bl
 $('block-search').oninput = paintBlocks; $('occupied-only').onchange = paintBlocks;
 $('fault-programming').onchange=e=>act('programming-fault',{enabled:e.target.checked});
 $('link').onclick = () => act('link', { connected: !state.link });
-try { const response = await fetch('api/config'); if (!response.ok) throw Error(); const config = await response.json(); $('tkl-link').href = config.tklUrl; $('tkl-link').hidden = false; } catch {}
+try { const response = await fetch('api/config'); if (!response.ok) throw Error(); const config = await response.json(); $('tkl-link').href = config.tklUrl; $('tkl-link').hidden = false;
+  // Stationens namn (Charlottendal eller en annan station i stations/) i rubriken och fliken.
+  const title = config.station?.title; if (title && title !== 'Charlottendal') { document.title = title + ' · Anläggning'; document.querySelector('.brand span').firstChild.textContent = title.toUpperCase(); document.querySelector('h1').textContent = title + ' i rörelse'; } } catch {}
 await poll(); setInterval(poll, 400);

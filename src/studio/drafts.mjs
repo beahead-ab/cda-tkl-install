@@ -12,8 +12,8 @@ const strip = r => Object.fromEntries(KEEP.filter(k => r[k] !== undefined).map(k
 const decorate = r => ({ ...r, typeLabel: TYPE_LABEL[r.type], runsInLabel: RUNS_IN[r.type], explain: explainRule(r) });
 
 export class StudioDrafts {
-  constructor({ base, field, rules, storage, now = Date.now, canActivate = () => ({ allowed: false, reason: 'Aktivering ej tillgänglig.' }), prepare = () => () => {}, proposal = () => ({ proposals: [], replaces: [] }), trial = runTrial, sampleUnchanged = 12 }) {
-    this.base = base; this.field = field; this.storage = storage; this.now = now; this.canActivate = canActivate; this.prepare = prepare; this.proposal = proposal; this.trial = trial; this.sampleUnchanged = sampleUnchanged;
+  constructor({ base, field, rules, storage, now = Date.now, canActivate = () => ({ allowed: false, reason: 'Aktivering ej tillgänglig.' }), prepare = () => () => {}, proposal = () => ({ proposals: [], replaces: [] }), trial = runTrial, sampleUnchanged = 12, sourceName = 'Cda60.xml' }) {
+    this.base = base; this.field = field; this.sourceName = sourceName; this.storage = storage; this.now = now; this.canActivate = canActivate; this.prepare = prepare; this.proposal = proposal; this.trial = trial; this.sampleUnchanged = sampleUnchanged;
     this.sessionId = randomUUID();
     this.names = { turnouts: new Set(Object.keys(base.turnouts)), blocks: new Set(Object.keys(base.blocks)), signals: new Set(Object.keys(base.signals)), lines: new Set(Object.keys(base.operatingControls?.lines || {})) };
     this.data = storage.load('studio-rules.json', { schema: 1, revision: 0, activeVersion: 0, versions: [{ id: 0, at: null, reason: 'Dagens regler ur driftprofilen', rules }], draft: null });
@@ -27,7 +27,7 @@ export class StudioDrafts {
   get active() { return this.data.versions[this.data.activeVersion]; }
   activeRules() { return this.active.rules; }
   // Reglerna tillämpade på en profil, i första hand den som driftbindningarna ger.
-  apply(profile = this.base, rules = this.activeRules()) { return applyRules(profile, rules, this.field); }
+  apply(profile = this.base, rules = this.activeRules()) { return applyRules(profile, rules, this.field, { sourceName: this.sourceName }); }
   status(draft, applied, problems) {
     if (problems.length) return { allowed: false, reason: 'Utkastet validerar inte.' };
     if (!draft.trial) return { allowed: false, reason: 'Prova utkastet i simulatorn först.' };
@@ -39,7 +39,7 @@ export class StudioDrafts {
   view(baseProfile = this.base) {
     const draft = this.data.draft; let d = null;
     if (draft) {
-      const problems = validateRules(draft.rules, this.names), applied = applyRules(baseProfile, draft.rules, this.field);
+      const problems = validateRules(draft.rules, this.names), applied = applyRules(baseProfile, draft.rules, this.field, { sourceName: this.sourceName });
       const activeIds = new Set(this.activeRules().map(r => r.id)), draftIds = new Set(draft.rules.map(r => r.id));
       const routes = applied.changes.routes;
       d = { baseVersion: draft.baseVersion, note: draft.note, createdAt: draft.createdAt, rules: draft.rules.length,
@@ -71,7 +71,7 @@ export class StudioDrafts {
   test(data, baseProfile = this.base) {
     this.check(data); const draft = this.data.draft; if (!draft) fail('Inget utkast att prova.');
     const problems = validateRules(draft.rules, this.names); if (problems.length) fail('Utkastet validerar inte: ' + problems.map(p => p.rule + ': ' + p.problem).join(' '));
-    const applied = applyRules(baseProfile, draft.rules, this.field), changed = applied.changes.routes.map(r => r.id);
+    const applied = applyRules(baseProfile, draft.rules, this.field, { sourceName: this.sourceName }), changed = applied.changes.routes.map(r => r.id);
     const rest = applied.profile.routes.map(r => r.id).filter(id => !changed.includes(id)), step = Math.max(1, Math.floor(rest.length / this.sampleUnchanged));
     const sample = rest.filter((_, i) => i % step === 0).slice(0, this.sampleUnchanged);
     const result = this.trial({ profile: applied.profile, field: applied.field, routeIds: [...changed, ...sample] });
@@ -83,7 +83,7 @@ export class StudioDrafts {
   activate(data, baseProfile = this.base) {
     this.check(data); const draft = this.data.draft; if (!draft) fail('Inget utkast att aktivera.');
     if (typeof data.reason !== 'string' || data.reason.trim().length < 3 || data.reason.length > 500 || /[\u0000-\u001f]/.test(data.reason)) fail('Beskriv underlaget för ändringen (3–500 tecken).');
-    const problems = validateRules(draft.rules, this.names), applied = applyRules(baseProfile, draft.rules, this.field), status = this.status(draft, applied, problems);
+    const problems = validateRules(draft.rules, this.names), applied = applyRules(baseProfile, draft.rules, this.field, { sourceName: this.sourceName }), status = this.status(draft, applied, problems);
     if (!status.allowed) fail(status.reason);
     const next = copy(this.data), id = next.versions.length, apply = this.prepare(applied.profile, applied.field);
     next.versions.push({ id, at: this.now(), reason: data.reason.trim(), rules: copy(draft.rules) }); next.activeVersion = id; next.draft = null;

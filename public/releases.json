@@ -1,5 +1,12 @@
 [
   {
+    "version": "0.82.12",
+    "date": "2026-10-20",
+    "notes": [
+      "Spårplanens knappar behåller sin låsmarkering mellan rapporterna även på stationer utan programmeringsspår; rättar blinkandet i Träkvista"
+    ]
+  },
+  {
     "version": "0.82.11",
     "date": "2026-10-18",
     "notes": [

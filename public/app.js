@@ -600,7 +600,8 @@ function paintPlan() {
       attribute(b.g,'aria-description',selectedEnd?'Vald slutpunkt · bekräftar tågvägsval.':selectedStart?'Vald startpunkt · välj slutplupp.':preparingRole?(preparingRole==='start'?'Startpunkt':'Slutpunkt')+' · Tågvägen förbereds.':'');
     }
     b.g.classList.toggle('chosen', b.id === chosen); b.g.classList.toggle('unavailable', !b.available || (b.names.length && state.manual?.[b.names[0]]?.allowed===false));
-    b.g.classList.toggle('locked',!!state?.routes.some(r=>b.names.some(n=>r.turnouts[n]))||(state.operating?.programming?.reserved&&b.names.includes('Vx133')));
+    // Utan programmeringsspår blir sista ledet undefined. toggle måste få ett booleskt värde för att inte växla klassen vid varje rapport.
+    b.g.classList.toggle('locked',!!(state?.routes.some(r=>b.names.some(n=>r.turnouts[n]))||(state.operating?.programming?.reserved&&b.names.includes('Vx133'))));
     b.g.classList.toggle('line-is-blocked',!!state.operating?.lines.some(l=>l.blocked&&l.button===b.id));
   }
   for (const [id, data] of routeNodes) if (!state?.routes.some(r => r.id === id)) { data.g.remove(); routeNodes.delete(id); }

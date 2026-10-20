@@ -28,7 +28,10 @@ skapa ägaren; i webbdriften skapas ägaren på servern.
 - **Ägaren** skapas en gång: lokalt i Kom igång eller på inloggningssidan ("Skapa ägaren"); i webbdriften med
   `printf '%s\n' "$PASSWORD" | node scripts/create-owner.mjs <e-post>` som användaren `charlottendal`.
 - **Inbjudan.** Under Inställningar → Den här datorn → Användare skriver ägaren användarens e-postadress och väljer roll.
-  TKL visar en engångskod `XXXX-XXXX` (utan 0, O, 1 och I) som gäller sju dagar. Den nya användaren öppnar
+  TKL visar en engångskod `XXXX-XXXX` (utan 0, O, 1 och I) som gäller sju dagar. **Kopiera hela inbjudan** kopierar
+  en färdig text med stationens namn, installationens inloggningsadress, e-post, kod, roll, sista giltighetstid
+  och instruktioner för att välja lösenord. Samma text visas vid **Ny kod**. Om webbläsaren spärrar urklipp
+  markeras hela texten för manuell kopiering. Koden visas bara när den skapas. Den nya användaren öppnar
   inloggningssidan, väljer "Jag har en inbjudningskod" och anger e-post, kod och ett eget lösenord. Koden lagras
   bara som hash och fungerar en gång.
 - **Ny kod** nollställer användarens lösenord och avslutar dess inloggningar. **Ta bort** loggar ut användaren

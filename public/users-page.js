@@ -4,7 +4,7 @@ import {createAdminDialog} from './admin-ui.js';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const when=t=>t?new Date(t).toLocaleString('sv-SE',{dateStyle:'short',timeStyle:'short'}):'';
 const ROLE={owner:'ägare',admin:'administratör',ranger:'rangerare'};
-export function createUsersPage({root,api,message,session}){
+export function createUsersPage({root,api,message,session,stationTitle}){
   if(!root)return null;
   let view=null,last='';
   const pill=(mode,text)=>`<span class="settings-state" data-state="${mode}">${esc(text)}</span>`;
@@ -22,10 +22,15 @@ export function createUsersPage({root,api,message,session}){
   };
   const showCode=(result,title)=>{
     const body=document.createElement('div');
-    body.innerHTML=`<p>Lämna e-postadressen och koden till <b>${esc(result.user.username)}</b> (${ROLE[result.user.role]}). Koden visas bara nu och gäller till ${esc(when(result.expires))}.</p><p class="users-code"><code>${esc(result.code)}</code> <button type="button" data-copy-code>Kopiera</button></p><p class="settings-consequence">Den nya användaren öppnar inloggningssidan, väljer "Jag har en inbjudningskod" och anger namn, kod och ett eget lösenord.</p>`;
-    body.querySelector('[data-copy-code]').onclick=async e=>{try{await navigator.clipboard.writeText(result.code);e.target.textContent='Kopierad';}catch{e.target.textContent='Markera koden och kopiera';}};
+    const text=`Hej!\n\nDu är inbjuden till ${stationTitle?stationTitle+' TKL':'TKL'}.\n\nAdress: ${new URL('/login',location.origin).href}\nE-post: ${result.user.username}\nEngångskod: ${result.code}\nRoll: ${ROLE[result.user.role]}\nKoden gäller till: ${when(result.expires)}\n\nSå kommer du igång:\n1. Öppna adressen ovan.\n2. Välj ”Jag har en inbjudningskod”.\n3. Ange din e-postadress och engångskoden.\n4. Välj och upprepa ett eget lösenord (6–128 tecken).\n5. Klicka på ”Skapa lösenord och logga in”.\n\nKoden kan bara användas en gång. Därefter loggar du in med e-postadressen och ditt lösenord.`;
+    body.innerHTML='<p>Kopiera hela texten och lämna den till användaren. Koden visas bara nu. Ingen e-post skickas automatiskt.</p><label class="users-invitation">Inbjudningstext<textarea readonly rows="17" spellcheck="false"></textarea></label><button type="button" data-copy-invitation>Kopiera hela inbjudan</button><p class="settings-consequence" role="status" aria-live="polite"></p>';
+    const field=body.querySelector('textarea'),status=body.querySelector('[role=status]');field.value=text;
+    body.querySelector('[data-copy-invitation]').onclick=async()=>{
+      try{await navigator.clipboard.writeText(text);status.textContent='Hela inbjudan är kopierad.';}
+      catch{field.focus();field.select();status.textContent='Texten är markerad. Kopiera den med tangentbordet eller menyn.';}
+    };
     const close=document.createElement('button');close.type='button';close.textContent='Klart';
-    const modal=createAdminDialog({title,body,saveButton:close});modal.footer.querySelector('[data-cancel]')?.remove();close.onclick=()=>modal.close();modal.open();
+    const modal=createAdminDialog({title,body,saveButton:close});modal.footer.querySelector('[data-cancel]')?.remove();close.onclick=()=>modal.close();modal.element.addEventListener('close',()=>modal.element.remove(),{once:true});modal.open();
   };
   const invite=()=>{
     const form=document.createElement('form');form.className='admin-form';

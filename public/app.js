@@ -837,7 +837,7 @@ async function start() {
   stationSettings=createStationSettings($('station-settings'),{api,message,session:()=>authSession});
   updatePage=createUpdatePage({root:$('advanced-update-content'),api,message});
   const aiPage=createAiPage({root:$('advanced-ai-content'),api,message});
-  const usersPage=createUsersPage({root:$('advanced-users-content'),api,message,session:()=>authSession});
+  const usersPage=createUsersPage({root:$('advanced-users-content'),api,message,session:()=>authSession,stationTitle:config.station?.title});
   const startPage=createStartPage({root:$('advanced-start-content'),api,message,session:()=>authSession,onChange:v=>{config.onboarding={done:v.done,remaining:v.remaining};panelHead?.startNotice(config.onboarding);startStatus();}});
   const startStatus=()=>{const o=config.onboarding,el=$('start-status');if(el)el.textContent=o&&!o.done?'· '+o.remaining+' kvar':'';};
   panelHead?.startNotice(config.onboarding);startStatus();

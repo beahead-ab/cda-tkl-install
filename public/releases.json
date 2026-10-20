@@ -1,5 +1,12 @@
 [
   {
+    "version": "0.82.13",
+    "date": "2026-10-20",
+    "notes": [
+      "Kopiera hela inbjudan med inloggningslänk, e-post, engångskod, roll, giltighetstid och instruktioner för att välja lösenord; gäller även Ny kod"
+    ]
+  },
+  {
     "version": "0.82.12",
     "date": "2026-10-20",
     "notes": [

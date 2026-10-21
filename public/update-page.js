@@ -1,7 +1,7 @@
-// Inställningar → Uppdatering: the installed version, the latest one and, on a Mac or
-// PC, the one line to run, always at hand with a copy button. A Raspberry Pi and the web
-// deployment start the update themselves; on Render, Render builds main (and a Deploy Hook lets
-// the panel start that build).
+// Inställningar → Uppdatering: the installed version and the latest one. En Raspberry Pi, webbdriften och
+// sedan 0.84.0 också en Mac eller PC uppdaterar sig själva härifrån; på Render bygger Render main (och en
+// Deploy Hook låter panelen starta bygget). En äldre användarinstallation utan update-skript får raden att
+// köra, alltid till hands med en kopieringsknapp.
 import {updateLines,openUpdateNotice,canFetchLatest,buildRepository} from './update-notice.js';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const KIND_TEXT={'raspberry-pi':'Raspberry Pi',mac:'Mac',windows:'Windows',web:'webbdriften',render:'webbdriften på Render'};
@@ -44,10 +44,12 @@ export function createUpdatePage({root,api,message}){
       const state=update.available?[pill('warn','Ny version finns'),`${update.latest} kan installeras. Inget ändras förrän du uppdaterar.`]
         :update.latest?[pill('ok','Senaste versionen'),'Inget att göra.']
         :[pill('off','Okänt'),update.error||'Senaste versionen har inte kunnat läsas än. Uppdateringen fungerar ändå.'];
-      const who=update.kind==='render'?'Render':update.kind==='web'?'Servern':'Pi:n';
+      const who=update.kind==='render'?'Render':update.kind==='web'?'Servern':update.kind==='mac'?'Macen':update.kind==='windows'?'Datorn':'Pi:n';
       const checked=update.checkedAt?new Date(update.checkedAt).toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'}):'';
       const search=`<div class="settings-actions"><button type="button" data-check-update>Sök efter ny version</button><p>Läser installationsförrådet på GitHub nu. Annars sker det varje timme${checked?'; senast '+checked:''}.</p></div>`;
-      const fetches=update.kind==='render'?'Render bygger den nya versionen ur '+buildRepository(update)+' och startar om webbdriften; driftdata och inloggningar ligger kvar på disken':`${who} hämtar från ${esc(repository.split('/')[1])}, tar en säkerhetskopia, installerar och startar om TKL själv`;
+      const fetches=update.kind==='render'?'Render bygger den nya versionen ur '+buildRepository(update)+' och startar om webbdriften; driftdata och inloggningar ligger kvar på disken'
+        :update.kind==='mac'||update.kind==='windows'?`${who} hämtar från ${esc(repository.split('/')[1])}, installerar den nya versionen bredvid den nuvarande och startar om TKL själv; föregående version återställs om den nya inte svarar`
+        :`${who} hämtar från ${esc(repository.split('/')[1])}, tar en säkerhetskopia, installerar och startar om TKL själv`;
       const how=update.canStart
         ?(update.available?`<div class="settings-actions"><button type="button" class="primary" data-start-update>Uppdatera nu</button><p>${fetches}. Panelen är borta en kort stund${isWeb(update.kind)?' för alla som är inne':''}.</p></div>`
           :canFetchLatest(update)?`<div class="settings-actions"><button type="button" data-start-update>Hämta senaste versionen</button><p>Versionen gick inte att läsa, men ${who} kan ändå hämta och installera den senaste. ${fetches}.</p></div>`

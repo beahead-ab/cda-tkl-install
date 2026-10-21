@@ -57,6 +57,13 @@ grep -q '^CHARLOTTENDAL_INSTALL_KIND=' "$APP/app.env" || printf '\nCHARLOTTENDAL
 # En annan station än Charlottendal: stationen och förrådet för uppdateringar.
 [ "$TKL_STATION" = charlottendal ] || grep -q '^CHARLOTTENDAL_STATION=' "$APP/app.env" || printf 'CHARLOTTENDAL_STATION=%s\n' "$TKL_STATION" >> "$APP/app.env"
 [ "$TKL_REPOSITORY" = beahead-ab/cda-tkl-install ] || grep -q '^CHARLOTTENDAL_INSTALL_REPOSITORY=' "$APP/app.env" || printf 'CHARLOTTENDAL_INSTALL_REPOSITORY=%s\n' "$TKL_REPOSITORY" >> "$APP/app.env"
+# Privat förråd: spara samma token som installationen fick, så att Uppdatering i panelen ser nya versioner.
+# Som på Pi:n (scripts/install-raspberry-pi.sh), fast i installationens egen mapp och bara för den egna användaren.
+if [ -n "${CDA_TKL_TOKEN:-}" ]; then umask 077 && printf '%s\n' "$CDA_TKL_TOKEN" > "$APP/github-token" && umask 022; fi
+if [ -f "$APP/github-token" ]; then
+  chmod 0600 "$APP/github-token"
+  grep -q '^CHARLOTTENDAL_GITHUB_TOKEN_FILE=' "$APP/app.env" || printf 'CHARLOTTENDAL_GITHUB_TOKEN_FILE="%s"\n' "$APP/github-token" >> "$APP/app.env"
+fi
 # "Application Support" has a space: run.sh sources app.env, so the value must be quoted.
 # Installations from before 0.50.1 wrote it unquoted, and TKL then kept its data in the
 # release's own var folder. Quote it, and bring that data into state once.
@@ -65,6 +72,9 @@ if [ -z "$(ls -A "$APP/state" 2>/dev/null)" ] && [ -n "$PREVIOUS" ] && [ -n "$(l
   cp -Rp "$PREVIOUS/var"/. "$APP/state"/ && rm -f "$APP/state/.gitkeep" && echo "Driftdata flyttade till $APP/state"
 fi
 cp "$SOURCE_DIR/packaging/mac/run.sh" "$APP/run.sh" && chmod +x "$APP/run.sh"
+# Uppdateringen härifrån: panelens Uppdatera nu startar det här skriptet, som kör installationsraden igen.
+cp "$SOURCE_DIR/packaging/mac/update.sh" "$APP/update.sh" && chmod +x "$APP/update.sh"
+grep -q '^CHARLOTTENDAL_UPDATE_COMMAND=' "$APP/app.env" || printf 'CHARLOTTENDAL_UPDATE_COMMAND="%s"\n' "$APP/update.sh" >> "$APP/app.env"
 
 # The app that opens the panel: Chrome (WebHID for the Stream Deck), else the default browser.
 # It goes in Program (/Applications), which an administrator can write without sudo;

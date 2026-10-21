@@ -56,10 +56,14 @@ Mac och PC beskrivs nedan.
 
 ### Uppdatera
 
-När en ny version finns visar statusraden `● Uppdatering X`. Tryck på den: rutan visar raden att köra
-och har en knapp som kopierar den. Kör installationsraden igen i Terminal. Inställningar och
-driftdata ligger kvar; svarar den nya versionen inte inom 40 sekunder återställs den föregående
-automatiskt.
+När en ny version finns visar statusraden `● Uppdatering X`. Tryck på den och välj **Uppdatera nu**:
+Macen hämtar versionen, installerar den bredvid den nuvarande och startar om TKL, vilket tar ett par
+minuter. Inställningar och driftdata ligger kvar; svarar den nya versionen inte inom 40 sekunder
+återställs den föregående automatiskt. Inställningar → Uppdatering visar hur det gick, och loggen
+ligger i `logs/update.log` i installationens mapp.
+
+Det går lika bra att köra installationsraden igen i Terminal; en installation från före 0.84.0 visar
+raden att köra tills den har uppdaterats en gång.
 
 ### Var allt ligger
 
@@ -68,6 +72,7 @@ automatiskt.
 | Program, Node.js och versioner | `~/Library/Application Support/Charlottendal TKL/` (`current` pekar på versionen som används) |
 | Inställningar | `~/Library/Application Support/Charlottendal TKL/app.env` |
 | Driftdata | `~/Library/Application Support/Charlottendal TKL/state/` |
+| Uppdateringsskript och logg | `~/Library/Application Support/Charlottendal TKL/update.sh`, `logs/update.log` |
 | Logg | `~/Library/Application Support/Charlottendal TKL/logs/tkl.log` |
 | Autostart | `~/Library/LaunchAgents/se.beahead.cda-tkl.plist` |
 | App | `/Applications/Charlottendal TKL.app` (utan administratörsrätt `~/Applications`) |
@@ -132,10 +137,14 @@ Om Windows Defender SmartScreen eller brandväggen frågar: TKL lyssnar bara på
 
 ### Uppdatera
 
-När en ny version finns visar statusraden `● Uppdatering X`. Tryck på den: rutan visar raden att köra
-och har en knapp som kopierar den. Kör installationsraden igen i PowerShell. Inställningar och
-driftdata ligger kvar; svarar den nya versionen inte inom 40 sekunder återställs den föregående
-automatiskt.
+När en ny version finns visar statusraden `● Uppdatering X`. Tryck på den och välj **Uppdatera nu**:
+datorn hämtar versionen, installerar den bredvid den nuvarande och startar om TKL, vilket tar ett par
+minuter. Inställningar och driftdata ligger kvar; svarar den nya versionen inte inom 40 sekunder
+återställs den föregående automatiskt. Inställningar → Uppdatering visar hur det gick, och loggen
+ligger i `logs\update.log` i installationens mapp.
+
+Det går lika bra att köra installationsraden igen i PowerShell; en installation från före 0.84.0 visar
+raden att köra tills den har uppdaterats en gång.
 
 ### Var allt ligger
 
@@ -145,6 +154,7 @@ automatiskt.
 | Inställningar | `%LOCALAPPDATA%\Charlottendal TKL\app.env` |
 | Driftdata | `%LOCALAPPDATA%\Charlottendal TKL\state\` |
 | Logg | `%LOCALAPPDATA%\Charlottendal TKL\logs\tkl.log` |
+| Uppdateringsskript och logg | `%LOCALAPPDATA%\Charlottendal TKL\update.ps1`, `logs\update.log` |
 | Autostart | `Charlottendal TKL.lnk` i `shell:startup` |
 | Genväg | `Charlottendal TKL.lnk` på skrivbordet |
 
@@ -174,15 +184,18 @@ Den sista raden tar även bort driftdata och inställningar.
 ## Gemensamt
 
 - **LocoNet.** En ny installation har LocoNet ej ansluten: TKL svarar själv och kör trafikspelets tåg från
-  TrainMeet-servern. *Anslut till LocoNet*, med en LocoBuffer på USB, görs med lägesknappen i statusraden, på
-  Raspberry Pi och Mac men inte på Windows än. Se [LocoNet ansluten eller ej ansluten](docs/loconet-anslutning.md).
+  TrainMeet-servern. *Anslut till LocoNet* görs med lägesknappen i statusraden, på Raspberry Pi och Mac men inte
+  på Windows än. Banan nås på två sätt, valt under Inställningar → Banan (LocoNet): en **LocoBuffer på USB** eller
+  en **BTLocoBridge över Bluetooth** (Möllehems smartphoninterface), som paras i datorn först. Se
+  [LocoNet ansluten eller ej ansluten](docs/loconet-anslutning.md).
 - **Inloggning.** TKL svarar bara på datorn själv. Operatören behöver ingen inloggning; Inställningar och
   Objekt och regler kräver en inloggad ägare eller administratör så snart ägaren är skapad (se
   `docs/anvandare.md`). Ägaren skapas i Kom igång vid första starten.
 - **En TKL per dator.** Alla använder portarna 8910–8912.
 - **Ny version.** Varje installation tittar efter nya versioner i `beahead-ab/cda-tkl-install` när den
   startar och sedan var sjätte timme; den läser bara versionsnumret och skickar inget om datorn.
-  På Raspberry Pi startar knappen **Uppdatera nu** uppdateringen direkt från ställverket.
+  Knappen **Uppdatera nu** i ställverket gör hela uppdateringen: på Raspberry Pi, och sedan 0.84.0 också på
+  Mac och PC.
 - **AI-tjänst.** Chatten och AI-genomgången i Objekt och regler behöver en nyckel från Anthropic, inlagd
   under **Inställningar → Den här datorn → AI-tjänst**; Kom igång frågar efter den. Nyckeln stannar på
   TKL-servern.

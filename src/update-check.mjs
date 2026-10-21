@@ -28,14 +28,20 @@ const KINDS=new Set(['raspberry-pi','mac','windows','web','render']);
 export const renderHook=value=>/^https:\/\/api\.render\.com\/deploy\/srv-[^\s?#\/]+\?key=[^\s&#]+$/.test(String(value||''))?String(value):'';
 // A Render build that has not replaced the running version after this long is reported as failed.
 const RENDER_TIMEOUT_MS=30*60000;
+// Samma sak för en Mac eller PC, där uppdateringen körs av installationens eget update-skript: har versionen inte
+// bytts efter den här tiden kom den nya versionen inte upp, och den gamla är återställd av installeraren.
+const LOCAL_TIMEOUT_MS=20*60000;
+const SELF_RUN=new Set(['render','mac','windows']);
 const IN_PROGRESS=new Set(['fetching','installing','backup','restarting']);
-// The systemd unit the panel may start; elsewhere the update runs from Terminal or PowerShell.
+// The systemd unit the panel may start. En Mac eller PC har i stället installationens eget update-skript
+// (CHARLOTTENDAL_UPDATE_COMMAND, skrivet av installeraren); utan det körs uppdateringen från Terminal eller PowerShell.
 export const UPDATE_UNITS={'raspberry-pi':'cda-tkl-update.service',web:'charlottendal-update.service'};
+export const USER_KINDS=new Set(['mac','windows']);
 export const newer=(a,b)=>{const x=String(a).split(/[.+-]/).map(Number),y=String(b).split(/[.+-]/).map(Number);for(let i=0;i<3;i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0;}return false;};
 export class UpdateCheck{
-  constructor({current,kind,fetcher=fetch,now=Date.now,repository=DEFAULT_REPOSITORY,product='Charlottendal TKL',url=repositoryUrls(repository).url,releasesUrl=repositoryUrls(repository).releasesUrl,token=()=>'',intervalMs=3600000,statusFile=null,readFile=null,writeFile=null,hook=''}){
+  constructor({current,kind,fetcher=fetch,now=Date.now,repository=DEFAULT_REPOSITORY,product='Charlottendal TKL',url=repositoryUrls(repository).url,releasesUrl=repositoryUrls(repository).releasesUrl,token=()=>'',intervalMs=3600000,statusFile=null,readFile=null,writeFile=null,hook='',command=''}){
     if(!KINDS.has(kind))throw Error('Okänd installationstyp: '+kind);
-    Object.assign(this,{current,kind,fetcher,now,repository,product,url,releasesUrl,token,intervalMs,statusFile,readFile,writeFile,hook:kind==='render'?renderHook(hook):''});this.runCache={text:null,value:null};this.latest=null;this.checkedAt=0;this.error='';this.timer=null;this.newReleases=[];
+    Object.assign(this,{current,kind,fetcher,now,repository,product,url,releasesUrl,token,intervalMs,statusFile,readFile,writeFile,hook:kind==='render'?renderHook(hook):'',command:USER_KINDS.has(kind)?String(command||''):''});this.runCache={text:null,value:null};this.latest=null;this.checkedAt=0;this.error='';this.timer=null;this.newReleases=[];
   }
   start(delayMs=30000){this.settle();const run=()=>this.check().catch(()=>{});this.timer=setTimeout(()=>{run();this.timer=setInterval(run,this.intervalMs);this.timer.unref?.();},delayMs);this.timer.unref?.();}
   // Med token: GitHubs API, som läser även ett privat förråd. Utan: den publika filen, som förut.
@@ -76,10 +82,18 @@ export class UpdateCheck{
     const at=new Date(this.now()).toISOString().replace(/\.\d+Z$/,'Z');
     try{this.writeFile(this.statusFile,JSON.stringify({phase,message,at,from,to})+'\n');}catch{}
   }
+  // Där TKL själv för anteckningarna (Render, Mac och PC) är den startade uppdateringen klar så snart en process med
+  // en annan version läser filen, och misslyckad när ingen sådan kom.
   settle(){
-    if(this.kind!=='render')return;const run=this.run();if(!run||!IN_PROGRESS.has(run.phase))return;
+    if(!SELF_RUN.has(this.kind))return;const run=this.run();if(!run||!IN_PROGRESS.has(run.phase))return;
     if(run.from&&run.from!==this.current)this.write('done','Version '+this.current+' är installerad. Föregående version: '+run.from+'.',run.from,this.current);
-    else if(this.now()-Date.parse(run.at)>RENDER_TIMEOUT_MS)this.write('failed','Render har inte bytt version på 30 minuter; '+run.from+' kör fortfarande. Se Events på tjänsten i Render.',run.from,run.to);
+    else if(this.kind==='render'){if(this.now()-Date.parse(run.at)>RENDER_TIMEOUT_MS)this.write('failed','Render har inte bytt version på 30 minuter; '+run.from+' kör fortfarande. Se Events på tjänsten i Render.',run.from,run.to);}
+    else if(this.now()-Date.parse(run.at)>LOCAL_TIMEOUT_MS)this.write('failed','Uppdateringen blev inte klar; '+run.from+' kör fortfarande. Installeraren återställer den gamla versionen om den nya inte startar. Loggen finns i installationens logs-mapp.',run.from,run.to);
+  }
+  // Uppdatera nu på en Mac eller PC: panelen startar installationens update-skript, som kör installationsraden igen.
+  startLocal(){
+    if(!this.command)throw Error('Den här installationen har inget uppdateringsskript.');
+    this.write('fetching','Hämtar och installerar '+(this.latest||'senaste versionen')+'. TKL startar om när den är installerad.',this.current,this.latest||'');
   }
   // Uppdatera nu on Render: the Deploy Hook builds the newest commit of the branch Render follows.
   async startRender(){
@@ -93,5 +107,5 @@ export class UpdateCheck{
   // Render took over the web server's state directory on 6 October with its last update.json (0.59.1 → 0.68.0,
   // failed), and a build Render starts by itself writes no file.
   lastRun(){const run=this.run();return run&&run.from&&newer(this.current,run.from)&&(!run.to||newer(this.current,run.to))?null:run;}
-  view(){return {kind:this.kind,repository:this.repository,product:this.product,current:this.current,latest:this.latest,available:!!this.latest&&newer(this.latest,this.current),newReleases:this.newReleases,checkedAt:this.checkedAt,error:this.error,canStart:this.kind==='render'?!!this.hook:!!UPDATE_UNITS[this.kind],run:this.lastRun()};}
+  view(){return {kind:this.kind,repository:this.repository,product:this.product,current:this.current,latest:this.latest,available:!!this.latest&&newer(this.latest,this.current),newReleases:this.newReleases,checkedAt:this.checkedAt,error:this.error,canStart:this.kind==='render'?!!this.hook:!!UPDATE_UNITS[this.kind]||!!this.command,run:this.lastRun()};}
 }

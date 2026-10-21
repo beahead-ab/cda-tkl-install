@@ -27,7 +27,7 @@ import { PanelIndications } from './panel-indications.mjs';
 import { TrainMeet } from './trainmeet.mjs';
 import { ModelClock } from './model-clock.mjs';
 import { describeProtocol, TelegramRecorder } from './telegram-recorder.mjs';
-import { UpdateCheck, UPDATE_UNITS, installRepository, readToken } from './update-check.mjs';
+import { UpdateCheck, UPDATE_UNITS, USER_KINDS, installRepository, readToken } from './update-check.mjs';
 import { studioData, studioRules, buildRegistry, detectionInventory } from './studio/index.mjs';
 import { CardInventory, mgpSummary } from './studio/cards.mjs';
 import { Measurements } from './studio/measure.mjs';
@@ -221,7 +221,7 @@ const release=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.u
 // makes it one, so Inställningar → Uppdatering can update it from cda-tkl-install. On Render, deploy/render
 // sets the kind and RENDER_DEPLOY_HOOK_URL (a secret set in Render) lets the panel start a new build.
 const installKind=process.env.CHARLOTTENDAL_INSTALL_KIND||(fs.existsSync('/usr/local/sbin/charlottendal-update')?'web':'');
-const updateCheck=installKind?new UpdateCheck({current:release,kind:installKind,repository:installRepository(),product:station.title+' TKL',token:()=>readToken(),statusFile:path.join(storage.directory,'update.json'),readFile:file=>fs.readFileSync(file,'utf8'),
+const updateCheck=installKind?new UpdateCheck({current:release,kind:installKind,repository:installRepository(),product:station.title+' TKL',token:()=>readToken(),command:process.env.CHARLOTTENDAL_UPDATE_COMMAND||'',statusFile:path.join(storage.directory,'update.json'),readFile:file=>fs.readFileSync(file,'utf8'),
   writeFile:(file,text)=>{fs.writeFileSync(file+'.tmp',text,{mode:0o640});fs.renameSync(file+'.tmp',file);},hook:process.env.RENDER_DEPLOY_HOOK_URL}):null;
 updateCheck?.start();
 const snapshot = () => {const state=engine.snapshot();return { ...state,release,update:updateCheck?.view()??null,connectionInfo:connectionInfo(profile),connectionMode:connectionView(),installationStation:installationStation.view(stationRuntime()),destinations:destinations.view(),streamDeck:streamDeckLayouts.view(),bindingVersion:bindings.data.activeVersion,bindingActivation:activationStatus(), recordings:recorder.view(),clock:modelClock.snapshot(),trainMeet:trainMeet.view(),panelIndications:panelIndications.snapshot(state),trace, configurationVersion:configuration.data.activeVersion,trainInformation:trainInformation.snapshot(),trainTracking:tracker.view(),trafficTrains:trafficTrains.view(),automation:automation.view() };};
@@ -330,6 +330,14 @@ const server = http.createServer(async (req, res) => {
     // Anslut till eller koppla från LocoNet: vem som helst vid panelen (samma villkor för alla); LocoBuffern ställer ägaren eller en administratör in.
     if(url.pathname==='/api/connection/mode'){switchConnection(data?.mode);dirty=true;return json(res,{connection:connectionView(),state:snapshot()});}
     if(url.pathname==='/api/connection/locobuffer'){connection.setLocobuffer(data);engine.log('connection-mode',`LocoBuffer inställd: ${data.device||'ingen'} · ${data.baud} baud · ${data.flow==='rtscts'?'RTS/CTS':'ingen flödeskontroll'}.`);dirty=true;return json(res,connectionView({devices:true}));}
+    // Vilken anslutning banan nås genom: LocoBuffern på USB eller BTLocoBridge över Bluetooth.
+    if(url.pathname==='/api/connection/adapter'){
+      const view=connection.setAdapter(data);
+      engine.log('connection-mode',view.adapter==='btlocobridge'
+        ?`BTLocoBridge inställd: ${view.btlocobridge.target||'ingen'}${view.btlocobridge.target&&!view.btlocobridge.target.startsWith('/dev/')?' · kanal '+view.btlocobridge.channel:''}.`
+        :`LocoBuffer inställd: ${view.locobuffer.device||'ingen'} · ${view.locobuffer.baud} baud · ${view.locobuffer.flow==='rtscts'?'RTS/CTS':'ingen flödeskontroll'}.`);
+      dirty=true;return json(res,connectionView({devices:true}));
+    }
     if(url.pathname==='/api/destinations'){const result=destinations.save(data,trainMeet.context?.stations||[]);dirty=true;return json(res,result);}
     if(url.pathname.startsWith('/api/trainmeet/')){
       const command={connect:'connect',configure:'configure',pair:'pair',refresh:'refresh',disconnect:'disconnect',stations:'stations',clearance:'clearance',movement:'movement'}[url.pathname.slice('/api/trainmeet/'.length)];
@@ -352,6 +360,20 @@ const server = http.createServer(async (req, res) => {
       if(updateCheck.kind==='render'){
         try{await updateCheck.startRender();}catch(e){return json(res,{error:'Render kunde inte starta bygget: '+(e?.message||e)},409);}
         engine.log('update','Render bygger '+(updateCheck.view().latest||'senaste versionen')+'. Webbdriften startar om när bygget är klart.');dirty=true;
+        return json(res,{started:true});
+      }
+      // En Mac eller PC: installationens eget update-skript, som kör installationsraden igen med den sparade
+      // token. Det startas fristående, för att överleva att installeraren stoppar och startar om TKL.
+      if(USER_KINDS.has(updateCheck.kind)){
+        const command=updateCheck.command;
+        const child=updateCheck.kind==='windows'
+          ?spawn(path.join(process.env.SystemRoot||'C:\\Windows','System32','WindowsPowerShell','v1.0','powershell.exe'),['-NoProfile','-WindowStyle','Hidden','-ExecutionPolicy','Bypass','-File',command],{detached:true,stdio:'ignore',windowsHide:true})
+          :spawn('/bin/sh',[command],{detached:true,stdio:'ignore'});
+        const failed=await new Promise(r=>{child.on('error',e=>r(e.message));child.on('spawn',()=>r(''));});
+        if(failed)return json(res,{error:'Uppdateringen kunde inte startas: '+failed},409);
+        child.unref();
+        updateCheck.startLocal();
+        engine.log('update','Uppdatering till '+(updateCheck.view().latest||'senaste versionen')+' startad. TKL startar om när den är installerad.');dirty=true;
         return json(res,{started:true});
       }
       // Pi:ns uppdateringstjänst heter som installationen (cda-tkl-update, tk-tkl-update för Träkvista).

@@ -9,7 +9,7 @@ parkopplas under Inställningar → TrainMeet. Utan server är TKL offline för 
 | Läge | Vad som händer |
 |---|---|
 | **Ej ansluten** (från början) | TKL väntar inte på LocoNet. Det du gör på panelen räknas som utfört och TKL ger sig själv återrapporten: en växel rapporterar det läge den fick order om, en signal det besked den fick. **Trafikspelets tåg kör TKL längs tågvägarna**, så att spåren blir belagda, tågen syns med sina nummer och tågvägen löses upp när tåget har kommit fram. Inget går ut på LocoNet. Automaten finns bara här. |
-| **Ansluten** | *Anslut till LocoNet*: TKL styr banan över en LocoBuffer på USB, som TKL själv startar gatewayen för (`scripts/locobuffer-gateway.mjs`, port 8913). Återrapporterna kommer från banan; tågen är de riktiga. |
+| **Ansluten** | *Anslut till LocoNet*: TKL styr banan över den inställda anslutningen — en LocoBuffer på USB eller en BTLocoBridge över Bluetooth (0.83.0) — som TKL själv startar gatewayen för (`scripts/locobuffer-gateway.mjs`, port 8913). Återrapporterna kommer från banan; tågen är de riktiga. |
 
 Kärnan, låsningen och reglerna är desamma i båda lägena; bara förbindelsen byts. Internt heter lägena `live` och
 `offline` (i `connection.json` och API:t).
@@ -87,10 +87,41 @@ TKL byter aldrig läge av sig självt. Försvinner LocoBuffern medan LocoNet är
 **LocoNet svarar inte**, alla fältlägen blir okända och TKL startar gatewayen igen, allt glesare upp till var 15:e
 sekund, tills LocoBuffern svarar eller någon kopplar från.
 
+## Två anslutningar: LocoBuffer och BTLocoBridge
+
+Banan nås på två sätt, och valet görs per installation under **Inställningar → Banan (LocoNet)**. Båda stationerna har
+båda valen; LocoNet är en buss, så en installation använder en anslutning i taget. Den andras inställning ligger kvar
+och kan väljas tillbaka utan att skrivas om.
+
+| | LocoBuffer (USB) | BTLocoBridge (Bluetooth) |
+|---|---|---|
+| Vad | En LocoBuffer-USB mellan datorn och LocoNet | Möllehems *Smartphone interface*, som JMRI kallar BT LocoBridge |
+| Ställs in med | Enhet under `/dev`, hastighet och flödeskontroll | Kortets Bluetooth-adress `AA:BB:CC:DD:EE:FF` och kanal (1 som standard) |
+| Hur TKL pratar | `scripts/serial-port.py`, 8N1 över serieporten | `scripts/bluetooth-port.py`, en RFCOMM-förbindelse till kortets serieprofil |
+| Raspberry Pi | Ja | Ja: para kortet med `bluetoothctl` först, ange sedan adressen |
+| Mac | Ja | Ja, men kortet paras i Bluetooth-inställningarna och anges som sin serieport, `/dev/cu.…`; kanalen används då inte |
+| Windows | Inte än | Inte än |
+
+Kortet paras alltid i datorn först; TKL ansluter bara till det och gör ingen egen parkoppling eller sökning. Över
+Bluetooth finns ingen hastighet eller flödeskontroll att ställa in — kortet sköter LocoNets timing, precis som
+LocoBuffern gör på USB. I övrigt är allt detsamma: samma telegramgräns, samma gateway på port 8913, samma avfrågning
+av spårledningarna och samma villkor för att byta läge.
+
+På en Raspberry Pi:
+
+```sh
+bluetoothctl                     # scan on … pair AA:BB:CC:DD:EE:FF … trust AA:BB:CC:DD:EE:FF … quit
+```
+
+Därefter: Inställningar → Banan (LocoNet) → **BTLocoBridge (Bluetooth)**, adressen, Spara anslutningen, och
+*Anslut till LocoNet*. Faller förbindelsen försöker TKL igen, allt glesare upp till var 15:e sekund, som för USB.
+
 ## Var LocoNet kan anslutas
 
-- **Raspberry Pi:** ja. Tjänsten `cda-tkl` ingår i gruppen `dialout` (sedan 0.78.0) för att nå serieporten.
-- **Mac:** ja, med LocoBuffern som `/dev/cu.usbserial-…` eller `/dev/cu.usbmodem…`.
+- **Raspberry Pi:** ja. Tjänsten `cda-tkl` ingår i gruppen `dialout` (sedan 0.78.0) för att nå serieporten, och
+  BTLocoBridge nås över RFCOMM när kortet är parat i systemet.
+- **Mac:** ja, med LocoBuffern som `/dev/cu.usbserial-…` eller `/dev/cu.usbmodem…`, och BTLocoBridge som sin parade
+  serieport `/dev/cu.…`.
 - **Windows:** inte än; serieporten läses med POSIX-verktyg.
 - **Webbdriften (Render):** nej, den har ingen LocoNet; TKL svarar alltid själv.
 
@@ -100,8 +131,8 @@ ansluten.
 
 ## Prov
 
-- `test/connection-mode.test.mjs`: läget, LocoBufferns värden, gatewayen som startas, stoppas och startas om, fallbacken
-  till ej ansluten, den fristående gatewayen, enhetslistan.
+- `test/connection-mode.test.mjs`: läget, anslutningarnas värden, valet mellan LocoBuffer och BTLocoBridge, gatewayen
+  som startas, stoppas och startas om, fallbacken till ej ansluten, den fristående gatewayen, enhetslistan.
 - `test/simulated-trains.test.mjs`: trafikspelets tåg (på linjen och uppställda, aldrig två gånger, nytt försök, inget
   när LocoNet är ansluten) och ett tåg som ställs på ett spår och kör ut.
 - `test/tracking-integration.mjs`: TKL, den egna återrapporten och en TrainMeet-server som processer; tåg 421 från

@@ -6,7 +6,8 @@
 # simulator started hidden at login and restarted if they stop, and a desktop shortcut
 # that opens the panel in Edge or Chrome (WebHID, for the Stream Deck). Run it again to
 # update; the settings and operating data are kept. No administrator rights are needed.
-# $env:CDA_TKL_TOKEN reads the package from a private repository instead (forks).
+# $env:TKL_TOKEN or $env:CDA_TKL_TOKEN reads the package from a private repository
+# instead (forks, and a station's own repository while it is private).
 # Everything runs in its own scope, so settings and variables do not leak into the
 # user's PowerShell session, and a failure is reported instead of closing the window.
 & {
@@ -16,6 +17,8 @@ $ProgressPreference = 'SilentlyContinue'
 
 $Repository = 'beahead-ab/cda-tkl-install'
 $Branch = if ($env:CDA_TKL_BRANCH) { $env:CDA_TKL_BRANCH } else { 'main' }
+# Samma två namn som install.sh läser, så Pi, Mac och PC tar emot samma token.
+$Token = if ($env:TKL_TOKEN) { $env:TKL_TOKEN } else { $env:CDA_TKL_TOKEN }
 $NodeMajor = 22
 $Temp = Join-Path ([IO.Path]::GetTempPath()) ('tkl-' + [Guid]::NewGuid())
 New-Item -ItemType Directory -Force -Path $Temp | Out-Null
@@ -31,8 +34,8 @@ try {
     if ($env:CDA_TKL_SOURCE) { Copy-Item $env:CDA_TKL_SOURCE $Archive }
     else {
       Write-Host 'Hämtar Charlottendal TKL …'
-      if ($env:CDA_TKL_TOKEN) {
-        Get-File "https://api.github.com/repos/$Repository/zipball/$Branch" $Archive @{ Authorization = "Bearer $env:CDA_TKL_TOKEN"; Accept = 'application/vnd.github+json' }
+      if ($Token) {
+        Get-File "https://api.github.com/repos/$Repository/zipball/$Branch" $Archive @{ Authorization = "Bearer $Token"; Accept = 'application/vnd.github+json' }
       } else {
         Get-File "https://github.com/$Repository/archive/refs/heads/$Branch.zip" $Archive
       }
@@ -99,6 +102,14 @@ try {
   }
   if (-not (Select-String -Path $EnvFile -Pattern '^CHARLOTTENDAL_INSTALL_KIND=' -Quiet)) { Add-Content -Path $EnvFile -Value 'CHARLOTTENDAL_INSTALL_KIND=windows' -Encoding UTF8 }
   if ($Identity['TKL_STATION'] -and $Identity['TKL_STATION'] -ne 'charlottendal' -and -not (Select-String -Path $EnvFile -Pattern '^CHARLOTTENDAL_STATION=' -Quiet)) { Add-Content -Path $EnvFile -Value ('CHARLOTTENDAL_STATION=' + $Identity['TKL_STATION']) -Encoding UTF8 }
+  # Privat förråd: spara samma token som installationen fick, så att Uppdatering i panelen ser nya versioner.
+  $TokenFile = Join-Path $App 'github-token'
+  if ($Token) { Set-Content -Path $TokenFile -Value $Token -Encoding ASCII }
+  if ((Test-Path $TokenFile) -and -not (Select-String -Path $EnvFile -Pattern '^CHARLOTTENDAL_GITHUB_TOKEN_FILE=' -Quiet)) { Add-Content -Path $EnvFile -Value ('CHARLOTTENDAL_GITHUB_TOKEN_FILE=' + $TokenFile) -Encoding UTF8 }
+  # Uppdateringen härifrån: panelens Uppdatera nu startar det här skriptet, som kör installationsraden igen.
+  $UpdateScript = Join-Path $App 'update.ps1'
+  Copy-Item (Join-Path $Source 'packaging\windows\update.ps1') $UpdateScript -Force
+  if (-not (Select-String -Path $EnvFile -Pattern '^CHARLOTTENDAL_UPDATE_COMMAND=' -Quiet)) { Add-Content -Path $EnvFile -Value ('CHARLOTTENDAL_UPDATE_COMMAND=' + $UpdateScript) -Encoding UTF8 }
   if ($Identity['TKL_REPOSITORY'] -and $Identity['TKL_REPOSITORY'] -ne 'beahead-ab/cda-tkl-install' -and -not (Select-String -Path $EnvFile -Pattern '^CHARLOTTENDAL_INSTALL_REPOSITORY=' -Quiet)) { Add-Content -Path $EnvFile -Value ('CHARLOTTENDAL_INSTALL_REPOSITORY=' + $Identity['TKL_REPOSITORY']) -Encoding UTF8 }
   Copy-Item -Force (Join-Path $Source 'packaging\windows\run.ps1') (Join-Path $App 'run.ps1')
 
